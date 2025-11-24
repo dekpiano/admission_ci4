@@ -1,0 +1,237 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Models\AdmissionModel;
+use App\Libraries\Timeago;
+use App\Libraries\Datethai;
+
+class NewAdmission extends BaseController
+{
+    protected $admissionModel;
+    protected $db;
+    protected $session;
+    protected $timeago;
+    protected $datethai;
+
+    public function __construct()
+    {
+        $this->admissionModel = new AdmissionModel();
+        $this->db = \Config\Database::connect();
+        $this->session = \Config\Services::session();
+        $this->timeago = new Timeago();
+        $this->datethai = new Datethai();
+        helper(['url', 'form']);
+    }
+
+    public function index()
+    {
+        $data['title'] = "ระบบรับสมัครนักเรียนออนไลน์";
+        $data['checkYear'] = $this->admissionModel->getOpenYear();
+        $data['systemStatus'] = $this->admissionModel->getSystemStatus();
+        $data['quotas'] = $this->admissionModel->getAllQuotas();
+        
+        return view('User/UserHome', $data);
+    }
+
+    public function pre_check($level = null)
+    {
+        if (!$level) {
+            return redirect()->to('new-admission');
+        }
+
+        $data['title'] = "ตรวจสอบสิทธิ์การสมัคร " . ($level == 1 ? "ม.1" : "ม.4");
+        $data['level'] = $level;
+        $data['checkYear'] = $this->admissionModel->getOpenYear();
+        
+        return view('User/UserPreCheck', $data);
+    }
+
+    public function check_id_card()
+    {
+        $idCard = $this->request->getPost('recruit_idCard');
+        $level = $this->request->getPost('level');
+        $year = $this->admissionModel->getOpenYear()->openyear_year;
+
+        if ($this->admissionModel->isIdCardRegistered($idCard, $year)) {
+            return redirect()->back()->withInput()->with('error', 'เลขบัตรประชาชนนี้ได้ทำการสมัครเรียนแล้ว กรุณาตรวจสอบสถานะ');
+        }
+
+        // Store ID Card in session to use in register form
+        $this->session->setFlashdata('pre_check_idCard', $idCard);
+        
+        return redirect()->to('new-admission/register/' . $level);
+    }
+
+    public function register($level = null)
+    {
+        if (!$level) {
+            return redirect()->to('new-admission');
+        }
+
+        // Check if ID Card is passed from pre-check
+        $preCheckIdCard = $this->session->getFlashdata('pre_check_idCard');
+        
+        // If no ID Card in session (direct access), redirect to pre-check
+        if (!$preCheckIdCard) {
+             return redirect()->to('new-admission/pre-check/' . $level);
+        }
+
+        $data['title'] = "สมัครเรียน " . ($level == 1 ? "ม.1" : "ม.4");
+        $data['level'] = $level;
+        $data['checkYear'] = $this->admissionModel->getOpenYear();
+        $data['quotas'] = $this->admissionModel->getAllQuotas(); // Filter in view or here
+        $data['preCheckIdCard'] = $preCheckIdCard; // Pass to view
+        
+        // Get courses based on level
+        $gradeLevel = ($level == 1) ? 'ม.ต้น' : 'ม.ปลาย';
+        $data['courses'] = $this->admissionModel->getCoursesByGradeLevel($gradeLevel);
+
+        return view('User/UserRegister', $data);
+    }
+
+    public function status()
+    {
+        $data['title'] = "ตรวจสอบสถานะการสมัคร";
+        return view('User/UserStatus', $data);
+    }
+
+    public function save_register()
+    {
+        $post = $this->request->getPost();
+        
+        // Basic Validation
+        if (!$this->validate([
+            'recruit_idCard' => 'required|min_length[13]|max_length[13]',
+            'recruit_firstName' => 'required',
+            'recruit_lastName' => 'required',
+            'recruit_category' => 'required'
+        ])) {
+            return redirect()->back()->withInput()->with('error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+        }
+
+        $year = $this->admissionModel->getOpenYear()->openyear_year;
+
+        // Check duplicate
+        if ($this->admissionModel->isIdCardRegistered($post['recruit_idCard'], $year)) {
+            return redirect()->to('new-admission/status')->with('error', 'คุณได้ลงทะเบียนแล้ว กรุณาตรวจสอบสถานะ');
+        }
+
+        // Generate ID
+        $recruit_id = $this->NumberID();
+
+        // Handle Birthday
+        $recruit_birthday = ($post['recruit_birthdayY'] - 543) . '-' . $post['recruit_birthdayM'] . '-' . $post['recruit_birthdayD'];
+
+        // Lookup Course Details for Rank 1 (Primary)
+        $courseDetails1 = $this->admissionModel->getCourseDetails($post['recruit_tpyeRoom1']);
+        $course_fullname = $courseDetails1 ? $courseDetails1->course_fullname : '';
+        $course_branch = $courseDetails1 ? $courseDetails1->course_branch : '';
+
+        // Handle Ranks for recruit_majorOrder (Format: ID|ID|ID)
+        $ranks = [];
+        if (!empty($post['recruit_tpyeRoom1'])) {
+            $ranks[] = $post['recruit_tpyeRoom1'];
+        }
+        if (!empty($post['recruit_tpyeRoom2'])) {
+            $ranks[] = $post['recruit_tpyeRoom2'];
+        }
+        if (!empty($post['recruit_tpyeRoom3'])) {
+            $ranks[] = $post['recruit_tpyeRoom3'];
+        }
+        $majorOrder = implode('|', $ranks);
+
+        // Prepare Data
+        $data_insert = [
+            'recruit_id'  => $recruit_id,
+            'recruit_year' => $year,
+            'recruit_regLevel' => $post['recruit_regLevel'],
+            'recruit_prefix' => $post['recruit_prefix'],
+            'recruit_firstName' => $post['recruit_firstName'],
+            'recruit_lastName' => $post['recruit_lastName'],
+            'recruit_idCard' => $post['recruit_idCard'],
+            'recruit_birthday' => $recruit_birthday,
+            'recruit_race' => $post['recruit_race'],
+            'recruit_nationality' => $post['recruit_nationality'],
+            'recruit_religion' => $post['recruit_religion'],
+            'recruit_phone' => $post['recruit_phone'],
+            'recruit_homeNumber' => $post['recruit_homeNumber'],
+            'recruit_homeGroup' => $post['recruit_homeGroup'],
+            'recruit_homeRoad' => $post['recruit_homeRoad'],
+            'recruit_homeSubdistrict' => $post['recruit_homeSubdistrict'],
+            'recruit_homedistrict' => $post['recruit_homedistrict'],
+            'recruit_homeProvince' => $post['recruit_homeProvince'],
+            'recruit_homePostcode' => $post['recruit_homePostcode'],
+            'recruit_oldSchool' => $post['recruit_oldSchool'],
+            'recruit_district' => $post['recruit_district'],
+            'recruit_province' => $post['recruit_province'],
+            'recruit_grade' => $post['recruit_grade'],
+            'recruit_category' => $post['recruit_category'],
+            'recruit_tpyeRoom' => $course_fullname,
+            'recruit_major' => $course_branch, 
+            'recruit_majorOrder' => $majorOrder,
+            'recruit_agegroup' => 0,
+            'recruit_status' => "รอการตรวจสอบ",
+            'recruit_date'    => date('Y-m-d H:i:s'),
+            'recruit_dateUpdate' => date('Y-m-d H:i:s'),
+            'recruit_statusSurrender' => 'Normal',
+            'recruit_StatusQuiz' => 'รอเข้าสอบ'
+        ];
+
+        // Handle Files
+        $file_fields = ['recruit_img', 'recruit_certificateEdu', 'recruit_copyidCard', 'recruit_copyAddress'];
+        $folder_map = [
+            'recruit_img' => 'img',
+            'recruit_certificateEdu' => 'certificate',
+            'recruit_copyidCard' => 'copyidCard',
+            'recruit_copyAddress' => 'copyAddress'
+        ];
+
+        foreach ($file_fields as $field) {
+            $file = $this->request->getFile($field);
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $folder = $folder_map[$field];
+                $path = 'uploads/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder . '/';
+                
+                if (!is_dir(FCPATH . $path)) {
+                    mkdir(FCPATH . $path, 0777, true);
+                }
+
+                $newName = $file->getRandomName();
+                $file->move(FCPATH . $path, $newName);
+                $data_insert[$field] = $newName;
+            }
+        }
+
+        // Insert
+        $this->db->transBegin();
+        $this->admissionModel->insert($data_insert);
+
+        if ($this->db->transStatus() === FALSE) {
+            $this->db->transRollback();
+            return redirect()->back()->withInput()->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+        } else {
+            $this->db->transCommit();
+            return redirect()->to('new-admission/status')->with('success', 'สมัครเรียนสำเร็จ! กรุณาตรวจสอบสถานะ');
+        }
+    }
+
+    private function NumberID()
+    {
+        $openyear = $this->admissionModel->getOpenYear();
+        $chk_id = $this->admissionModel->getLatestRecruitId();
+
+        if (empty($chk_id)) {
+            $year =  $openyear->openyear_year;
+            return $year . "0001";
+        } else {
+            if (strpos($chk_id->recruit_id, $openyear->openyear_year) === 0) {
+                 $number = substr($chk_id->recruit_id, strlen($openyear->openyear_year));
+                 $s = sprintf("%04d", $number + 1);
+                 return $openyear->openyear_year . $s;
+            } else {
+                 return $openyear->openyear_year . "0001";
+            }
+        }
+    }
+}
