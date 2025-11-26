@@ -4,7 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 
-class UserController extends BaseController
+class AdminControlUser extends BaseController
 {
     protected $db;
     protected $db_academic;
@@ -22,13 +22,13 @@ class UserController extends BaseController
         $data['title'] = 'จัดการผู้ใช้งาน';
         
         // Fetch Admins with Personnel Info
-        $builder = $this->db_academic->table('tb_admin_rloes');
+        $builder = $this->db->table('tb_admin_rloes');
         $builder->select('tb_admin_rloes.*, tb_personnel.pers_prefix, tb_personnel.pers_firstname, tb_personnel.pers_lastname, tb_personnel.pers_img, tb_personnel.pers_username');
         // Join across databases requires specifying database name if on same server, 
         // but CI4 Query Builder with multiple connections is tricky for joins.
         // Best to fetch admins first, then fetch personnel info, or use raw SQL if DBs are on same server.
         // Assuming same server:
-        $builder->join('skjacth_personnel.tb_personnel', 'skjacth_personnel.tb_personnel.pers_id = skjacth_academic.tb_admin_rloes.admin_rloes_userid');
+        $builder->join('skjacth_personnel.tb_personnel', 'skjacth_personnel.tb_personnel.pers_id = tb_admin_rloes.admin_rloes_userid');
         $data['users'] = $builder->get()->getResult();
 
         return view('Admin/PageAdminUser/PageAdminUserIndex', $data);
@@ -59,9 +59,10 @@ class UserController extends BaseController
     {
         $userId = $this->request->getPost('user_id');
         $role = $this->request->getPost('role'); // e.g., 'Super Admin', 'Staff'
+        $position = $this->request->getPost('position');
         
         // Check if already exists
-        $exists = $this->db_academic->table('tb_admin_rloes')->where('admin_rloes_userid', $userId)->countAllResults();
+        $exists = $this->db->table('tb_admin_rloes')->where('admin_rloes_userid', $userId)->countAllResults();
         
         if ($exists > 0) {
             return $this->response->setJSON(['success' => false, 'msg' => 'ผู้ใช้งานนี้มีสิทธิ์อยู่แล้ว']);
@@ -71,17 +72,17 @@ class UserController extends BaseController
             'admin_rloes_userid' => $userId,
             'admin_rloes_status' => $role,
             'admin_rloes_nanetype' => 'Admin', // Default type
-            'admin_rloes_academic_position' => ''
+            'admin_rloes_academic_position' => $position
         ];
         
-        $this->db_academic->table('tb_admin_rloes')->insert($data);
+        $this->db->table('tb_admin_rloes')->insert($data);
         
         return $this->response->setJSON(['success' => true, 'msg' => 'เพิ่มผู้ใช้งานเรียบร้อยแล้ว']);
     }
 
     public function delete($id)
     {
-        $this->db_academic->table('tb_admin_rloes')->where('admin_rloes_id', $id)->delete();
+        $this->db->table('tb_admin_rloes')->where('admin_rloes_id', $id)->delete();
         return redirect()->to(base_url('skjadmin/users'))->with('success', 'ลบผู้ใช้งานเรียบร้อยแล้ว');
     }
 }

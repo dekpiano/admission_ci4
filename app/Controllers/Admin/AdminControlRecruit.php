@@ -5,7 +5,7 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
 
-class RecruitController extends BaseController
+class AdminControlRecruit extends BaseController
 {
     public function index()
     {
@@ -32,6 +32,7 @@ class RecruitController extends BaseController
 
         $data['years'] = $years;
         $data['selected_year'] = $selectedYear;
+        $data['title'] = 'ข้อมูลผู้สมัคร';
 
         return view('Admin/PageAdminRecruit/PageAdminRecruitIndex', $data);
     }
@@ -80,6 +81,7 @@ class RecruitController extends BaseController
             $data['recruit']['major_order_list'] = []; // Ensure it's always an array even if recruit_majorOrder is empty
         }
 
+        $data['title'] = 'รายละเอียดผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitView', $data);
     }
 
@@ -92,6 +94,7 @@ class RecruitController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException('ไม่พบข้อมูลผู้สมัคร ID: ' . $id);
         }
 
+        $data['title'] = 'แก้ไขข้อมูลผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitEdit', $data);
     }
 

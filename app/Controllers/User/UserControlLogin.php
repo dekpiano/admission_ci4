@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\User;
 
+use App\Controllers\BaseController;
 use App\Models\LoginModel;
 use App\Models\AdmissionModel;
 use Google_Client;
 use Google_Service_Oauth2;
 
-class Login extends BaseController
+class UserControlLogin extends BaseController
 {
     protected $loginModel;
     protected $admissionModel;

@@ -5,21 +5,9 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
 
-class Statistic extends BaseController
+class AdminControlStatistic extends BaseController
 {
     protected $db;
-    protected $session;
-    protected $title = "การรับสมัคร";
-    protected $admissionModel;
-
-    public function __construct()
-    {
-        $this->db = \Config\Database::connect(); // Keep for now for complex queries not yet in model
-        $this->session = \Config\Services::session();
-        $this->admissionModel = new AdmissionModel();
-        helper(['url']);
-    }
-
     private function checkAuth()
     {
         if (!$this->session->has('login_id')) {
@@ -116,101 +104,6 @@ class Statistic extends BaseController
 
         return view('AdminssionStatistic', $data);
     }
-Controllers\Admin;
-
-use App\Controllers\BaseController;
-
-class Statistic extends BaseController
-{
-    protected $db;
-    protected $session;
-    protected $title = "การรับสมัคร";
-
-    public function __construct()
-    {
-        $this->db = \Config\Database::connect();
-        $this->session = \Config\Services::session();
-        helper(['url']);
-    }
-
-    private function checkAuth()
-    {
-        if (!$this->session->has('login_id')) {
-            return redirect()->to('loginAdmin');
-        }
-        return null;
-    }
-
-    public function statistic_student($year)
-    {
-        if ($redir = $this->checkAuth()) return $redir;
-
-        $data['switch'] = $this->db->table("tb_onoffsys")->get()->getResult();
-        $data['title'] = $this->title;
-
-        $data['recruit'] = $this->db->table('tb_recruitstudent')
-            ->select('COUNT(recruit_year) AS StuALL,
-		COUNT(CASE WHEN recruit_status = "ผ่านการตรวจสอบ" THEN 1 END) AS Pass,
-		COUNT(CASE WHEN recruit_status != "ผ่านการตรวจสอบ" THEN 1 END) AS NoPass,
-		COUNT(CASE WHEN recruit_regLevel = "1" THEN 1 END) AS NumAllM1,
-		COUNT(CASE WHEN recruit_regLevel = "4" THEN 1 END) AS NumAllM4,
-		COUNT(
-			CASE 
-			WHEN recruit_regLevel = "2" ||  
-			recruit_regLevel = "3" ||
-			recruit_regLevel = "5" ||
-			recruit_regLevel = "6" 
-			THEN 1 END
-			) AS NumAllMother')
-            ->where('recruit_year', $year)
-            ->orderBy('recruit_id', 'DESC')
-            ->get()->getResult();
-
-        $data['checkYear'] = $this->db->table('tb_openyear')->get()->getResult();
-        $data['year'] = $this->db->table('tb_recruitstudent')->select('recruit_year')->groupBy('recruit_year')->orderBy('recruit_year', 'DESC')->get()->getResult();
-
-        $data['ChartNormal'] = $this->ChartNormal($year);
-
-        return view('admin/admin_admission_Statistic.php', $data);
-    }
-
-    public function ChartNormal($year)
-    {
-        $ChartNormal = $this->db->table('tb_recruitstudent')
-            ->select("recruit_date,
-			SUM(CASE WHEN recruit_major = 'วิทย์ - คณิต' AND recruit_regLevel = 1 THEN 1 ELSE 0 END) AS M1_Sci,
-			SUM(CASE WHEN recruit_major = 'วิทย์ - เทคโน' AND recruit_regLevel = 1 THEN 1 ELSE 0 END) AS M1_Teac,
-			SUM(CASE WHEN recruit_major = 'ภาษา' AND recruit_regLevel = 1 THEN 1 ELSE 0 END) AS M1_Lang,
-			SUM(CASE WHEN recruit_major = 'ดนตรี' AND recruit_regLevel = 1 THEN 1 ELSE 0 END) AS M1_Music,
-			SUM(CASE WHEN recruit_major = 'ศิลปะ' AND recruit_regLevel = 1 THEN 1 ELSE 0 END) AS M1_Art,
-			SUM(CASE WHEN recruit_major = 'นาฏศิลป์' AND recruit_regLevel = 1 THEN 1 ELSE 0 END) AS M1_Dance,
-			SUM(CASE WHEN recruit_major = 'การงาน' AND recruit_regLevel = 1 THEN 1 ELSE 0 END) AS M1_Career,
-			 SUM(CASE 
-				WHEN recruit_major IN ('วิทย์ - คณิต', 'วิทย์ - เทคโน', 'ภาษา', 'ดนตรี', 'ศิลปะ', 'นาฏศิลป์', 'การงาน') 
-				AND recruit_regLevel IN (1) 
-				THEN 1 ELSE 0 
-			END) AS Total_M1,
-			SUM(CASE WHEN recruit_major = 'วิทย์ - คณิต' AND recruit_regLevel = 4 THEN 1 ELSE 0 END) AS M4_Sci,
-			SUM(CASE WHEN recruit_major = 'วิทย์ - เทคโน' AND recruit_regLevel = 4 THEN 1 ELSE 0 END) AS M4_Teac,
-			SUM(CASE WHEN recruit_major = 'ภาษา' AND recruit_regLevel = 4 THEN 1 ELSE 0 END) AS M4_Lang,
-			SUM(CASE WHEN recruit_major = 'ดนตรี' AND recruit_regLevel = 4 THEN 1 ELSE 0 END) AS M4_Music,
-			SUM(CASE WHEN recruit_major = 'ศิลปะ' AND recruit_regLevel = 4 THEN 1 ELSE 0 END) AS M4_Art,
-			SUM(CASE WHEN recruit_major = 'นาฏศิลป์' AND recruit_regLevel = 4 THEN 1 ELSE 0 END) AS M4_Dance,
-			SUM(CASE WHEN recruit_major = 'การงาน' AND recruit_regLevel = 4 THEN 1 ELSE 0 END) AS M4_Career,
-			SUM(CASE 
-				WHEN recruit_major IN ('วิทย์ - คณิต', 'วิทย์ - เทคโน', 'ภาษา', 'ดนตรี', 'ศิลปะ', 'นาฏศิลป์', 'การงาน') 
-				AND recruit_regLevel IN (4) 
-				THEN 1 ELSE 0 
-			END) AS Total_M4")
-            ->where('recruit_year', $year)
-            ->where('recruit_category', 'normal')
-            ->where("recruit_date BETWEEN '2025-03-25' AND '2025-03-31'", NULL, FALSE)
-            ->groupBy('recruit_date')
-            ->get()->getResult();
-
-        return $ChartNormal;
-    }
-
     public function ChartStudentsRecruitM1()
     {
         $ChartStuAll = [];

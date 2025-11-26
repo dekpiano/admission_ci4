@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\User;
 
+use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
 use App\Libraries\Timeago;
 use App\Libraries\Datethai;
 use CodeIgniter\I18n\Time;
 
-class Admission extends BaseController
+class UserControlAdmission extends BaseController
 {
     protected $admissionModel;
     protected $db;

@@ -7,7 +7,7 @@ use App\Models\Admin\AdmissionModel;
 use App\Models\AdmissionModel as MainAdmissionModel; // For getSchool
 use App\Libraries\Timeago;
 
-class Admission extends BaseController
+class AdminControlAdmission extends BaseController
 {
     protected $adminAdmissionModel;
     protected $mainAdmissionModel;

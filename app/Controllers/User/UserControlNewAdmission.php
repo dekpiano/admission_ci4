@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\User;
 
+use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
 use App\Libraries\Timeago;
 use App\Libraries\Datethai;
 
-class NewAdmission extends BaseController
+class UserControlNewAdmission extends BaseController
 {
     protected $admissionModel;
     protected $db;

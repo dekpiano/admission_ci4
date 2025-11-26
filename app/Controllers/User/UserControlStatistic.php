@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\User;
 
 use App\Libraries\Datethai;
 
-class Statistic extends BaseController
+class UserControlStatistic extends BaseController
 {
     protected $db;
     protected $datethai;

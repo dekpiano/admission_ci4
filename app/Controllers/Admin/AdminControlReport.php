@@ -4,7 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 
-class ReportController extends BaseController
+class AdminControlReport extends BaseController
 {
     protected $db;
     protected $db_thailand;

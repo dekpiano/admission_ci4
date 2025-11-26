@@ -4,7 +4,7 @@
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">จัดการระบบ /</span> ผู้ใช้งาน (Users)</h4>
 
-    <div class="card">
+    <div class="card p-3">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">รายชื่อผู้ดูแลระบบ</h5>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
@@ -67,16 +67,18 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="searchPersonnel" class="form-label">ค้นหาบุคลากร (ชื่อ-สกุล)</label>
-                    <input type="text" id="searchPersonnel" class="form-control" placeholder="พิมพ์ชื่อเพื่อค้นหา...">
-                    <div id="searchResults" class="list-group mt-2" style="max-height: 200px; overflow-y: auto; display: none;"></div>
+                    <select id="searchPersonnel" class="form-select" style="width: 100%;"></select>
                 </div>
-                <input type="hidden" id="selectedUserId">
                 <div class="mb-3">
                     <label for="userRole" class="form-label">สิทธิ์การใช้งาน</label>
                     <select id="userRole" class="form-select">
                         <option value="Admin">Admin (ผู้ดูแลทั่วไป)</option>
                         <option value="Super Admin">Super Admin (ผู้ดูแลสูงสุด)</option>
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label for="userPosition" class="form-label">ตำแหน่ง</label>
+                    <input type="text" id="userPosition" class="form-control" placeholder="ระบุตำแหน่ง">
                 </div>
             </div>
             <div class="modal-footer">
@@ -90,6 +92,9 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
@@ -98,75 +103,61 @@
                 "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json"
             }
         });
+
+        // Initialize Select2
+        $('#searchPersonnel').select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#addUserModal'),
+            placeholder: 'พิมพ์ชื่อเพื่อค้นหา...',
+            allowClear: true,
+            minimumInputLength: 2,
+            ajax: {
+                url: '<?= base_url('skjadmin/users/search') ?>',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term // search term
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            }
+        });
     });
-
-    let searchTimeout;
-    const searchInput = document.getElementById('searchPersonnel');
-    const resultsDiv = document.getElementById('searchResults');
-
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        const term = this.value;
-        
-        if (term.length < 2) {
-            resultsDiv.style.display = 'none';
-            return;
-        }
-
-        searchTimeout = setTimeout(() => {
-            fetch(`<?= base_url('skjadmin/users/search') ?>?term=${term}`)
-                .then(response => response.json())
-                .then(data => {
-                    resultsDiv.innerHTML = '';
-                    if (data.length > 0) {
-                        data.forEach(item => {
-                            const a = document.createElement('a');
-                            a.className = 'list-group-item list-group-item-action';
-                            a.href = '#';
-                            a.textContent = item.text;
-                            a.onclick = (e) => {
-                                e.preventDefault();
-                                selectUser(item.id, item.text);
-                            };
-                            resultsDiv.appendChild(a);
-                        });
-                        resultsDiv.style.display = 'block';
-                    } else {
-                        resultsDiv.style.display = 'none';
-                    }
-                });
-        }, 500);
-    });
-
-    function selectUser(id, name) {
-        document.getElementById('selectedUserId').value = id;
-        searchInput.value = name;
-        resultsDiv.style.display = 'none';
-    }
 
     function saveUser() {
-        const userId = document.getElementById('selectedUserId').value;
-        const role = document.getElementById('userRole').value;
+        const userId = $('#searchPersonnel').val();
+        const role = $('#userRole').val();
+        const position = $('#userPosition').val();
 
         if (!userId) {
             Swal.fire('แจ้งเตือน', 'กรุณาเลือกบุคลากร', 'warning');
             return;
         }
 
-        fetch('<?= base_url('skjadmin/users/create') ?>', {
+        $.ajax({
+            url: '<?= base_url('skjadmin/users/create') ?>',
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
+            data: {
+                user_id: userId,
+                role: role,
+                position: position
             },
-            body: `user_id=${userId}&role=${role}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire('สำเร็จ', data.msg, 'success').then(() => location.reload());
-            } else {
-                Swal.fire('ผิดพลาด', data.msg, 'error');
+            success: function(response) {
+                if (response.success) {
+                    $('#addUserModal').modal('hide');
+                    Swal.fire('สำเร็จ', response.msg, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('ผิดพลาด', response.msg, 'error');
+                }
+            },
+            error: function() {
+                Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
             }
         });
     }

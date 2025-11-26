@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\User;
 
+use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
 use App\Models\LoginModel;
 use App\Models\ConfirmModel;
 use App\Libraries\Datethai;
 
-class Confirm extends BaseController
+class UserControlConfirm extends BaseController
 {
     protected $admissionModel;
     protected $loginModel;

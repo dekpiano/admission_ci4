@@ -4,7 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 
-class SettingController extends BaseController
+class AdminControlSetting extends BaseController
 {
     protected $db;
     protected $session;

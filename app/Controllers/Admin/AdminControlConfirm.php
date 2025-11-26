@@ -4,7 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 
-class Confirm extends BaseController
+class AdminControlConfirm extends BaseController
 {
     protected $db;
     protected $session;

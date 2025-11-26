@@ -5,7 +5,7 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\QuotaModel;
 
-class QuotaController extends BaseController
+class AdminControlQuota extends BaseController
 {
     public function index()
     {
@@ -73,12 +73,14 @@ class QuotaController extends BaseController
         }
 
         $data['quotas'] = $quotas;
+        $data['title'] = 'การจัดการโควต้า';
         return view('Admin/PageAdminQuota/PageAdminQuotaIndex', $data);
     }
 
     public function add()
     {
-        return view('Admin/PageAdminQuota/PageAdminQuotaAdd');
+        $data['title'] = 'เพิ่มโควต้า';
+        return view('Admin/PageAdminQuota/PageAdminQuotaAdd', $data);
     }
 
     public function create()
@@ -106,6 +108,7 @@ class QuotaController extends BaseController
         if (empty($data['quota'])) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('ไม่พบข้อมูลโควต้าสำหรับ ID: ' . $id);
         }
+        $data['title'] = 'แก้ไขโควต้า';
         return view('Admin/PageAdminQuota/PageAdminQuotaEdit', $data);
     }
 

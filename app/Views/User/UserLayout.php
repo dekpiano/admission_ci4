@@ -24,6 +24,7 @@
       href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
       rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=K2D:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
@@ -39,7 +40,7 @@
     <!-- Page CSS -->
     <style>
         body {
-            font-family: 'Prompt', 'Public Sans', sans-serif;
+            font-family: 'K2D', 'Prompt', 'Public Sans', sans-serif;
         }
         
         /* Pastel Blue Theme Overrides */

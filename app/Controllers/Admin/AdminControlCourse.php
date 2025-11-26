@@ -5,18 +5,20 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\CourseModel;
 
-class CourseController extends BaseController
+class AdminControlCourse extends BaseController
 {
     public function index()
     {
         $model = new CourseModel();
         $data['courses'] = $model->findAll();
+        $data['title'] = 'การจัดการหลักสูตร';
         return view('Admin/PageAdminCourse/PageAdminCourseIndex', $data);
     }
 
     public function add()
     {
-        return view('Admin/PageAdminCourse/PageAdminCourseAdd');
+        $data['title'] = 'เพิ่มหลักสูตร';
+        return view('Admin/PageAdminCourse/PageAdminCourseAdd', $data);
     }
 
     public function create()
@@ -40,6 +42,7 @@ class CourseController extends BaseController
         if (empty($data['course'])) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('ไม่พบข้อมูลหลักสูตรสำหรับ ID: ' . $id);
         }
+        $data['title'] = 'แก้ไขหลักสูตร';
         return view('Admin/PageAdminCourse/PageAdminCourseEdit', $data);
     }
 

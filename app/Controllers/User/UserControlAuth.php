@@ -12,7 +12,7 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
-class UserAuth extends \App\Controllers\BaseController
+class UserControlAuth extends \App\Controllers\BaseController
 {
     private $googleClient = null;
     private $GoogleButton = "";
@@ -95,8 +95,8 @@ class UserAuth extends \App\Controllers\BaseController
     public function googleCallback()
     {
         $session = session();
-        $DB_Academic = \Config\Database::connect('academic'); // Academic database
-        $DBrloes = $DB_Academic->table('tb_admin_rloes');
+        $DB_Admission = \Config\Database::connect(); // Admission database (Default)
+        $DBrloes = $DB_Admission->table('tb_admin_rloes');
         $DB_Personnel = \Config\Database::connect('skjpers'); // Personnel database
         $DBPers = $DB_Personnel->table('tb_personnel');     
         
@@ -174,8 +174,8 @@ class UserAuth extends \App\Controllers\BaseController
 
     private function setUserSession($user)
     {
-        $DB_Academic = \Config\Database::connect('academic');
-        $DBrloes = $DB_Academic->table('tb_admin_rloes');
+        $DB_Admission = \Config\Database::connect();
+        $DBrloes = $DB_Admission->table('tb_admin_rloes');
         
         // Fetch roles if any
         $User2 = $DBrloes->select('admin_rloes_status,GROUP_CONCAT(admin_rloes_nanetype) AS rloesAll')

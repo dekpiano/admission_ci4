@@ -15,7 +15,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Dashboard - Admin | SKJ Admission</title>
+    <title><?= isset($title) ? $title : 'Dashboard' ?> - Admin | SKJ Admission</title>
 
     <meta name="description" content="" />
 
@@ -107,6 +107,12 @@
               </a>
             </li>
 
+            <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/reports') !== false) ? 'active' : '' ?>">
+              <a href="<?= site_url('skjadmin/reports') ?>" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
+                <div data-i18n="Reports">รายงาน/พิมพ์</div>
+              </a>
+            </li>
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">System</span>
             </li>
@@ -133,16 +139,10 @@
             <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/users') !== false) ? 'active' : '' ?>">
               <a href="<?= site_url('skjadmin/users') ?>" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-user-check"></i>
-                <div data-i18n="Users">ผู้ใช้งาน</div>
+                <div data-i18n="Users">จัดการผู้ใช้งาน</div>
               </a>
             </li>
 
-            <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/reports') !== false) ? 'active' : '' ?>">
-              <a href="<?= site_url('skjadmin/reports') ?>" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
-                <div data-i18n="Reports">รายงาน/พิมพ์</div>
-              </a>
-            </li>
 
           </ul>
         </aside>
@@ -206,7 +206,7 @@
                       <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="auth-login-basic.html">
+                      <a class="dropdown-item" href="<?= site_url('admin/logout') ?>">
                         <i class="bx bx-power-off me-2"></i>
                         <span class="align-middle">Log Out</span>
                       </a>
