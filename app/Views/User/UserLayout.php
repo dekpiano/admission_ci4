@@ -202,7 +202,7 @@
               <span class="menu-header-text">เจ้าหน้าที่</span>
             </li>
             <li class="menu-item">
-              <a href="<?= base_url('login') ?>" class="menu-link">
+              <a href="<?= base_url('auth/login') ?>" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-lock-alt"></i>
                 <div data-i18n="Login">เข้าสู่ระบบ</div>
               </a>

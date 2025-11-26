@@ -44,55 +44,12 @@ class Login extends BaseController
 
     public function login_student()
     {
-        $data['checkYear'] = $this->admissionModel->getOpenYear();
-        $data['GoogleButton'] = $this->GoogleButton;
-        return view('login/login_main.php', $data);
-    }
-
-    public function login_main()
-    {
-        $data['checkYear'] = $this->admissionModel->getOpenYear();
-        $data['GoogleButton'] = $this->GoogleButton;
-        return view('login/login_admin.php', $data);
+        return redirect()->to(base_url('auth/login'));
     }
 
     public function login_admin()
     {
-        $data['checkYear'] = $this->admissionModel->getOpenYear();
-        $year = $this->admissionModel->getOpenYear();
-
-        if ($this->request->getGet('code')) {
-            if (isset($this->googleClient)) {
-                $token = $this->googleClient->fetchAccessTokenWithAuthCode($this->request->getGet('code'));
-                $this->googleClient->setAccessToken($token);
-
-                $google_oauth = new Google_Service_Oauth2($this->googleClient);
-                $google_account_info = $google_oauth->userinfo->get();
-
-                $DBpers = \Config\Database::connect('skjpers');
-                $result = $DBpers->table('tb_personnel')->where('pers_username', $google_account_info->email)->get()->getRow();
-                
-                if ($result) {
-                    $this->session->set([
-                        'login_id' => $result->pers_id,
-                        'fullname' => $result->pers_prefix . $result->pers_firstname . ' ' . $result->pers_lastname,
-                        'status' => 'user',
-                        'permission_menu' => $result->pers_workother_id,
-                        'user_img' => $result->pers_img,
-                        'year' => $year->openyear_year
-                    ]);
-                    return redirect()->to('admin/Recruitment/' . $data['checkYear']->openyear_year);
-                } else {
-                     // Handle user not found
-                     return redirect()->to('loginAdmin')->with('error', 'User not found');
-                }
-            }
-        } else {
-             if (isset($this->googleClient)) {
-                $auth_url = $this->googleClient->createAuthUrl();
-                return redirect()->to($auth_url);
-             }
-        }
+        return redirect()->to(base_url('auth/login'));
     }
 
     public function validlogin()
@@ -116,9 +73,9 @@ class Login extends BaseController
                 'year' => $year->openyear_year
             ]);
 
-            return redirect()->to('admin/Recruitment/' . $this->request->getPost('openyear_year'));
+            return redirect()->to('skjadmin'); // Redirect to new admin dashboard
         } else {
-            return redirect()->to('welcome');
+            return redirect()->to('auth/login')->with('error', 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
         }
     }
 
