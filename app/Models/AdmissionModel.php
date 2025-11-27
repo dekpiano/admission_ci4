@@ -13,7 +13,7 @@ class AdmissionModel extends Model
         'recruit_idCard', 'recruit_birthday', 'recruit_race', 'recruit_nationality', 'recruit_religion', 'recruit_phone',
         'recruit_homeNumber', 'recruit_homeGroup', 'recruit_homeRoad', 'recruit_homeSubdistrict', 'recruit_homedistrict',
         'recruit_homeProvince', 'recruit_homePostcode', 'recruit_oldSchool', 'recruit_district', 'recruit_province',
-        'recruit_grade', 'recruit_category', 'recruit_tpyeRoom', 'recruit_major', 'recruit_majorOrder', 'recruit_agegroup',
+        'recruit_grade', 'recruit_category', 'recruit_tpyeRoom', 'recruit_tpyeRoom_id', 'recruit_major', 'recruit_majorOrder', 'recruit_agegroup',
         'recruit_img', 'recruit_status', 'recruit_date', 'recruit_dateUpdate', 'recruit_address', 'recruit_copyAddress',
         'recruit_statusSurrender', 'recruit_StatusQuiz', 'recruit_certificateAbility', 'recruit_certificateEdu',
         'recruit_certificateEduB', 'recruit_copyidCard'
@@ -139,6 +139,11 @@ class AdmissionModel extends Model
     public function getAllQuotas()
     {
         return $this->db->table('tb_quota')->get()->getResult();
+    }
+
+    public function getAllCourses()
+    {
+        return $this->db->table('tb_course')->get()->getResult();
     }
     
     public function getCoursesByGradeLevel($level)

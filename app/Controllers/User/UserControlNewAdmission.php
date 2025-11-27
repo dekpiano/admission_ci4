@@ -31,6 +31,8 @@ class UserControlNewAdmission extends BaseController
         $data['checkYear'] = $this->admissionModel->getOpenYear();
         $data['systemStatus'] = $this->admissionModel->getSystemStatus();
         $data['quotas'] = $this->admissionModel->getAllQuotas();
+        $data['courses'] = $this->admissionModel->getAllCourses();
+        $data['datethai'] = $this->datethai; // Pass Datethai library to view
         
         return view('User/UserHome', $data);
     }
@@ -44,6 +46,8 @@ class UserControlNewAdmission extends BaseController
         $data['title'] = "ตรวจสอบสิทธิ์การสมัคร " . ($level == 1 ? "ม.1" : "ม.4");
         $data['level'] = $level;
         $data['checkYear'] = $this->admissionModel->getOpenYear();
+        $data['quotas'] = $this->admissionModel->getAllQuotas(); // Add quotas for menu generation
+        $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
         
         return view('User/UserPreCheck', $data);
     }
@@ -83,6 +87,7 @@ class UserControlNewAdmission extends BaseController
         $data['checkYear'] = $this->admissionModel->getOpenYear();
         $data['quotas'] = $this->admissionModel->getAllQuotas(); // Filter in view or here
         $data['preCheckIdCard'] = $preCheckIdCard; // Pass to view
+        $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
         
         // Get courses based on level
         $gradeLevel = ($level == 1) ? 'ม.ต้น' : 'ม.ปลาย';
@@ -91,9 +96,32 @@ class UserControlNewAdmission extends BaseController
         return view('User/UserRegister', $data);
     }
 
+    public function ajax_school_search()
+    {
+        $searchTerm = $this->request->getVar('q'); // select2 sends 'q' for search term
+
+        // The getSchool method already exists in AdmissionModel
+        $response = $this->admissionModel->getSchool(['search' => $searchTerm]);
+
+        // Re-format for Select2.js, which expects 'id' and 'text' keys
+        $select2_data = [];
+        foreach($response as $item) {
+            $select2_data[] = [
+                'id' => $item['value'],      // schoola_id
+                'text' => $item['label'],    // schoola_name
+                'amphur' => $item['amphur'],  // schoola_amphur
+                'province' => $item['province'] // schoola_province
+            ];
+        }
+
+        return $this->response->setJSON(['results' => $select2_data]);
+    }
+
     public function status()
     {
         $data['title'] = "ตรวจสอบสถานะการสมัคร";
+        $data['quotas'] = $this->admissionModel->getAllQuotas(); // Add quotas for menu generation
+        $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
         return view('User/UserStatus', $data);
     }
 
@@ -169,9 +197,10 @@ class UserControlNewAdmission extends BaseController
             'recruit_grade' => $post['recruit_grade'],
             'recruit_category' => $post['recruit_category'],
             'recruit_tpyeRoom' => $course_fullname,
+            'recruit_tpyeRoom_id' => $post['recruit_tpyeRoom1'],
             'recruit_major' => $course_branch, 
             'recruit_majorOrder' => $majorOrder,
-            'recruit_agegroup' => 0,
+            'recruit_agegroup' => isset($post['recruit_agegroup']) ? $post['recruit_agegroup'] : 0,
             'recruit_status' => "รอการตรวจสอบ",
             'recruit_date'    => date('Y-m-d H:i:s'),
             'recruit_dateUpdate' => date('Y-m-d H:i:s'),
@@ -180,12 +209,12 @@ class UserControlNewAdmission extends BaseController
         ];
 
         // Handle Files
-        $file_fields = ['recruit_img', 'recruit_certificateEdu', 'recruit_copyidCard', 'recruit_copyAddress'];
+        $file_fields = ['recruit_img', 'recruit_certificateEdu', 'recruit_certificateEduB', 'recruit_copyidCard'];
         $folder_map = [
             'recruit_img' => 'img',
             'recruit_certificateEdu' => 'certificate',
-            'recruit_copyidCard' => 'copyidCard',
-            'recruit_copyAddress' => 'copyAddress'
+            'recruit_certificateEduB' => 'certificate',
+            'recruit_copyidCard' => 'copyidCard'
         ];
 
         foreach ($file_fields as $field) {

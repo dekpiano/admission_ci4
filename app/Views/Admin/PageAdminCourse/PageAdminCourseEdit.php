@@ -27,6 +27,10 @@
                 </select>
                 <label for="course_gradelevel">ระดับชั้น</label>
             </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="course_age" name="course_age" value="<?= esc($course['course_age'] ?? '') ?>" placeholder="ระบุอายุเป็นตัวเลข คั่นด้วยเครื่องหมายจุลภาค (,) เช่น 13,14,15,16">
+                <label for="course_age">ช่วงอายุ (ระบุตัวเลข เช่น 13,14,15)</label>
+            </div>
             <div class="mt-3">
                 <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
                 <a href="<?= site_url('skjadmin/courses') ?>" class="btn btn-secondary">ยกเลิก</a>

@@ -29,6 +29,7 @@ class AdminControlCourse extends BaseController
             'course_initials' => $this->request->getPost('course_initials'),
             'course_branch' => $this->request->getPost('course_branch'),
             'course_gradelevel' => $this->request->getPost('course_gradelevel'),
+            'course_age' => $this->request->getPost('course_age'),
         ];
         $model->insert($data);
         return redirect()->to(site_url('skjadmin/courses'))->with('success', 'เพิ่มหลักสูตรใหม่สำเร็จ');
@@ -54,6 +55,7 @@ class AdminControlCourse extends BaseController
             'course_initials' => $this->request->getPost('course_initials'),
             'course_branch' => $this->request->getPost('course_branch'),
             'course_gradelevel' => $this->request->getPost('course_gradelevel'),
+            'course_age' => $this->request->getPost('course_age'),
         ];
         $model->update($id, $data);
         return redirect()->to(site_url('skjadmin/courses'))->with('success', 'อัปเดตหลักสูตรสำเร็จ');

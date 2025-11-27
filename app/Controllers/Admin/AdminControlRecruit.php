@@ -24,7 +24,7 @@ class AdminControlRecruit extends BaseController
         // Join with Quota table to get readable category names
         $data['recruits'] = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials')
                                   ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left')
-                                  ->join('tb_course', 'tb_course.course_fullname = tb_recruitstudent.recruit_tpyeRoom', 'left')
+                                  ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                                   ->where('recruit_year', $selectedYear)
                                   ->groupBy('tb_recruitstudent.recruit_id')
                                   ->orderBy('recruit_id', 'DESC')
@@ -42,7 +42,9 @@ class AdminControlRecruit extends BaseController
         $model = new AdmissionModel();
         $courseModel = new \App\Models\CourseModel(); 
         
-        $data['recruit'] = $model->find($id);
+        $data['recruit'] = $model->select('tb_recruitstudent.*, tb_course.course_fullname as course_name_joined')
+                                 ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+                                 ->find($id);
 
         if (empty($data['recruit'])) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('ไม่พบข้อมูลผู้สมัคร ID: ' . $id);
@@ -94,6 +96,7 @@ class AdminControlRecruit extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException('ไม่พบข้อมูลผู้สมัคร ID: ' . $id);
         }
 
+        $data['courses'] = $model->getAllCourses();
         $data['title'] = 'แก้ไขข้อมูลผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitEdit', $data);
     }
@@ -101,6 +104,17 @@ class AdminControlRecruit extends BaseController
     public function update($id = null)
     {
         $model = new AdmissionModel();
+        $courseModel = new \App\Models\CourseModel();
+
+        // Get Course Name from ID for backward compatibility (optional but recommended)
+        $courseId = $this->request->getPost('recruit_tpyeRoom_id');
+        $courseName = '';
+        if ($courseId) {
+            $course = $courseModel->find($courseId);
+            if ($course) {
+                $courseName = $course['course_fullname'];
+            }
+        }
 
         $data = [
             'recruit_idCard' => $this->request->getPost('recruit_idCard'),
@@ -113,7 +127,8 @@ class AdminControlRecruit extends BaseController
             'recruit_grade' => $this->request->getPost('recruit_grade'),
             'recruit_regLevel' => $this->request->getPost('recruit_regLevel'),
             'recruit_category' => $this->request->getPost('recruit_category'),
-            'recruit_tpyeRoom' => $this->request->getPost('recruit_tpyeRoom'),
+            'recruit_tpyeRoom' => $courseName, // Keep text for legacy
+            'recruit_tpyeRoom_id' => $courseId, // New ID
             'recruit_status' => $this->request->getPost('recruit_status'),
             'recruit_homeNumber' => $this->request->getPost('recruit_homeNumber'),
             'recruit_homeGroup' => $this->request->getPost('recruit_homeGroup'),
@@ -185,7 +200,7 @@ class AdminControlRecruit extends BaseController
         $builder = $model->builder();
         $builder->select('tb_recruitstudent.recruit_id')
                 ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left')
-                ->join('tb_course', 'tb_course.course_fullname = tb_recruitstudent.recruit_tpyeRoom', 'left')
+                ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                 ->where('tb_recruitstudent.recruit_year', $year);
 
         if (!empty($searchValue)) {
@@ -196,7 +211,7 @@ class AdminControlRecruit extends BaseController
                 ->orLike('tb_recruitstudent.recruit_category', $searchValue)
                 ->orLike('tb_quota.quota_explain', $searchValue)
                 ->orLike('tb_course.course_initials', $searchValue)
-                ->orLike('tb_recruitstudent.recruit_tpyeRoom', $searchValue)
+                ->orLike('tb_course.course_fullname', $searchValue)
                 ->groupEnd();
         }
 
@@ -204,9 +219,9 @@ class AdminControlRecruit extends BaseController
 
         // 3. Fetch Data
         $builder = $model->builder();
-        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_initials, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status')
+        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_initials, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status')
                 ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left')
-                ->join('tb_course', 'tb_course.course_fullname = tb_recruitstudent.recruit_tpyeRoom', 'left')
+                ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                 ->where('tb_recruitstudent.recruit_year', $year);
 
         if (!empty($searchValue)) {
@@ -217,7 +232,7 @@ class AdminControlRecruit extends BaseController
                 ->orLike('tb_recruitstudent.recruit_category', $searchValue)
                 ->orLike('tb_quota.quota_explain', $searchValue)
                 ->orLike('tb_course.course_initials', $searchValue)
-                ->orLike('tb_recruitstudent.recruit_tpyeRoom', $searchValue)
+                ->orLike('tb_course.course_fullname', $searchValue)
                 ->groupEnd();
         }
 
@@ -257,7 +272,7 @@ class AdminControlRecruit extends BaseController
                 'recruit_id' => esc($recruit['recruit_id'] ?? ''),
                 'name' => '<strong>' . esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '') . ' ' . ($recruit['recruit_lastName'] ?? '')) . '</strong>',
                 'category' => esc($recruit['quota_explain'] ?? $recruit['recruit_category']),
-                'course' => esc($recruit['course_initials'] ?? $recruit['recruit_tpyeRoom']),
+                'course' => esc($recruit['course_initials'] ?? $recruit['course_fullname'] ?? $recruit['recruit_tpyeRoom']),
                 'status' => '<span class="badge ' . $statusClass . ' me-1">' . esc($status) . '</span>',
                 'actions' => $actions
             ];
@@ -277,8 +292,9 @@ class AdminControlRecruit extends BaseController
     {
         $db = \Config\Database::connect();
         $model = new AdmissionModel();
-        $recruit = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_quota.quota_key')
+        $recruit = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_quota.quota_key, tb_course.course_fullname as course_name_joined')
                          ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left')
+                         ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                          ->find($id);
 
         if (!$recruit) {
@@ -385,7 +401,9 @@ class AdminControlRecruit extends BaseController
             $html .= '</div>';
         } else {
             $html .= '<div style="position:absolute;top:570px;left:200px; width:100%">';
-            $html .= "ลำดับที่ 1 ".$recruit['recruit_tpyeRoom']. ' สาขา '.$recruit['recruit_major'];
+            // Use course_name_joined if available, otherwise fallback to recruit_tpyeRoom
+            $courseDisplay = !empty($recruit['course_name_joined']) ? $recruit['course_name_joined'] : $recruit['recruit_tpyeRoom'];
+            $html .= "ลำดับที่ 1 ".$courseDisplay. ' สาขา '.$recruit['recruit_major'];
             $html .= '</div>';
         }
 

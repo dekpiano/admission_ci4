@@ -24,6 +24,29 @@
                                 onchange="updateStatus('onoff_regis', this.checked)">
                         </div>
                     </div>
+                    
+                    <!-- Date Settings -->
+                    <div class="bg-label-secondary p-3 rounded mb-4">
+                        <small class="fw-bold d-block mb-2"><i class='bx bx-time-five'></i> กำหนดช่วงเวลาเปิดรับสมัครอัตโนมัติ</small>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label for="dateOpen" class="form-label text-muted small mb-1">วันเปิดรับสมัคร</label>
+                                <input type="datetime-local" class="form-control form-control-sm" id="dateOpen" 
+                                    value="<?= isset($settings->onoff_datetime_regis_open) ? date('Y-m-d\TH:i', strtotime($settings->onoff_datetime_regis_open)) : '' ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="dateClose" class="form-label text-muted small mb-1">วันปิดรับสมัคร</label>
+                                <input type="datetime-local" class="form-control form-control-sm" id="dateClose" 
+                                    value="<?= isset($settings->onoff_datetime_regis_close) ? date('Y-m-d\TH:i', strtotime($settings->onoff_datetime_regis_close)) : '' ?>">
+                            </div>
+                            <div class="col-12 text-end mt-2">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="updateDates()">
+                                    <i class='bx bx-save me-1'></i> บันทึกเวลา
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <hr>
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <div>
@@ -62,16 +85,35 @@
                     <div class="mb-3">
                         <label for="selectYear" class="form-label">ปีการศึกษาปัจจุบันที่เปิดรับ</label>
                         <select class="form-select" id="selectYear" onchange="updateYear(this.value)">
-                            <?php foreach ($years as $y): ?>
-                                <option value="<?= $y->recruit_year ?>" <?= ($yearConfig->openyear_year == $y->recruit_year) ? 'selected' : '' ?>>
-                                    <?= $y->recruit_year ?>
+                            <?php 
+                            // Collect all available years
+                            $available_years = [];
+                            if(!empty($years)) {
+                                foreach($years as $y) {
+                                    $available_years[] = $y->recruit_year;
+                                }
+                            }
+                            
+                            // Add current config year
+                            if(isset($yearConfig->openyear_year)) {
+                                $available_years[] = $yearConfig->openyear_year;
+                            }
+                            
+                            // Add current Thai year and next year
+                            $currentThaiYear = date('Y') + 543;
+                            $available_years[] = $currentThaiYear;
+                            $available_years[] = $currentThaiYear + 1;
+                            
+                            // Unique and Sort Descending
+                            $available_years = array_unique($available_years);
+                            rsort($available_years);
+                            
+                            foreach ($available_years as $y_val): 
+                            ?>
+                                <option value="<?= $y_val ?>" <?= (isset($yearConfig->openyear_year) && $yearConfig->openyear_year == $y_val) ? 'selected' : '' ?>>
+                                    <?= $y_val ?>
                                 </option>
                             <?php endforeach; ?>
-                            <!-- Add next year option automatically if not exists -->
-                            <?php $nextYear = date('Y') + 543 + 1; ?>
-                            <?php if (!in_array($nextYear, array_column($years, 'recruit_year'))): ?>
-                                <option value="<?= $nextYear ?>"><?= $nextYear ?></option>
-                            <?php endif; ?>
                         </select>
                         <div class="form-text">การเปลี่ยนปีการศึกษาจะส่งผลต่อการแสดงผลข้อมูลในหน้าแรกและการออกเลขที่ใบสมัคร</div>
                     </div>
@@ -99,6 +141,38 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    function updateDates() {
+        const dateOpen = document.getElementById('dateOpen').value;
+        const dateClose = document.getElementById('dateClose').value;
+
+        fetch('<?= base_url('skjadmin/settings/update_dates') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `dateOpen=${dateOpen}&dateClose=${dateClose}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'บันทึกสำเร็จ',
+                    text: data.msg,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire('Error', 'เกิดข้อผิดพลาด', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+        });
+    }
+
     function updateStatus(field, mode) {
         fetch('<?= base_url('skjadmin/settings/update_status') ?>', {
             method: 'POST',

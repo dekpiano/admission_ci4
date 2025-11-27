@@ -43,47 +43,154 @@
             font-family: 'K2D', 'Prompt', 'Public Sans', sans-serif;
         }
         
-        /* Pastel Blue Theme Overrides */
+        /* Pastel Pink - Blue Theme Overrides */
         :root {
-            --bs-primary: #74b9ff;
-            --bs-primary-rgb: 116, 185, 255;
-            --bs-link-color: #74b9ff;
-            --bs-link-hover-color: #5aa0e8;
+            /* Primary Pink (Pastel) */
+            --bs-primary: #ff9eb5; 
+            --bs-primary-rgb: 255, 158, 181;
+            
+            /* Secondary Blue (Pastel) */
+            --bs-info: #84d2f6;
+            --bs-info-rgb: 132, 210, 246;
+
+            --bs-link-color: #ff9eb5;
+            --bs-link-hover-color: #ff7da0;
         }
         
+        /* Primary = Pink */
         .text-primary {
-            color: #74b9ff !important;
+            color: #ff9eb5 !important;
         }
-        
+        .bg-primary {
+            background-color: #ff9eb5 !important;
+        }
         .btn-primary {
-            background-color: #74b9ff;
-            border-color: #74b9ff;
+            background-color: #ff9eb5;
+            border-color: #ff9eb5;
             color: #fff;
         }
-        
         .btn-primary:hover {
-            background-color: #5aa0e8 !important;
-            border-color: #5aa0e8 !important;
+            background-color: #ff85a3 !important;
+            border-color: #ff85a3 !important;
         }
-
         .btn-outline-primary {
-            color: #74b9ff;
-            border-color: #74b9ff;
+            color: #ff9eb5;
+            border-color: #ff9eb5;
+        }
+        .btn-outline-primary:hover {
+            background-color: #ff9eb5;
+            border-color: #ff9eb5;
+            color: #fff;
         }
 
-        .btn-outline-primary:hover {
-            background-color: #74b9ff;
-            border-color: #74b9ff;
+        /* Info = Blue (Pastel) */
+        .text-info {
+            color: #84d2f6 !important;
+        }
+        .bg-info {
+            background-color: #84d2f6 !important;
+        }
+        .btn-info {
+            background-color: #84d2f6;
+            border-color: #84d2f6;
+            color: #fff;
+        }
+        .btn-info:hover {
+            background-color: #6cc3eb !important;
+            border-color: #6cc3eb !important;
+        }
+
+        /* Custom Pastel Classes */
+        .bg-pastel-pink {
+            background-color: #ff9eb5 !important;
+            color: #fff;
+        }
+        .text-pastel-pink {
+            color: #ff9eb5 !important;
         }
         
+        .bg-pastel-blue {
+            background-color: #84d2f6 !important;
+            color: #fff;
+        }
+        .text-pastel-blue {
+            color: #84d2f6 !important;
+        }
+
+        /* Form Focus */
         .form-control:focus, .form-select:focus {
-            border-color: #74b9ff;
-            box-shadow: 0 0 0 0.25rem rgba(116, 185, 255, 0.25);
+            border-color: #ff9eb5;
+            box-shadow: 0 0 0 0.25rem rgba(255, 158, 181, 0.25);
         }
         
         .page-item.active .page-link {
-            background-color: #74b9ff;
-            border-color: #74b9ff;
+            background-color: #ff9eb5;
+            border-color: #ff9eb5;
+        }
+        
+        /* Sidebar Customization */
+        #layout-menu {
+            background-color: #ff9eb5 !important; /* Pastel Pink */
+            /* Subtle Wave Line Pattern */
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='12' viewBox='0 0 40 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6q10-6 20 0t20 0' stroke='%23ffffff' stroke-width='2' fill='none' stroke-opacity='0.15'/%3E%3C/svg%3E");
+            background-size: 40px 12px;
+        }
+        
+        #layout-menu .menu-link {
+            color: #fff !important;
+        }
+        
+        #layout-menu .menu-item.active > .menu-link {
+            background-color: #fff !important;
+            color: #ff9eb5 !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        
+        #layout-menu .menu-item.active > .menu-link i {
+            color: #ff9eb5 !important;
+        }
+        
+        #layout-menu .menu-icon {
+            color: #fff !important;
+        }
+        
+        #layout-menu .menu-header-text {
+            color: rgba(255,255,255,0.8) !important;
+        }
+        
+        #layout-menu .app-brand-text {
+            color: #fff !important;
+        }
+        
+        /* Navbar Customization */
+        #layout-navbar {
+            background-color: #ff9eb5 !important; /* Pastel Pink */
+            /* Subtle Wave Line Pattern */
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='12' viewBox='0 0 40 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6q10-6 20 0t20 0' stroke='%23ffffff' stroke-width='2' fill='none' stroke-opacity='0.15'/%3E%3C/svg%3E");
+            background-size: 40px 12px;
+            color: #fff !important;
+        }
+
+        #layout-navbar .text-primary {
+            color: #fff !important;
+        }
+        
+        #layout-navbar .bx-menu {
+            color: #fff !important;
+        }
+        
+        #layout-navbar .nav-link {
+             color: #fff !important;
+        }
+        
+        #layout-navbar a {
+            color: #fff !important;
+        }
+        
+        /* Menu Active State Override from previous step to match new sidebar */
+        .menu-item.active > .menu-link {
+            color: #ff9eb5 !important;
+            background-color: #ffffff !important;
         }
     </style>
     <?= $this->renderSection('styles') ?>
@@ -130,20 +237,20 @@
                           <mask id="mask-2" fill="white">
                             <use xlink:href="#path-1"></use>
                           </mask>
-                          <use fill="currentColor" xlink:href="#path-1"></use>
+                          <use fill="#ffffff" xlink:href="#path-1"></use>
                           <g id="Path-3" mask="url(#mask-2)">
-                            <use fill="currentColor" xlink:href="#path-3"></use>
+                            <use fill="#ffffff" xlink:href="#path-3"></use>
                             <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-3"></use>
                           </g>
                           <g id="Path-4" mask="url(#mask-2)">
-                            <use fill="currentColor" xlink:href="#path-4"></use>
+                            <use fill="#ffffff" xlink:href="#path-4"></use>
                             <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-4"></use>
                           </g>
                         </g>
                         <g
                           id="Triangle"
                           transform="translate(19.000000, 11.000000) rotate(-300.000000) translate(-19.000000, -11.000000) ">
-                          <use fill="currentColor" xlink:href="#path-5"></use>
+                          <use fill="#ffffff" xlink:href="#path-5"></use>
                           <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-5"></use>
                         </g>
                       </g>
@@ -174,18 +281,60 @@
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">สมัครเรียน</span>
             </li>
-            <li class="menu-item <?= uri_string() == 'new-admission/pre-check/1' || uri_string() == 'new-admission/register/1' ? 'active' : '' ?>">
-              <a href="<?= base_url('new-admission/pre-check/1') ?>" class="menu-link">
+            <?php
+            // Logic to determine open levels, similar to UserHome.php
+            $open_levels = [];
+            
+            // Check System Status & Date Time
+            $is_system_open = false;
+            if (isset($systemStatus) && $systemStatus->onoff_regis == 'on') {
+                $is_system_open = true;
+                if (isset($systemStatus->onoff_datetime_regis_close)) {
+                    if (time() > strtotime($systemStatus->onoff_datetime_regis_close)) {
+                        $is_system_open = false;
+                    }
+                }
+            }
+
+            if ($is_system_open && !empty($quotas)) {
+                foreach ($quotas as $quota) {
+                    if (isset($quota->quota_status) && $quota->quota_status == 'on' && !empty($quota->quota_level)) {
+                        $level_string = $quota->quota_level;
+                        $levels_in_quota = [];
+                        
+                        if (strpos($level_string, '|') !== false) {
+                            $levels_in_quota = explode('|', $level_string);
+                        } elseif (strpos($level_string, ',') !== false) {
+                            $levels_in_quota = explode(',', $level_string);
+                        } else {
+                            $levels_in_quota = [$level_string];
+                        }
+                        
+                        foreach ($levels_in_quota as $level_str) {
+                            $level_num_char = preg_replace('/[^0-9]/', '', $level_str);
+                            if (is_numeric($level_num_char)) {
+                                $open_levels[] = intval($level_num_char);
+                            }
+                        }
+                    }
+                }
+            }
+            $open_levels = array_unique($open_levels);
+            sort($open_levels);
+
+            // Display menu items for open levels
+            foreach ($open_levels as $level_num):
+                $is_junior_high = $level_num <= 3;
+                $menu_link_level = $is_junior_high ? '1' : '4'; // The actual pre-check level (1 or 4)
+                $current_uri_level = (uri_string() == 'new-admission/pre-check/' . $menu_link_level && service('request')->getGet('level') == $level_num) || uri_string() == 'new-admission/register/' . $menu_link_level;
+            ?>
+            <li class="menu-item <?= $current_uri_level ? 'active' : '' ?>">
+              <a href="<?= base_url('new-admission/pre-check/' . $menu_link_level . '?level=' . $level_num) ?>" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-user-plus"></i>
-                <div data-i18n="M.1">ระดับชั้น ม.1</div>
+                <div data-i18n="M.<?= $level_num ?>">ระดับชั้น ม.<?= $level_num ?></div>
               </a>
             </li>
-            <li class="menu-item <?= uri_string() == 'new-admission/pre-check/4' || uri_string() == 'new-admission/register/4' ? 'active' : '' ?>">
-              <a href="<?= base_url('new-admission/pre-check/4') ?>" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-user-plus"></i>
-                <div data-i18n="M.4">ระดับชั้น ม.4</div>
-              </a>
-            </li>
+            <?php endforeach; ?>
 
             <!-- Status -->
             <li class="menu-header small text-uppercase">
@@ -229,7 +378,8 @@
               <!-- Search -->
               <div class="navbar-nav align-items-center">
                 <div class="nav-item d-flex align-items-center">
-                  <span class="fw-bold text-primary">ระบบรับสมัครนักเรียนออนไลน์ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</span>
+                  <span class="fw-bold text-primary d-none d-md-block">ระบบรับสมัครนักเรียนออนไลน์ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</span>
+                  <span class="fw-bold text-primary d-block d-md-none">ระบบรับสมัครนักเรียนใหม่ SKJ</span>
                 </div>
               </div>
               <!-- /Search -->
@@ -244,7 +394,7 @@
                     data-size="large"
                     data-show-count="true"
                     aria-label="Star themeselection/sneat-html-admin-template-free on GitHub"
-                    >ปีการศึกษา <?= date('Y')+543 ?></a
+                    >ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?></a
                   >
                 </li>
               </ul>

@@ -10,12 +10,13 @@
         <table class="table table-bordered" id="coursesTable">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>ชื่อเต็มหลักสูตร</th>
-              <th>ชื่อย่อ</th>
-              <th>สาขา</th>
-              <th>ระดับชั้น</th>
-              <th>Actions</th>
+              <th style="width: 5%;">ID</th>
+              <th style="width: 30%;">ชื่อเต็มหลักสูตร</th>
+              <th style="width: 15%;">ชื่อย่อ</th>
+              <th style="width: 10%;">สาขา</th>
+              <th style="width: 10%;">ระดับชั้น</th>
+              <th style="width: 15%;">ช่วงอายุ</th>
+              <th style="width: 5%;">Actions</th>
             </tr>
           </thead>
           <tbody class="table-border-bottom-0">
@@ -23,10 +24,11 @@
               <?php foreach ($courses as $course) : ?>
                 <tr>
                   <td><?= esc($course['course_id']) ?></td>
-                  <td><?= esc($course['course_fullname']) ?></td>
-                  <td><?= esc($course['course_initials']) ?></td>
+                  <td style="white-space: normal;"><?= esc($course['course_fullname']) ?></td>
+                  <td style="white-space: normal;"><?= esc($course['course_initials']) ?></td>
                   <td><?= esc($course['course_branch']) ?></td>
                   <td><?= esc($course['course_gradelevel']) ?></td>
+                  <td style="white-space: normal;"><?= esc($course['course_age'] ?? '-') ?></td>
                   <td>
                     <div class="dropdown">
                       <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">

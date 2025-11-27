@@ -136,12 +136,14 @@
               </a>
             </li>
 
-            <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/users') !== false) ? 'active' : '' ?>">
-              <a href="<?= site_url('skjadmin/users') ?>" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-user-check"></i>
-                <div data-i18n="Users">จัดการผู้ใช้งาน</div>
-              </a>
-            </li>
+<?php if (session()->get('status') === 'superadmin'): ?>
+<li class="menu-item <?= (strpos(uri_string(), 'skjadmin/users') !== false) ? 'active' : '' ?>">
+  <a href="<?= site_url('skjadmin/users') ?>" class="menu-link">
+    <i class="menu-icon tf-icons bx bx-user-check"></i>
+    <div data-i18n="Users">จัดการผู้ใช้งาน</div>
+  </a>
+</li>
+<?php endif; ?>
 
 
           </ul>
@@ -164,55 +166,46 @@
 
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
               <ul class="navbar-nav flex-row align-items-center ms-auto">
-                <!-- User -->
-                <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <div class="avatar avatar-online">
-                      <img src="<?= base_url('public/sneat-assets/img/avatars/1.png') ?>" alt class="w-px-40 h-auto rounded-circle" />
-                    </div>
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <div class="d-flex">
-                          <div class="flex-shrink-0 me-3">
-                            <div class="avatar avatar-online">
-                              <img src="<?= base_url('public/sneat-assets/img/avatars/1.png') ?>" alt class="w-px-40 h-auto rounded-circle" />
-                            </div>
-                          </div>
-                          <div class="flex-grow-1">
-                            <span class="fw-semibold d-block">Admin</span>
-                            <small class="text-muted">Admin</small>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="bx bx-user me-2"></i>
-                        <span class="align-middle">My Profile</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="bx bx-cog me-2"></i>
-                        <span class="align-middle">Settings</span>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="<?= site_url('admin/logout') ?>">
-                        <i class="bx bx-power-off me-2"></i>
-                        <span class="align-middle">Log Out</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
+<?php
+    // Retrieve user's position from tb_admin_rloes
+    $db = \Config\Database::connect();
+    $builderPos = $db->table('tb_admin_rloes');
+    $builderPos->select('admin_rloes_academic_position');
+    $builderPos->where('admin_rloes_userid', session()->get('user_id'));
+    $posRow = $builderPos->get()->getRow();
+    $userPosition = $posRow ? $posRow->admin_rloes_academic_position : '';
+?>
+<li class="nav-item navbar-dropdown dropdown-user dropdown">
+  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+    <div class="avatar avatar-online">
+      <img src="<?= base_url('public/sneat-assets/img/avatars/1.png') ?>" alt class="w-px-40 h-auto rounded-circle" />
+    </div>
+  </a>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li>
+      <a class="dropdown-item" href="#">
+        <div class="d-flex">
+          <div class="flex-shrink-0 me-3">
+            <div class="avatar avatar-online">
+              <img src="<?= base_url('public/sneat-assets/img/avatars/1.png') ?>" alt class="w-px-40 h-auto rounded-circle" />
+            </div>
+          </div>
+          <div class="flex-grow-1">
+            <span class="fw-semibold d-block"><?= session()->get('pers_firstname') ?> <?= session()->get('pers_lastname') ?></span>
+            <small class="text-muted"><?= session()->get('status') ?></small>
+          </div>
+        </div>
+      </a>
+    </li>
+    <li><div class="dropdown-divider"></div></li>
+    <li>
+      <a class="dropdown-item" href="<?= site_url('admin/logout') ?>">
+        <i class="bx bx-power-off me-2"></i>
+        <span class="align-middle">Log Out</span>
+      </a>
+    </li>
+  </ul>
+</li>
                 <!--/ User -->
               </ul>
             </div>

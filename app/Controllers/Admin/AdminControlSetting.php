@@ -83,4 +83,26 @@ class AdminControlSetting extends BaseController
         
         return $this->response->setJSON(['success' => true, 'msg' => 'บันทึกข้อความเรียบร้อยแล้ว']);
     }
+    public function update_dates()
+    {
+        $dateOpen = $this->request->getPost('dateOpen');
+        $dateClose = $this->request->getPost('dateClose');
+        
+        $updateData = [];
+        if (!empty($dateOpen)) {
+            $updateData['onoff_datetime_regis_open'] = date('Y-m-d H:i:s', strtotime($dateOpen));
+        } else {
+             $updateData['onoff_datetime_regis_open'] = null;
+        }
+
+        if (!empty($dateClose)) {
+            $updateData['onoff_datetime_regis_close'] = date('Y-m-d H:i:s', strtotime($dateClose));
+        } else {
+            $updateData['onoff_datetime_regis_close'] = null;
+        }
+        
+        $this->db->table('tb_onoffsys')->where('onoff_id', 1)->update($updateData);
+        
+        return $this->response->setJSON(['success' => true, 'msg' => 'บันทึกช่วงเวลาเรียบร้อยแล้ว']);
+    }
 }

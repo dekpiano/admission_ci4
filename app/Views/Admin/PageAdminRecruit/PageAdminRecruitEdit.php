@@ -85,8 +85,17 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="recruit_tpyeRoom" name="recruit_tpyeRoom" value="<?= esc($recruit['recruit_tpyeRoom']) ?>">
-                        <label for="recruit_tpyeRoom">แผนการเรียน</label>
+                        <select class="form-select" id="recruit_tpyeRoom_id" name="recruit_tpyeRoom_id">
+                            <option value="">-- เลือกแผนการเรียน --</option>
+                            <?php if(isset($courses)): ?>
+                                <?php foreach ($courses as $course): ?>
+                                    <option value="<?= $course->course_id ?>" <?= (isset($recruit['recruit_tpyeRoom_id']) && $recruit['recruit_tpyeRoom_id'] == $course->course_id) ? 'selected' : '' ?>>
+                                        <?= esc($course->course_fullname) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <label for="recruit_tpyeRoom_id">แผนการเรียน</label>
                     </div>
 
                      <div class="form-floating mb-3">

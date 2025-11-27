@@ -93,7 +93,7 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" name="quota_course[]" value="<?= $c['course_id'] ?>" id="course_<?= $c['course_id'] ?>" <?= in_array((string)$c['course_id'], $selectedCourses) ? 'checked' : '' ?>>
                                                     <label class="form-check-label" for="course_<?= $c['course_id'] ?>">
-                                                        <?= esc($c['course_fullname']) ?>
+                                                        <?= esc($c['course_initials']) ?> (<?= esc($c['course_branch']) ?>)
                                                     </label>
                                                 </div>
                                             <?php endforeach; ?>
@@ -114,7 +114,7 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" name="quota_course[]" value="<?= $c['course_id'] ?>" id="course_<?= $c['course_id'] ?>" <?= in_array((string)$c['course_id'], $selectedCourses) ? 'checked' : '' ?>>
                                                     <label class="form-check-label" for="course_<?= $c['course_id'] ?>">
-                                                        <?= esc($c['course_fullname']) ?>
+                                                        <?= esc($c['course_initials']) ?> (<?= esc($c['course_branch']) ?>)
                                                     </label>
                                                 </div>
                                             <?php endforeach; ?>

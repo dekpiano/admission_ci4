@@ -1,6 +1,8 @@
 <?= $this->extend('User/UserLayout') ?>
 
 <?= $this->section('styles') ?>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <style>
     /* Custom Wizard CSS */
     .step-indicator {
@@ -171,6 +173,28 @@
             align-items: center;
             gap: 8px;
         }
+        
+        /* Mobile Friendly Radio Buttons for Age Selection */
+        .form-check-inline {
+            display: flex;
+            align-items: center;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-radius: 50rem;
+            border: 1px solid #d9dee3;
+        }
+        .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+            margin-top: 0;
+            margin-right: 0.5rem;
+        }
+        .form-check-label {
+            font-size: 1rem;
+            cursor: pointer;
+        }
     }
 </style>
 <?= $this->endSection() ?>
@@ -181,7 +205,7 @@
     <div class="col-xl-10">
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center border-bottom">
-                <h5 class="mb-0 text-primary"><i class='bx bx-edit me-2'></i>แบบฟอร์มสมัครเรียน (Registration Form)</h5>
+                <h5 class="mb-0 text-primary"><i class='bx bx-edit me-2'></i>แบบฟอร์มสมัครเรียน ชั้นมัธยมศึกษาปีที่ <?= $level ?> (Registration Form)</h5>
                 <small class="text-muted">กรุณากรอกข้อมูลให้ครบถ้วน</small>
             </div>
             <div class="card-body pt-4">
@@ -374,6 +398,14 @@
                                 <select class="form-select" name="recruit_race" id="recruit_race" required>
                                     <option value="ไทย" selected>ไทย</option>
                                     <option value="จีน">จีน</option>
+                                    <option value="ญี่ปุ่น">ญี่ปุ่น</option>
+                                    <option value="เกาหลี">เกาหลี</option>
+                                    <option value="เวียดนาม">เวียดนาม</option>
+                                    <option value="ลาว">ลาว</option>
+                                    <option value="กัมพูชา">กัมพูชา</option>
+                                    <option value="พม่า">พม่า</option>
+                                    <option value="มาเลเซีย">มาเลเซีย</option>
+                                    <option value="อินเดีย">อินเดีย</option>
                                     <option value="อื่นๆ">อื่นๆ</option>
                                 </select>
                             </div>
@@ -382,6 +414,14 @@
                                 <select class="form-select" name="recruit_nationality" id="recruit_nationality" required>
                                     <option value="ไทย" selected>ไทย</option>
                                     <option value="จีน">จีน</option>
+                                    <option value="ญี่ปุ่น">ญี่ปุ่น</option>
+                                    <option value="เกาหลี">เกาหลี</option>
+                                    <option value="เวียดนาม">เวียดนาม</option>
+                                    <option value="ลาว">ลาว</option>
+                                    <option value="กัมพูชา">กัมพูชา</option>
+                                    <option value="พม่า">พม่า</option>
+                                    <option value="มาเลเซีย">มาเลเซีย</option>
+                                    <option value="อินเดีย">อินเดีย</option>
                                     <option value="อื่นๆ">อื่นๆ</option>
                                 </select>
                             </div>
@@ -391,6 +431,9 @@
                                     <option value="พุทธ" selected>พุทธ</option>
                                     <option value="อิสลาม">อิสลาม</option>
                                     <option value="คริสต์">คริสต์</option>
+                                    <option value="ฮินดู">ฮินดู</option>
+                                    <option value="ซิกข์">ซิกข์</option>
+                                    <option value="ไม่นับถือศาสนา">ไม่นับถือศาสนา</option>
                                     <option value="อื่นๆ">อื่นๆ</option>
                                 </select>
                             </div>
@@ -465,10 +508,13 @@
 
                         <div class="row mb-3">
                             <div class="col-sm-12">
-                                <label for="recruit_oldSchool" class="form-label">โรงเรียนเดิม <span class="text-danger">*</span></label>
+                                <label for="recruit_oldSchool_select" class="form-label">ค้นหาโรงเรียนเดิม <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class='bx bxs-school'></i></span>
-                                    <input type="text" class="form-control" name="recruit_oldSchool" id="recruit_oldSchool" placeholder="ชื่อโรงเรียนเดิม" required>
+                                    <select class="form-select" id="recruit_oldSchool_select" required>
+                                        <option value="">-- พิมพ์เพื่อค้นหาชื่อโรงเรียน --</option>
+                                    </select>
+                                    <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool" required>
                                 </div>
                             </div>
                         </div>
@@ -506,11 +552,19 @@
                         <div class="row">
 
                             <div class="col-md-6 mb-3">
-                                <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า-หลัง) <span class="text-danger">*</span></label>
+                                <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า) <span class="text-danger">*</span></label>
                                 <input class="form-control" type="file" id="recruit_certificateEdu" name="recruit_certificateEdu" accept="image/*,.pdf" required onchange="previewImage(this, 'preview_certificate')">
                                 <div class="mt-2 text-center">
-                                    <img id="preview_certificate" src="#" alt="ตัวอย่าง ปพ.1" class="img-thumbnail d-none" style="max-height: 200px;">
+                                    <img id="preview_certificate" src="#" alt="ตัวอย่าง ปพ.1 (หน้า)" class="img-thumbnail d-none" style="max-height: 200px;">
                                     <p id="preview_certificate_name" class="d-none text-muted small"></p>
+                                </div>
+                            </div>
+                             <div class="col-md-6 mb-3">
+                                <label for="recruit_certificateEduB" class="form-label">ปพ.1 (หลัง) <span class="text-danger">*</span></label>
+                                <input class="form-control" type="file" id="recruit_certificateEduB" name="recruit_certificateEduB" accept="image/*,.pdf" required onchange="previewImage(this, 'preview_certificateB')">
+                                <div class="mt-2 text-center">
+                                    <img id="preview_certificateB" src="#" alt="ตัวอย่าง ปพ.1 (หลัง)" class="img-thumbnail d-none" style="max-height: 200px;">
+                                    <p id="preview_certificateB_name" class="d-none text-muted small"></p>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -519,14 +573,6 @@
                                 <div class="mt-2 text-center">
                                     <img id="preview_idcard" src="#" alt="ตัวอย่างบัตรประชาชน" class="img-thumbnail d-none" style="max-height: 200px;">
                                     <p id="preview_idcard_name" class="d-none text-muted small"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="recruit_copyAddress" class="form-label">สำเนาทะเบียนบ้าน <span class="text-danger">*</span></label>
-                                <input class="form-control" type="file" id="recruit_copyAddress" name="recruit_copyAddress" accept="image/*,.pdf" required onchange="previewImage(this, 'preview_address')">
-                                <div class="mt-2 text-center">
-                                    <img id="preview_address" src="#" alt="ตัวอย่างทะเบียนบ้าน" class="img-thumbnail d-none" style="max-height: 200px;">
-                                    <p id="preview_address_name" class="d-none text-muted small"></p>
                                 </div>
                             </div>
                         </div>
@@ -543,7 +589,7 @@
                             <button type="button" class="btn btn-primary" id="nextBtn">
                                 ถัดไป <i class='bx bx-chevron-right'></i>
                             </button>
-                            <button type="submit" class="btn btn-success" id="submitBtn" style="display:none;">
+                            <button type="button" class="btn btn-success" id="submitBtn" style="display:none;" onclick="if(validateStep(currentStep)) { showConfirmationModal(); } else { Swal.fire({ icon: 'warning', title: 'ข้อมูลยังไม่ครบถ้วน', text: 'กรุณาตรวจสอบข้อมูลในขั้นตอนสุดท้ายให้ครบถ้วนก่อนยืนยัน', confirmButtonText: 'ตกลง' }); }">
                                 <i class='bx bx-check-circle'></i> ยืนยันการสมัครเรียน
                             </button>
                         </div>
@@ -588,7 +634,65 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
+<!-- Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
+    $(document).ready(function() {
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+
+        $('#recruit_oldSchool_select').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- พิมพ์เพื่อค้นหาชื่อโรงเรียน --',
+            ajax: {
+                url: '<?= base_url('new-admission/school-search') ?>',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term // search term
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('#recruit_oldSchool_select').on('select2:select', function (e) {
+            var data = e.params.data;
+            $('#recruit_oldSchool').val(data.text); // Set hidden input with school name
+            $('#recruit_district').val(data.amphur); // Set district
+            $('#recruit_province').val(data.province); // Set province
+
+            // Trigger change event for validation or other listeners if any
+            $('#recruit_oldSchool').trigger('change');
+            $('#recruit_district').trigger('change');
+            $('#recruit_province').trigger('change');
+        });
+
+        $('#confirmSubmitBtn').on('click', function() {
+            $('#regisForm').submit();
+        });
+
+        $('#submitBtn').on('click', function(e) {
+            e.preventDefault(); // Prevent default button action
+            if (validateStep(currentStep)) {
+                showConfirmationModal(confirmModal);
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ข้อมูลยังไม่ครบถ้วน',
+                    text: 'กรุณาตรวจสอบข้อมูลในขั้นตอนสุดท้ายให้ครบถ้วนก่อนยืนยัน',
+                    confirmButtonText: 'ตกลง'
+                });
+            }
+        });
+    });
+
     // Image Cropping Logic
     let cropper;
     const imageToCrop = document.getElementById('image_to_crop');
@@ -605,14 +709,13 @@
             }
             reader.readAsDataURL(file);
             
-            // Clear input so same file can be selected again
             input.value = ''; 
         }
     }
 
     document.getElementById('cropModal').addEventListener('shown.bs.modal', function () {
         cropper = new Cropper(imageToCrop, {
-            aspectRatio: 3 / 4, // 1.5 inch photo ratio
+            aspectRatio: 3 / 4, 
             viewMode: 1,
             autoCropArea: 1,
         });
@@ -633,23 +736,15 @@
             });
 
             const croppedImage = canvas.toDataURL('image/jpeg');
-            
-            // Show preview
             document.getElementById('preview_img_display').src = croppedImage;
-            
-            // Set hidden input value (base64)
             document.getElementById('recruit_img_cropped').value = croppedImage;
-            
-            // Set validator value to pass required check
             document.getElementById('recruit_img_validator').value = 'uploaded';
             document.getElementById('recruit_img_validator').classList.remove('is-invalid');
             document.getElementById('recruit_img_validator').classList.add('is-valid');
-
             cropModal.hide();
         }
     });
 
-    // General File Preview Function (for other docs)
     function previewImage(input, previewId) {
         const preview = document.getElementById(previewId);
         const namePreview = document.getElementById(previewId + '_name');
@@ -658,7 +753,6 @@
             const file = input.files[0];
             const reader = new FileReader();
 
-            // Check if file is an image
             if (file.type.match('image.*')) {
                 reader.onload = function(e) {
                     preview.src = e.target.result;
@@ -667,7 +761,6 @@
                 }
                 reader.readAsDataURL(file);
             } else {
-                // Not an image (e.g. PDF)
                 preview.src = '#';
                 preview.classList.add('d-none');
                 if(namePreview) {
@@ -682,19 +775,15 @@
         }
     }
 
-    // Initialize Thailand Address Auto Complete
     $.Thailand({
-        $district: $('#recruit_homeSubdistrict'), // ตำบล
-        $amphoe: $('#recruit_homedistrict'), // อำเภอ
-        $province: $('#recruit_homeProvince'), // จังหวัด
-        $zipcode: $('#recruit_homePostcode'), // รหัสไปรษณีย์
+        $district: $('#recruit_homeSubdistrict'), 
+        $amphoe: $('#recruit_homedistrict'),
+        $province: $('#recruit_homeProvince'),
+        $zipcode: $('#recruit_homePostcode'),
     });
 
-    // Pass courses data to JS
     const coursesData = <?= json_encode($courses) ?>;
     
-    // Course Selection Logic
-    // Course Selection Logic
     document.getElementById('recruit_category').addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         const allowedCourses = selectedOption.getAttribute('data-courses').split('|');
@@ -703,39 +792,201 @@
             document.getElementById('recruit_tpyeRoom2'),
             document.getElementById('recruit_tpyeRoom3')
         ];
-        const courseSection = document.getElementById('course_section');
+        // Get the containers for each select to hide/show them
+        const courseContainers = [
+            courseSelects[0].closest('.input-group'),
+            courseSelects[1].closest('.input-group'),
+            courseSelects[2].closest('.input-group')
+        ];
         
+        const courseSection = document.getElementById('course_section');
+        const courseLabel = courseSection.querySelector('label.form-label'); // Get the label element
+        
+        // Create container for age radio buttons if it doesn't exist
+        let ageRadioContainer = document.getElementById('age_radio_container');
+        if (!ageRadioContainer) {
+            ageRadioContainer = document.createElement('div');
+            ageRadioContainer.id = 'age_radio_container';
+            ageRadioContainer.className = 'mb-3';
+            ageRadioContainer.style.display = 'none';
+            courseSection.appendChild(ageRadioContainer);
+        }
+        
+        // Create hidden input for recruit_agegroup if it doesn't exist
+        let ageGroupInput = document.querySelector('input[name="recruit_agegroup"]');
+        if (!ageGroupInput) {
+            ageGroupInput = document.createElement('input');
+            ageGroupInput.type = 'hidden';
+            ageGroupInput.name = 'recruit_agegroup';
+            document.getElementById('regisForm').appendChild(ageGroupInput);
+        }
+
         // Reset all selects
         courseSelects.forEach((select, index) => {
-            select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 1} --</option>`;
+            select.innerHTML = `<option value="" selected disabled>-- เลือก${index === 0 ? '' : 'อันดับ ' + (index + 1)} --</option>`;
             select.value = "";
+            // Remove any existing event listeners by cloning (simple way)
+            const newSelect = select.cloneNode(true);
+            select.parentNode.replaceChild(newSelect, select);
+            courseSelects[index] = newSelect; // Update reference
         });
         
+        // Clear radio container
+        ageRadioContainer.innerHTML = '';
+        ageGroupInput.value = '';
+
         let hasCourses = false;
-        
-        // Populate options
+        let isSportsQuota = false; // Flag to check if it's a sports quota
+        let sportsData = {}; // Object to store sports and their ages/ids: { 'Football': {id: 1, ages: ['13', '14']} }
+
+        // First pass: Check quota type and organize data
         coursesData.forEach(course => {
             if (allowedCourses.includes(course.course_id.toString())) {
-                courseSelects.forEach(select => {
-                    const option = document.createElement('option');
-                    option.value = course.course_id;
-                    option.text = course.course_fullname;
-                    select.appendChild(option);
-                });
                 hasCourses = true;
+                if (course.course_age && course.course_age.trim() !== '') {
+                    isSportsQuota = true;
+                    // Assuming one course per sport branch for simplicity based on user request "13,14,15 in one course_age"
+                    // If multiple courses have same branch, we might need to handle differently, but here we assume grouping by branch.
+                    sportsData[course.course_branch] = {
+                        id: course.course_id,
+                        ages: course.course_age.split(',').map(s => s.trim()).filter(s => s !== ''),
+                        fullname: course.course_fullname
+                    };
+                }
             }
         });
         
         if (hasCourses) {
-            courseSection.style.display = 'block'; // Changed from flex to block for vertical stacking
+            courseSection.style.display = 'block'; 
             courseSelects[0].required = true;
+            
+            if (isSportsQuota) {
+                // --- Sports Quota Logic ---
+                courseLabel.innerHTML = 'เลือกชนิดกีฬาและรุ่นอายุ <span class="text-danger">*</span>';
+                
+                // Setup Dropdown 1: Sport Type (Branch)
+                courseContainers[0].style.display = 'flex';
+                courseContainers[0].querySelector('.input-group-text').style.display = 'none'; // Hide "Rank 1" label
+                courseSelects[0].innerHTML = '<option value="" selected disabled>-- เลือกชนิดกีฬา --</option>';
+                
+                Object.keys(sportsData).forEach(sport => {
+                    const option = document.createElement('option');
+                    option.value = sportsData[sport].id; // Store course_id directly here
+                    option.text = sport;
+                    courseSelects[0].appendChild(option);
+                });
+
+                // Hide Dropdown 2 & 3
+                courseContainers[1].style.display = 'none';
+                courseContainers[2].style.display = 'none';
+                courseSelects[1].required = false;
+                courseSelects[2].required = false;
+                
+                // Ensure Dropdown 1 submits as recruit_tpyeRoom1
+                courseSelects[0].setAttribute('name', 'recruit_tpyeRoom1');
+                courseSelects[1].removeAttribute('name');
+                courseSelects[2].removeAttribute('name');
+
+                // Add Event Listener to Dropdown 1 to show Age Radios
+                courseSelects[0].addEventListener('change', function() {
+                    const selectedCourseId = this.value;
+                    // Find the sport data based on ID (a bit inefficient but works)
+                    let selectedSportData = null;
+                    for (const sport in sportsData) {
+                        if (sportsData[sport].id == selectedCourseId) {
+                            selectedSportData = sportsData[sport];
+                            break;
+                        }
+                    }
+                    
+                    ageRadioContainer.innerHTML = '<label class="form-label d-block">เลือกรุ่นอายุ <span class="text-danger">*</span></label>';
+                    ageGroupInput.value = ''; // Reset hidden input
+                    
+                    if (selectedSportData && selectedSportData.ages.length > 0) {
+                        const rowDiv = document.createElement('div');
+                        rowDiv.className = 'row g-2';
+                        
+                        selectedSportData.ages.forEach(age => {
+                            const colDiv = document.createElement('div');
+                            colDiv.className = 'col-auto';
+                            
+                            const radioDiv = document.createElement('div');
+                            radioDiv.className = 'form-check form-check-inline';
+                            
+                            const radioInput = document.createElement('input');
+                            radioInput.className = 'form-check-input';
+                            radioInput.type = 'radio';
+                            radioInput.name = 'age_radio_group'; // Temporary name for radio group
+                            radioInput.id = 'age_' + age;
+                            radioInput.value = age;
+                            radioInput.required = true;
+                            
+                            radioInput.addEventListener('change', function() {
+                                ageGroupInput.value = this.value;
+                            });
+                            
+                            const radioLabel = document.createElement('label');
+                            radioLabel.className = 'form-check-label';
+                            radioLabel.htmlFor = 'age_' + age;
+                            radioLabel.innerText = age + ' ปี';
+                            
+                            radioDiv.appendChild(radioInput);
+                            radioDiv.appendChild(radioLabel);
+                            colDiv.appendChild(radioDiv);
+                            rowDiv.appendChild(colDiv);
+                        });
+                        
+                        ageRadioContainer.appendChild(rowDiv);
+                        ageRadioContainer.style.display = 'block';
+                    } else {
+                        ageRadioContainer.style.display = 'none';
+                    }
+                });
+
+            } else {
+                // --- Normal Quota Logic ---
+                courseLabel.innerHTML = 'เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span class="text-danger">*</span>';
+                ageRadioContainer.style.display = 'none';
+                
+                // Restore names
+                courseSelects[0].setAttribute('name', 'recruit_tpyeRoom1');
+                courseSelects[1].setAttribute('name', 'recruit_tpyeRoom2');
+                courseSelects[2].setAttribute('name', 'recruit_tpyeRoom3');
+
+                // Show all ranks
+                courseContainers[0].style.display = 'flex';
+                courseContainers[1].style.display = 'flex';
+                courseContainers[2].style.display = 'flex';
+                
+                // Restore labels
+                courseContainers[0].querySelector('.input-group-text').style.display = 'block';
+                courseContainers[1].querySelector('.input-group-text').style.display = 'block';
+                courseContainers[2].querySelector('.input-group-text').style.display = 'block';
+
+                // Populate Dropdown 1 (and others similarly if we wanted dynamic filtering, but for now just list all)
+                courseSelects.forEach((select, index) => {
+                    select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 1} --</option>`;
+                    coursesData.forEach(course => {
+                        if (allowedCourses.includes(course.course_id.toString())) {
+                            const option = document.createElement('option');
+                            option.value = course.course_id;
+                            option.text = course.course_fullname;
+                            select.appendChild(option);
+                        }
+                    });
+                });
+                
+                courseSelects[0].required = true;
+                courseSelects[1].required = false;
+                courseSelects[2].required = false;
+            }
         } else {
             courseSection.style.display = 'none';
             courseSelects[0].required = false;
+            if(ageRadioContainer) ageRadioContainer.style.display = 'none';
         }
     });
 
-    // Prevent duplicate selections
     const courseSelects = document.querySelectorAll('.course-select');
     courseSelects.forEach(select => {
         select.addEventListener('change', function() {
@@ -746,10 +997,8 @@
             courseSelects.forEach(s => {
                 const currentVal = s.value;
                 Array.from(s.options).forEach(opt => {
-                    if (opt.value === "") return; // Skip placeholder
+                    if (opt.value === "") return; 
                     
-                    // Enable if it's the current value of this select
-                    // OR if it's NOT selected in any other select
                     if (opt.value === currentVal || !selectedValues.includes(opt.value)) {
                         opt.disabled = false;
                     } else {
@@ -767,14 +1016,114 @@
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const submitBtn = document.getElementById('submitBtn');
+    
+    function showConfirmationModal(confirmModal) {
+        const formData = new FormData(document.getElementById('regisForm'));
+        const dataList = document.getElementById('confirm-data-list');
+        dataList.innerHTML = ''; 
+
+        const fieldLabels = {
+            recruit_category: 'ประเภทโควตา',
+            recruit_tpyeRoom1: 'แผนการเรียนอันดับ 1',
+            recruit_tpyeRoom2: 'แผนการเรียนอันดับ 2',
+            recruit_tpyeRoom3: 'แผนการเรียนอันดับ 3',
+            recruit_img_validator: 'รูปถ่ายนักเรียน',
+            recruit_prefix: 'คำนำหน้า',
+            recruit_firstName: 'ชื่อ',
+            recruit_lastName: 'นามสกุล',
+            recruit_idCard: 'เลขบัตรประชาชน',
+            recruit_birthday: 'วันเกิด',
+            recruit_race: 'เชื้อชาติ',
+            recruit_nationality: 'สัญชาติ',
+            recruit_religion: 'ศาสนา',
+            recruit_phone: 'เบอร์โทรศัพท์',
+            recruit_homeNumber: 'บ้านเลขที่',
+            recruit_homeGroup: 'หมู่ที่',
+            recruit_homeRoad: 'ถนน',
+            recruit_homeSubdistrict: 'ตำบล/แขวง',
+            recruit_homedistrict: 'อำเภอ/เขต',
+            recruit_homeProvince: 'จังหวัด',
+            recruit_homePostcode: 'รหัสไปรษณีย์',
+            recruit_oldSchool: 'โรงเรียนเดิม',
+            recruit_district: 'อำเภอ รร. เดิม',
+            recruit_province: 'จังหวัด รร. เดิม',
+            recruit_grade: 'เกรดเฉลี่ย',
+            recruit_certificateEdu: 'ปพ.1 (หน้า)',
+            recruit_certificateEduB: 'ปพ.1 (หลัง)',
+            recruit_copyidCard: 'สำเนาบัตรประชาชน',
+        };
+
+        let html = '<dl class="row">';
+
+        const birthday = formData.get('recruit_birthdayD') + '/' + formData.get('recruit_birthdayM') + '/' + formData.get('recruit_birthdayY');
+
+        for (const [key, label] of Object.entries(fieldLabels)) {
+            let value;
+            const element = document.querySelector(`[name="${key}"]`);
+            
+            if (key === 'recruit_birthday') {
+                value = birthday;
+            } else if(element && element.tagName === 'SELECT') {
+                 if (element.value !== "") {
+                    value = element.options[element.selectedIndex].text;
+                 } else {
+                    value = 'ไม่ได้เลือก';
+                 }
+            } else if (key.endsWith('_validator')) {
+                 value = formData.get('recruit_img_cropped') ? '<span class="text-success">อัปโหลดแล้ว</span>' : '<span class="text-danger">ยังไม่ได้อัปโหลด</span>';
+            } else if (element && element.type === 'file') {
+                 value = element.files.length > 0 ? `<span class="text-success">ไฟล์: ${element.files[0].name}</span>` : 'ไม่ได้เลือก';
+            } else {
+                value = formData.get(key) || '-';
+            }
+            
+            html += `<dt class="col-sm-4">${label}</dt><dd class="col-sm-8">${value}</dd>`;
+        }
+        html += '</dl>';
+        dataList.innerHTML = html;
+
+        // Set image preview in modal
+        const imgElem = document.getElementById('confirm_image');
+        const croppedVal = document.getElementById('recruit_img_cropped').value;
+        if (croppedVal) {
+            imgElem.src = croppedVal;
+            imgElem.classList.remove('d-none');
+        } else {
+            imgElem.classList.add('d-none');
+        }
+
+        // Helper function to set document previews
+        const setDocPreview = (srcImgId, srcTxtId, targetImgId, targetTxtId) => {
+             const srcImg = document.getElementById(srcImgId);
+             const srcTxt = document.getElementById(srcTxtId);
+             const targetImg = document.getElementById(targetImgId);
+             const targetTxt = document.getElementById(targetTxtId);
+             
+             if(srcImg && !srcImg.classList.contains('d-none')) {
+                 targetImg.src = srcImg.src;
+                 targetImg.classList.remove('d-none');
+                 targetTxt.classList.add('d-none');
+             } else if(srcTxt && !srcTxt.classList.contains('d-none')) {
+                 targetTxt.textContent = srcTxt.textContent;
+                 targetTxt.classList.remove('d-none');
+                 targetImg.classList.add('d-none');
+             } else {
+                 targetImg.classList.add('d-none');
+                 targetTxt.classList.add('d-none');
+             }
+        };
+
+        setDocPreview('preview_certificate', 'preview_certificate_name', 'confirm_certificate', 'confirm_certificate_name');
+        setDocPreview('preview_certificateB', 'preview_certificateB_name', 'confirm_certificateB', 'confirm_certificateB_name');
+        setDocPreview('preview_idcard', 'preview_idcard_name', 'confirm_idcard', 'confirm_idcard_name');
+
+        confirmModal.show();
+    }
 
     function showStep(step) {
-        // Hide all steps
         document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
-        // Show current step
         document.getElementById('step-' + step).classList.add('active');
         
-        // Update indicators
         document.querySelectorAll('.step').forEach((el, index) => {
             if (index + 1 < step) {
                 el.classList.add('completed');
@@ -787,20 +1136,9 @@
             }
         });
 
-        // Button visibility
-        if (step === 1) {
-            prevBtn.style.display = 'none';
-        } else {
-            prevBtn.style.display = 'inline-block';
-        }
-
-        if (step === totalSteps) {
-            nextBtn.style.display = 'none';
-            submitBtn.style.display = 'inline-block';
-        } else {
-            nextBtn.style.display = 'inline-block';
-            submitBtn.style.display = 'none';
-        }
+        prevBtn.style.display = (step === 1) ? 'none' : 'inline-block';
+        nextBtn.style.display = (step === totalSteps) ? 'none' : 'inline-block';
+        submitBtn.style.display = (step === totalSteps) ? 'inline-block' : 'none';
     }
 
     function validateStep(step) {
@@ -815,13 +1153,11 @@
             } else {
                 input.classList.remove('is-invalid');
             }
-            // Check HTML5 validity
             if (!input.checkValidity()) {
                 input.classList.add('is-invalid');
                 valid = false;
             }
         });
-
         return valid;
     }
 
@@ -846,7 +1182,6 @@
         window.scrollTo(0, 0);
     });
 
-    // Real-time validation removal
     document.querySelectorAll('input, select').forEach(input => {
         input.addEventListener('input', function() {
             if (this.value) {
@@ -858,8 +1193,58 @@
         });
     });
 
-    // Initialize
     showStep(1);
 
 </script>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmModalLabel">โปรดตรวจสอบข้อมูลการสมัครของท่าน</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-danger">**กรุณาตรวจสอบข้อมูลให้ถูกต้องครบถ้วน หากยืนยันการสมัครแล้ว จะไม่สามารถกลับมาแก้ไขได้**</p>
+        <div id="confirm-data-list" class="list-group">
+            <!-- Data will be injected here by JS -->
+        </div>
+        <!-- Image preview placeholder -->
+        <div class="mt-3">
+            <h6 class="fw-bold border-bottom pb-2">รูปถ่ายนักเรียน</h6>
+            <div class="text-center" id="confirm-image-wrapper">
+                <img id="confirm_image" src="#" alt="รูปถ่ายนักเรียน" class="img-thumbnail d-none" style="max-width:200px; max-height:250px; object-fit:contain;" />
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <h6 class="fw-bold border-bottom pb-2">เอกสารหลักฐาน</h6>
+            <div class="row">
+                <div class="col-md-4 text-center mb-3">
+                    <p class="small mb-1 fw-bold">ปพ.1 (หน้า)</p>
+                    <img id="confirm_certificate" src="#" class="img-thumbnail d-none" style="max-height:150px; width: auto;">
+                    <p id="confirm_certificate_name" class="small text-muted d-none"></p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <p class="small mb-1 fw-bold">ปพ.1 (หลัง)</p>
+                    <img id="confirm_certificateB" src="#" class="img-thumbnail d-none" style="max-height:150px; width: auto;">
+                    <p id="confirm_certificateB_name" class="small text-muted d-none"></p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <p class="small mb-1 fw-bold">สำเนาบัตรประชาชน</p>
+                    <img id="confirm_idcard" src="#" class="img-thumbnail d-none" style="max-height:150px; width: auto;">
+                    <p id="confirm_idcard_name" class="small text-muted d-none"></p>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">แก้ไขข้อมูล</button>
+        <button type="button" class="btn btn-success" id="confirmSubmitBtn">ยืนยันและสมัครเรียน</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?= $this->endSection() ?>

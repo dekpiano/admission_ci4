@@ -14,7 +14,7 @@ class CourseModel extends Model
     protected $returnType     = 'array';
     protected $useSoftDeletes = false; // Assuming no soft deletes for courses
 
-    protected $allowedFields = ['course_fullname', 'course_initials', 'course_branch', 'course_gradelevel'];
+    protected $allowedFields = ['course_fullname', 'course_initials', 'course_branch', 'course_gradelevel', 'course_age'];
 
     protected $useTimestamps = false; // Assuming no timestamp fields for courses
     protected $createdField  = 'created_at';

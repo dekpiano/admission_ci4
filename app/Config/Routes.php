@@ -23,6 +23,7 @@ $routes->get('new-admission/pre-check/(:num)', 'User\UserControlNewAdmission::pr
 $routes->post('new-admission/check-id', 'User\UserControlNewAdmission::check_id_card');
 $routes->get('new-admission/register/(:num)', 'User\UserControlNewAdmission::register/$1');
 $routes->get('new-admission/status', 'User\UserControlNewAdmission::status');
+$routes->get('new-admission/school-search', 'User\UserControlNewAdmission::ajax_school_search'); // Route for Select2 school search
 $routes->post('new-admission/save', 'User\UserControlNewAdmission::save_register');
 
 // Routes for editing admission data
@@ -144,6 +145,7 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('settings/update_status', 'AdminControlSetting::update_status');
     $routes->post('settings/update_year', 'AdminControlSetting::update_year');
     $routes->post('settings/update_comment', 'AdminControlSetting::update_comment');
+    $routes->post('settings/update_dates', 'AdminControlSetting::update_dates');
 
     // User Management
     $routes->get('users', 'AdminControlUser::index');
