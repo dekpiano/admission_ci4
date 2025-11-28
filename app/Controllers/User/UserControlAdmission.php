@@ -584,6 +584,105 @@ class UserControlAdmission extends BaseController
         }
     }
 
+    public function pdf($id)
+    {
+        // 1. Load mPDF (Logic from AdminControlReport)
+        $path = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
+        if (file_exists($path . '/librarie_skj/mpdf/vendor/autoload.php')) {
+            require_once $path . '/librarie_skj/mpdf/vendor/autoload.php';
+        } else {
+            // Fallback to vendor if custom path fails
+            if (file_exists(FCPATH . '../vendor/autoload.php')) {
+                require_once FCPATH . '../vendor/autoload.php';
+            }
+        }
+
+        if (!class_exists('\Mpdf\Mpdf')) {
+            return "ไม่พบไลบรารี mPDF กรุณาติดตั้ง";
+        }
+
+        // 2. Database Connections
+        $db = \Config\Database::connect();
+        
+        // 3. Fetch Student Data
+        // We use $id passed to the function, NOT session, to allow status check printing
+        $builder = $db->table('tb_recruitstudent');
+        $builder->where('recruit_id', $id);
+        $student = $builder->get()->getRow();
+
+        if (!$student) {
+            return "ไม่พบข้อมูลนักเรียน";
+        }
+
+        // 4. Prepare Data
+        $date_Y = date('Y', strtotime($student->recruit_birthday)) + 543;
+        $TH_Month = array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฏาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
+        $date_D = date('d', strtotime($student->recruit_birthday));
+        $date_M = date('n', strtotime($student->recruit_birthday));
+
+        $date_Y_regis = date('Y', strtotime($student->recruit_date)) + 543;
+        $date_D_regis = date('d', strtotime($student->recruit_date));
+        $date_M_regis = date('n', strtotime($student->recruit_date));
+
+        // 5. Initialize mPDF (Card Format [210, 90])
+        // Clean output buffer
+        if (ob_get_length()) ob_clean();
+
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'default_font_size' => 16,
+            'default_font' => 'sarabun',
+            'format' => [210, 90],
+            'tempDir' => WRITEPATH . 'temp' // Added tempDir as per AdminControlReport
+        ]);
+
+        $mpdf->SetTitle($student->recruit_prefix . $student->recruit_firstName . ' ' . $student->recruit_lastName);
+        $mpdf->showImageErrors = true;
+
+        // 6. Generate HTML Content
+        // Image Path
+        $img_path = FCPATH . 'uploads/recruitstudent/m' . $student->recruit_regLevel . '/img/' . $student->recruit_img;
+        
+        // Check if image exists, otherwise use placeholder or empty
+        $img_tag = '';
+        if (file_exists($img_path) && !empty($student->recruit_img)) {
+            $img_tag = '<img style="width:120px;height:100px;" src="' . $img_path . '">';
+        }
+
+        $html = '<div style="position:absolute;top:100px;left:75px; width:100%">' . $img_tag . '</div>';
+        $html .= '<div style="position:absolute;top:57px;left:150px; width:100%">' . sprintf("%04d", $student->recruit_id) . '</div>'; // Application ID
+        $html .= '<div style="position:absolute;top:100px;left:250px; width:100%">' . $student->recruit_prefix . $student->recruit_firstName . '</div>'; // Name
+        $html .= '<div style="position:absolute;top:100px;left:480px; width:100%">' . $student->recruit_lastName . '</div>'; // Surname
+        $html .= '<div style="position:absolute;top:127px;left:400px; width:100%">' . $student->recruit_idCard . '</div>'; // ID Card
+        $html .= '<div style="position:absolute;top:155px;left:270px; width:100%"> ' . $student->recruit_tpyeRoom . '</div>'; // Program
+        
+        // License Image (Signature/Stamp)
+        $license_path = FCPATH . 'public/asset/img/license.png'; // Adjusted path assuming public/asset
+        if (!file_exists($license_path)) {
+             $license_path = FCPATH . 'asset/img/license.png'; // Try alternate path
+        }
+        if (file_exists($license_path)) {
+             $html .= '<div style="position:absolute;top:200px;left:340px; width:100%"><img style="width:120px;height:100px;" src="' . $license_path . '"></div>';
+        }
+
+        $html .= '<div style="position:absolute;top:255px;left:360px; width:100%">' . $date_D_regis . ' ' . $TH_Month[$date_M_regis - 1] . ' ' . $date_Y_regis . '</div>'; // Date
+
+        // 7. Set Template
+        $templatePath = FCPATH . 'uploads/recruitstudent/pdf_registudentForStudent.pdf';
+        
+        if (file_exists($templatePath)) {
+            $mpdf->SetDocTemplate($templatePath, true);
+        } else {
+            $html .= '<div style="color:red; position:absolute; top:0; left:0;">Template not found: ' . $templatePath . '</div>';
+        }
+
+        $mpdf->WriteHTML($html);
+        
+        $this->response->setHeader('Content-Type', 'application/pdf');
+        $mpdf->Output('Reg_' . $student->recruit_idCard . '.pdf', 'I');
+        exit(); // Prevent CI4 from interfering with the output
+    }
+
     public function SchoolList()
     {
         $postData = $this->request->getPost();
@@ -597,4 +696,3 @@ class UserControlAdmission extends BaseController
         return $this->response->setJSON($data);
     }
 }
-

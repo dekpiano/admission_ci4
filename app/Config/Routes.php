@@ -161,6 +161,13 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->get('surrender', 'AdminControlSurrender::index');
     $routes->post('surrender/update', 'AdminControlSurrender::UpdateSurrender');
     $routes->get('surrender/print/(:num)', 'AdminControlSurrender::print/$1');
+
+    // Service Area Schools
+    $routes->get('service-area-schools', 'AdminServiceAreaSchools::index');
+    $routes->get('service-area-schools/search-all', 'AdminServiceAreaSchools::search_all_schools');
+    $routes->post('service-area-schools/add', 'AdminServiceAreaSchools::add');
+    $routes->post('service-area-schools/delete/(:num)', 'AdminServiceAreaSchools::delete/$1');
+
 });
 
 // Compatibility / Legacy Routes (Mapping old CI3 controller names to new CI4 controllers)
@@ -174,5 +181,6 @@ $routes->post('admission/get_student_status', 'User\UserControlAdmission::get_st
 $routes->post('control_admission/reg_insert', 'User\UserControlAdmission::reg_insert');
 $routes->post('control_admission/check_print', 'User\UserControlAdmission::check_print');
 $routes->post('control_admission/SchoolList', 'User\UserControlAdmission::SchoolList');
+$routes->get('control_admission/pdf/(:num)', 'User\UserControlAdmission::pdf/$1'); // Added PDF route
 $routes->post('control_admission/data_user', 'User\UserControlAdmission::data_user');
 $routes->post('control_login/validlogin', 'User\UserControlLogin::validlogin');

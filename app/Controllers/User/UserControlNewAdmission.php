@@ -56,16 +56,24 @@ class UserControlNewAdmission extends BaseController
     {
         $idCard = $this->request->getPost('recruit_idCard');
         $level = $this->request->getPost('level');
-        $year = $this->admissionModel->getOpenYear()->openyear_year;
 
-        if ($this->admissionModel->isIdCardRegistered($idCard, $year)) {
-            return redirect()->back()->withInput()->with('error', 'เลขบัตรประชาชนนี้ได้ทำการสมัครเรียนแล้ว กรุณาตรวจสอบสถานะ');
+        // Basic Validation
+        if (empty($idCard)) {
+            return redirect()->back()->with('error', 'กรุณากรอกเลขบัตรประชาชน');
         }
 
-        // Store ID Card in session to use in register form
+        // Check if ID card already exists in tb_recruitstudent
+        $existingStudent = $this->admissionModel->checkIdCard($idCard);
+
+        if ($existingStudent) {
+            return redirect()->back()->with('error', 'เลขบัตรประชาชนนี้ได้ทำการสมัครไปแล้ว');
+        }
+
+        // Pass ID card to the registration form (via session or view data)
+        // For security, using session flashdata is better than URL parameters
         $this->session->setFlashdata('pre_check_idCard', $idCard);
-        
-        return redirect()->to('new-admission/register/' . $level);
+
+        return redirect()->to(base_url('new-admission/register/' . $level));
     }
 
     public function register($level = null)
@@ -87,6 +95,10 @@ class UserControlNewAdmission extends BaseController
         $data['checkYear'] = $this->admissionModel->getOpenYear();
         $data['quotas'] = $this->admissionModel->getAllQuotas(); // Filter in view or here
         $data['preCheckIdCard'] = $preCheckIdCard; // Pass to view
+        $data['preCheckQuota'] = $this->session->getFlashdata('pre_check_quota');
+        $data['preCheckOldSchool'] = $this->session->getFlashdata('pre_check_oldSchool');
+        $data['preCheckDistrict'] = $this->session->getFlashdata('pre_check_district');
+        $data['preCheckProvince'] = $this->session->getFlashdata('pre_check_province');
         $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
         
         // Get courses based on level
@@ -99,9 +111,14 @@ class UserControlNewAdmission extends BaseController
     public function ajax_school_search()
     {
         $searchTerm = $this->request->getVar('q'); // select2 sends 'q' for search term
+        $isServiceArea = $this->request->getVar('is_service_area');
 
-        // The getSchool method already exists in AdmissionModel
-        $response = $this->admissionModel->getSchool(['search' => $searchTerm]);
+        if ($isServiceArea === 'true') {
+             $response = $this->admissionModel->getServiceAreaSchools($searchTerm);
+        } else {
+             // The getSchool method already exists in AdmissionModel
+             $response = $this->admissionModel->getSchool(['search' => $searchTerm]);
+        }
 
         // Re-format for Select2.js, which expects 'id' and 'text' keys
         $select2_data = [];

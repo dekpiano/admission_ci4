@@ -129,6 +129,13 @@
               </a>
             </li>
             
+            <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/service-area-schools') !== false) ? 'active' : '' ?>">
+              <a href="<?= site_url('skjadmin/service-area-schools') ?>" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-map-pin"></i>
+                <div data-i18n="ServiceArea">โรงเรียนในเขตพื้นที่</div>
+              </a>
+            </li>
+
             <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/settings') !== false) ? 'active' : '' ?>">
               <a href="<?= site_url('skjadmin/settings') ?>" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-cog"></i>

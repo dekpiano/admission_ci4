@@ -246,10 +246,10 @@
                         <div class="row mb-3">
                             <div class="col-sm-12">
                                 <label for="recruit_category" class="form-label">ประเภทโควตา <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-star'></i></span>
                                     <select class="form-select" name="recruit_category" id="recruit_category" required>
-                                        <option value="" selected disabled>-- กรุณาเลือกประเภทโควตา --</option>
+                                        <option value="" disabled selected>-- กรุณาเลือกประเภทโควตา --</option>
                                         <?php foreach($quotas as $quota): ?>
                                             <?php if($quota->quota_status == 'on' && strpos($quota->quota_level, (string)$level) !== false): ?>
                                                 <option value="<?= $quota->quota_key ?>" data-courses="<?= $quota->quota_course ?>">
@@ -262,26 +262,43 @@
                             </div>
                         </div>
 
+                        <!-- Service Area School Search (Hidden by default) -->
+                        <div class="row mb-3" id="service_area_section" style="display:none;">
+                            <div class="col-sm-12">
+                                <div class="alert alert-info">
+                                    <i class='bx bx-info-circle me-1'></i> สำหรับโควตาเขตพื้นที่บริการ กรุณาระบุโรงเรียนเดิมของท่านเพื่อตรวจสอบสิทธิ์
+                                </div>
+                                <label for="service_area_school_search" class="form-label">ค้นหาโรงเรียนเดิม (เฉพาะในเขตพื้นที่บริการ) <span class="text-danger">*</span></label>
+                                <div class="input-group flex-nowrap">
+                                    <span class="input-group-text"><i class='bx bxs-school'></i></span>
+                                    <select class="form-select" id="service_area_school_search" style="width: 100%;">
+                                        <option value="">-- พิมพ์ชื่อโรงเรียนเพื่อค้นหา --</option>
+                                    </select>
+                                </div>
+                                <div class="form-text text-danger">* ต้องเลือกโรงเรียนจากรายการที่ปรากฏเท่านั้น หากไม่พบแสดงว่าไม่อยู่ในเขตพื้นที่บริการ</div>
+                            </div>
+                        </div>
+
                         <div class="row mb-3" id="course_section" style="display:none;">
                             <div class="col-sm-12">
                                 <label class="form-label">เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span class="text-danger">*</span></label>
                                 
-                                <div class="mb-2 input-group">
-                                    <span class="input-group-text">อันดับ 1</span>
+                                <div class="mb-2 input-group flex-nowrap">
+                                    <span class="input-group-text" style="min-width: 80px;">อันดับ 1</span>
                                     <select class="form-select course-select" name="recruit_tpyeRoom1" id="recruit_tpyeRoom1" required>
                                         <option value="" selected disabled>-- เลือกอันดับ 1 --</option>
                                     </select>
                                 </div>
 
-                                <div class="mb-2 input-group">
-                                    <span class="input-group-text">อันดับ 2</span>
+                                <div class="mb-2 input-group flex-nowrap">
+                                    <span class="input-group-text" style="min-width: 80px;">อันดับ 2</span>
                                     <select class="form-select course-select" name="recruit_tpyeRoom2" id="recruit_tpyeRoom2">
                                         <option value="" selected disabled>-- เลือกอันดับ 2 --</option>
                                     </select>
                                 </div>
 
-                                <div class="mb-2 input-group">
-                                    <span class="input-group-text">อันดับ 3</span>
+                                <div class="mb-2 input-group flex-nowrap">
+                                    <span class="input-group-text" style="min-width: 80px;">อันดับ 3</span>
                                     <select class="form-select course-select" name="recruit_tpyeRoom3" id="recruit_tpyeRoom3">
                                         <option value="" selected disabled>-- เลือกอันดับ 3 --</option>
                                     </select>
@@ -331,14 +348,14 @@
                             </div>
                             <div class="col-sm-4">
                                 <label for="recruit_firstName" class="form-label">ชื่อ <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-user'></i></span>
                                     <input type="text" class="form-control" name="recruit_firstName" id="recruit_firstName" placeholder="ชื่อจริง" required>
                                 </div>
                             </div>
                             <div class="col-sm-5">
                                 <label for="recruit_lastName" class="form-label">นามสกุล <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-user'></i></span>
                                     <input type="text" class="form-control" name="recruit_lastName" id="recruit_lastName" placeholder="นามสกุล" required>
                                 </div>
@@ -348,7 +365,7 @@
                         <div class="row mb-3">
                             <div class="col-sm-12">
                                 <label for="recruit_idCard" class="form-label">เลขบัตรประชาชน (13 หลัก) <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-id-card'></i></span>
                                     <input type="text" class="form-control" name="recruit_idCard" id="recruit_idCard" maxlength="13" required placeholder="เลขบัตรประชาชน 13 หลัก" value="<?= isset($preCheckIdCard) ? $preCheckIdCard : '' ?>" readonly>
                                 </div>
@@ -442,7 +459,7 @@
                         <div class="row mb-3">
                             <div class="col-sm-12">
                                 <label for="recruit_phone" class="form-label">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-phone'></i></span>
                                     <input type="tel" class="form-control" name="recruit_phone" id="recruit_phone" placeholder="08xxxxxxxx" required>
                                 </div>
@@ -459,7 +476,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="recruit_homeNumber" class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-home'></i></span>
                                     <input type="text" class="form-control" name="recruit_homeNumber" id="recruit_homeNumber" placeholder="บ้านเลขที่" required>
                                 </div>
@@ -492,7 +509,7 @@
                         <div class="row mb-3">
                              <div class="col-md-6">
                                 <label for="recruit_homePostcode" class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-map-pin'></i></span>
                                     <input type="text" class="form-control" name="recruit_homePostcode" id="recruit_homePostcode" placeholder="รหัสไปรษณีย์" required>
                                 </div>
@@ -509,29 +526,34 @@
                         <div class="row mb-3">
                             <div class="col-sm-12">
                                 <label for="recruit_oldSchool_select" class="form-label">ค้นหาโรงเรียนเดิม <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bxs-school'></i></span>
-                                    <select class="form-select" id="recruit_oldSchool_select" required>
-                                        <option value="">-- พิมพ์เพื่อค้นหาชื่อโรงเรียน --</option>
-                                    </select>
-                                    <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool" required>
+                                    <?php if(isset($preCheckOldSchool) && !empty($preCheckOldSchool)): ?>
+                                        <input type="text" class="form-control" value="<?= $preCheckOldSchool ?>" readonly>
+                                        <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool" value="<?= $preCheckOldSchool ?>">
+                                    <?php else: ?>
+                                        <select class="form-select" id="recruit_oldSchool_select" required>
+                                            <option value="">-- พิมพ์เพื่อค้นหาชื่อโรงเรียน --</option>
+                                        </select>
+                                        <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool" required>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-sm-6">
                                 <label for="recruit_district" class="form-label">อำเภอที่ตั้งโรงเรียน <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="recruit_district" id="recruit_district" placeholder="อำเภอ" required>
+                                <input type="text" class="form-control" name="recruit_district" id="recruit_district" placeholder="อำเภอ" required value="<?= isset($preCheckDistrict) ? $preCheckDistrict : '' ?>" <?= isset($preCheckDistrict) && !empty($preCheckDistrict) ? 'readonly' : '' ?>>
                             </div>
                             <div class="col-sm-6">
                                 <label for="recruit_province" class="form-label">จังหวัดที่ตั้งโรงเรียน <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="recruit_province" id="recruit_province" placeholder="จังหวัด" required>
+                                <input type="text" class="form-control" name="recruit_province" id="recruit_province" placeholder="จังหวัด" required value="<?= isset($preCheckProvince) ? $preCheckProvince : '' ?>" <?= isset($preCheckProvince) && !empty($preCheckProvince) ? 'readonly' : '' ?>>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-sm-12">
                                 <label for="recruit_grade" class="form-label">เกรดเฉลี่ยสะสม (GPAX) <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-bar-chart-alt-2'></i></span>
                                     <input type="number" step="0.01" min="0" max="4.00" class="form-control" name="recruit_grade" id="recruit_grade" placeholder="เช่น 3.50" required>
                                 </div>
@@ -649,8 +671,11 @@
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
+                    var selectedQuotaText = $('#recruit_category option:selected').text();
+                    var isServiceArea = selectedQuotaText.includes('เขตพื้นที่บริการ');
                     return {
-                        q: params.term // search term
+                        q: params.term, // search term
+                        is_service_area: isServiceArea
                     };
                 },
                 processResults: function (data) {
@@ -784,9 +809,131 @@
 
     const coursesData = <?= json_encode($courses) ?>;
     
+    // Initialize Service Area School Search (Step 1)
+    $('#service_area_school_search').select2({
+        theme: 'bootstrap-5',
+        placeholder: '-- พิมพ์ชื่อโรงเรียนเพื่อค้นหา --',
+        allowClear: true,
+        width: '100%',
+        ajax: {
+            url: '<?= base_url('new-admission/school-search') ?>',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // search term
+                    is_service_area: true // Force service area search
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.results
+                };
+            },
+            cache: true
+        }
+    });
+
+    // Handle Service Area School Selection
+    $('#service_area_school_search').on('select2:select', function (e) {
+        var data = e.params.data;
+        
+        // Auto-fill Step 4 fields
+        var step4Select = $('#recruit_oldSchool_select');
+        if (step4Select.find("option[value='" + data.id + "']").length) {
+            step4Select.val(data.id).trigger('change');
+        } else { 
+            var newOption = new Option(data.text, data.id, true, true);
+            step4Select.append(newOption).trigger('change');
+        }
+
+        $('#recruit_oldSchool').val(data.text);
+        $('#recruit_district').val(data.amphur);
+        $('#recruit_province').val(data.province);
+        
+        // Show Course Section after school is selected (if quota is service area)
+        const quotaText = $('#recruit_category option:selected').text();
+        if (quotaText.includes('เขตพื้นที่บริการ')) {
+             $('#course_section').slideDown();
+        }
+    });
+
     document.getElementById('recruit_category').addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
+        const quotaText = selectedOption.text;
         const allowedCourses = selectedOption.getAttribute('data-courses').split('|');
+        
+        // Handle Service Area Logic
+        const serviceAreaSection = document.getElementById('service_area_section');
+        const serviceAreaSearch = document.getElementById('service_area_school_search');
+        const courseSection = document.getElementById('course_section');
+        
+        // Reset Step 4 fields state first
+        $('#recruit_oldSchool').val('');
+        $('#recruit_district').val('');
+        $('#recruit_province').val('');
+        $('#recruit_district').prop('readonly', false);
+        $('#recruit_province').prop('readonly', false);
+        $('#recruit_oldSchool_select').val(null).trigger('change');
+        $('#recruit_oldSchool_select').prop('disabled', false);
+        // If it was replaced by a text input (from pre-check), we might need to handle that, 
+        // but here we assume standard flow or that pre-check data is already handled on load.
+        // For simplicity, we target the select2.
+
+        if (quotaText.includes('เขตพื้นที่บริการ')) {
+            // --- Service Area Quota ---
+            serviceAreaSection.style.display = 'block';
+            serviceAreaSearch.setAttribute('data-required', 'true'); 
+            
+            if (!$('#service_area_school_search').val()) {
+                courseSection.style.display = 'none';
+            } else {
+                courseSection.style.display = 'block';
+            }
+
+        } else if (quotaText.includes('โรงเรียนเดิม')) {
+            // --- Old School Quota (M.3 Original School) ---
+            serviceAreaSection.style.display = 'none';
+            serviceAreaSearch.removeAttribute('data-required');
+            
+            // Auto-fill Step 4 with Fixed School
+            const fixedSchoolName = "สวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์";
+            const fixedDistrict = "เมืองนครสวรรค์";
+            const fixedProvince = "นครสวรรค์";
+
+            // Set Hidden Fields
+            $('#recruit_oldSchool').val(fixedSchoolName);
+            $('#recruit_district').val(fixedDistrict);
+            $('#recruit_province').val(fixedProvince);
+
+            // Set Visual Fields (Step 4)
+            // Update Select2
+            var step4Select = $('#recruit_oldSchool_select');
+            if (step4Select.find("option[value='" + fixedSchoolName + "']").length) {
+                step4Select.val(fixedSchoolName).trigger('change');
+            } else { 
+                var newOption = new Option(fixedSchoolName, fixedSchoolName, true, true);
+                step4Select.append(newOption).trigger('change');
+            }
+            step4Select.prop('disabled', true); // Lock the select
+
+            // Lock District and Province inputs
+            $('#recruit_district').val(fixedDistrict).prop('readonly', true);
+            $('#recruit_province').val(fixedProvince).prop('readonly', true);
+
+            // Show Course Section immediately
+            courseSection.style.display = 'block';
+
+        } else {
+            // --- Other Quotas ---
+            serviceAreaSection.style.display = 'none';
+            serviceAreaSearch.removeAttribute('data-required');
+            $('#service_area_school_search').val(null).trigger('change'); 
+            
+            // Show course section immediately
+            courseSection.style.display = 'block';
+        }
+
         const courseSelects = [
             document.getElementById('recruit_tpyeRoom1'),
             document.getElementById('recruit_tpyeRoom2'),
@@ -799,7 +946,7 @@
             courseSelects[2].closest('.input-group')
         ];
         
-        const courseSection = document.getElementById('course_section');
+
         const courseLabel = courseSection.querySelector('label.form-label'); // Get the label element
         
         // Create container for age radio buttons if it doesn't exist
@@ -970,7 +1117,10 @@
                         if (allowedCourses.includes(course.course_id.toString())) {
                             const option = document.createElement('option');
                             option.value = course.course_id;
-                            option.text = course.course_fullname;
+                            // Display: Initials - Branch (e.g., วิทย์-คณิต - ห้องเรียนพิเศษ)
+                            const initials = course.course_initials || course.course_fullname; // Fallback to fullname if initials missing
+                            const branch = course.course_branch || '';
+                            option.text = `${initials} ${branch ? '(' + branch + ')' : ''}`;
                             select.appendChild(option);
                         }
                     });
@@ -984,30 +1134,48 @@
             courseSection.style.display = 'none';
             courseSelects[0].required = false;
             if(ageRadioContainer) ageRadioContainer.style.display = 'none';
+            if(ageRadioContainer) ageRadioContainer.style.display = 'none';
         }
+        
+        // Re-attach duplicate prevention logic
+        setupCourseSelectionLogic();
     });
 
-    const courseSelects = document.querySelectorAll('.course-select');
-    courseSelects.forEach(select => {
-        select.addEventListener('change', function() {
-            const selectedValues = Array.from(courseSelects)
+    function setupCourseSelectionLogic() {
+        const selects = document.querySelectorAll('.course-select');
+        
+        function updateOptions() {
+            const selectedValues = Array.from(selects)
                 .map(s => s.value)
                 .filter(v => v !== "");
 
-            courseSelects.forEach(s => {
+            selects.forEach(s => {
                 const currentVal = s.value;
                 Array.from(s.options).forEach(opt => {
                     if (opt.value === "") return; 
                     
-                    if (opt.value === currentVal || !selectedValues.includes(opt.value)) {
-                        opt.disabled = false;
-                    } else {
+                    // Disable if selected in OTHER selects
+                    // But keep enabled if it's the currently selected value of THIS select
+                    if (selectedValues.includes(opt.value) && opt.value !== currentVal) {
                         opt.disabled = true;
+                    } else {
+                        opt.disabled = false;
                     }
                 });
             });
+        }
+
+        selects.forEach(select => {
+            // Remove old listeners to avoid duplicates if called multiple times (though replaceChild handles that mostly)
+            // But since we use anonymous function, we can't easily remove. 
+            // Better to just ensure we are attaching to fresh elements or handle it.
+            // Since we replace elements in the quota change logic, we just need to attach 'change' event.
+            select.addEventListener('change', updateOptions);
         });
-    });
+    }
+
+    // Initial setup
+    setupCourseSelectionLogic();
 
     // Wizard Logic
     let currentStep = 1;
@@ -1065,7 +1233,22 @@
                 value = birthday;
             } else if(element && element.tagName === 'SELECT') {
                  if (element.value !== "") {
-                    value = element.options[element.selectedIndex].text;
+                    // Check if it's a course selection
+                    if (key.startsWith('recruit_tpyeRoom')) {
+                        const courseId = element.value;
+                        const course = coursesData.find(c => c.course_id == courseId);
+                        if (course) {
+                            // Display: Initials - Branch (e.g., วิทย์-คณิต - ห้องเรียนพิเศษ)
+                            // Handle potential null/empty values gracefully
+                            const initials = course.course_initials || course.course_fullname;
+                            const branch = course.course_branch || '';
+                            value = `${initials} ${branch ? '(' + branch + ')' : ''}`;
+                        } else {
+                            value = element.options[element.selectedIndex].text;
+                        }
+                    } else {
+                        value = element.options[element.selectedIndex].text;
+                    }
                  } else {
                     value = 'ไม่ได้เลือก';
                  }
@@ -1145,6 +1328,23 @@
         const stepEl = document.getElementById('step-' + step);
         const inputs = stepEl.querySelectorAll('input, select, textarea');
         let valid = true;
+
+        // Custom Validation for Service Area School in Step 1
+        if (step === 1) {
+            const serviceAreaSearch = document.getElementById('service_area_school_search');
+            if (serviceAreaSearch && serviceAreaSearch.hasAttribute('data-required')) {
+                // Check if value is selected (Select2 uses the select element's value)
+                if (!$(serviceAreaSearch).val()) {
+                    // Show error (maybe using SweetAlert or adding class)
+                    // Since it's a select2, adding is-invalid to the select might not show visually on the select2 container
+                    // We can use the container:
+                    $(serviceAreaSearch).next('.select2-container').find('.select2-selection').addClass('border-danger');
+                    valid = false;
+                } else {
+                    $(serviceAreaSearch).next('.select2-container').find('.select2-selection').removeClass('border-danger');
+                }
+            }
+        }
 
         inputs.forEach(input => {
             if (input.hasAttribute('required') && !input.value) {

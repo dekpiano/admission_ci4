@@ -68,6 +68,12 @@ class AdmissionModel extends Model
     {
         return $this->select('recruit_id')->orderBy('recruit_id', 'DESC')->get()->getRow();
     }
+
+    public function checkIdCard($idCard)
+    {
+        $year = $this->getOpenYear()->openyear_year;
+        return $this->isIdCardRegistered($idCard, $year);
+    }
     
     public function findStudentForStatusCheck($idcard, $birthday, $year)
     {
@@ -178,6 +184,27 @@ class AdmissionModel extends Model
             }
         }
 
+        return $response;
+    }
+
+    public function getServiceAreaSchools($search)
+    {
+        $builder = $this->db->table('tb_service_area_schools');
+        $builder->select('id, school_name, school_amphur, school_province');
+        if (!empty($search)) {
+            $builder->like('school_name', $search);
+        }
+        $records = $builder->get()->getResult();
+
+        $response = [];
+        foreach ($records as $row) {
+            $response[] = [
+                "value" => $row->school_name, // Use name as value for consistency if ID is not used in main table
+                "label" => $row->school_name,
+                "province" => $row->school_province,
+                "amphur" => $row->school_amphur
+            ];
+        }
         return $response;
     }
 }

@@ -75,7 +75,13 @@
                                 <div class="form-floating">
                                     <select class="form-select" name="search_year" id="search_year" required>
                                         <option value="">ปี (พ.ศ.)</option>
-                                        <?php $curYear = date('Y')+543; for($i=$curYear-20; $i<=$curYear-10; $i++): ?>
+                                        <?php 
+                                            $curYear = date('Y')+543; 
+                                            // Expand range: 9 years old to 25 years old
+                                            $startYear = $curYear - 25;
+                                            $endYear = $curYear - 9;
+                                            for($i=$startYear; $i<=$endYear; $i++): 
+                                        ?>
                                             <option value="<?= $i ?>"><?= $i ?></option>
                                         <?php endfor; ?>
                                     </select>
@@ -116,7 +122,7 @@
                     </div>
 
                     <div class="d-grid mt-3">
-                        <a href="#" class="btn btn-outline-primary" id="print_btn" style="display:none;">
+                        <a href="#" class="btn btn-outline-primary" id="print_btn" style="display:none;" target="_blank">
                             <i class="bx bx-printer me-1"></i> พิมพ์ใบสมัคร
                         </a>
                         <a href="#" class="btn btn-warning mt-2" id="edit_btn" style="display:none;">
@@ -159,9 +165,11 @@
 
         // Debug: Log data being sent
         console.log('--- Data sending to server ---');
-        for (var pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]); 
-        }
+        console.log('ID Card:', formData.get('search_idcard'));
+        console.log('DOB (Gregorian):', dob);
+        console.log('Year (Gregorian):', gregorianYear);
+        console.log('Month:', formData.get('search_month'));
+        console.log('Day:', formData.get('search_day'));
         console.log('------------------------------');
 
         btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังตรวจสอบ...';
