@@ -169,7 +169,7 @@ class AdmissionModel extends Model
         if (isset($postData['search'])) {
             // Select record
             $builder = $db_schollall->table('schoolall');
-            $builder->select('schoola_province,schoola_amphur,schoola_name,schoola_id');
+            $builder->select('schoola_province,schoola_amphur,schoola_district,schoola_name,schoola_id');
             $builder->like('schoola_name', $postData['search']);
 
             $records = $builder->get()->getResult();
@@ -179,6 +179,7 @@ class AdmissionModel extends Model
                     "value" => $row->schoola_id,
                     "label" => $row->schoola_name,
                     "amphur" => $row->schoola_amphur,
+                    "district" => $row->schoola_district,
                     "province" => $row->schoola_province,
                 );
             }

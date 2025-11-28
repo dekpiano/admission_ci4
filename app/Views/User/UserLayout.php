@@ -286,6 +286,12 @@
                 <div data-i18n="Status">ตรวจสอบสถานะ</div>
               </a>
             </li>
+            <li class="menu-item <?= uri_string() == 'confirmation/login' ? 'active' : '' ?>">
+              <a href="<?= base_url('confirmation/login') ?>" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user-check"></i>
+                <div data-i18n="Confirmation">รายงานตัวนักเรียนใหม่</div>
+              </a>
+            </li>
 
 
           </ul>

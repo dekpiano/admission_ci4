@@ -52,10 +52,15 @@ $routes->get('StudentsStatus', 'User\UserControlStudents::StudentsStatus');
 $routes->get('Students/Logout', 'User\UserControlStudents::logoutStudent');
 $routes->get('Students/Print', 'User\UserControlStudents::PDFForStudent');
 
-// Confirm
-$routes->get('Confirm', 'User\UserControlConfirm::StudentsConfirm');
-$routes->get('Confirm/Logout', 'User\UserControlLogin::Confirmlogout');
-$routes->get('Confirm/Print', 'User\UserControlConfirm::PDFForStudent');
+// Confirmation (Online Registration)
+$routes->group('confirmation', ['namespace' => 'App\Controllers\User'], function ($routes) {
+    $routes->get('/', 'UserControlConfirmation::login'); // Default to login
+    $routes->get('login', 'UserControlConfirmation::login');
+    $routes->post('check', 'UserControlConfirmation::checkStudent');
+    $routes->get('form', 'UserControlConfirmation::form');
+    $routes->post('save', 'UserControlConfirmation::save');
+    $routes->get('logout', 'UserControlConfirmation::logout');
+});
 
 // Admin
 $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
@@ -81,10 +86,6 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($rou
     $routes->post('admission/SelectThailand', 'AdminControlAdmission::SelectThailand');
     $routes->post('admission/DataRecruitment', 'AdminControlAdmission::DataRecruitment');
     
-    // Confirm
-    $routes->get('PrintConfirm/(:any)', 'AdminControlConfirm::PagePrintConnfirm/$1');
-    $routes->get('Confirm/pdfConfirm/(:any)/(:any)', 'AdminControlConfirm::pdfConfirm/$1/$2'); 
-
     // Surrender
     $routes->get('Surrender/(:any)', 'AdminControlSurrender::PageSurrenderMain/$1');
     $routes->post('surrender/UpdateSurrender', 'AdminControlSurrender::UpdateSurrender');

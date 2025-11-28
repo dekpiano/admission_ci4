@@ -128,6 +128,9 @@
                         <a href="#" class="btn btn-warning mt-2" id="edit_btn" style="display:none;">
                             <i class="bx bx-edit me-1"></i> แก้ไขข้อมูล
                         </a>
+                        <a href="<?= base_url('confirmation/login') ?>" class="btn btn-success mt-2" id="confirmation_btn" style="display:none;">
+                            <i class="bx bx-user-check me-1"></i> รายงานตัวออนไลน์
+                        </a>
                     </div>
                 </div>
             </div>
@@ -201,22 +204,25 @@
                 // Reset classes
                 statusBadge.className = 'badge';
                 
+                document.getElementById('print_btn').style.display = 'none';
+                document.getElementById('edit_btn').style.display = 'none';
+                document.getElementById('confirmation_btn').style.display = 'none';
+
                 if (student.recruit_status.includes('ผ่านการตรวจสอบ')) {
                     statusBadge.classList.add('bg-success'); // Green
                     document.getElementById('print_btn').style.display = 'block';
                     document.getElementById('print_btn').href = '<?= base_url('control_admission/pdf/') ?>' + student.recruit_id;
-                    document.getElementById('edit_btn').style.display = 'none'; // Hide edit button
+                    document.getElementById('confirmation_btn').style.display = 'block'; // Show confirmation button
                 } else { // Status is not 'ผ่านการตรวจสอบ'
-                    document.getElementById('print_btn').style.display = 'none';
-                    document.getElementById('edit_btn').style.display = 'block'; // Show edit button
-                    document.getElementById('edit_btn').href = '<?= base_url('admission/edit/') ?>' + student.recruit_id;
-
                     // Determine badge color for non-verified statuses
                     if (student.recruit_status.includes('ไม่ผ่านการตรวจสอบ') || student.recruit_status.includes('แก้ไข')) {
                         statusBadge.classList.add('bg-danger'); // Red
+                        document.getElementById('edit_btn').style.display = 'block'; // Show edit button
+                        document.getElementById('edit_btn').href = '<?= base_url('admission/edit/') ?>' + student.recruit_id;
                     } else if (student.recruit_status.includes('รอการตรวจสอบ')) {
                         statusBadge.classList.add('bg-warning'); // Yellow/Orange (Waiting)
-                    } else {
+                    }
+                     else {
                         statusBadge.classList.add('bg-info'); // Default for other non-verified statuses
                     }
                 }
