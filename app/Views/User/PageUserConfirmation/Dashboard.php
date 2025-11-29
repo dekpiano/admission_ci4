@@ -531,49 +531,57 @@
             }
         });
         
-        $('input[name="par_service"]').change(function(){
+        // Father
+        $('input[name="par_service"]').change(function(e, isInit){
             var name = $(this).val();
-            // Hide all service inputs for Father
-            $('input[name="par_serviceName[]"]').hide().val('');
+            var textInputs = $('input[name="par_serviceName[]"]');
+            
+            if (!isInit) {
+                textInputs.hide().val('');
+            } else {
+                textInputs.hide();
+            }
             
             if(name != 'ไม่ได้รับราชการ'){
-                 // Find the input associated with this radio
-                 // Structure: .d-flex > .form-check > input[radio] ... input[text]
-                 $(this).closest('.form-check').next('input[name="par_serviceName[]"]').show().focus();
+                 var target = $(this).closest('.form-check').next('input[name="par_serviceName[]"]');
+                 target.show();
+                 if(!isInit) target.focus();
             }
         });
 
         // Mother
-        $('input[name="par_restM"]').change(function(){
-            if($(this).val() == 'อื่นๆ'){
-                $('#par_restOrthorM').show().focus();
-            }else{
-                $('#par_restOrthorM').hide().val('');
-            }
-        });
-        
-         $('input[name="par_serviceM"]').change(function(){
+         $('input[name="par_serviceM"]').change(function(e, isInit){
             var name = $(this).val();
-            $('input[name="par_serviceNameM[]"]').hide().val('');
+            var textInputs = $('input[name="par_serviceNameM[]"]');
+            
+            if (!isInit) {
+                textInputs.hide().val('');
+            } else {
+                textInputs.hide();
+            }
+
             if(name != 'ไม่ได้รับราชการ'){
-                 $(this).closest('.form-check').next('input[name="par_serviceNameM[]"]').show().focus();
+                 var target = $(this).closest('.form-check').next('input[name="par_serviceNameM[]"]');
+                 target.show();
+                 if(!isInit) target.focus();
             }
         });
 
         // Guardian
-        $('input[name="par_restO"]').change(function(){
-            if($(this).val() == 'อื่นๆ'){
-                $('#par_restOrthorO').show().focus();
-            }else{
-                $('#par_restOrthorO').hide().val('');
-            }
-        });
-        
-         $('input[name="par_serviceO"]').change(function(){
+         $('input[name="par_serviceO"]').change(function(e, isInit){
             var name = $(this).val();
-            $('input[name="par_serviceNameO[]"]').hide().val('');
+            var textInputs = $('input[name="par_serviceNameO[]"]');
+            
+            if (!isInit) {
+                textInputs.hide().val('');
+            } else {
+                textInputs.hide();
+            }
+
             if(name != 'ไม่ได้รับราชการ'){
-                 $(this).closest('.form-check').next('input[name="par_serviceNameO[]"]').show().focus();
+                 var target = $(this).closest('.form-check').next('input[name="par_serviceNameO[]"]');
+                 target.show();
+                 if(!isInit) target.focus();
             }
         });
         
@@ -588,11 +596,11 @@
 
         // Trigger change events on load to set initial state
         $('input[name="par_rest"]:checked').trigger('change');
-        $('input[name="par_service"]:checked').trigger('change');
+        $('input[name="par_service"]:checked').trigger('change', [true]);
         $('input[name="par_restM"]:checked').trigger('change');
-        $('input[name="par_serviceM"]:checked').trigger('change');
+        $('input[name="par_serviceM"]:checked').trigger('change', [true]);
         $('input[name="par_restO"]:checked').trigger('change');
-        $('input[name="par_serviceO"]:checked').trigger('change');
+        $('input[name="par_serviceO"]:checked').trigger('change', [true]);
         $('input[name="stu_presentLife"]:checked').trigger('change');
 
         // Checkbox "Same as Home Address"

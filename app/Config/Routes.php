@@ -59,6 +59,7 @@ $routes->group('confirmation', ['namespace' => 'App\Controllers\User'], function
     $routes->post('check', 'UserControlConfirmation::checkStudent');
     $routes->get('form', 'UserControlConfirmation::form');
     $routes->post('save', 'UserControlConfirmation::save');
+    $routes->get('save', 'UserControlConfirmation::form'); // Redirect GET requests to form to prevent 404
     $routes->get('logout', 'UserControlConfirmation::logout');
 });
 

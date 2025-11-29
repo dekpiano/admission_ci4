@@ -58,10 +58,22 @@
                 <?php 
                 if(@$stuConf[0]->stu_birthDay){
                     $birt =  explode("-",$stuConf[0]->stu_birthDay); 
-                    $stuYear = intval(@$birt[2]);$stuMount = intval(@$birt[1]);$stuDay = intval(@$birt[0]);
+                    // Database format is YYYY-MM-DD
+                    $stuYear = intval(@$birt[0]) + 543; // Convert AD to BE
+                    $stuMount = intval(@$birt[1]);
+                    $stuDay = intval(@$birt[2]);
                 }else{
                     $birt =  explode("-",$stu[0]->recruit_birthday); 
-                    $stuYear = intval(@$birt[0]+543);$stuMount = intval(@$birt[1]);$stuDay = intval(@$birt[2]);            
+                    // Recruit format might be YYYY-MM-DD as well, check if year > 2400 (BE) or < 2100 (AD)
+                    // Assuming recruit_birthday is also YYYY-MM-DD (AD)
+                    $year = intval(@$birt[0]);
+                    if ($year < 2400) {
+                         $stuYear = $year + 543;
+                    } else {
+                         $stuYear = $year;
+                    }
+                    $stuMount = intval(@$birt[1]);
+                    $stuDay = intval(@$birt[2]);            
                 }
                 ?>
                 
@@ -261,7 +273,7 @@
                         <div class="col">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="stu_parenalStatus" id="stu_parenalStatus<?=$key?>"
-                                    value="<?=$v_parstu;?>" <?php if(isset($stuConf[0]->stu_parenalStatus) && $stuConf[0]->stu_parenalStatus == $v_parstu) echo "checked"; ?> required>
+                                    value="<?=$v_parstu;?>" <?php if(isset($stuConf[0]->stu_parenalStatus) && trim($stuConf[0]->stu_parenalStatus) == $v_parstu) echo "checked"; ?> required>
                                 <label class="form-check-label" for="stu_parenalStatus<?=$key?>"><?=$v_parstu;?></label>
                             </div>
                         </div>
@@ -277,7 +289,7 @@
                         <div class="col">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="stu_presentLife" id="stu_presentLife<?=$key?>"
-                                    value="<?=$v_pars;?>" <?php if(isset($stuConf[0]->stu_presentLife) && $stuConf[0]->stu_presentLife == $v_pars) echo "checked"; ?> required>
+                                    value="<?=$v_pars;?>" <?php if(isset($stuConf[0]->stu_presentLife) && trim($stuConf[0]->stu_presentLife) == $v_pars) echo "checked"; ?> required>
                                 <label class="form-check-label" for="stu_presentLife<?=$key?>"><?=$v_pars;?></label>
                             </div>
                         </div>
@@ -286,7 +298,7 @@
                         <div class="col">
                             <input type="text" id="stu_personOther" name="stu_personOther" class="form-control form-control-sm"
                             value="<?=($stuConf[0]->stu_personOther ?? '')?>" 
-                            style="<?=($stuConf[0]->stu_presentLife ?? '') == "บุคคลอื่น" ? '' : 'display:none;'?>" 
+                            style="<?=trim($stuConf[0]->stu_presentLife ?? '') == "บุคคลอื่น" ? '' : 'display:none;'?>" 
                             placeholder="ระบุบุคคลอื่น">
                         </div>
                     </div>

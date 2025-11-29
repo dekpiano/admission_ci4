@@ -141,7 +141,7 @@
                                 </div>
                                 <input type="text" class="form-control form-control-sm w-auto" 
                                     id="par_serviceName<?=$key?>" name="par_serviceName[]" placeholder="ระบุชื่อ<?=$v_Name?>"
-                                    value="<?=$father->par_serviceName ?? '';?>"
+                                    value="<?=($father->par_service ?? '') == $v_Name ? ($father->par_serviceName ?? '') : ''?>"
                                     style="<?=($father->par_service ?? '') == $v_Name ? '' : 'display:none;'?>">
                             </div>
                         </div>

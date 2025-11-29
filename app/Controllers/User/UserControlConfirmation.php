@@ -371,10 +371,6 @@ class UserControlConfirmation extends BaseController
             'par_hPostcode' . $suffix => 'required',
         ];
 
-        // Adjust rule keys to match input names for proper error reporting
-        // Actually, validation runs on $data keys.
-        // We need to set rules using the keys present in $data.
-        
         $validation = \Config\Services::validation();
         $validation->setRules($rules);
 
@@ -415,26 +411,41 @@ class UserControlConfirmation extends BaseController
             'par_rest' => $saveData['par_rest' . $suffix] ?? '',
             'par_restOrthor' => $saveData['par_restOrthor' . $suffix] ?? '',
             'par_service' => $saveData['par_service' . $suffix] ?? '',
-            // Handle serviceName array (take first non-empty element if array)
-            'par_serviceName' => is_array($saveData['par_serviceName' . $suffix] ?? '') ? (reset(array_filter($saveData['par_serviceName' . $suffix] ?? [], function($v) { return trim($v) !== ''; })) ?: '') : ($saveData['par_serviceName' . $suffix] ?? ''),
+            'par_serviceName' => $this->extractServiceName($saveData['par_serviceName' . $suffix] ?? ''),
             'par_claim' => $saveData['par_claim' . $suffix] ?? '',
         ];
 
-        // Check if parent record exists for this student and relation
-        $existing = $this->db->table('skjacth_personnel.tb_parent')
-                             ->where('par_stuID', $studentId)
-                             ->where('par_relationKey', $relationKey)
-                             ->get()->getRow();
+        try {
+            // Check if parent record exists for this student and relation
+            $existing = $this->db->table('skjacth_personnel.tb_parent')
+                                 ->where('par_stuID', $studentId)
+                                 ->where('par_relationKey', $relationKey)
+                                 ->get()->getRow();
 
-        if ($existing) {
-            $this->db->table('skjacth_personnel.tb_parent')
-                     ->where('par_id', $existing->par_id)
-                     ->update($parentData);
-        } else {
-            $this->db->table('skjacth_personnel.tb_parent')->insert($parentData);
+            if ($existing) {
+                $this->db->table('skjacth_personnel.tb_parent')
+                         ->where('par_id', $existing->par_id)
+                         ->update($parentData);
+            } else {
+                $this->db->table('skjacth_personnel.tb_parent')->insert($parentData);
+            }
+
+            return $this->response->setJSON(['status' => 'success', 'message' => 'บันทึกข้อมูล' . $relationKey . 'เรียบร้อยแล้ว']);
+        } catch (\Throwable $e) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Database Error: ' . $e->getMessage()]);
         }
+    }
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'บันทึกข้อมูล' . $relationKey . 'เรียบร้อยแล้ว']);
+    private function extractServiceName($input) {
+        if (is_array($input)) {
+            foreach ($input as $val) {
+                if (!empty(trim($val))) {
+                    return trim($val);
+                }
+            }
+            return '';
+        }
+        return trim($input);
     }
 
     /**

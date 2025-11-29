@@ -218,7 +218,7 @@
                                 </div>
                                 <input type="text" class="form-control form-control-sm w-auto" 
                                     id="par_serviceNameO<?=$key?>" name="par_serviceNameO[]" placeholder="ระบุชื่อ<?=$v_Name?>"
-                                    value="<?=$guardian->par_serviceName ?? '';?>"
+                                    value="<?=($guardian->par_service ?? '') == $v_Name ? ($guardian->par_serviceName ?? '') : ''?>"
                                     style="<?=($guardian->par_service ?? '') == $v_Name ? '' : 'display:none;'?>">
                             </div>
                         </div>
