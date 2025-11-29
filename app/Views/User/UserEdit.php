@@ -229,7 +229,7 @@
                                         <option value="" selected disabled>-- กรุณาเลือกประเภทโควตา --</option>
                                         <?php foreach($quotas as $quota): ?>
                                             <?php if($quota->quota_status == 'on' && strpos($quota->quota_level, (string)$level) !== false): ?>
-                                                <option value="<?= $quota->quota_key ?>" data-courses="<?= $quota->quota_course ?>" <?= (isset($student['recruit_category']) && $student['recruit_category'] == $quota->quota_key) ? 'selected' : '' ?>>
+                                                <option value="<?= $quota->quota_id ?>" data-courses="<?= $quota->quota_course ?>" <?= (isset($student['recruit_category']) && $student['recruit_category'] == $quota->quota_id) ? 'selected' : '' ?>>
                                                     <?= $quota->quota_explain ?>
                                                 </option>
                                             <?php endif; ?>

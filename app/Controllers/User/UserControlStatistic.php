@@ -25,7 +25,7 @@ class UserControlStatistic extends BaseController
 					SUM(CASE WHEN recruit_prefix = "เด็กหญิง" or recruit_prefix = "นางสาว" THEN 1 END) AS Girl,
 					SUM(CASE WHEN recruit_prefix = "เด็กชาย" or recruit_prefix = "นาย" THEN 1 END) AS Man,
 					tb_quota.quota_explain')
-            ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category')
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category')
             ->where('recruit_year', $year)
             ->groupBy('tb_recruitstudent.recruit_category')
             ->orderBy('recruit_date', 'ASC')
@@ -38,9 +38,9 @@ class UserControlStatistic extends BaseController
 					SUM(CASE WHEN recruit_prefix = "นางสาว" or recruit_prefix = "เด็กหญิง" AND recruit_regLevel = 4 THEN 1 END) AS Girl4,
 					SUM(CASE WHEN recruit_prefix = "นาย" or recruit_prefix = "เด็กชาย" AND recruit_regLevel = 4 THEN 1 END) AS Man4,
 					tb_quota.quota_explain')
-            ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category')
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category')
             ->where('recruit_year', $year)
-            ->where('recruit_category', "normal")
+            ->where('recruit_category', 3)
             ->where('recruit_date BETWEEN "2024-03-09" AND "2024-03-15"')
             ->groupBy('tb_recruitstudent.recruit_date')
             ->orderBy('recruit_date', 'ASC')
@@ -60,7 +60,7 @@ class UserControlStatistic extends BaseController
 			SUM(CASE WHEN recruit_prefix = "เด็กชาย"  and recruit_regLevel = 1 THEN 1 ELSE 0 END) AS M1,
 			SUM(CASE WHEN (recruit_prefix = "เด็กชาย" and recruit_regLevel = 4) or (recruit_prefix = "นาย" and recruit_regLevel = 4) THEN 1 ELSE 0 END) AS M4')
             ->where('recruit_year', $year)
-            ->where('recruit_category', 'normal')
+            ->where('recruit_category', 3)
             ->groupBy('recruit_date')
             ->get()->getResult();
 
@@ -85,7 +85,7 @@ class UserControlStatistic extends BaseController
 			SUM(CASE WHEN recruit_regLevel = 6 THEN 1 ELSE 0 END) AS M6,
 			COUNT(recruit_major) AS Tatal')
             ->where('recruit_year', $year)
-            ->where("recruit_category", "quotasport")
+            ->where("recruit_category", 5)
             ->groupBy('recruit_major')
             ->get()->getResult();
 
@@ -124,7 +124,8 @@ class UserControlStatistic extends BaseController
 			SUM(CASE WHEN recruit_regLevel = 6 THEN 1 ELSE 0 END) AS M6,
 			COUNT(recruit_major) AS Tatal')
             ->where('recruit_year', $year)
-            ->where("recruit_category", "quotasport")
+            ->where('recruit_year', $year)
+            ->where("recruit_category", 5)
             ->groupBy('recruit_major')
             ->get()->getResultArray();
         echo json_encode($data);
@@ -139,7 +140,7 @@ class UserControlStatistic extends BaseController
 					,tb_recruitstudent.recruit_year
 					,tb_recruitstudent.recruit_date')
             ->where('recruit_year', $Year)
-            ->where('recruit_category', 'quotasport')
+            ->where('recruit_category', 5)
             ->get()->getRow();
 
         echo json_encode($data['StatisticViewQuotaSportFM']);
@@ -188,7 +189,7 @@ class UserControlStatistic extends BaseController
 					,tb_recruitstudent.recruit_year
 					,tb_recruitstudent.recruit_date')
             ->where('recruit_year', $Year)
-            ->where('recruit_category', 'normal')
+            ->where('recruit_category', 3)
             ->get()->getRow();
 
         echo json_encode($data['StatisticGeneralTotal']);

@@ -252,7 +252,7 @@
                                         <option value="" disabled selected>-- กรุณาเลือกประเภทโควตา --</option>
                                         <?php foreach($quotas as $quota): ?>
                                             <?php if($quota->quota_status == 'on' && strpos($quota->quota_level, (string)$level) !== false): ?>
-                                                <option value="<?= $quota->quota_key ?>" data-courses="<?= $quota->quota_course ?>">
+                                                <option value="<?= $quota->quota_id ?>" data-courses="<?= $quota->quota_course ?>">
                                                     <?= $quota->quota_explain ?>
                                                 </option>
                                             <?php endif; ?>

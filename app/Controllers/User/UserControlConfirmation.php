@@ -238,6 +238,19 @@ class UserControlConfirmation extends BaseController
 
     private function saveStudent($data, $studentId)
     {
+        // Keep original data for saving
+        $saveData = $data;
+
+        // Clean data for validation
+        $data['stu_iden'] = str_replace('-', '', $data['stu_iden']);
+        $data['stu_phone'] = str_replace('-', '', $data['stu_phone']);
+        $data['stu_phoneUrgent'] = str_replace('-', '', $data['stu_phoneUrgent']);
+        $data['stu_phoneFriend'] = str_replace('-', '', $data['stu_phoneFriend']);
+        
+        // Construct birthdate for validation
+        $birthDate = ($data['stu_year'] - 543) . '-' . sprintf('%02d', $data['stu_month']) . '-' . sprintf('%02d', $data['stu_day']);
+        $data['stu_birthDay'] = $birthDate;
+
         // Validation Rules
         $rules = [
             'stu_iden' => 'required|numeric|exact_length[13]',
@@ -251,16 +264,6 @@ class UserControlConfirmation extends BaseController
             'stu_day' => 'required|numeric',
         ];
 
-        // Clean data before validation
-        $data['stu_iden'] = str_replace('-', '', $data['stu_iden']);
-        $data['stu_phone'] = str_replace('-', '', $data['stu_phone']);
-        $data['stu_phoneUrgent'] = str_replace('-', '', $data['stu_phoneUrgent']);
-        $data['stu_phoneFriend'] = str_replace('-', '', $data['stu_phoneFriend']);
-        
-        // Construct birthdate for validation
-        $birthDate = ($data['stu_year'] - 543) . '-' . sprintf('%02d', $data['stu_month']) . '-' . sprintf('%02d', $data['stu_day']);
-        $data['stu_birthDay'] = $birthDate;
-
         $validation = \Config\Services::validation();
         $validation->setRules($rules);
 
@@ -268,65 +271,67 @@ class UserControlConfirmation extends BaseController
             return $this->response->setJSON(['status' => 'error', 'message' => implode(', ', $validation->getErrors())]);
         }
 
-        // Prepare data for tb_students
+        // Prepare data for tb_students using ORIGINAL formatted data ($saveData) where appropriate
+        // But use constructed birthDate
         $studentData = [
-            'stu_iden' => $data['stu_iden'],
-            'stu_prefix' => $data['stu_prefix'],
-            'stu_fristName' => $data['stu_fristName'],
-            'stu_lastName' => $data['stu_lastName'],
-            'stu_nickName' => $data['stu_nickName'],
+            'stu_UpdateConfirm' => $this->admissionModel->getOpenYear()->openyear_year,
+            'stu_iden' => $saveData['stu_iden'], // Save with dashes
+            'stu_prefix' => $saveData['stu_prefix'],
+            'stu_fristName' => $saveData['stu_fristName'],
+            'stu_lastName' => $saveData['stu_lastName'],
+            'stu_nickName' => $saveData['stu_nickName'],
             'stu_birthDay' => $birthDate,
-            'stu_phone' => $data['stu_phone'],
-            'stu_email' => $data['stu_email'],
-            'stu_birthHospital' => $data['stu_birthHospital'],
-            'stu_birthTambon' => $data['stu_birthTambon'],
-            'stu_birthDistrict' => $data['stu_birthDistrict'],
-            'stu_birthProvirce' => $data['stu_birthProvirce'],
-            'stu_nationality' => $data['stu_nationality'],
-            'stu_race' => $data['stu_race'],
-            'stu_religion' => $data['stu_religion'],
-            'stu_bloodType' => $data['stu_bloodType'],
-            'stu_diseaes' => $data['stu_diseaes'],
-            'stu_disablde' => $data['stu_disablde'],
-            'stu_wieght' => $data['stu_wieght'],
-            'stu_hieght' => $data['stu_hieght'],
-            'stu_talent' => $data['stu_talent'],
-            'stu_numberSibling' => $data['stu_numberSibling'],
-            'stu_firstChild' => $data['stu_firstChild'],
-            'stu_numberSiblingSkj' => $data['stu_numberSiblingSkj'],
-            'stu_parenalStatus' => $data['stu_parenalStatus'],
-            'stu_presentLife' => $data['stu_presentLife'],
-            'stu_personOther' => $data['stu_personOther'] ?? '',
-            'stu_hCode' => $data['stu_hCode'],
-            'stu_hNumber' => $data['stu_hNumber'],
-            'stu_hMoo' => $data['stu_hMoo'],
-            'stu_hRoad' => $data['stu_hRoad'],
-            'stu_hTambon' => $data['stu_hTambon'],
-            'stu_hDistrict' => $data['stu_hDistrict'],
-            'stu_hProvince' => $data['stu_hProvince'],
-            'stu_hPostCode' => $data['stu_hPostCode'], 
-            'stu_cNumber' => $data['stu_cNumber'],
-            'stu_cMoo' => $data['stu_cMoo'],
-            'stu_cRoad' => $data['stu_cRoad'],
-            'stu_cTumbao' => $data['stu_cTumbao'],
-            'stu_cDistrict' => $data['stu_cDistrict'],
-            'stu_cProvince' => $data['stu_cProvince'],
-            'stu_cPostcode' => $data['stu_cPostcode'],
-            'stu_natureRoom' => $data['stu_natureRoom'],
-            'stu_farSchool' => $data['stu_farSchool'],
-            'stu_travel' => $data['stu_travel'],
-            'stu_gradLevel' => $data['stu_gradLevel'],
-            'stu_schoolfrom' => $data['stu_schoolfrom'],
-            'stu_schoolTambao' => $data['stu_schoolTambao'],
-            'stu_schoolDistrict' => $data['stu_schoolDistrict'],
-            'stu_schoolProvince' => $data['stu_schoolProvince'],
-            'stu_usedStudent' => $data['stu_usedStudent'],
-            'stu_inputLevel' => $data['stu_inputLevel'] ?? '',
-            'stu_phoneUrgent' => $data['stu_phoneUrgent'],
-            'stu_phoneFriend' => $data['stu_phoneFriend'],
+            'stu_phone' => $saveData['stu_phone'], // Save with dashes
+            'stu_email' => $saveData['stu_email'],
+            'stu_birthHospital' => $saveData['stu_birthHospital'],
+            'stu_birthTambon' => $saveData['stu_birthTambon'],
+            'stu_birthDistrict' => $saveData['stu_birthDistrict'],
+            'stu_birthProvirce' => $saveData['stu_birthProvirce'],
+            'stu_nationality' => $saveData['stu_nationality'],
+            'stu_race' => $saveData['stu_race'],
+            'stu_religion' => $saveData['stu_religion'],
+            'stu_bloodType' => $saveData['stu_bloodType'],
+            'stu_diseaes' => $saveData['stu_diseaes'],
+            'stu_disablde' => $saveData['stu_disablde'],
+            'stu_wieght' => $saveData['stu_wieght'],
+            'stu_hieght' => $saveData['stu_hieght'],
+            'stu_talent' => $saveData['stu_talent'],
+            'stu_numberSibling' => $saveData['stu_numberSibling'],
+            'stu_firstChild' => $saveData['stu_firstChild'],
+            'stu_numberSiblingSkj' => $saveData['stu_numberSiblingSkj'],
+            'stu_parenalStatus' => $saveData['stu_parenalStatus'],
+            'stu_presentLife' => $saveData['stu_presentLife'],
+            'stu_personOther' => $saveData['stu_personOther'] ?? '',
+            'stu_hCode' => $saveData['stu_hCode'],
+            'stu_hNumber' => $saveData['stu_hNumber'],
+            'stu_hMoo' => $saveData['stu_hMoo'],
+            'stu_hRoad' => $saveData['stu_hRoad'],
+            'stu_hTambon' => $saveData['stu_hTambon'],
+            'stu_hDistrict' => $saveData['stu_hDistrict'],
+            'stu_hProvince' => $saveData['stu_hProvince'],
+            'stu_hPostCode' => $saveData['stu_hPostCode'], 
+            'stu_cNumber' => $saveData['stu_cNumber'],
+            'stu_cMoo' => $saveData['stu_cMoo'],
+            'stu_cRoad' => $saveData['stu_cRoad'],
+            'stu_cTumbao' => $saveData['stu_cTumbao'],
+            'stu_cDistrict' => $saveData['stu_cDistrict'],
+            'stu_cProvince' => $saveData['stu_cProvince'],
+            'stu_cPostcode' => $saveData['stu_cPostcode'],
+            'stu_natureRoom' => $saveData['stu_natureRoom'],
+            'stu_farSchool' => $saveData['stu_farSchool'],
+            'stu_travel' => $saveData['stu_travel'],
+            'stu_gradLevel' => $saveData['stu_gradLevel'],
+            'stu_schoolfrom' => $saveData['stu_schoolfrom'],
+            'stu_schoolTambao' => $saveData['stu_schoolTambao'],
+            'stu_schoolDistrict' => $saveData['stu_schoolDistrict'],
+            'stu_schoolProvince' => $saveData['stu_schoolProvince'],
+            'stu_usedStudent' => $saveData['stu_usedStudent'],
+            'stu_inputLevel' => $saveData['stu_inputLevel'] ?? '',
+            'stu_phoneUrgent' => $saveData['stu_phoneUrgent'], // Save with dashes
+            'stu_phoneFriend' => $saveData['stu_phoneFriend'], // Save with dashes
         ];
 
-        // Check if student exists
+        // Check if student exists (using ID with dashes as per session/DB convention)
         $existing = $this->db->table('skjacth_personnel.tb_students')->where('stu_iden', $studentId)->get()->getRow();
 
         if ($existing) {
@@ -340,73 +345,80 @@ class UserControlConfirmation extends BaseController
 
     private function saveParent($data, $studentId, $relationKey)
     {
-        // Map fields based on relation key (Father, Mother, Guardian have different suffixes in form)
+        // Keep original data
+        $saveData = $data;
+
+        // Map fields based on relation key
         $suffix = '';
         if ($relationKey == 'แม่') $suffix = 'M';
         if ($relationKey == 'ผู้ปกครอง') $suffix = 'O';
 
-        // Clean data before mapping
-        $idNumber = str_replace('-', '', $data['par_IdNumber' . $suffix] ?? '');
-        $phone = str_replace('-', '', $data['par_phone' . $suffix] ?? '');
+        // Clean data for validation
+        $data['par_IdNumber' . $suffix] = str_replace('-', '', $data['par_IdNumber' . $suffix] ?? '');
+        $data['par_phone' . $suffix] = str_replace('-', '', $data['par_phone' . $suffix] ?? '');
+
+        // Validation Rules
+        $rules = [
+            'par_prefix' . $suffix => 'required',
+            'par_firstName' . $suffix => 'required',
+            'par_lastName' . $suffix => 'required',
+            'par_IdNumber' . $suffix => 'required|numeric|exact_length[13]',
+            'par_phone' . $suffix => 'required',
+            'par_hNumber' . $suffix => 'required',
+            'par_hTambon' . $suffix => 'required',
+            'par_hDistrict' . $suffix => 'required',
+            'par_hProvince' . $suffix => 'required',
+            'par_hPostcode' . $suffix => 'required',
+        ];
+
+        // Adjust rule keys to match input names for proper error reporting
+        // Actually, validation runs on $data keys.
+        // We need to set rules using the keys present in $data.
+        
+        $validation = \Config\Services::validation();
+        $validation->setRules($rules);
+
+        if (!$validation->run($data)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => implode(', ', $validation->getErrors())]);
+        }
 
         $parentData = [
             'par_stuID' => $studentId,
             'par_relationKey' => $relationKey,
-            'par_relation' => $data['par_relation' . $suffix] ?? $relationKey, // Default to key if not set
-            'par_prefix' => $data['par_prefix' . $suffix],
-            'par_firstName' => $data['par_firstName' . $suffix],
-            'par_lastName' => $data['par_lastName' . $suffix],
-            'par_ago' => $data['par_ago' . $suffix],
-            'par_IdNumber' => $idNumber,
-            'par_phone' => $phone,
-            'par_race' => $data['par_race' . $suffix],
-            'par_national' => $data['par_national' . $suffix],
-            'par_religion' => $data['par_religion' . $suffix],
-            'par_career' => $data['par_career' . $suffix],
-            'par_education' => $data['par_education' . $suffix],
-            'par_salary' => $data['par_salary' . $suffix],
-            'par_positionJob' => $data['par_positionJob' . $suffix],
-            'par_decease' => $data['par_decease' . $suffix] ?? null,
-            'par_hNumber' => $data['par_hNumber' . $suffix],
-            'par_hMoo' => $data['par_hMoo' . $suffix],
-            'par_hTambon' => $data['par_hTambon' . $suffix],
-            'par_hDistrict' => $data['par_hDistrict' . $suffix],
-            'par_hProvince' => $data['par_hProvince' . $suffix],
-            'par_hPostcode' => $data['par_hPostcode' . $suffix],
-            'par_cNumber' => $data['par_cNumber' . $suffix],
-            'par_cMoo' => $data['par_cMoo' . $suffix],
-            'par_cTambon' => $data['par_cTambon' . $suffix],
-            'par_cDistrict' => $data['par_cDistrict' . $suffix],
-            'par_cProvince' => $data['par_cProvince' . $suffix],
-            'par_cPostcode' => $data['par_cPostcode' . $suffix],
-            'par_rest' => $data['par_rest' . $suffix] ?? '',
-            'par_restOrthor' => $data['par_restOrthor' . $suffix] ?? '',
-            'par_service' => $data['par_service' . $suffix] ?? '',
-            // Handle serviceName array (take first element if array)
-            'par_serviceName' => is_array($data['par_serviceName' . $suffix] ?? '') ? ($data['par_serviceName' . $suffix][0] ?? '') : ($data['par_serviceName' . $suffix] ?? ''),
-            'par_claim' => $data['par_claim' . $suffix] ?? '',
+            'par_relation' => $saveData['par_relation' . $suffix] ?? $relationKey,
+            'par_prefix' => $saveData['par_prefix' . $suffix],
+            'par_firstName' => $saveData['par_firstName' . $suffix],
+            'par_lastName' => $saveData['par_lastName' . $suffix],
+            'par_ago' => $saveData['par_ago' . $suffix],
+            'par_IdNumber' => $saveData['par_IdNumber' . $suffix], // Save with dashes
+            'par_phone' => $saveData['par_phone' . $suffix],       // Save with dashes
+            'par_race' => $saveData['par_race' . $suffix],
+            'par_national' => $saveData['par_national' . $suffix],
+            'par_religion' => $saveData['par_religion' . $suffix],
+            'par_career' => $saveData['par_career' . $suffix],
+            'par_education' => $saveData['par_education' . $suffix],
+            'par_salary' => $saveData['par_salary' . $suffix],
+            'par_positionJob' => $saveData['par_positionJob' . $suffix],
+            'par_decease' => $saveData['par_decease' . $suffix] ?? null,
+            'par_hNumber' => $saveData['par_hNumber' . $suffix],
+            'par_hMoo' => $saveData['par_hMoo' . $suffix],
+            'par_hTambon' => $saveData['par_hTambon' . $suffix],
+            'par_hDistrict' => $saveData['par_hDistrict' . $suffix],
+            'par_hProvince' => $saveData['par_hProvince' . $suffix],
+            'par_hPostcode' => $saveData['par_hPostcode' . $suffix],
+            'par_cNumber' => $saveData['par_cNumber' . $suffix],
+            'par_cMoo' => $saveData['par_cMoo' . $suffix],
+            'par_cTambon' => $saveData['par_cTambon' . $suffix],
+            'par_cDistrict' => $saveData['par_cDistrict' . $suffix],
+            'par_cProvince' => $saveData['par_cProvince' . $suffix],
+            'par_cPostcode' => $saveData['par_cPostcode' . $suffix],
+            'par_rest' => $saveData['par_rest' . $suffix] ?? '',
+            'par_restOrthor' => $saveData['par_restOrthor' . $suffix] ?? '',
+            'par_service' => $saveData['par_service' . $suffix] ?? '',
+            // Handle serviceName array (take first non-empty element if array)
+            'par_serviceName' => is_array($saveData['par_serviceName' . $suffix] ?? '') ? (reset(array_filter($saveData['par_serviceName' . $suffix] ?? [], function($v) { return trim($v) !== ''; })) ?: '') : ($saveData['par_serviceName' . $suffix] ?? ''),
+            'par_claim' => $saveData['par_claim' . $suffix] ?? '',
         ];
-
-        // Validation Rules
-        $rules = [
-            'par_prefix' => 'required',
-            'par_firstName' => 'required',
-            'par_lastName' => 'required',
-            'par_IdNumber' => 'required|numeric|exact_length[13]',
-            'par_phone' => 'required',
-            'par_hNumber' => 'required',
-            'par_hTambon' => 'required',
-            'par_hDistrict' => 'required',
-            'par_hProvince' => 'required',
-            'par_hPostcode' => 'required',
-        ];
-
-        $validation = \Config\Services::validation();
-        $validation->setRules($rules);
-
-        if (!$validation->run($parentData)) {
-            return $this->response->setJSON(['status' => 'error', 'message' => implode(', ', $validation->getErrors())]);
-        }
 
         // Check if parent record exists for this student and relation
         $existing = $this->db->table('skjacth_personnel.tb_parent')

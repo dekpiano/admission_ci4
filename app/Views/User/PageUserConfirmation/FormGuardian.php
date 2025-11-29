@@ -22,7 +22,7 @@
                     <div class="d-flex flex-wrap gap-3">
                         <div class="form-check custom-option custom-option-basic">
                             <label class="form-check-label custom-option-content" for="useFather">
-                                <input name="guardianOption" class="form-check-input" type="radio" value="father" id="useFather" onchange="selectGuardian('father')" <?=empty($FatherConf) ? 'disabled' : ''?> />
+                                <input name="guardianOption" class="form-check-input" type="radio" value="father" id="useFather" onchange="selectGuardian('father')" <?=empty($FatherConf) ? 'disabled' : ''?> <?= ($guardian->par_relation ?? '') == 'บิดา' ? 'checked' : '' ?> />
                                 <span class="custom-option-header">
                                     <span class="h6 mb-0">บิดา</span>
                                     <small class="text-muted">ใช้ข้อมูลบิดา <?=empty($FatherConf) ? '<span class="text-danger">(ยังไม่กรอกข้อมูล)</span>' : ''?></small>
@@ -32,7 +32,7 @@
 
                         <div class="form-check custom-option custom-option-basic">
                             <label class="form-check-label custom-option-content" for="useMother">
-                                <input name="guardianOption" class="form-check-input" type="radio" value="mother" id="useMother" onchange="selectGuardian('mother')" <?=empty($MotherConf) ? 'disabled' : ''?> />
+                                <input name="guardianOption" class="form-check-input" type="radio" value="mother" id="useMother" onchange="selectGuardian('mother')" <?=empty($MotherConf) ? 'disabled' : ''?> <?= ($guardian->par_relation ?? '') == 'มารดา' ? 'checked' : '' ?> />
                                 <span class="custom-option-header">
                                     <span class="h6 mb-0">มารดา</span>
                                     <small class="text-muted">ใช้ข้อมูลมารดา <?=empty($MotherConf) ? '<span class="text-danger">(ยังไม่กรอกข้อมูล)</span>' : ''?></small>
@@ -42,7 +42,7 @@
 
                         <div class="form-check custom-option custom-option-basic">
                             <label class="form-check-label custom-option-content" for="useOther">
-                                <input name="guardianOption" class="form-check-input" type="radio" value="other" id="useOther" onchange="selectGuardian('other')" checked />
+                                <input name="guardianOption" class="form-check-input" type="radio" value="other" id="useOther" onchange="selectGuardian('other')" <?= ($guardian->par_relation ?? '') != 'บิดา' && ($guardian->par_relation ?? '') != 'มารดา' ? 'checked' : '' ?> />
                                 <span class="custom-option-header">
                                     <span class="h6 mb-0">บุคคลอื่น</span>
                                     <small class="text-muted">กรอกข้อมูลใหม่</small>
@@ -205,28 +205,32 @@
 
                 <div class="col-12 mt-3">
                     <label class="form-label fw-bold text-muted mb-2">กรณีรับราชการ</label>
-                    <div class="d-flex flex-column gap-2">
+                    <div class="row row-cols-auto g-2">
                         <?php $Name = array('กระทรวง','กรม','กอง','ฝ่าย/แผนก');
                         foreach ($Name as $key => $v_Name) : ?>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="form-check">
-                                <input class="form-check-input par_serviceO" type="radio" name="par_serviceO"
-                                    id="par_serviceO<?=$key?>" value="<?=$v_Name?>"
-                                    <?=($guardian->par_service ?? '') ==$v_Name?"checked":""?>>
-                                <label class="form-check-label" for="par_serviceO<?=$key?>"><?=$v_Name?></label>
+                        <div class="col">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input par_serviceO" type="radio" name="par_serviceO"
+                                        id="par_serviceO<?=$key?>" value="<?=$v_Name?>"
+                                        <?php if(isset($guardian->par_service) && $guardian->par_service == $v_Name) echo "checked"; ?>>
+                                    <label class="form-check-label" for="par_serviceO<?=$key?>"><?=$v_Name?></label>
+                                </div>
+                                <input type="text" class="form-control form-control-sm w-auto" 
+                                    id="par_serviceNameO<?=$key?>" name="par_serviceNameO[]" placeholder="ระบุชื่อ<?=$v_Name?>"
+                                    value="<?=$guardian->par_serviceName ?? '';?>"
+                                    style="<?=($guardian->par_service ?? '') == $v_Name ? '' : 'display:none;'?>">
                             </div>
-                            <input type="text" class="form-control form-control-sm w-auto" 
-                                id="par_serviceNameO<?=$key?>" name="par_serviceNameO[]" placeholder="ระบุชื่อ<?=$v_Name?>"
-                                value="<?=$guardian->par_serviceName ?? '';?>"
-                                style="<?=($guardian->par_service ?? '') == $v_Name ? '' : 'display:none;'?>">
                         </div>
                         <?php endforeach; ?>
                         
-                        <div class="form-check">
-                            <input class="form-check-input par_serviceO" type="radio" name="par_serviceO"
-                                id="par_serviceO99" value="ไม่ได้รับราชการ"
-                                <?=($guardian->par_service ?? 'ไม่ได้รับราชการ') =="ไม่ได้รับราชการ"?"checked":""?>>
-                            <label class="form-check-label" for="par_serviceO99">ไม่ได้รับราชการ</label>
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input par_serviceO" type="radio" name="par_serviceO"
+                                    id="par_serviceO99" value="ไม่ได้รับราชการ"
+                                    <?php if(!isset($guardian->par_service) || $guardian->par_service == "ไม่ได้รับราชการ") echo "checked"; ?>>
+                                <label class="form-check-label" for="par_serviceO99">ไม่ได้รับราชการ</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -236,12 +240,12 @@
                     <div class="d-flex gap-4">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="par_claimO" id="par_claimO1"
-                                value="เบิกได้" <?=($guardian->par_claim ?? '') =="เบิกได้"?"checked":""?>>
+                                value="เบิกได้" <?php if(isset($guardian->par_claim) && $guardian->par_claim == "เบิกได้") echo "checked"; ?>>
                             <label class="form-check-label" for="par_claimO1">เบิกได้</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="par_claimO" id="par_claimO2"
-                                value="เบิกไม่ได้" <?=($guardian->par_claim ?? 'เบิกไม่ได้') =="เบิกไม่ได้"?"checked":""?>>
+                                value="เบิกไม่ได้" <?php if(!isset($guardian->par_claim) || $guardian->par_claim == "เบิกไม่ได้") echo "checked"; ?>>
                             <label class="form-check-label" for="par_claimO2">เบิกไม่ได้</label>
                         </div>
                     </div>
@@ -335,27 +339,31 @@
 
                 <div class="col-12 mt-3">
                     <label class="form-label fw-bold text-muted mb-2">ลักษณะที่พัก</label>
-                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                    <div class="row row-cols-auto g-2 align-items-center">
                         <?php $Name = array('บ้านตนเอง','เช่าบ้าน','อาศัยผู้อื่นอยู่','บ้านพักสวัสดิการ');
                         foreach ($Name as $key => $v_Name) : ?>
-                        <div class="form-check">
-                            <input class="form-check-input par_restO" type="radio" name="par_restO"
-                                id="par_restO<?=$key;?>" value="<?=$v_Name;?>"
-                                <?=($guardian->par_rest ?? 'บ้านตนเอง') ==$v_Name?"checked":""?>>
-                            <label class="form-check-label" for="par_restO<?=$key;?>"><?=$v_Name;?></label>
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input par_restO" type="radio" name="par_restO"
+                                    id="par_restO<?=$key;?>" value="<?=$v_Name;?>"
+                                    <?php if((!isset($guardian->par_rest) && $v_Name == 'บ้านตนเอง') || (isset($guardian->par_rest) && $guardian->par_rest == $v_Name)) echo "checked"; ?>>
+                                <label class="form-check-label" for="par_restO<?=$key;?>"><?=$v_Name;?></label>
+                            </div>
                         </div>
                         <?php endforeach; ?>
                         
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="form-check">
-                                <input class="form-check-input par_restO" type="radio" name="par_restO" id="par_restO99"
-                                    value="อื่นๆ" <?=($guardian->par_rest ?? 'อื่นๆ') =="อื่นๆ"?"checked":""?>>
-                                <label class="form-check-label" for="par_restO99">อื่นๆ</label>
+                        <div class="col">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input par_restO" type="radio" name="par_restO" id="par_restO99"
+                                        value="อื่นๆ" <?php if(isset($guardian->par_rest) && $guardian->par_rest == "อื่นๆ") echo "checked"; ?>>
+                                    <label class="form-check-label" for="par_restO99">อื่นๆ</label>
+                                </div>
+                                <input type="text" class="form-control form-control-sm w-auto par_restOrthorO" placeholder="ระบุ"
+                                    id="par_restOrthorO" name="par_restOrthorO" 
+                                    value="<?=$guardian->par_restOrthor ?? '' ?>"
+                                    style="<?=($guardian->par_rest ?? 'อื่นๆ') == 'อื่นๆ' ? '' : 'display:none;'?>">
                             </div>
-                            <input type="text" class="form-control form-control-sm w-auto par_restOrthorO" placeholder="ระบุ"
-                                id="par_restOrthorO" name="par_restOrthorO" 
-                                value="<?=$guardian->par_restOrthor ?? '' ?>"
-                                style="<?=($guardian->par_rest ?? 'อื่นๆ') == 'อื่นๆ' ? '' : 'display:none;'?>">
                         </div>
                     </div>
                 </div>

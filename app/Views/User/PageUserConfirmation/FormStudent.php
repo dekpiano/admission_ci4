@@ -255,13 +255,15 @@
                 
                 <div class="col-12">
                     <label class="form-label fw-bold text-muted mb-2">สถานภาพบิดา-มารดา</label>
-                    <div class="d-flex flex-wrap gap-3">
+                    <div class="row row-cols-auto g-2">
                         <?php $parstu = array("อยู่ด้วยกัน","แยกกันอยู่","หย่าร้าง","บิดาถึงแก่กรรม","มารดาถึงแก่กรรม","บิดาและมารดาถึงแก่กรรม","บิดาหรือมารดาแต่งงานใหม่"); 
                         foreach ($parstu as $key => $v_parstu) : ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="stu_parenalStatus" id="stu_parenalStatus<?=$key?>"
-                                value="<?=$v_parstu;?>" <?=($stuConf[0]->stu_parenalStatus ?? '') ==$v_parstu?"checked":""?> required>
-                            <label class="form-check-label" for="stu_parenalStatus<?=$key?>"><?=$v_parstu;?></label>
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="stu_parenalStatus" id="stu_parenalStatus<?=$key?>"
+                                    value="<?=$v_parstu;?>" <?php if(isset($stuConf[0]->stu_parenalStatus) && $stuConf[0]->stu_parenalStatus == $v_parstu) echo "checked"; ?> required>
+                                <label class="form-check-label" for="stu_parenalStatus<?=$key?>"><?=$v_parstu;?></label>
+                            </div>
                         </div>
                         <?php endforeach; ?>
                     </div>
@@ -269,21 +271,23 @@
 
                 <div class="col-12">
                     <label class="form-label fw-bold text-muted mb-2">สภาพความเป็นอยู่ปัจจุบัน</label>
-                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                    <div class="row row-cols-auto g-2 align-items-center">
                         <?php $pars = array("อยู่กับบิดาและมารดา","อยู่กับบิดาหรือมารดา","บุคคลอื่น"); 
                         foreach ($pars as $key => $v_pars) : ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="stu_presentLife" id="stu_presentLife<?=$key?>"
-                                value="<?=$v_pars;?>" <?=($stuConf[0]->stu_presentLife ?? '') ==$v_pars?"checked":""?> required>
-                            <label class="form-check-label" for="stu_presentLife<?=$key?>"><?=$v_pars;?></label>
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="stu_presentLife" id="stu_presentLife<?=$key?>"
+                                    value="<?=$v_pars;?>" <?php if(isset($stuConf[0]->stu_presentLife) && $stuConf[0]->stu_presentLife == $v_pars) echo "checked"; ?> required>
+                                <label class="form-check-label" for="stu_presentLife<?=$key?>"><?=$v_pars;?></label>
+                            </div>
                         </div>
                         <?php endforeach; ?>
                         
-                        <div class="ms-2">
-                                <input type="text" id="stu_personOther" name="stu_personOther" class="form-control form-control-sm"
-                                value="<?=($stuConf[0]->stu_personOther ?? '')?>" 
-                                style="<?=($stuConf[0]->stu_presentLife ?? '') == "บุคคลอื่น" ? '' : 'display:none;'?>" 
-                                placeholder="ระบุบุคคลอื่น">
+                        <div class="col">
+                            <input type="text" id="stu_personOther" name="stu_personOther" class="form-control form-control-sm"
+                            value="<?=($stuConf[0]->stu_personOther ?? '')?>" 
+                            style="<?=($stuConf[0]->stu_presentLife ?? '') == "บุคคลอื่น" ? '' : 'display:none;'?>" 
+                            placeholder="ระบุบุคคลอื่น">
                         </div>
                     </div>
                 </div>
@@ -395,17 +399,19 @@
                 
                 <div class="col-12 mt-3">
                     <label class="form-label fw-bold text-muted mb-2">ลักษณะที่อยู่อาศัย</label>
-                    <div class="d-flex flex-wrap">
-                        <div class="btn-group">
+                        <div class="row row-cols-auto g-2">
                             <?php $addr = array("บ้านตนเอง","เช่าอยู่","อาศัยผู้อื่นอยู่","บ้านพักราชการ","วัด","หอพัก"); 
                             foreach ($addr as $key => $v_addr) : 
                                 $isChecked = ($stuConf[0]->stu_natureRoom ?? '') == $v_addr ? "checked" : "";
                             ?>
-                            <input type="radio" class="btn-check" name="stu_natureRoom" id="natureRoom<?=$key?>" value="<?=$v_addr;?>" <?=$isChecked?> required>
-                            <label class="btn btn-outline-primary px-3" for="natureRoom<?=$key?>"><?=$v_addr;?></label>
+                            <div class="col">
+                                <div class="form-check">
+                                    <input type="radio" class="form-check-input" name="stu_natureRoom" id="natureRoom<?=$key?>" value="<?=$v_addr;?>" <?php if(isset($stuConf[0]->stu_natureRoom) && $stuConf[0]->stu_natureRoom == $v_addr) echo "checked"; ?> required>
+                                    <label class="form-check-label" for="natureRoom<?=$key?>"><?=$v_addr;?></label>
+                                </div>
+                            </div>
                             <?php endforeach; ?>
                         </div>
-                    </div>
                     
                 </div>
             </div>
@@ -484,12 +490,16 @@
                 <div class="col-md-12">
                     <label class="form-label mb-2">เคยเป็นนักเรียนโรงเรียนสวนกุหลาบวิทยาลัย(จิรประวัติ) นครสวรรค์ หรือไม่?</label>
                     <div class="d-flex align-items-center gap-3">
-                        <div class="btn-group" role="group" aria-label="Used Student Radio Group">
-                            <input type="radio" class="btn-check" name="stu_usedStudent" id="stu_usedStudent1" value="ไม่เคย" <?=($stuConf[0]->stu_usedStudent ?? '')=="ไม่เคย"?"checked":""?> required>
-                            <label class="btn btn-outline-primary" for="stu_usedStudent1">ไม่เคย</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="stu_usedStudent" id="stu_usedStudent1" value="ไม่เคย" <?php if(isset($stuConf[0]->stu_usedStudent) && $stuConf[0]->stu_usedStudent == "ไม่เคย") echo "checked"; ?> required>
+                                <label class="form-check-label" for="stu_usedStudent1">ไม่เคย</label>
+                            </div>
 
-                            <input type="radio" class="btn-check" name="stu_usedStudent" id="stu_usedStudent2" value="เคย" <?=($stuConf[0]->stu_usedStudent ?? '')=="เคย"?"checked":""?> required>
-                            <label class="btn btn-outline-primary" for="stu_usedStudent2">เคย</label>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="stu_usedStudent" id="stu_usedStudent2" value="เคย" <?php if(isset($stuConf[0]->stu_usedStudent) && $stuConf[0]->stu_usedStudent == "เคย") echo "checked"; ?> required>
+                                <label class="form-check-label" for="stu_usedStudent2">เคย</label>
+                            </div>
                         </div>
                         
                         <div class="d-flex align-items-center ms-2">

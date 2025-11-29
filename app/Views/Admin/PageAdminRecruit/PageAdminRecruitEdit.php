@@ -76,10 +76,13 @@
 
                      <div class="form-floating mb-3">
                         <select class="form-select" id="recruit_category" name="recruit_category">
-                            <option value="normal" <?= $recruit['recruit_category'] == 'normal' ? 'selected' : '' ?>>ปกติ</option>
-                            <option value="quotaM1" <?= $recruit['recruit_category'] == 'quotaM1' ? 'selected' : '' ?>>โควต้า ม.1</option>
-                            <option value="quotaM4" <?= $recruit['recruit_category'] == 'quotaM4' ? 'selected' : '' ?>>โควต้า ม.4</option>
-                             <option value="quotasport" <?= $recruit['recruit_category'] == 'quotasport' ? 'selected' : '' ?>>โควต้านักกีฬา</option>
+                            <?php if(isset($quotas)): ?>
+                                <?php foreach ($quotas as $quota): ?>
+                                    <option value="<?= $quota->quota_id ?>" <?= $recruit['recruit_category'] == $quota->quota_id ? 'selected' : '' ?>>
+                                        <?= esc($quota->quota_explain) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                         <label for="recruit_category">ประเภทการสมัคร</label>
                     </div>

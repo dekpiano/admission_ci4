@@ -94,9 +94,12 @@ class UserControlAdmission extends BaseController
         }
 
         // --- NEW CHECK ---
-        if ($student['recruit_category'] !== 'normal') {
+        // --- NEW CHECK ---
+        // ID 3 is 'normal'
+        if ($student['recruit_category'] != 3) {
             return redirect()->to('new-admission/status')->with('error', 'คุณไม่สามารถแก้ไขข้อมูลการสมัครประเภทนี้ได้ กรุณาติดต่อผู้ดูแลระบบ');
         }
+        // --- END NEW CHECK ---
         // --- END NEW CHECK ---
 
         $level = $student['recruit_regLevel'];
@@ -121,9 +124,12 @@ class UserControlAdmission extends BaseController
             }
 
             // --- NEW CHECK ---
-            if ($original_student['recruit_category'] !== 'normal') {
+            // --- NEW CHECK ---
+            // ID 3 is 'normal'
+            if ($original_student['recruit_category'] != 3) {
                 return redirect()->to('new-admission/status')->with('error', 'คุณไม่สามารถแก้ไขข้อมูลการสมัครประเภทนี้ได้ กรุณาติดต่อผู้ดูแลระบบ');
             }
+            // --- END NEW CHECK ---
             // --- END NEW CHECK ---
 
             // Expanded validation rules
@@ -324,8 +330,8 @@ class UserControlAdmission extends BaseController
         $data = $this->dataAll();
         $post = $this->request->getPost();
 
-        //รับรอบปกติ
-        if ($post['recruit_category'] == "normal") {
+        //รับรอบปกติ (ID 3 = normal)
+        if ($post['recruit_category'] == 3) {
             $SelImpo = implode('|', $post['recruit_majorOrder']);
             $checkCourse = $this->admissionModel->getCourseDetails($post['recruit_majorOrder'][0]);
             $course_fullname = $checkCourse ? $checkCourse->course_fullname : '';

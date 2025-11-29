@@ -23,7 +23,7 @@ class AdminControlRecruit extends BaseController
 
         // Join with Quota table to get readable category names
         $data['recruits'] = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials')
-                                  ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left')
+                                  ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
                                   ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                                   ->where('recruit_year', $selectedYear)
                                   ->groupBy('tb_recruitstudent.recruit_id')
@@ -97,6 +97,7 @@ class AdminControlRecruit extends BaseController
         }
 
         $data['courses'] = $model->getAllCourses();
+        $data['quotas'] = $model->getAllQuotas();
         $data['title'] = 'แก้ไขข้อมูลผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitEdit', $data);
     }
@@ -199,7 +200,7 @@ class AdminControlRecruit extends BaseController
         // 2. Count Filtered Records
         $builder = $model->builder();
         $builder->select('tb_recruitstudent.recruit_id')
-                ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left')
+                ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
                 ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                 ->where('tb_recruitstudent.recruit_year', $year);
 
@@ -209,6 +210,7 @@ class AdminControlRecruit extends BaseController
                 ->orLike('tb_recruitstudent.recruit_firstName', $searchValue)
                 ->orLike('tb_recruitstudent.recruit_lastName', $searchValue)
                 ->orLike('tb_recruitstudent.recruit_category', $searchValue)
+                ->orLike('tb_quota.quota_key', $searchValue)
                 ->orLike('tb_quota.quota_explain', $searchValue)
                 ->orLike('tb_course.course_initials', $searchValue)
                 ->orLike('tb_course.course_fullname', $searchValue)
@@ -220,7 +222,7 @@ class AdminControlRecruit extends BaseController
         // 3. Fetch Data
         $builder = $model->builder();
         $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_initials, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status')
-                ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left')
+                ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
                 ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                 ->where('tb_recruitstudent.recruit_year', $year);
 
@@ -230,6 +232,7 @@ class AdminControlRecruit extends BaseController
                 ->orLike('tb_recruitstudent.recruit_firstName', $searchValue)
                 ->orLike('tb_recruitstudent.recruit_lastName', $searchValue)
                 ->orLike('tb_recruitstudent.recruit_category', $searchValue)
+                ->orLike('tb_quota.quota_key', $searchValue)
                 ->orLike('tb_quota.quota_explain', $searchValue)
                 ->orLike('tb_course.course_initials', $searchValue)
                 ->orLike('tb_course.course_fullname', $searchValue)
@@ -293,7 +296,7 @@ class AdminControlRecruit extends BaseController
         $db = \Config\Database::connect();
         $model = new AdmissionModel();
         $recruit = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_quota.quota_key, tb_course.course_fullname as course_name_joined')
-                         ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left')
+                         ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
                          ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                          ->find($id);
 

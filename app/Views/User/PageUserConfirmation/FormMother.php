@@ -128,28 +128,32 @@
 
                 <div class="col-12 mt-3">
                     <label class="form-label fw-bold text-muted mb-2">กรณีรับราชการ</label>
-                    <div class="d-flex flex-column gap-2">
+                    <div class="row row-cols-auto g-2">
                         <?php $Name = array('กระทรวง','กรม','กอง','ฝ่าย/แผนก');
                         foreach ($Name as $key => $v_Name) : ?>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="form-check">
-                                <input class="form-check-input par_serviceM" type="radio" name="par_serviceM"
-                                    id="par_serviceM<?=$key?>" value="<?=$v_Name?>"
-                                    <?=($mother->par_service ?? '') ==$v_Name?"checked":""?>>
-                                <label class="form-check-label" for="par_serviceM<?=$key?>"><?=$v_Name?></label>
+                        <div class="col">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input par_serviceM" type="radio" name="par_serviceM"
+                                        id="par_serviceM<?=$key?>" value="<?=$v_Name?>"
+                                        <?php if(isset($mother->par_service) && $mother->par_service == $v_Name) echo "checked"; ?>>
+                                    <label class="form-check-label" for="par_serviceM<?=$key?>"><?=$v_Name?></label>
+                                </div>
+                                <input type="text" class="form-control form-control-sm w-auto" 
+                                    id="par_serviceNameM<?=$key?>" name="par_serviceNameM[]" placeholder="ระบุชื่อ<?=$v_Name?>"
+                                    value="<?=$mother->par_serviceName ?? '';?>"
+                                    style="<?=($mother->par_service ?? '') == $v_Name ? '' : 'display:none;'?>">
                             </div>
-                            <input type="text" class="form-control form-control-sm w-auto" 
-                                id="par_serviceNameM<?=$key?>" name="par_serviceNameM[]" placeholder="ระบุชื่อ<?=$v_Name?>"
-                                value="<?=$mother->par_serviceName ?? '';?>"
-                                style="<?=($mother->par_service ?? '') == $v_Name ? '' : 'display:none;'?>">
                         </div>
                         <?php endforeach; ?>
                         
-                        <div class="form-check">
-                            <input class="form-check-input par_serviceM" type="radio" name="par_serviceM"
-                                id="par_serviceM99" value="ไม่ได้รับราชการ"
-                                <?=($mother->par_service ?? 'ไม่ได้รับราชการ') =="ไม่ได้รับราชการ"?"checked":""?>>
-                            <label class="form-check-label" for="par_serviceM99">ไม่ได้รับราชการ</label>
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input par_serviceM" type="radio" name="par_serviceM"
+                                    id="par_serviceM99" value="ไม่ได้รับราชการ"
+                                    <?php if(!isset($mother->par_service) || $mother->par_service == "ไม่ได้รับราชการ") echo "checked"; ?>>
+                                <label class="form-check-label" for="par_serviceM99">ไม่ได้รับราชการ</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -159,12 +163,12 @@
                     <div class="d-flex gap-4">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="par_claimM" id="par_claimM1"
-                                value="เบิกได้" <?=($mother->par_claim ?? '') =="เบิกได้"?"checked":""?>>
+                                value="เบิกได้" <?php if(isset($mother->par_claim) && $mother->par_claim == "เบิกได้") echo "checked"; ?>>
                             <label class="form-check-label" for="par_claimM1">เบิกได้</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="par_claimM" id="par_claimM2"
-                                value="เบิกไม่ได้" <?=($mother->par_claim ?? 'เบิกไม่ได้') =="เบิกไม่ได้"?"checked":""?>>
+                                value="เบิกไม่ได้" <?php if(!isset($mother->par_claim) || $mother->par_claim == "เบิกไม่ได้") echo "checked"; ?>>
                             <label class="form-check-label" for="par_claimM2">เบิกไม่ได้</label>
                         </div>
                     </div>
@@ -258,27 +262,31 @@
 
                 <div class="col-12 mt-3">
                     <label class="form-label fw-bold text-muted mb-2">ลักษณะที่พัก</label>
-                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                    <div class="row row-cols-auto g-2 align-items-center">
                         <?php $Name = array('บ้านตนเอง','เช่าบ้าน','อาศัยผู้อื่นอยู่','บ้านพักสวัสดิการ');
                         foreach ($Name as $key => $v_Name) : ?>
-                        <div class="form-check">
-                            <input class="form-check-input par_restM" type="radio" name="par_restM"
-                                id="par_restM<?=$key;?>" value="<?=$v_Name;?>"
-                                <?=($mother->par_rest ?? 'บ้านตนเอง') ==$v_Name?"checked":""?>>
-                            <label class="form-check-label" for="par_restM<?=$key;?>"><?=$v_Name;?></label>
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input par_restM" type="radio" name="par_restM"
+                                    id="par_restM<?=$key;?>" value="<?=$v_Name;?>"
+                                    <?php if((!isset($mother->par_rest) && $v_Name == 'บ้านตนเอง') || (isset($mother->par_rest) && $mother->par_rest == $v_Name)) echo "checked"; ?>>
+                                <label class="form-check-label" for="par_restM<?=$key;?>"><?=$v_Name;?></label>
+                            </div>
                         </div>
                         <?php endforeach; ?>
                         
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="form-check">
-                                <input class="form-check-input par_restM" type="radio" name="par_restM" id="par_restM99"
-                                    value="อื่นๆ" <?=($mother->par_rest ?? 'อื่นๆ') =="อื่นๆ"?"checked":""?>>
-                                <label class="form-check-label" for="par_restM99">อื่นๆ</label>
+                        <div class="col">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input par_restM" type="radio" name="par_restM" id="par_restM99"
+                                        value="อื่นๆ" <?php if(isset($mother->par_rest) && $mother->par_rest == "อื่นๆ") echo "checked"; ?>>
+                                    <label class="form-check-label" for="par_restM99">อื่นๆ</label>
+                                </div>
+                                <input type="text" class="form-control form-control-sm w-auto par_restOrthor" placeholder="ระบุ"
+                                    id="par_restOrthorM" name="par_restOrthorM" 
+                                    value="<?=$mother->par_restOrthor ?? '' ?>"
+                                    style="<?=($mother->par_rest ?? 'อื่นๆ') == 'อื่นๆ' ? '' : 'display:none;'?>">
                             </div>
-                            <input type="text" class="form-control form-control-sm w-auto par_restOrthor" placeholder="ระบุ"
-                                id="par_restOrthorM" name="par_restOrthorM" 
-                                value="<?=$mother->par_restOrthor ?? '' ?>"
-                                style="<?=($mother->par_rest ?? 'อื่นๆ') == 'อื่นๆ' ? '' : 'display:none;'?>">
                         </div>
                     </div>
                 </div>
