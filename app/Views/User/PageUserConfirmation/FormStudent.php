@@ -558,3 +558,84 @@
     </div>
 
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const formId = '<?= $Action; ?>';
+    const form = document.getElementById(formId);
+    
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            let firstInvalidField = null;
+
+            const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+
+            for (const field of requiredFields) {
+                if (field.offsetParent === null || field.disabled) {
+                    continue;
+                }
+
+                let isFieldValid = true;
+                if (field.type === 'radio') {
+                    const radioGroup = form.querySelectorAll(`input[name="${field.name}"]`);
+                    let oneChecked = false;
+                    for(const radio of radioGroup) {
+                        if(radio.checked) {
+                            oneChecked = true;
+                            break;
+                        }
+                    }
+                    if (!oneChecked) {
+                        isFieldValid = false;
+                    }
+                } else {
+                    if (field.value.trim() === '') {
+                        isFieldValid = false;
+                    }
+                }
+
+                if (!isFieldValid) {
+                    isValid = false;
+                    if (!firstInvalidField) {
+                        firstInvalidField = field;
+                    }
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: 'กรุณากรอกข้อมูลที่บังคับให้ครบถ้วนก่อนทำการบันทึก',
+                    confirmButtonText: 'ตกลง'
+                }).then(() => {
+                    if (firstInvalidField) {
+                        firstInvalidField.focus();
+                        firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
+        });
+
+        form.querySelectorAll('input[required], select[required], textarea[required]').forEach(field => {
+            field.addEventListener('input', () => {
+                if (field.value.trim() !== '') {
+                    field.classList.remove('is-invalid');
+                }
+            });
+             field.addEventListener('change', () => {
+                if (field.value.trim() !== '') {
+                    field.classList.remove('is-invalid');
+                }
+            });
+        });
+    }
+});
+</script>

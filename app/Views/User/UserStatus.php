@@ -208,7 +208,7 @@
                 document.getElementById('edit_btn').style.display = 'none';
                 document.getElementById('confirmation_btn').style.display = 'none';
 
-                if (student.recruit_status.includes('ผ่านการตรวจสอบ')) {
+                if (student.recruit_status === 'ผ่านการตรวจสอบ') {
                     statusBadge.classList.add('bg-success'); // Green
                     document.getElementById('print_btn').style.display = 'block';
                     document.getElementById('print_btn').href = '<?= base_url('control_admission/pdf/') ?>' + student.recruit_id;

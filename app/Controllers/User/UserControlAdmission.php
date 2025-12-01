@@ -122,14 +122,14 @@ class UserControlAdmission extends BaseController
             $original_student = $this->admissionModel->find($recruit_id);
 
             if (!$original_student) {
-                return redirect()->back()->with('error', 'ไม่พบข้อมูลนักเรียนที่ต้องการแก้ไข');
+                return $this->response->setJSON(['status' => 'error', 'message' => 'ไม่พบข้อมูลนักเรียนที่ต้องการแก้ไข']);
             }
 
             // --- NEW CHECK ---
             // --- NEW CHECK ---
             // ID 3 is 'normal'
             if ($original_student['recruit_category'] != 3) {
-                return redirect()->to('new-admission/status')->with('error', 'คุณไม่สามารถแก้ไขข้อมูลการสมัครประเภทนี้ได้ กรุณาติดต่อผู้ดูแลระบบ');
+                return $this->response->setJSON(['status' => 'error', 'message' => 'คุณไม่สามารถแก้ไขข้อมูลการสมัครประเภทนี้ได้ กรุณาติดต่อผู้ดูแลระบบ']);
             }
             // --- END NEW CHECK ---
             // --- END NEW CHECK ---
@@ -162,11 +162,12 @@ class UserControlAdmission extends BaseController
                 'recruit_img_cropped' => 'permit_empty',
                 'recruit_certificateEdu' => 'if_exist|max_size[recruit_certificateEdu,4096]|ext_in[recruit_certificateEdu,jpg,jpeg,png,pdf]',
                 'recruit_copyidCard' => 'if_exist|max_size[recruit_copyidCard,4096]|ext_in[recruit_copyidCard,jpg,jpeg,png,pdf]',
-                'recruit_copyAddress' => 'if_exist|max_size[recruit_copyAddress,4096]|ext_in[recruit_copyAddress,jpg,jpeg,png,pdf]',
+                'recruit_certificateEduB' => 'if_exist|max_size[recruit_certificateEduB,4096]|ext_in[recruit_certificateEduB,jpg,jpeg,png,pdf]',
             ];
 
             if (!$this->validate($rules)) {
-                return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+                $errors = implode('<br>', $this->validator->getErrors());
+                return $this->response->setJSON(['status' => 'error', 'message' => $errors]);
             }
 
             $post = $this->request->getPost();
@@ -222,6 +223,7 @@ class UserControlAdmission extends BaseController
 
                 $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/img';
                 
+                $remoteUpload = new RemoteUpload();
                 $result = $remoteUpload->upload($tempFile, $subPath, $fileName);
                 
                 if ($result && $result['status'] === 'success') {
@@ -235,11 +237,11 @@ class UserControlAdmission extends BaseController
             }
 
             // Other document files
-            $file_fields_upload = ['recruit_certificateEdu', 'recruit_copyidCard', 'recruit_copyAddress'];
+            $file_fields_upload = ['recruit_certificateEdu', 'recruit_certificateEduB', 'recruit_copyidCard'];
             $folder_map = [
                 'recruit_certificateEdu' => 'certificate',
+                'recruit_certificateEduB' => 'certificate',
                 'recruit_copyidCard' => 'copyidCard',
-                'recruit_copyAddress' => 'copyAddress',
             ];
 
             foreach ($file_fields_upload as $field) {
@@ -254,7 +256,7 @@ class UserControlAdmission extends BaseController
                     if ($result && $result['status'] === 'success') {
                         $data_update[$field] = $result['filename'];
                         // Delete old file
-                        if (!empty($original_student[$field])) {
+                        if (isset($original_student[$field]) && !empty($original_student[$field])) {
                             $remoteUpload->delete($original_student[$field], $subPath);
                         }
                     }
@@ -266,13 +268,17 @@ class UserControlAdmission extends BaseController
 
             if ($this->db->transStatus() === false) {
                 $this->db->transRollback();
-                return redirect()->back()->withInput()->with('error', 'ไม่สามารถบันทึกข้อมูลได้! กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง');
+                return $this->response->setJSON(['status' => 'error', 'message' => 'ไม่สามารถบันทึกข้อมูลได้! กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง']);
             } else {
                 $this->db->transCommit();
-                return redirect()->to('new-admission/status')->with('success', 'แก้ไขข้อมูลสำเร็จแล้ว กรุณารอการตรวจสอบอีกครั้ง');
+                return $this->response->setJSON([
+                    'status' => 'success', 
+                    'message' => 'แก้ไขข้อมูลสำเร็จแล้ว กรุณารอการตรวจสอบอีกครั้ง',
+                    'redirect_url' => base_url('new-admission/status')
+                ]);
             }
         }
-        return redirect()->to('/');
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Request']);
     }
 
 
@@ -677,16 +683,43 @@ class UserControlAdmission extends BaseController
         $mpdf->showImageErrors = true;
 
         // 6. Generate HTML Content
+        // 6. Generate HTML Content
         // Image Path
-        // Use Remote URL
-        $img_path = base_url('image-proxy?file=recruitstudent/m' . $student->recruit_regLevel . '/img/' . $student->recruit_img);
-        
-        // Check if image exists - for remote, we can't easily check file_exists without a request.
-        // But mPDF handles 404 images by showing error or nothing.
-        // We can just use the URL.
         $img_tag = '';
         if (!empty($student->recruit_img)) {
-            $img_tag = '<img style="width:120px;height:100px;" src="' . $img_path . '">';
+            // Construct Remote URL directly to avoid localhost loopback issues with mPDF
+            $remoteBaseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
+            $fileName = 'recruitstudent/m' . $student->recruit_regLevel . '/img/' . $student->recruit_img;
+            $fullRemoteUrl = rtrim($remoteBaseUrl, '/') . '/' . ltrim($fileName, '/');
+
+            try {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $fullRemoteUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+                $imageData = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if ($httpCode == 200 && !empty($imageData)) {
+                    // Detect MIME type from content, not extension
+                    $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                    $mime = $finfo->buffer($imageData);
+                    
+                    // Allow only valid image types
+                    $allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+                    
+                    if (in_array($mime, $allowedMimes)) {
+                        $base64 = base64_encode($imageData);
+                        $img_src = 'data:' . $mime . ';base64,' . $base64;
+                        $img_tag = '<img style="width:120px;height:100px;" src="' . $img_src . '">';
+                    }
+                }
+            } catch (\Exception $e) {
+                // Fallback or ignore
+            }
         }
 
         $html = '<div style="position:absolute;top:100px;left:75px; width:100%">' . $img_tag . '</div>';

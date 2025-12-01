@@ -520,7 +520,7 @@
                         <div class="row">
 
                             <div class="col-md-6 mb-3">
-                                <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า-หลัง) <?= empty($student['recruit_certificateEdu']) ? '<span class="text-danger">*</span>' : '' ?></label>
+                                <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า) <?= empty($student['recruit_certificateEdu']) ? '<span class="text-danger">*</span>' : '' ?></label>
                                 <input class="form-control" type="file" id="recruit_certificateEdu" name="recruit_certificateEdu" accept="image/*,.pdf" <?= empty($student['recruit_certificateEdu']) ? 'required' : '' ?> onchange="previewImage(this, 'preview_certificate')">
                                 <div class="mt-2 text-center">
                                     <?php if (!empty($student['recruit_certificateEdu'])): ?>
@@ -529,17 +529,39 @@
                                             $file_extension = pathinfo($student['recruit_certificateEdu'], PATHINFO_EXTENSION);
                                         ?>
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
-                                            <img id="preview_certificate" src="<?= $file_path ?>" alt="ตัวอย่าง ปพ.1" class="img-thumbnail" style="max-height: 200px;">
+                                            <img id="preview_certificate" src="<?= $file_path ?>" alt="ตัวอย่าง ปพ.1 (หน้า)" class="img-thumbnail" style="max-height: 200px;">
                                         <?php else: ?>
                                             <i class='bx bxs-file-pdf display-4 text-danger'></i>
                                             <p class="text-muted small">ไฟล์ปัจจุบัน: <a href="<?= $file_path ?>" target="_blank"><?= esc($student['recruit_certificateEdu']) ?></a></p>
                                         <?php endif; ?>
                                     <?php else: ?>
-                                        <img id="preview_certificate" src="#" alt="ตัวอย่าง ปพ.1" class="img-thumbnail d-none" style="max-height: 200px;">
+                                        <img id="preview_certificate" src="#" alt="ตัวอย่าง ปพ.1 (หน้า)" class="img-thumbnail d-none" style="max-height: 200px;">
                                     <?php endif; ?>
                                     <p id="preview_certificate_name" class="<?= !empty($student['recruit_certificateEdu']) && !in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif']) ? '' : 'd-none' ?> text-muted small"></p>
                                 </div>
                             </div>
+                             <div class="col-md-6 mb-3">
+                                <label for="recruit_certificateEduB" class="form-label">ปพ.1 (หลัง) <?= empty($student['recruit_certificateEduB']) ? '<span class="text-danger">*</span>' : '' ?></label>
+                                <input class="form-control" type="file" id="recruit_certificateEduB" name="recruit_certificateEduB" accept="image/*,.pdf" <?= empty($student['recruit_certificateEduB']) ? 'required' : '' ?> onchange="previewImage(this, 'preview_certificateB')">
+                                <div class="mt-2 text-center">
+                                    <?php if (!empty($student['recruit_certificateEduB'])): ?>
+                                        <?php 
+                                            $file_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/certificate/' . $student['recruit_certificateEduB']);
+                                            $file_extension = pathinfo($student['recruit_certificateEduB'], PATHINFO_EXTENSION);
+                                        ?>
+                                        <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
+                                            <img id="preview_certificateB" src="<?= $file_path ?>" alt="ตัวอย่าง ปพ.1 (หลัง)" class="img-thumbnail" style="max-height: 200px;">
+                                        <?php else: ?>
+                                            <i class='bx bxs-file-pdf display-4 text-danger'></i>
+                                            <p class="text-muted small">ไฟล์ปัจจุบัน: <a href="<?= $file_path ?>" target="_blank"><?= esc($student['recruit_certificateEduB']) ?></a></p>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <img id="preview_certificateB" src="#" alt="ตัวอย่าง ปพ.1 (หลัง)" class="img-thumbnail d-none" style="max-height: 200px;">
+                                    <?php endif; ?>
+                                    <p id="preview_certificateB_name" class="<?= !empty($student['recruit_certificateEduB']) && !in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif']) ? '' : 'd-none' ?> text-muted small"></p>
+                                </div>
+                            </div>
+
                             <div class="col-md-6 mb-3">
                                 <label for="recruit_copyidCard" class="form-label">สำเนาบัตรประชาชน <?= empty($student['recruit_copyidCard']) ? '<span class="text-danger">*</span>' : '' ?></label>
                                 <input class="form-control" type="file" id="recruit_copyidCard" name="recruit_copyidCard" accept="image/*,.pdf" <?= empty($student['recruit_copyidCard']) ? 'required' : '' ?> onchange="previewImage(this, 'preview_idcard')">
@@ -561,27 +583,7 @@
                                     <p id="preview_idcard_name" class="<?= !empty($student['recruit_copyidCard']) && !in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif']) ? '' : 'd-none' ?> text-muted small"></p>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="recruit_copyAddress" class="form-label">สำเนาทะเบียนบ้าน <?= empty($student['recruit_copyAddress']) ? '<span class="text-danger">*</span>' : '' ?></label>
-                                <input class="form-control" type="file" id="recruit_copyAddress" name="recruit_copyAddress" accept="image/*,.pdf" <?= empty($student['recruit_copyAddress']) ? 'required' : '' ?> onchange="previewImage(this, 'preview_address')">
-                                <div class="mt-2 text-center">
-                                    <?php if (!empty($student['recruit_copyAddress'])): ?>
-                                        <?php 
-                                            $file_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/copyAddress/' . $student['recruit_copyAddress']);
-                                            $file_extension = pathinfo($student['recruit_copyAddress'], PATHINFO_EXTENSION);
-                                        ?>
-                                        <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
-                                            <img id="preview_address" src="<?= $file_path ?>" alt="ตัวอย่างทะเบียนบ้าน" class="img-thumbnail" style="max-height: 200px;">
-                                        <?php else: ?>
-                                            <i class='bx bxs-file-pdf display-4 text-danger'></i>
-                                            <p class="text-muted small">ไฟล์ปัจจุบัน: <a href="<?= $file_path ?>" target="_blank"><?= esc($student['recruit_copyAddress']) ?></a></p>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <img id="preview_address" src="#" alt="ตัวอย่างทะเบียนบ้าน" class="img-thumbnail d-none" style="max-height: 200px;">
-                                    <?php endif; ?>
-                                    <p id="preview_address_name" class="<?= !empty($student['recruit_copyAddress']) && !in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif']) ? '' : 'd-none' ?> text-muted small"></p>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
 
@@ -854,10 +856,15 @@
                 }
             },
             error: function(xhr, status, error) {
+                // console.error('AJAX Error:', xhr);
+                // console.error('Status:', status);
+                // console.error('Error Thrown:', error);
+                // console.error('Response Text:', xhr.responseText);
+                
                 Swal.fire({
                     icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้: ' + error,
+                    title: 'เกิดข้อผิดพลาด (' + xhr.status + ': ' + error + ')',
+                    html: 'ไม่สามารถประมวลผลคำขอได้ กรุณาติดต่อผู้ดูแลระบบ<br><small>รายละเอียดเพิ่มเติมถูกบันทึกใน Console ของเบราว์เซอร์แล้ว</small>',
                     confirmButtonText: 'ตกลง'
                 });
             }

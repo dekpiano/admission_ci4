@@ -461,7 +461,7 @@
                                 <label for="recruit_phone" class="form-label">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-phone'></i></span>
-                                    <input type="tel" class="form-control" name="recruit_phone" id="recruit_phone" placeholder="08xxxxxxxx" required>
+                                    <input type="tel" class="form-control" name="recruit_phone" id="recruit_phone" placeholder="0x-xxxx-xxxx" maxlength="12" required>
                                 </div>
                             </div>
                         </div>
@@ -780,15 +780,41 @@
     function handleImageSelect(input) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                console.error('Invalid file type selected:', file.type);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ชนิดไฟล์รูปภาพไม่ถูกต้อง',
+                    text: 'กรุณาเลือกไฟล์รูปภาพที่เป็น JPG, PNG หรือ GIF เท่านั้น',
+                    confirmButtonText: 'ตกลง'
+                });
+                input.value = ''; // Clear the input
+                return;
+            }
+
             const reader = new FileReader();
 
             reader.onload = function(e) {
                 imageToCrop.src = e.target.result;
                 cropModal.show();
-            }
+            };
+
+            reader.onerror = function(error) {
+                console.error('Error reading image file:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาดในการอ่านไฟล์รูปภาพ',
+                    text: 'ไม่สามารถอ่านไฟล์รูปภาพได้ โปรดลองใหม่อีกครั้ง หรือเลือกไฟล์อื่น',
+                    confirmButtonText: 'ตกลง'
+                });
+                input.value = ''; // Clear the input
+            };
+            
             reader.readAsDataURL(file);
             
-            input.value = ''; 
+            input.value = ''; // Clear the input after processing to allow selecting same file again if needed
         }
     }
 
@@ -1448,6 +1474,21 @@
     });
 
     showStep(1);
+
+    document.getElementById('recruit_phone').addEventListener('input', function (e) {
+        const input = e.target.value.replace(/\D/g, '').substring(0, 10);
+        let formatted = '';
+        if (input.length > 0) {
+            formatted = input.substring(0, 2);
+        }
+        if (input.length > 2) {
+            formatted += '-' + input.substring(2, 6);
+        }
+        if (input.length > 6) {
+            formatted += '-' + input.substring(6, 10);
+        }
+        e.target.value = formatted;
+    });
 
 </script>
 

@@ -292,7 +292,7 @@ class UserControlNewAdmission extends BaseController
                  } else {
                      return $this->response->setJSON([
                          'status' => 'error', 
-                         'message' => 'เกิดข้อผิดพลาดในการอัปโหลดรูปถ่าย'
+                         'message' => 'เกิดข้อผิดพลาดในการอัปโหลดรูปถ่าย: ' . ($result['message'] ?? 'ไม่ทราบสาเหตุ')
                      ]);
                  }
 
@@ -310,7 +310,7 @@ class UserControlNewAdmission extends BaseController
                      // Rollback previous uploads? For now just return error
                      return $this->response->setJSON([
                          'status' => 'error', 
-                         'message' => 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์ ' . $field
+                         'message' => 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์ ' . $field . ': ' . ($result['message'] ?? 'ไม่ทราบสาเหตุ')
                      ]);
                 }
             }
