@@ -281,7 +281,7 @@
                                     <div class="card-body text-center p-3">
                                         <div class="mb-3">
                                             <?php 
-                                                $student_img_path = base_url('uploads/recruitstudent/m' . $level . '/img/' . $student['recruit_img']);
+                                                $student_img_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/img/' . $student['recruit_img']);
                                                 $default_img = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
                                             ?>
                                             <img id="preview_img_display" src="<?= !empty($student['recruit_img']) ? $student_img_path : $default_img ?>" alt="รูปถ่ายนักเรียน" class="d-block rounded mx-auto" style="width: 150px; height: 200px; object-fit: contain; border: 2px dashed #d9dee3;">
@@ -525,7 +525,7 @@
                                 <div class="mt-2 text-center">
                                     <?php if (!empty($student['recruit_certificateEdu'])): ?>
                                         <?php 
-                                            $file_path = base_url('uploads/recruitstudent/m' . $level . '/certificate/' . $student['recruit_certificateEdu']);
+                                            $file_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/certificate/' . $student['recruit_certificateEdu']);
                                             $file_extension = pathinfo($student['recruit_certificateEdu'], PATHINFO_EXTENSION);
                                         ?>
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
@@ -546,7 +546,7 @@
                                 <div class="mt-2 text-center">
                                     <?php if (!empty($student['recruit_copyidCard'])): ?>
                                         <?php 
-                                            $file_path = base_url('uploads/recruitstudent/m' . $level . '/copyidCard/' . $student['recruit_copyidCard']);
+                                            $file_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/copyidCard/' . $student['recruit_copyidCard']);
                                             $file_extension = pathinfo($student['recruit_copyidCard'], PATHINFO_EXTENSION);
                                         ?>
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
@@ -567,7 +567,7 @@
                                 <div class="mt-2 text-center">
                                     <?php if (!empty($student['recruit_copyAddress'])): ?>
                                         <?php 
-                                            $file_path = base_url('uploads/recruitstudent/m' . $level . '/copyAddress/' . $student['recruit_copyAddress']);
+                                            $file_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/copyAddress/' . $student['recruit_copyAddress']);
                                             $file_extension = pathinfo($student['recruit_copyAddress'], PATHINFO_EXTENSION);
                                         ?>
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
@@ -796,6 +796,73 @@
     });
 
     // --- End of Corrected Course Logic ---
+
+    // AJAX Submission for Edit Form
+    $('#regisForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        // Basic validation check (HTML5 validation)
+        if (!this.checkValidity()) {
+            e.stopPropagation();
+            this.classList.add('was-validated');
+            Swal.fire({
+                icon: 'warning',
+                title: 'ข้อมูลยังไม่ครบถ้วน',
+                text: 'กรุณาตรวจสอบข้อมูลให้ครบถ้วน',
+                confirmButtonText: 'ตกลง'
+            });
+            return;
+        }
+
+        // Show loading
+        Swal.fire({
+            title: 'กำลังบันทึกข้อมูล...',
+            text: 'กรุณารอสักครู่ ระบบกำลังอัปโหลดไฟล์และบันทึกข้อมูล',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = response.redirect_url;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: response.message,
+                        confirmButtonText: 'ตกลง'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้: ' + error,
+                    confirmButtonText: 'ตกลง'
+                });
+            }
+        });
+    });
 
 
     // Wizard Logic (unchanged)

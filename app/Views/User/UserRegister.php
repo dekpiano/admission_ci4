@@ -700,7 +700,61 @@
         });
 
         $('#confirmSubmitBtn').on('click', function() {
-            $('#regisForm').submit();
+            // Hide modal
+            confirmModal.hide();
+            
+            // Show loading
+            Swal.fire({
+                title: 'กำลังบันทึกข้อมูล...',
+                text: 'กรุณารอสักครู่ ระบบกำลังอัปโหลดไฟล์และบันทึกข้อมูล',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            var formData = new FormData($('#regisForm')[0]);
+
+            $.ajax({
+                url: $('#regisForm').attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = response.redirect_url;
+                        });
+                    } else {
+                        var errorMsg = response.message;
+                        if (response.errors) {
+                            errorMsg += '\n' + Object.values(response.errors).join('\n');
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: errorMsg,
+                            confirmButtonText: 'ตกลง'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้: ' + error,
+                        confirmButtonText: 'ตกลง'
+                    });
+                }
+            });
         });
 
         $('#submitBtn').on('click', function(e) {

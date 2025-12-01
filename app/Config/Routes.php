@@ -26,6 +26,9 @@ $routes->get('new-admission/status', 'User\UserControlNewAdmission::status');
 $routes->get('new-admission/school-search', 'User\UserControlNewAdmission::ajax_school_search'); // Route for Select2 school search
 $routes->post('new-admission/save', 'User\UserControlNewAdmission::save_register');
 
+// Image Proxy for remote images
+$routes->get('image-proxy', 'User\ImageProxy::index');
+
 // Routes for editing admission data
 $routes->get('admission/edit/(:num)', 'User\UserControlAdmission::edit_student/$1');
 $routes->post('admission/update', 'User\UserControlAdmission::update_student');

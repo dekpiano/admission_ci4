@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
 use App\Libraries\Timeago;
 use App\Libraries\Datethai;
+use App\Libraries\RemoteUpload;
 
 class UserControlNewAdmission extends BaseController
 {
@@ -144,23 +145,54 @@ class UserControlNewAdmission extends BaseController
 
     public function save_register()
     {
+        if (!$this->request->isAJAX()) {
+            return redirect()->back()->with('error', 'Invalid Request');
+        }
+
         $post = $this->request->getPost();
         
         // Basic Validation
         if (!$this->validate([
-            'recruit_idCard' => 'required|min_length[13]|max_length[13]',
-            'recruit_firstName' => 'required',
-            'recruit_lastName' => 'required',
-            'recruit_category' => 'required'
+            'recruit_idCard' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'กรุณากรอกเลขบัตรประชาชน',
+                ]
+            ],
+            'recruit_firstName' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'กรุณากรอกชื่อ',
+                ]
+            ],
+            'recruit_lastName' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'กรุณากรอกนามสกุล',
+                ]
+            ],
+            'recruit_category' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'กรุณาเลือกประเภทโควตา',
+                ]
+            ]
         ])) {
-            return redirect()->back()->withInput()->with('error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                'errors' => $this->validator->getErrors()
+            ]);
         }
 
         $year = $this->admissionModel->getOpenYear()->openyear_year;
 
         // Check duplicate
         if ($this->admissionModel->isIdCardRegistered($post['recruit_idCard'], $year)) {
-            return redirect()->to('new-admission/status')->with('error', 'คุณได้ลงทะเบียนแล้ว กรุณาตรวจสอบสถานะ');
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'เลขบัตรประชาชนนี้ได้ทำการสมัครไปแล้ว กรุณาตรวจสอบสถานะ'
+            ]);
         }
 
         // Generate ID
@@ -221,7 +253,7 @@ class UserControlNewAdmission extends BaseController
             'recruit_status' => "รอการตรวจสอบ",
             'recruit_date'    => date('Y-m-d H:i:s'),
             'recruit_dateUpdate' => date('Y-m-d H:i:s'),
-            'recruit_statusSurrender' => 'Normal',
+            'recruit_statusSurrender' => '',
             'recruit_StatusQuiz' => 'รอเข้าสอบ'
         ];
 
@@ -234,32 +266,79 @@ class UserControlNewAdmission extends BaseController
             'recruit_copyidCard' => 'copyidCard'
         ];
 
+        $uploadedFiles = []; // Keep track to rollback if needed
+
         foreach ($file_fields as $field) {
             $file = $this->request->getFile($field);
-            if ($file && $file->isValid() && !$file->hasMoved()) {
-                $folder = $folder_map[$field];
-                $path = 'uploads/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder . '/';
-                
-                if (!is_dir(FCPATH . $path)) {
-                    mkdir(FCPATH . $path, 0777, true);
-                }
+            // Check if file is uploaded or if there's a base64 string for image
+            if ($field === 'recruit_img' && !empty($post['recruit_img_cropped'])) {
+                 // Handle Base64 Image
+                 $base64Image = $post['recruit_img_cropped'];
+                 $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64Image));
+                 $fileName = $year . '-' . $post['recruit_idCard'] . '-' . uniqid() . '.png';
+                 
+                 $tempFile = tempnam(sys_get_temp_dir(), 'img');
+                 file_put_contents($tempFile, $imageData);
 
-                $newName = $file->getRandomName();
-                $file->move(FCPATH . $path, $newName);
-                $data_insert[$field] = $newName;
+                 $remoteUpload = new RemoteUpload();
+                 $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/img';
+                 
+                 $result = $remoteUpload->upload($tempFile, $subPath, $fileName);
+                 @unlink($tempFile);
+
+                 if ($result && $result['status'] === 'success') {
+                     $data_insert[$field] = $result['filename'];
+                     $uploadedFiles[] = ['path' => $subPath, 'file' => $result['filename']];
+                 } else {
+                     return $this->response->setJSON([
+                         'status' => 'error', 
+                         'message' => 'เกิดข้อผิดพลาดในการอัปโหลดรูปถ่าย'
+                     ]);
+                 }
+
+            } elseif ($file && $file->isValid() && !$file->hasMoved()) {
+                $folder = $folder_map[$field];
+                $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder;
+                
+                $remoteUpload = new RemoteUpload();
+                $result = $remoteUpload->upload($file, $subPath);
+                
+                if ($result && $result['status'] === 'success') {
+                    $data_insert[$field] = $result['filename'];
+                    $uploadedFiles[] = ['path' => $subPath, 'file' => $result['filename']];
+                } else {
+                     // Rollback previous uploads? For now just return error
+                     return $this->response->setJSON([
+                         'status' => 'error', 
+                         'message' => 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์ ' . $field
+                     ]);
+                }
             }
         }
 
         // Insert
         $this->db->transBegin();
-        $this->admissionModel->insert($data_insert);
-
-        if ($this->db->transStatus() === FALSE) {
-            $this->db->transRollback();
-            return redirect()->back()->withInput()->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-        } else {
+        try {
+            $this->admissionModel->insert($data_insert);
+            
+            if ($this->db->transStatus() === FALSE) {
+                throw new \Exception('Database Insert Failed');
+            }
+            
             $this->db->transCommit();
-            return redirect()->to('new-admission/status')->with('success', 'สมัครเรียนสำเร็จ! กรุณาตรวจสอบสถานะ');
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'สมัครเรียนสำเร็จ! กรุณาตรวจสอบสถานะ',
+                'redirect_url' => base_url('new-admission/status')
+            ]);
+
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            // Ideally delete uploaded files here if transaction failed
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง'
+            ]);
         }
     }
 

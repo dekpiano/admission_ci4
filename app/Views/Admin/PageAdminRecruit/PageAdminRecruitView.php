@@ -18,7 +18,7 @@
                     <div class="user-avatar-section">
                         <div class="d-flex align-items-center flex-column">
                             <img class="img-fluid rounded my-4" 
-                                 src="<?= base_url('uploads/recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '')) . '/img/' . ($recruit['recruit_img'] ?? 'default.png') ?>" 
+                                 src="<?= base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '') . '/img/' . ($recruit['recruit_img'] ?? 'default.png')) ?>" 
                                  height="110" width="110" 
                                  alt="User avatar"
                                  style="object-fit: cover;"
@@ -241,8 +241,8 @@
                             <div class="row g-3">
                                 <?php 
                                 $docs = [
-                                    ['name' => 'ปพ.1', 'file' => $recruit['recruit_certificateEdu'], 'icon' => 'bx-file', 'folder' => 'certificate'],
-                                    ['name' => 'ปพ.7', 'file' => $recruit['recruit_certificateEduB'], 'icon' => 'bx-file', 'folder' => 'certificateB'],
+                                    ['name' => 'ปพ.1 ด้านหน้า', 'file' => $recruit['recruit_certificateEdu'], 'icon' => 'bx-file', 'folder' => 'certificate'],
+                                    ['name' => 'ปพ.1 ด้านหลัง', 'file' => $recruit['recruit_certificateEduB'], 'icon' => 'bx-file', 'folder' => 'certificate'],
                                     ['name' => 'สำเนาบัตรประชาชน', 'file' => $recruit['recruit_copyidCard'], 'icon' => 'bx-id-card', 'folder' => 'copyidCard'],
                                     ['name' => 'สำเนาทะเบียนบ้าน', 'file' => $recruit['recruit_copyAddress'], 'icon' => 'bx-home', 'folder' => 'copyAddress'],
                                     ['name' => 'เอกสารความสามารถพิเศษ', 'file' => $recruit['recruit_certificateAbility'], 'icon' => 'bx-medal', 'folder' => 'certificateAbility'],
@@ -255,7 +255,7 @@
                                                 <i class="bx <?= $doc['icon'] ?> bx-lg mb-3 text-secondary"></i>
                                                 <h6 class="card-title"><?= $doc['name'] ?></h6>
                                                 <?php if (!empty($doc['file'])): ?>
-                                                    <a href="<?= base_url('uploads/recruitstudent/m' . $recruit['recruit_regLevel'] . '/' . $doc['folder'] . '/' . $doc['file']) ?>" 
+                                                    <a href="<?= base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/' . $doc['folder'] . '/' . $doc['file']) ?>" 
                                                        target="_blank" 
                                                        class="btn btn-sm btn-outline-primary">
                                                        <i class="bx bx-show me-1"></i> ดูเอกสาร

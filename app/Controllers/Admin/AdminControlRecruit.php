@@ -83,6 +83,7 @@ class AdminControlRecruit extends BaseController
             $data['recruit']['major_order_list'] = []; // Ensure it's always an array even if recruit_majorOrder is empty
         }
 
+        $data['remote_base_url'] = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
         $data['title'] = 'รายละเอียดผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitView', $data);
     }
@@ -98,6 +99,7 @@ class AdminControlRecruit extends BaseController
 
         $data['courses'] = $model->getAllCourses();
         $data['quotas'] = $model->getAllQuotas();
+        $data['remote_base_url'] = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
         $data['title'] = 'แก้ไขข้อมูลผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitEdit', $data);
     }
@@ -143,11 +145,21 @@ class AdminControlRecruit extends BaseController
         // Handle file upload
         $img = $this->request->getFile('recruit_img');
         if ($img->isValid() && !$img->hasMoved()) {
-            // You might want to delete the old image first
-            $newName = $img->getRandomName();
-            $year = $model->find($id)['recruit_year'];
-            $img->move(ROOTPATH . 'public/uploads/recruitstudent/' . $year, $newName);
-            $data['recruit_img'] = $newName;
+            $currentRecruit = $model->find($id);
+            $regLevel = $currentRecruit['recruit_regLevel'];
+            
+            $remoteUpload = new \App\Libraries\RemoteUpload();
+            $subPath = 'admission/recruitstudent/m' . $regLevel . '/img';
+            
+            $result = $remoteUpload->upload($img, $subPath);
+            
+            if ($result && $result['status'] === 'success') {
+                $data['recruit_img'] = $result['filename'];
+                // Delete old image if exists
+                if (!empty($currentRecruit['recruit_img'])) {
+                    $remoteUpload->delete($currentRecruit['recruit_img'], $subPath);
+                }
+            }
         }
 
         $model->update($id, $data);
@@ -158,9 +170,42 @@ class AdminControlRecruit extends BaseController
     public function delete($id = null)
     {
         $model = new AdmissionModel();
-        $model->delete($id);
+        $recruit = $model->find($id); // Find the record first
 
-        return redirect()->to(site_url('skjadmin/recruits'))->with('success', 'ลบข้อมูลผู้สมัครสำเร็จ');
+        if ($recruit) {
+            $remoteUpload = new \App\Libraries\RemoteUpload();
+            $regLevel = $recruit['recruit_regLevel'];
+
+            // Array of fields and their corresponding subdirectories
+            $fileFields = [
+                'recruit_img' => 'img',
+                'recruit_certificateEdu' => 'certificate',
+                'recruit_certificateEduB' => 'certificateB',
+                'recruit_copyidCard' => 'copyidCard',
+                'recruit_copyAddress' => 'copyAddress',
+            ];
+
+            // Delete individual files
+            foreach ($fileFields as $field => $folder) {
+                if (!empty($recruit[$field])) {
+                    $subPath = 'admission/recruitstudent/m' . $regLevel . '/' . $folder;
+                    $remoteUpload->delete($recruit[$field], $subPath);
+                }
+            }
+
+            // Delete ability certificate files (which can be multiple)
+            if (!empty($recruit['recruit_certificateAbility'])) {
+                $ability_files = explode('|', $recruit['recruit_certificateAbility']);
+                if (count($ability_files) > 0) {
+                    $subPath = 'admission/recruitstudent/m' . $regLevel . '/certificateAbility';
+                    $remoteUpload->delete($ability_files, $subPath);
+                }
+            }
+        }
+
+        $model->delete($id); // Now delete the DB record
+
+        return redirect()->to(site_url('skjadmin/recruits'))->with('success', 'ลบข้อมูลผู้สมัครและไฟล์ที่เกี่ยวข้องสำเร็จ');
     }
 
     public function updateStatus()
@@ -356,8 +401,10 @@ class AdminControlRecruit extends BaseController
         
         // Generate HTML
         $html = '';
-        $imgUrl = FCPATH.'uploads/recruitstudent/m'.$recruit['recruit_regLevel'].'/img/'.$recruit['recruit_img'];
-        if (file_exists($imgUrl) && !empty($recruit['recruit_img'])) {
+        $baseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
+        $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . $recruit['recruit_img']);
+        
+        if (!empty($recruit['recruit_img'])) {
              $html .= '<div style="position:absolute;top:90px;left:635px; width:100%"><img style="width: 120px;height:100px;" src="'.$imgUrl.'"></div>'; 
         }
         

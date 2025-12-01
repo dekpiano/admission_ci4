@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\Admin\AdmissionModel;
 use App\Models\AdmissionModel as MainAdmissionModel; // For getSchool
 use App\Libraries\Timeago;
+use App\Libraries\RemoteUpload;
 
 class AdminControlAdmission extends BaseController
 {
@@ -243,29 +244,24 @@ class AdminControlAdmission extends BaseController
             'recruit_copyidCard' => 'copyidCard'
         ];
         
-        $openyear = $this->db->table('tb_openyear')->get()->getResult();
         $data_R = $this->db->table('tb_recruitstudent')->where('recruit_id', $id)->get()->getRow();
+        $remoteUpload = new RemoteUpload(); // Instantiate once
 
         foreach ($file_fields as $field) {
             $file = $this->request->getFile($field);
             if ($file && $file->isValid() && !$file->hasMoved()) {
-                $foder = $folder_map[$field];
-                $rand_name = $openyear[0]->openyear_year . '-' . $post['recruit_idCard'] . uniqid();
-                $newName = $rand_name . '.' . $file->getExtension();
-                
-                $path = 'uploads/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $foder . '/';
-                if (!is_dir(FCPATH . $path)) mkdir(FCPATH . $path, 0777, true);
-                
-                $file->move(FCPATH . $path, $newName);
-                
-                // Resize/Rotate logic can be added here using CI4 Image service
-                // ...
+                $folder = $folder_map[$field]; // Fixed typo
+                $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder;
 
-                $data_update[$field] = $newName;
-                
-                // Delete old file
-                if (!empty($data_R->$field)) {
-                    @unlink(FCPATH . $path . $data_R->$field);
+                $result = $remoteUpload->upload($file, $subPath);
+
+                if ($result && $result['status'] === 'success') {
+                    $data_update[$field] = $result['filename'];
+
+                    // Delete old file
+                    if (!empty($data_R->$field)) {
+                        $remoteUpload->delete($data_R->$field, $subPath);
+                    }
                 }
             }
         }
@@ -286,19 +282,30 @@ class AdminControlAdmission extends BaseController
         $recruit_data = $this->db->table('tb_recruitstudent')->where('recruit_id', $id)->get()->getRow();
 
         if ($recruit_data) {
-            $recruit_regLevel_folder = FCPATH . "uploads/recruitstudent/m" . $recruit_data->recruit_regLevel . '/';
+            $remoteUpload = new RemoteUpload();
+            $regLevel = $recruit_data->recruit_regLevel;
 
-            // Delete files
-            @unlink($recruit_regLevel_folder . 'img/' . $recruit_data->recruit_img);
-            @unlink($recruit_regLevel_folder . 'certificate/' . $recruit_data->recruit_certificateEdu);
-            @unlink($recruit_regLevel_folder . 'certificateB/' . $recruit_data->recruit_certificateEduB);
-            @unlink($recruit_regLevel_folder . 'copyidCard/' . $recruit_data->recruit_copyidCard);
-            @unlink($recruit_regLevel_folder . 'copyAddress/' . $recruit_data->recruit_copyAddress);
+            // Define subpaths
+            $subpaths = [
+                'recruit_img' => 'admission/recruitstudent/m' . $regLevel . '/img',
+                'recruit_certificateEdu' => 'admission/recruitstudent/m' . $regLevel . '/certificate',
+                'recruit_certificateEduB' => 'admission/recruitstudent/m' . $regLevel . '/certificateB',
+                'recruit_copyidCard' => 'admission/recruitstudent/m' . $regLevel . '/copyidCard',
+                'recruit_copyAddress' => 'admission/recruitstudent/m' . $regLevel . '/copyAddress',
+            ];
 
+            // Delete individual files
+            foreach ($subpaths as $field => $subpath) {
+                if (!empty($recruit_data->$field)) {
+                    $remoteUpload->delete($recruit_data->$field, $subpath);
+                }
+            }
+
+            // Delete ability certificate files
             if (!empty($recruit_data->recruit_certificateAbility)) {
                 $ability_files = explode('|', $recruit_data->recruit_certificateAbility);
-                foreach ($ability_files as $file_name) {
-                    @unlink($recruit_regLevel_folder . 'certificateAbility/' . $file_name);
+                if (count($ability_files) > 0) {
+                    $remoteUpload->delete($ability_files, 'admission/recruitstudent/m' . $regLevel . '/certificateAbility');
                 }
             }
 

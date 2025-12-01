@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
 use App\Libraries\Timeago;
 use App\Libraries\Datethai;
+use App\Libraries\RemoteUpload;
 use CodeIgniter\I18n\Time;
 
 class UserControlAdmission extends BaseController
@@ -109,6 +110,7 @@ class UserControlAdmission extends BaseController
         $data['level'] = $level;
         $data['quotas'] = $this->admissionModel->getAllQuotas();
         $data['courses'] = $this->admissionModel->getCoursesByGradeLevel($gradeLevel);
+        $data['remote_base_url'] = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
 
         return view('User/UserEdit', $data);
     }
@@ -214,16 +216,22 @@ class UserControlAdmission extends BaseController
                 $base64Image = $post['recruit_img_cropped'];
                 $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64Image));
                 $fileName = $openyear . '-' . $post['recruit_idCard'] . '-' . uniqid() . '.png';
-                $path = FCPATH . 'uploads/recruitstudent/m' . $post['recruit_regLevel'] . '/img/';
-                if (!is_dir($path)) mkdir($path, 0777, true);
                 
-                if (file_put_contents($path . $fileName, $imageData)) {
-                    $data_update['recruit_img'] = $fileName;
+                $tempFile = tempnam(sys_get_temp_dir(), 'img');
+                file_put_contents($tempFile, $imageData);
+
+                $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/img';
+                
+                $result = $remoteUpload->upload($tempFile, $subPath, $fileName);
+                
+                if ($result && $result['status'] === 'success') {
+                    $data_update['recruit_img'] = $result['filename'];
                     // Delete old image
-                    if (!empty($original_student['recruit_img']) && file_exists($path . $original_student['recruit_img'])) {
-                        @unlink($path . $original_student['recruit_img']);
+                    if (!empty($original_student['recruit_img'])) {
+                        $remoteUpload->delete($original_student['recruit_img'], $subPath);
                     }
                 }
+                @unlink($tempFile);
             }
 
             // Other document files
@@ -238,15 +246,16 @@ class UserControlAdmission extends BaseController
                 $file = $this->request->getFile($field);
                 if ($file && $file->isValid() && !$file->hasMoved()) {
                     $folder = $folder_map[$field];
-                    $path = 'uploads/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder . '/';
-                    if (!is_dir(FCPATH . $path)) mkdir(FCPATH . $path, 0777, true);
+                    $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder;
                     
-                    $newName = $file->getRandomName();
-                    if ($file->move(FCPATH . $path, $newName)) {
-                        $data_update[$field] = $newName;
+                    $remoteUpload = new RemoteUpload();
+                    $result = $remoteUpload->upload($file, $subPath);
+
+                    if ($result && $result['status'] === 'success') {
+                        $data_update[$field] = $result['filename'];
                         // Delete old file
-                        if (!empty($original_student[$field]) && file_exists($path . $original_student[$field])) {
-                            @unlink($path . $original_student[$field]);
+                        if (!empty($original_student[$field])) {
+                            $remoteUpload->delete($original_student[$field], $subPath);
                         }
                     }
                 }
@@ -425,12 +434,29 @@ class UserControlAdmission extends BaseController
                     $this->db->transCommit();
 
                     // --- Save Profile Image ---
+                    // --- Save Profile Image ---
                     if ($fileName !== '') {
                         $image = $post['recruit_img'];
                         $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $image));
-                        $path = FCPATH . 'uploads/recruitstudent/m' . $post['recruit_regLevel'] . '/img/';
-                        if (!is_dir($path)) mkdir($path, 0777, true);
-                        file_put_contents($path . $fileName, $imageData);
+                        
+                        $tempFile = tempnam(sys_get_temp_dir(), 'img');
+                        file_put_contents($tempFile, $imageData);
+
+                        $remoteUpload = new RemoteUpload();
+                        $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/img';
+                        $result = $remoteUpload->upload($tempFile, $subPath, $fileName);
+                        
+                        // If upload failed, we might want to log it or handle it, but the record is already inserted.
+                        // Ideally we should update the record if filename changed, but here we used $fileName for insert.
+                        // If remote upload changes name, we need to update DB.
+                        if ($result && $result['status'] === 'success') {
+                             if ($result['filename'] !== $fileName) {
+                                 $this->admissionModel->student_update($student_id, ['recruit_img' => $result['filename']]);
+                             }
+                        } else {
+                             // Upload failed
+                        }
+                        @unlink($tempFile);
                     }
 
                     // --- Save Other Uploaded Files ---
@@ -452,13 +478,15 @@ class UserControlAdmission extends BaseController
                     foreach ($file_fields as $field) {
                         $file = $this->request->getFile($field);
                         if ($file && $file->isValid() && !$file->hasMoved()) {
-                            $foder = $folder_map[$field];
-                            $path = 'uploads/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $foder . '/';
-                            if (!is_dir(FCPATH . $path)) mkdir(FCPATH . $path, 0777, true);
+                            $folder = $folder_map[$field];
+                            $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder;
                             
-                            $newName = $file->getRandomName();
-                            $file->move(FCPATH . $path, $newName);
-                            $update_data[$field] = $newName;
+                            $remoteUpload = new RemoteUpload();
+                            $result = $remoteUpload->upload($file, $subPath);
+                            
+                            if ($result && $result['status'] === 'success') {
+                                $update_data[$field] = $result['filename'];
+                            }
                         }
                     }
 
@@ -480,24 +508,27 @@ class UserControlAdmission extends BaseController
     public function UploadCertificateAbility($files, $regLevel)
     {
         $SetName = array();
+        $remoteUpload = new RemoteUpload();
+        $subPath = 'admission/recruitstudent/m' . $regLevel . '/certificateAbility';
+
         foreach ($files as $file) {
             if ($file->isValid() && !$file->hasMoved()) {
-                $path = 'uploads/recruitstudent/m' . $regLevel . '/certificateAbility/';
-                if (!is_dir(FCPATH . $path)) mkdir(FCPATH . $path, 0777, true);
-
-                $newName = $file->getRandomName();
-                $file->move(FCPATH . $path, $newName);
-
+                
+                // Resize locally first
+                $tempName = $file->getTempName();
                 try {
                     \Config\Services::image()
-                        ->withFile(FCPATH . $path . $newName)
+                        ->withFile($tempName)
                         ->resize(1024, 1024, true, 'width')
-                        ->save(FCPATH . $path . $newName);
+                        ->save($tempName);
                 } catch (\Exception $e) {
                     // Log error or ignore
                 }
 
-                $SetName[] = $newName;
+                $result = $remoteUpload->upload($file, $subPath);
+                if ($result && $result['status'] === 'success') {
+                    $SetName[] = $result['filename'];
+                }
             }
         }
         $result = !empty($SetName) ? implode('|', $SetName) : 0;
@@ -647,11 +678,14 @@ class UserControlAdmission extends BaseController
 
         // 6. Generate HTML Content
         // Image Path
-        $img_path = FCPATH . 'uploads/recruitstudent/m' . $student->recruit_regLevel . '/img/' . $student->recruit_img;
+        // Use Remote URL
+        $img_path = base_url('image-proxy?file=recruitstudent/m' . $student->recruit_regLevel . '/img/' . $student->recruit_img);
         
-        // Check if image exists, otherwise use placeholder or empty
+        // Check if image exists - for remote, we can't easily check file_exists without a request.
+        // But mPDF handles 404 images by showing error or nothing.
+        // We can just use the URL.
         $img_tag = '';
-        if (file_exists($img_path) && !empty($student->recruit_img)) {
+        if (!empty($student->recruit_img)) {
             $img_tag = '<img style="width:120px;height:100px;" src="' . $img_path . '">';
         }
 
