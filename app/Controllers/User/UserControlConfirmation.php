@@ -466,7 +466,9 @@ class UserControlConfirmation extends BaseController
         $studentId = $this->session->get('confirmation_student_id');
         
         // Load mPDF
-        require_once ROOTPATH . 'librarie_skj/mpdf/vendor/autoload.php';
+        // require_once ROOTPATH . 'librarie_skj/mpdf/vendor/autoload.php';
+        $path = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
+        require_once $path . '/librarie_skj/mpdf/vendor/autoload.php';
 
         // Fetch Data
         $checkYear = $this->db->table('tb_openyear')->get()->getRow();
@@ -524,7 +526,7 @@ class UserControlConfirmation extends BaseController
         $html .= '<div style="position:absolute;top:463px;left:475px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
         $html .= '<div style="position:absolute;top:463px;left:550px; width:100%">' . $date_Y . '</div>';
 
-        $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . FCPATH . 'uploads/recruitstudent/m' . $recruit[0]->recruit_regLevel . '/img/' . $recruit[0]->recruit_img . '"></div>';
+        $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . $path . '/public/uploads/recruitstudent/m' . $recruit[0]->recruit_regLevel . '/img/' . $recruit[0]->recruit_img . '"></div>';
         
         $regLevel = $confrim[0]->stu_regLevel ?? $recruit[0]->recruit_regLevel;
         
@@ -563,7 +565,7 @@ class UserControlConfirmation extends BaseController
         $html .= '<div style="position:absolute;top:710px;left:410px; width:100%">' . $confrim[0]->stu_hieght . '</div>';
         $html .= '<div style="position:absolute;top:710px;left:640px; width:100%">' . $confrim[0]->stu_talent . '</div>';
 
-        $checkMark = '<div style="position:absolute;top:%dpx;left:%dpx; width:100%"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>';
+        $checkMark = '<div style="position:absolute;top:%dpx;left:%dpx; width:100%%"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>';
         
         if ($confrim[0]->stu_parenalStatus == 'อยู่ด้วยกัน') $html .= sprintf($checkMark, 740, 178);
         else if ($confrim[0]->stu_parenalStatus == 'แยกกันอยู่') $html .= sprintf($checkMark, 740, 270);
@@ -592,7 +594,7 @@ class UserControlConfirmation extends BaseController
         $html .= '<div style="position:absolute;top:883px;left:340px; width:100%">' . $confrim[0]->stu_cNumber . '</div>';
         $html .= '<div style="position:absolute;top:883px;left:450px; width:100%">' . $confrim[0]->stu_cMoo . '</div>';
         $html .= '<div style="position:absolute;top:883px;left:520px; width:100%">' . $confrim[0]->stu_cRoad . '</div>';
-        $html .= '<div style="position:absolute;top:883px;left:660px; width:100%">' . $confrim[0]->stu_cTambon . '</div>';
+        $html .= '<div style="position:absolute;top:883px;left:660px; width:100%">' . $confrim[0]->stu_cTumbao . '</div>';
         $html .= '<div style="position:absolute;top:905px;left:110px; width:100%">' . $confrim[0]->stu_cDistrict . '</div>';
         $html .= '<div style="position:absolute;top:905px;left:300px; width:100%">' . $confrim[0]->stu_cProvince . '</div>';
         $html .= '<div style="position:absolute;top:905px;left:490px; width:100%">' . $confrim[0]->stu_cPostcode . '</div>';
@@ -746,7 +748,7 @@ class UserControlConfirmation extends BaseController
         }
 
         if (($mother->par_claim ?? '') == 'เบิกได้') $html2 .= sprintf($checkMark, 875, 400);
-        // else if (($mother->par_claim ?? '') == 'เบิกไม่ได้') $html2 .= sprintf($checkMark, 875, 470);
+        else if (($mother->par_claim ?? '') == 'เบิกไม่ได้') $html2 .= sprintf($checkMark, 875, 470);
 
         // Guardian Data
         $confrimPu = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "ผู้ปกครอง")->get()->getResult();

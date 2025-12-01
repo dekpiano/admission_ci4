@@ -114,7 +114,7 @@
                         <label for="recruit_img" class="form-label">รูปถ่ายนักเรียน</label>
                         <input class="form-control" type="file" id="recruit_img" name="recruit_img">
                         <div class="mt-2">
-                             <img src="<?= base_url('uploads/recruitstudent/' . ($recruit['recruit_year'] ?? '')) . '/' . ($recruit['recruit_img'] ?? 'default.png') ?>" 
+                             <img src="<?= base_url('uploads/recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '')) . '/img/' . ($recruit['recruit_img'] ?? 'default.png') ?>" 
                                  alt="Applicant Photo" 
                                  class="img-fluid rounded" 
                                  style="width: 100px; height: 100px; object-fit: cover;"

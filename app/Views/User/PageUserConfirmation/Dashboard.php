@@ -7,7 +7,7 @@
             <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-4">
                 <div class="flex-shrink-0 mt-3 mx-sm-0 mx-auto">
                     <?php if (!empty($stu[0]->recruit_img)): ?>
-                        <img src="<?= $stu[0]->recruit_img ?>" alt="user image" class="d-block h-auto ms-0 ms-sm-4 rounded user-profile-img" style="max-width: 100px;" />
+                        <img src="<?= base_url('uploads/recruitstudent/m' . $stu[0]->recruit_regLevel . '/img/' . $stu[0]->recruit_img) ?>" alt="user image" class="d-block h-auto ms-0 ms-sm-4 rounded user-profile-img" style="max-width: 100px;" />
                     <?php else: ?>
                         <img src="<?= base_url() ?>/uploads/students/default.png" alt="user image" class="d-block h-auto ms-0 ms-sm-4 rounded user-profile-img" style="max-width: 100px;" />
                     <?php endif; ?>
