@@ -178,6 +178,12 @@
             color: #ff9eb5 !important;
             background-color: #ffffff !important;
         }
+
+        .disabled-link {
+            pointer-events: none;
+            opacity: 0.6; /* Optional: Visually indicate it's disabled */
+            cursor: not-allowed;
+        }
     </style>
     <?= $this->renderSection('styles') ?>
 
@@ -300,10 +306,29 @@
                 <div data-i18n="Status">ตรวจสอบสถานะ</div>
               </a>
             </li>
+            <?php
+            $is_confirmation_open = false;
+            $confirmation_status_text = 'ปิดรับรายงานตัว'; // Default text if closed
+
+            if (isset($systemStatus) && isset($systemStatus->onoff_confirmation) && $systemStatus->onoff_confirmation == 'on') {
+                $is_confirmation_open = true;
+                $confirmation_status_text = 'เปิดรับรายงานตัว'; // Text if open
+            }
+            ?>
             <li class="menu-item <?= uri_string() == 'confirmation/login' ? 'active' : '' ?>">
-              <a href="<?= base_url('confirmation/login') ?>" class="menu-link">
+              <a
+                href="<?= $is_confirmation_open ? base_url('confirmation/login') : 'javascript:void(0);' ?>"
+                class="menu-link <?= !$is_confirmation_open ? 'disabled-link' : '' ?>"
+                <?= !$is_confirmation_open ? 'data-bs-toggle="tooltip" data-bs-placement="right" title="ยังไม่เปิดรับรายงานตัว" data-disabled-message="ยังไม่เปิดรับรายงานตัว"' : '' ?>
+              >
                 <i class="menu-icon tf-icons bx bx-user-check"></i>
-                <div data-i18n="Confirmation">รายงานตัวนักเรียนใหม่</div>
+                <div data-i18n="Confirmation">รายงานตัวนักเรียนใหม่
+                    <?php if (!$is_confirmation_open): ?>
+                        <span class="badge bg-danger ms-2">ปิด</span>
+                    <?php else: ?>
+                        <span class="badge bg-success ms-2">เปิด</span>
+                    <?php endif; ?>
+                </div>
               </a>
             </li>
 
@@ -419,5 +444,24 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <?= $this->renderSection('scripts') ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const disabledLinks = document.querySelectorAll('.disabled-link');
+        disabledLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.classList.contains('disabled-link')) {
+                    e.preventDefault(); // Prevent navigation
+                    const message = this.dataset.disabledMessage || 'ไม่สามารถใช้งานได้ในขณะนี้';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ระบบยังไม่เปิด',
+                        text: message,
+                        confirmButtonText: 'ตกลง'
+                    });
+                }
+            });
+        });
+    });
+    </script>
   </body>
 </html>

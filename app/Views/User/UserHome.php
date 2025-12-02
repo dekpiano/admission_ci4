@@ -2,6 +2,91 @@
 
 <?= $this->section('styles') ?>
 <style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Stats Cards */
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid;
+        height: 100%;
+    }
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+    .stat-card.primary { border-left-color: #ff9eb5; }
+    .stat-card.success { border-left-color: #84d2f6; }
+    .stat-card.warning { border-left-color: #ffc4d6; }
+    .stat-card.info { border-left-color: #a8e0ff; }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    .stat-icon.primary { background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%); color: white; }
+    .stat-icon.success { background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%); color: white; }
+    .stat-icon.warning { background: linear-gradient(135deg, #ffb3c6 0%, #ffd4e0 100%); color: white; }
+    .stat-icon.info { background: linear-gradient(135deg, #b8e5fb 0%, #d4f1ff 100%); color: white; }
+    
+    /* Announcement Card */
+    .announcement-card {
+        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(255, 158, 181, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .announcement-card::after {
+        content: '';
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    /* Countdown */
     .countdown-container {
         font-family: 'Prompt', sans-serif;
         color: #fff;
@@ -12,7 +97,8 @@
         padding: 0;
         margin: 0;
         display: flex;
-        gap: 10px;
+        gap: 15px;
+        justify-content: center;
     }
     .countdown-container li {
         display: flex;
@@ -20,33 +106,161 @@
         align-items: center;
         justify-content: center;
         list-style-type: none;
-        padding: 0.5rem;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        min-width: 60px;
-        backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1rem 0.75rem;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        min-width: 80px;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
     }
     .countdown-container li span {
         display: block;
-        font-size: 1.5rem;
+        font-size: 2rem;
         font-weight: 700;
         line-height: 1;
     }
     .countdown-container li .label {
-        font-size: 0.65rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
-        margin-top: 4px;
-        opacity: 0.9;
+        margin-top: 8px;
+        opacity: 0.95;
+        font-weight: 600;
     }
-    @media (max-width: 576px) {
+    
+    /* Application Cards */
+    .app-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        border: 2px solid transparent;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .app-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #ff9eb5 0%, #84d2f6 100%);
+    }
+    .app-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        border-color: #ff9eb5;
+    }
+    .app-card.m4:hover {
+        border-color: #84d2f6;
+    }
+    .app-card.m4::before {
+        background: linear-gradient(90deg, #84d2f6 0%, #ff9eb5 100%);
+    }
+    
+    .level-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(255, 158, 181, 0.3);
+    }
+    .app-card.m4 .level-badge {
+        background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%);
+        box-shadow: 0 4px 15px rgba(132, 210, 246, 0.3);
+    }
+    
+    .apply-button {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border: none;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .apply-button::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    .apply-button:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+    .apply-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+    
+    /* Custom Button Colors - Pastel Pink/Blue */
+    .btn-primary {
+        background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%);
+        border: none;
+        color: white;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #ff89a8 0%, #ffb3c6 100%);
+    }
+    .btn-info {
+        background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%);
+        border: none;
+        color: white;
+    }
+    .btn-info:hover {
+        background: linear-gradient(135deg, #6ec6f0 0%, #95d9ff 100%);
+    }
+    
+    /* Schedule Table */
+    .schedule-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .schedule-header {
+        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+        color: white;
+        padding: 1.5rem;
+    }
+    .table-hover tbody tr {
+        transition: all 0.2s ease;
+    }
+    .table-hover tbody tr:hover {
+        background: linear-gradient(90deg, rgba(255, 158, 181, 0.1) 0%, rgba(132, 210, 246, 0.1) 100%);
+        transform: scale(1.01);
+    }
+    
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 2rem 1rem;
+        }
         .countdown-container li {
-            min-width: 50px;
-            padding: 0.25rem;
+            min-width: 60px;
+            padding: 0.75rem 0.5rem;
         }
         .countdown-container li span {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
+        }
+        .app-card {
+            margin-bottom: 1.5rem;
         }
     }
 </style>
@@ -54,124 +268,194 @@
 
 <?= $this->section('content') ?>
 
-<div class="row">
-    <div class="col-lg-12 mb-4 order-0">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0"><i class='bx bx-broadcast me-2'></i>ประกาศรับสมัครที่เปิดอยู่ในขณะนี้</h5>
-                    <span class="badge bg-white text-primary shadow-sm">ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?></span>
-                </div>
-                
-                <?php 
-                $hasActiveQuota = false;
-                if (!empty($quotas)) {
-                    foreach ($quotas as $quota) {
-                        if (isset($quota->quota_status) && $quota->quota_status == 'on') {
-                            $hasActiveQuota = true;
-                            ?>
-                            <?php
-                            $is_closed_announce = false;
-                            if (isset($systemStatus->onoff_datetime_regis_close)) {
-                                if (time() > strtotime($systemStatus->onoff_datetime_regis_close)) {
-                                    $is_closed_announce = true;
-                                }
-                            }
-                            ?>
-                            <div class="d-flex align-items-center mb-2 p-3 rounded <?= $is_closed_announce ? 'bg-secondary' : 'bg-primary' ?>" style="background-color: rgba(255,255,255,0.1);">
-                             
-                                <div class="flex-grow-1 text-center">
-                                    <h4 class="mb-1 text-white fw-bold">
-                                        <?= $quota->quota_explain ?> 
-                                        <?php if($is_closed_announce): ?>
-                                            <span class="badge bg-danger ms-2">ปิดรับสมัครแล้ว</span>
-                                        <?php elseif(isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)): ?>
-                                            <span class="badge bg-warning text-dark ms-2">รอเปิดรับสมัคร</span>
-                                        <?php endif; ?>
-                                    </h4>
-                                    
-                                    <?php if(isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)): ?>
-                                        <div class="text-center w-100 mt-3 mb-3">
-                                            <p class="text-white mb-2 opacity-90"><i class='bx bx-time-five'></i> กำลังจะเปิดรับสมัครในอีก...</p>
-                                            <div class="countdown-container" data-target="<?= $systemStatus->onoff_datetime_regis_open ?>">
-                                                <ul>
-                                                    <li><span class="days">0</span><div class="label">วัน</div></li>
-                                                    <li><span class="hours">0</span><div class="label">ชั่วโมง</div></li>
-                                                    <li><span class="minutes">0</span><div class="label">นาที</div></li>
-                                                    <li><span class="seconds">0</span><div class="label">วินาที</div></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                        <small class="text-white opacity-90">
-                                            <i class='bx bx-calendar-check'></i> เปิดรับ: 
-                                            <span class="bg-white text-success fw-bold px-2 py-0 rounded shadow-sm" style="font-size: 0.85rem;">
-                                                <?= isset($systemStatus->onoff_datetime_regis_open) ? $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_open)) : '-' ?>
-                                            </span>
-                                        </small>
-                                        <small class="text-white opacity-90">
-                                            <i class='bx bx-calendar-x'></i> ปิดรับ: 
-                                            <span class="bg-white text-danger fw-bold px-2 py-0 rounded shadow-sm" style="font-size: 0.85rem;">
-                                                <?= isset($systemStatus->onoff_datetime_regis_close) ? $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_close)) : '-' ?>
-                                            </span>
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php
-                        }
-                    }
-                }
-                
-                if (!$hasActiveQuota) {
-                    if (isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)) {
-                        ?>
-                        <div class="d-flex align-items-center mb-2 p-3 rounded bg-primary" style="background-color: rgba(255,255,255,0.1);">
-                            <div class="avatar me-3">
-                                <span class="avatar-initial rounded-circle bg-white text-primary"><i class='bx bx-time-five'></i></span>
-                            </div>
-                            <div class="flex-grow-1 text-center">
-                                <h6 class="mb-1 text-white fw-bold">
-                                    ระบบรับสมัครนักเรียนออนไลน์
-                                    <span class="badge bg-warning text-dark ms-2">รอเปิดรับสมัคร</span>
-                                </h6>
-                                
-                                <div class="text-center w-100 mt-3 mb-3">
-                                    <p class="text-white mb-2 opacity-90"><i class='bx bx-time-five'></i> กำลังจะเปิดรับสมัครในอีก...</p>
-                                    <div class="countdown-container" data-target="<?= $systemStatus->onoff_datetime_regis_open ?>">
-                                        <ul>
-                                            <li><span class="days">0</span><div class="label">วัน</div></li>
-                                            <li><span class="hours">0</span><div class="label">ชั่วโมง</div></li>
-                                            <li><span class="minutes">0</span><div class="label">นาที</div></li>
-                                            <li><span class="seconds">0</span><div class="label">วินาที</div></li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                    <small class="text-white opacity-90">
-                                        <i class='bx bx-calendar-check'></i> เปิดรับ: 
-                                        <span class="bg-white text-info fw-bold px-2 py-0 rounded shadow-sm" style="font-size: 0.85rem;">
-                                            <?= isset($systemStatus->onoff_datetime_regis_open) ? $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_open)) : '-' ?>
-                                        </span>
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                        <?php
-                    } else {
-                        echo '<div class="text-center py-4"><p class="text-muted mb-0 fs-5">ยังไม่มีประกาศรับสมัครในขณะนี้</p></div>';
-                    }
-                }
-                ?>
-            </div>
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content text-center">
+        <h1 class="display-4 fw-bold mb-3">
+            <i class='bx bx-graduation'></i> ระบบรับสมัครนักเรียนออนไลน์
+        </h1>
+        <p class="lead mb-4">โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="<?= base_url('new-admission/manual') ?>" class="btn btn-light btn-lg rounded-pill px-4">
+                <i class='bx bx-book-open me-2'></i> คู่มือการสมัคร
+            </a>
+            <a href="<?= base_url('new-admission/status') ?>" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                <i class='bx bx-search-alt me-2'></i> ตรวจสอบสถานะ
+            </a>
         </div>
     </div>
 </div>
 
-<div class="row justify-content-center" id="apply-section">
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6 col-6">
+        <div class="stat-card primary">
+            <div class="stat-icon primary">
+                <i class='bx bx-calendar'></i>
+            </div>
+            <h6 class="text-muted mb-1">ปีการศึกษา</h6>
+            <h3 class="fw-bold mb-0"><?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?></h3>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-6">
+        <div class="stat-card success">
+            <div class="stat-icon success">
+                <i class='bx bx-user-check'></i>
+            </div>
+            <h6 class="text-muted mb-1">สถานะระบบ</h6>
+            <h5 class="fw-bold mb-0">
+                <?php if(isset($systemStatus->onoff_regis) && $systemStatus->onoff_regis == 'on'): ?>
+                    <span class="text-success">เปิดรับสมัคร</span>
+                <?php else: ?>
+                    <span class="text-danger">ปิดรับสมัคร</span>
+                <?php endif; ?>
+            </h5>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-6">
+        <div class="stat-card warning">
+            <div class="stat-icon warning">
+                <i class='bx bx-time-five'></i>
+            </div>
+            <h6 class="text-muted mb-1">สถานะ</h6>
+            <h6 class="fw-bold mb-0">
+                <?php
+                if(isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)) {
+                    echo '<span class="text-warning">รอเปิดรับสมัคร</span>';
+                } elseif(isset($systemStatus->onoff_datetime_regis_close) && time() > strtotime($systemStatus->onoff_datetime_regis_close)) {
+                    echo '<span class="text-danger">ปิดรับสมัครแล้ว</span>';
+                } else {
+                    echo '<span class="text-success">กำลังรับสมัคร</span>';
+                }
+                ?>
+            </h6>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-6">
+        <div class="stat-card info">
+            <div class="stat-icon info">
+                <i class='bx bx-clipboard'></i>
+            </div>
+            <h6 class="text-muted mb-1">การรายงานตัว</h6>
+            <h5 class="fw-bold mb-0">
+                <?php
+                if(isset($systemStatus->onoff_report) && $systemStatus->onoff_report == 'on') {
+                    echo '<span class="text-success">เปิดรายงานตัว</span>';
+                } else {
+                    echo '<span class="text-muted">ยังไม่เปิด</span>';
+                }
+                ?>
+            </h5>
+        </div>
+    </div>
+</div>
+
+<!-- Announcement -->
+<div class="row mb-4">
+    <div class="col-12">
+        <?php 
+        $hasActiveQuota = false;
+        if (!empty($quotas)) {
+            foreach ($quotas as $quota) {
+                if (isset($quota->quota_status) && $quota->quota_status == 'on') {
+                    $hasActiveQuota = true;
+                    $is_closed_announce = false;
+                    if (isset($systemStatus->onoff_datetime_regis_close)) {
+                        if (time() > strtotime($systemStatus->onoff_datetime_regis_close)) {
+                            $is_closed_announce = true;
+                        }
+                    }
+                    ?>
+                    <div class="announcement-card">
+                        <div class="text-center">
+                            <h2 class="fw-bold mb-3">
+                                <i class='bx bx-broadcast me-2'></i> <?= $quota->quota_explain ?>
+                                <?php if($is_closed_announce): ?>
+                                    <span class="badge bg-danger ms-2">ปิดรับสมัครแล้ว</span>
+                                <?php elseif(isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)): ?>
+                                    <span class="badge bg-warning text-dark ms-2">รอเปิดรับสมัคร</span>
+                                <?php else: ?>
+                                    <span class="badge bg-success ms-2">กำลังรับสมัคร</span>
+                                <?php endif; ?>
+                            </h2>
+                            
+                            <?php if(isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)): ?>
+                                <p class="fs-5 mb-3"><i class='bx bx-time-five'></i> กำลังจะเปิดรับสมัครในอีก...</p>
+                                <div class="countdown-container mb-4" data-target="<?= $systemStatus->onoff_datetime_regis_open ?>">
+                                    <ul>
+                                        <li><span class="days">0</span><div class="label">วัน</div></li>
+                                        <li><span class="hours">0</span><div class="label">ชั่วโมง</div></li>
+                                        <li><span class="minutes">0</span><div class="label">นาที</div></li>
+                                        <li><span class="seconds">0</span><div class="label">วินาที</div></li>
+                                    </ul>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap mt-3">
+                                <div class="text-white d-flex align-items-center gap-2 px-3 py-2" style="background: rgba(72, 187, 120, 0.3); border: 2px solid rgba(72, 187, 120, 0.5); border-radius: 10px; backdrop-filter: blur(5px);">
+                                    <i class='bx bx-calendar-check' style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <div style="font-size: 0.85rem; font-weight: 600;">เปิดรับสมัคร</div>
+                                        <div class="fw-bold" style="font-size: 0.95rem;">
+                                            <?= isset($systemStatus->onoff_datetime_regis_open) ? $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_open)) : '-' ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-white d-flex align-items-center gap-2 px-3 py-2" style="background: rgba(245, 101, 101, 0.3); border: 2px solid rgba(245, 101, 101, 0.5); border-radius: 10px; backdrop-filter: blur(5px);">
+                                    <i class='bx bx-calendar-x' style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <div style="font-size: 0.85rem; font-weight: 600;">ปิดรับสมัคร</div>
+                                        <div class="fw-bold" style="font-size: 0.95rem;">
+                                            <?= isset($systemStatus->onoff_datetime_regis_close) ? $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_close)) : '-' ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                    break;
+                }
+            }
+        }
+        
+        if (!$hasActiveQuota) {
+            if (isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)) {
+                ?>
+                <div class="announcement-card">
+                    <div class="text-center">
+                        <h2 class="fw-bold mb-3">
+                            <i class='bx bx-time-five'></i> ระบบรับสมัครนักเรียนออนไลน์
+                            <span class="badge bg-warning text-dark ms-2">รอเปิดรับสมัคร</span>
+                        </h2>
+                        <p class="fs-5 mb-3">กำลังจะเปิดรับสมัครในอีก...</p>
+                        <div class="countdown-container" data-target="<?= $systemStatus->onoff_datetime_regis_open ?>">
+                            <ul>
+                                <li><span class="days">0</span><div class="label">วัน</div></li>
+                                <li><span class="hours">0</span><div class="label">ชั่วโมง</div></li>
+                                <li><span class="minutes">0</span><div class="label">นาที</div></li>
+                                <li><span class="seconds">0</span><div class="label">วินาที</div></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <?php
+            } else {
+                ?>
+                <div class="announcement-card text-center">
+                    <i class='bx bx-info-circle fs-1 mb-3'></i>
+                    <h3 class="fw-bold">ยังไม่มีประกาศรับสมัครในขณะนี้</h3>
+                    <p class="mb-0">กรุณาติดตามประกาศจากทางโรงเรียน</p>
+                </div>
+                <?php
+            }
+        }
+        ?>
+    </div>
+</div>
+
+<!-- Application Cards -->
+<div class="row justify-content-center g-4 mb-4" id="apply-section">
     <?php
     // --- Determine which levels are open based on active quotas ---
     $open_levels = []; 
@@ -190,10 +474,9 @@
                 }
 
                 foreach ($levels_in_quota as $level_str) {
-                     // Convert 'ม.1' to '1' etc. and ensure it's a number
                     $level_num_char = preg_replace('/[^0-9]/', '', $level_str);
                     if (is_numeric($level_num_char)) {
-                         $open_levels[] = intval($level_num_char);
+                        $open_levels[] = intval($level_num_char);
                     }
                 }
             }
@@ -211,15 +494,22 @@
                     $pre_check_url_level = $is_junior_high ? '1' : '4';
                     $subtitle = $is_junior_high ? 'สำหรับนักเรียนที่จบการศึกษาชั้น ป.6 หรือเทียบเท่า' : 'สำหรับนักเรียนที่จบการศึกษาชั้น ม.3 หรือเทียบเท่า';
                     $btn_class = $is_junior_high ? 'btn-primary' : 'btn-info text-white';
+                    $card_class = $is_junior_high ? '' : 'm4';
                 ?>
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body text-center d-flex flex-column">
-                            <h5 class="card-title">ระดับชั้นมัธยมศึกษาปีที่ <?= $level_num ?></h5>
-                            <h6 class="card-subtitle text-muted mb-3"><?= $subtitle ?></h6>
-                            <p class="card-text flex-grow-1">
-                                ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?>
-                            </p>
+                <div class="col-md-6 col-lg-5">
+                    <div class="app-card <?= $card_class ?>">
+                        <div class="text-center">
+                            <div class="level-badge">
+                                <i class='bx bx-bookmark me-1'></i> มัธยมศึกษาปีที่ <?= $level_num ?>
+                            </div>
+                            <p class="text-muted mb-3"><?= $subtitle ?></p>
+                            <div class="mb-4">
+                                <i class='bx bx-calendar fs-1 text-primary mb-2'></i>
+                                <p class="fw-bold text-dark mb-0">
+                                    ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?>
+                                </p>
+                            </div>
+                            
                             <?php 
                                 $is_closed = false;
                                 $is_not_open = false;
@@ -241,66 +531,103 @@
                             ?>
                             
                             <?php if ($is_closed): ?>
-                                <button class="btn btn-secondary mt-auto" disabled>ปิดรับสมัครแล้ว</button>
+                                <button class="apply-button btn btn-secondary" disabled>
+                                    <i class='bx bx-x-circle me-2'></i> ปิดรับสมัครแล้ว
+                                </button>
                             <?php elseif ($is_not_open): ?>
-                                <button class="btn btn-warning mt-auto" disabled>ยังไม่ถึงวันรับสมัคร</button>
+                                <button class="apply-button btn btn-warning" disabled>
+                                    <i class='bx bx-time-five me-2'></i> ยังไม่ถึงวันรับสมัคร
+                                </button>
                             <?php else: ?>
-                                <button type="button" class="btn <?= $btn_class ?> mt-auto apply-btn" data-href="<?= base_url('new-admission/pre-check/' . $pre_check_url_level . '?level=' . $level_num) ?>">สมัครเรียน ม.<?= $level_num ?></button>
+                                <button type="button" class="apply-button btn <?= $btn_class ?> apply-btn" data-href="<?= base_url('new-admission/pre-check/' . $pre_check_url_level . '?level=' . $level_num) ?>">
+                                    <i class='bx bx-edit-alt me-2'></i> สมัครเรียน ม.<?= $level_num ?>
+                                </button>
                             <?php endif; ?>
                         </div>
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <!-- No levels open based on quota status -->
             <div class="col-12">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">ยังไม่เปิดรับสมัคร</h5>
-                        <p class="text-muted">ยังไม่มีระดับชั้นที่เปิดรับสมัครในขณะนี้ กรุณาติดตามประกาศจากทางโรงเรียน</p>
-                    </div>
+                <div class="announcement-card text-center">
+                    <i class='bx bx-info-circle fs-1 mb-3'></i>
+                    <h4 class="fw-bold">ยังไม่เปิดรับสมัคร</h4>
+                    <p class="mb-0">ยังไม่มีระดับชั้นที่เปิดรับสมัครในขณะนี้ กรุณาติดตามประกาศจากทางโรงเรียน</p>
                 </div>
             </div>
         <?php endif; ?>
 
     <?php else: ?>
-        <!-- System is off -->
         <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center">
-                    <h5 class="card-title">ปิดระบบรับสมัคร</h5>
-                    <p class="text-muted">ระบบรับสมัครนักเรียนออนไลน์ยังไม่เปิดให้บริการ กรุณาติดตามประกาศจากทางโรงเรียน</p>
-                </div>
+            <div class="announcement-card text-center">
+                <i class='bx bx-lock-alt fs-1 mb-3'></i>
+                <h4 class="fw-bold">ปิดระบบรับสมัคร</h4>
+                <p class="mb-0">ระบบรับสมัครนักเรียนออนไลน์ยังไม่เปิดให้บริการ กรุณาติดตามประกาศจากทางโรงเรียน</p>
             </div>
         </div>
     <?php endif; ?>
 </div>
 
+<!-- Schedule Table -->
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">กำหนดการรับสมัคร</h5>
+        <div class="schedule-card">
+            <div class="schedule-header">
+                <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการรับสมัคร</h5>
             </div>
-            <div class="table-responsive text-nowrap">
-                <table class="table table-hover">
-                    <thead>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th>กิจกรรม</th>
-                            <th>วันที่</th>
-                            <th>หมายเหตุ</th>
+                            <th width="40%"><i class='bx bx-list-ul me-2'></i> กิจกรรม</th>
+                            <th width="35%"><i class='bx bx-calendar me-2'></i> วันที่</th>
+                            <th width="25%"><i class='bx bx-info-circle me-2'></i> หมายเหตุ</th>
                         </tr>
                     </thead>
-                    <tbody class="table-border-bottom-0">
+                    <tbody>
                         <tr>
-                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>เปิดรับสมัคร</strong></td>
-                            <td><?= isset($systemStatus->onoff_datetime_regis_open) ? date('d/m/Y H:i', strtotime($systemStatus->onoff_datetime_regis_open)) : '-' ?></td>
-                            <td><span class="badge bg-label-success me-1">Online</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="stat-icon success me-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                                        <i class='bx bx-calendar-check'></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0 fw-bold" style="font-size: 1.25rem; background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                            เปิดรับสมัคร
+                                        </h5>
+                                        <small class="text-muted">เริ่มสมัครเข้าเรียน</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <span class="badge bg-success rounded-pill px-4 py-2" style="font-size: 1rem;">
+                                    <i class='bx bx-time me-1'></i>
+                                    <?= isset($systemStatus->onoff_datetime_regis_open) ? date('d/m/Y H:i', strtotime($systemStatus->onoff_datetime_regis_open)) : '-' ?>
+                                </span>
+                            </td>
+                            <td class="align-middle"><span class="badge bg-label-success" style="font-size: 0.9rem;">Online</span></td>
                         </tr>
                         <tr>
-                            <td><i class="fab fa-react fa-lg text-info me-3"></i> <strong>ปิดรับสมัคร</strong></td>
-                            <td><?= isset($systemStatus->onoff_datetime_regis_close) ? date('d/m/Y H:i', strtotime($systemStatus->onoff_datetime_regis_close)) : '-' ?></td>
-                            <td><span class="badge bg-label-danger me-1">System Close</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="stat-icon warning me-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                                        <i class='bx bx-calendar-x'></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0 fw-bold" style="font-size: 1.25rem; background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                            ปิดรับสมัคร
+                                        </h5>
+                                        <small class="text-muted">สิ้นสุดการรับสมัคร</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <span class="badge bg-danger rounded-pill px-4 py-2" style="font-size: 1rem;">
+                                    <i class='bx bx-time me-1'></i>
+                                    <?= isset($systemStatus->onoff_datetime_regis_close) ? date('d/m/Y H:i', strtotime($systemStatus->onoff_datetime_regis_close)) : '-' ?>
+                                </span>
+                            </td>
+                            <td class="align-middle"><span class="badge bg-label-danger" style="font-size: 0.9rem;">System Close</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -319,7 +646,7 @@
       </div>
       <div class="modal-body">
         <p><strong>ข้อตกลงการใช้ข้อมูลส่วนบุคคลในการลงทะเบียนและสมัครเข้าศึกษาต่อในระบบรับสมัครออนไลน์ของโรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</strong></p>
-        <p>โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์ (“โรงเรียน”) ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลของผู้สมัคร ("ท่าน") โรงเรียนจึงได้จัดทำข้อตกลงและเงื่อนไขการใช้ข้อมูลส่วนบุคคลฉบับนี้ขึ้น เพื่อแจ้งให้ท่านทราบถึงวิธีการที่โรงเรียนเก็บรวบรวม ใช้ หรือเปิดเผยข้อมูลส่วนบุคคลของท่าน และสิทธิของท่านในฐานะเจ้าของข้อมูลส่วนบุคคล</p>
+        <p>โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์ ("โรงเรียน") ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลของผู้สมัคร ("ท่าน") โรงเรียนจึงได้จัดทำข้อตกลงและเงื่อนไขการใช้ข้อมูลส่วนบุคคลฉบับนี้ขึ้น เพื่อแจ้งให้ท่านทราบถึงวิธีการที่โรงเรียนเก็บรวบรวม ใช้ หรือเปิดเผยข้อมูลส่วนบุคคลของท่าน และสิทธิของท่านในฐานะเจ้าของข้อมูลส่วนบุคคล</p>
         
         <h6>1. ข้อมูลส่วนบุคคลที่เก็บรวบรวม</h6>
         <p>โรงเรียนจะเก็บรวบรวมข้อมูลส่วนบุคคลของท่านที่จำเป็นต่อการรับสมัครและการพิจารณาคัดเลือกเข้าศึกษาต่อ ซึ่งรวมถึงแต่ไม่จำกัดเพียง:</p>
@@ -345,7 +672,7 @@
         <p>โรงเรียนจะไม่เปิดเผยข้อมูลส่วนบุคคลของท่านแก่บุคคลภายนอกโดยไม่ได้รับความยินยอมจากท่าน เว้นแต่ในกรณีที่มีกฎหมายกำหนดให้สามารถกระทำได้</p>
 
         <h6>4. ระยะเวลาในการเก็บรักษาข้อมูล</h6>
-        <p>โรงเรียนจะเก็บรักษาข้อมูลส่วนบุคคลของท่านไว้เป็นระยะเวลาเท่าที่จำเป็นเพื่อบรรลุวัตถุประสงค์ที่ได้แจ้งไว้ และตามที่กฎหมายกำหนด</p>
+        <p>โรงเรียนจะเก็บรักษาข้อมูลส่วนบุคคลของท่านไว้เป็นระยะเวลาเท่าที่จำเป็นเพื่อบรรลุวัตถุประสงค์ที่ได้แจ้งไว้ และตามที่กฏหมายกำหนด</p>
 
         <h6>5. สิทธิของเจ้าของข้อมูล</h6>
         <p>ท่านมีสิทธิตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 ซึ่งรวมถึงสิทธิในการขอเข้าถึง ขอแก้ไข ขอให้ลบ หรือจำกัดการใช้ข้อมูลส่วนบุคคลของท่าน</p>
@@ -378,12 +705,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const minutesEl = timer.querySelector('.minutes');
         const secondsEl = timer.querySelector('.seconds');
 
-        const updateCountdown = () => {
+        function updateCountdown() {
             const now = new Date().getTime();
             const distance = targetDate - now;
 
             if (distance < 0) {
-                location.reload(); 
+                clearInterval(countdownInterval);
+                daysEl.textContent = '0';
+                hoursEl.textContent = '0';
+                minutesEl.textContent = '0';
+                secondsEl.textContent = '0';
+                setTimeout(() => location.reload(), 1000);
                 return;
             }
 
@@ -392,39 +724,34 @@ document.addEventListener('DOMContentLoaded', function() {
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            if(daysEl) daysEl.innerText = days;
-            if(hoursEl) hoursEl.innerText = hours;
-            if(minutesEl) minutesEl.innerText = minutes;
-            if(secondsEl) secondsEl.innerText = seconds;
-        };
+            daysEl.textContent = days;
+            hoursEl.textContent = hours.toString().padStart(2, '0');
+            minutesEl.textContent = minutes.toString().padStart(2, '0');
+            secondsEl.textContent = seconds.toString().padStart(2, '0');
+        }
 
-        updateCountdown(); 
-        setInterval(updateCountdown, 1000); 
+        updateCountdown();
+        const countdownInterval = setInterval(updateCountdown, 1000);
     });
 
-    // --- PDPA Modal Logic ---
-    const pdpaModalEl = document.getElementById('pdpaModal');
-    if (pdpaModalEl) {
-        const pdpaModal = new bootstrap.Modal(pdpaModalEl);
-        const acceptBtn = document.getElementById('pdpa-accept-btn');
-        let targetUrl = '';
+    // PDPA Modal
+    const applyButtons = document.querySelectorAll('.apply-btn');
+    const pdpaModal = new bootstrap.Modal(document.getElementById('pdpaModal'));
+    let selectedHref = '';
 
-        document.querySelectorAll('.apply-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                targetUrl = this.dataset.href;
-                pdpaModal.show();
-            });
+    applyButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            selectedHref = this.dataset.href;
+            pdpaModal.show();
         });
+    });
 
-        if (acceptBtn) {
-            acceptBtn.addEventListener('click', function() {
-                if (targetUrl) {
-                    window.location.href = targetUrl;
-                }
-            });
+    document.getElementById('pdpa-accept-btn').addEventListener('click', function() {
+        if (selectedHref) {
+            window.location.href = selectedHref;
         }
-    }
+    });
 });
 </script>
 <?= $this->endSection() ?>
