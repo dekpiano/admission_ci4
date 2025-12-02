@@ -315,17 +315,25 @@
     <div class="col-md-3 col-sm-6 col-6">
         <div class="stat-card warning">
             <div class="stat-icon warning">
-                <i class='bx bx-time-five'></i>
+                <i class='bx bx-folder-open'></i>
             </div>
-            <h6 class="text-muted mb-1">สถานะ</h6>
+            <h6 class="text-muted mb-1">รอบที่เปิด</h6>
             <h6 class="fw-bold mb-0">
                 <?php
-                if(isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)) {
-                    echo '<span class="text-warning">รอเปิดรับสมัคร</span>';
-                } elseif(isset($systemStatus->onoff_datetime_regis_close) && time() > strtotime($systemStatus->onoff_datetime_regis_close)) {
-                    echo '<span class="text-danger">ปิดรับสมัครแล้ว</span>';
+                $activeRounds = [];
+                if (!empty($quotas)) {
+                    foreach ($quotas as $quota) {
+                        if (isset($quota->quota_status) && $quota->quota_status == 'on') {
+                            $activeRounds[] = $quota->quota_explain;
+                        }
+                    }
+                }
+                
+                if (!empty($activeRounds)) {
+                    // Display first round name
+                    echo '<span class="text-success">' . $activeRounds[0] . '</span>';
                 } else {
-                    echo '<span class="text-success">กำลังรับสมัคร</span>';
+                    echo '<span class="text-muted">ไม่มีรอบเปิด</span>';
                 }
                 ?>
             </h6>
@@ -366,6 +374,7 @@
                         }
                     }
                     ?>
+                    <?php if ($systemStatus->onoff_regis == 'on'): ?>
                     <div class="announcement-card">
                         <div class="text-center">
                             <h2 class="fw-bold mb-3">
@@ -413,17 +422,18 @@
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
                     <?php
                     break;
                 }
             }
         }
-        
-        if (!$hasActiveQuota) {
-            if (isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)) {
-                ?>
-                <div class="announcement-card">
-                    <div class="text-center">
+       
+            if (!$hasActiveQuota) {
+                if (isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)) {
+                    ?>
+                    <div class="announcement-card">
+                        <div class="text-center">
                         <h2 class="fw-bold mb-3">
                             <i class='bx bx-time-five'></i> ระบบรับสมัครนักเรียนออนไลน์
                             <span class="badge bg-warning text-dark ms-2">รอเปิดรับสมัคร</span>
@@ -450,6 +460,7 @@
                 <?php
             }
         }
+    
         ?>
     </div>
 </div>

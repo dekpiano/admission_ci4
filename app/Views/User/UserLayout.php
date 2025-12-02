@@ -159,8 +159,6 @@
             color: rgba(255,255,255,0.8) !important;
         }
         
-        }
-        
         #layout-navbar .bx-menu {
             color: #fff !important;
         }
@@ -173,7 +171,7 @@
             color: #fff !important;
         }
         
-        /* Menu Active State Override from previous step to match new sidebar */
+        /* Menu Active State Override */
         .menu-item.active > .menu-link {
             color: #ff9eb5 !important;
             background-color: #ffffff !important;
@@ -181,8 +179,67 @@
 
         .disabled-link {
             pointer-events: none;
-            opacity: 0.6; /* Optional: Visually indicate it's disabled */
+            opacity: 0.6;
             cursor: not-allowed;
+        }
+
+        /* Mobile Responsive Improvements */
+        @media (max-width: 1199px) {
+            .layout-menu {
+                width: 260px !important;
+            }
+            
+            .menu-inner .menu-item .menu-link {
+                padding: 0.75rem 1rem !important;
+                font-size: 0.95rem !important;
+            }
+            
+            .menu-icon {
+                font-size: 1.2rem !important;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .layout-menu {
+                max-width: 280px !important;
+            }
+            
+            .menu-inner .menu-item .menu-link {
+                padding: 1rem 1.25rem !important;
+                font-size: 1rem !important;
+                min-height: 48px !important;
+            }
+            
+            .menu-icon {
+                font-size: 1.5rem !important;
+                margin-right: 1rem !important;
+            }
+            
+            .app-brand-logo img {
+                width: 35px !important;
+            }
+            
+            .app-brand-text {
+                font-size: 1.1rem !important;
+            }
+            
+            .menu-header {
+                padding: 1rem 1.25rem 0.5rem !important;
+            }
+            
+            .badge {
+                font-size: 0.7rem !important;
+            }
+            
+            /* Navbar Mobile Tweaks */
+            #layout-navbar {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+            
+            .navbar-nav-right {
+                width: 100%;
+            }
         }
     </style>
     <?= $this->renderSection('styles') ?>
@@ -242,7 +299,7 @@
               <span class="menu-header-text">สมัครเรียน</span>
             </li>
             <?php
-            // Logic to determine open levels, similar to UserHome.php
+            // Logic to determine open levels
             $open_levels = [];
             
             // Check System Status & Date Time
@@ -285,7 +342,7 @@
             // Display menu items for open levels
             foreach ($open_levels as $level_num):
                 $is_junior_high = $level_num <= 3;
-                $menu_link_level = $is_junior_high ? '1' : '4'; // The actual pre-check level (1 or 4)
+                $menu_link_level = $is_junior_high ? '1' : '4';
                 $current_uri_level = (uri_string() == 'new-admission/pre-check/' . $menu_link_level && service('request')->getGet('level') == $level_num) || uri_string() == 'new-admission/register/' . $menu_link_level;
             ?>
             <li class="menu-item <?= $current_uri_level ? 'active' : '' ?>">
@@ -308,11 +365,11 @@
             </li>
             <?php
             $is_confirmation_open = false;
-            $confirmation_status_text = 'ปิดรับรายงานตัว'; // Default text if closed
+            $confirmation_status_text = 'ปิดรับรายงานตัว';
 
             if (isset($systemStatus) && isset($systemStatus->onoff_confirmation) && $systemStatus->onoff_confirmation == 'on') {
                 $is_confirmation_open = true;
-                $confirmation_status_text = 'เปิดรับรายงานตัว'; // Text if open
+                $confirmation_status_text = 'เปิดรับรายงานตัว';
             }
             ?>
             <li class="menu-item <?= uri_string() == 'confirmation/login' ? 'active' : '' ?>">
@@ -344,34 +401,41 @@
           <nav
             class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
             id="layout-navbar">
-            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+            
+            <!-- Mobile Toggle & Brand (Redesigned) -->
+            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-xl-0 d-xl-none">
               <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-                <i class="bx bx-menu bx-sm"></i>
+                <i class="bx bx-menu" style="font-size: 1.8rem; color: #ff9eb5 !important;"></i>
               </a>
             </div>
 
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-              <!-- Search -->
-              <div class="navbar-nav align-items-center">
+              <!-- Search/Brand Area -->
+              <div class="navbar-nav align-items-center flex-grow-1">
                 <div class="nav-item d-flex align-items-center">
-                  <span class="fw-bold text-primary d-none d-md-block">ระบบรับสมัครนักเรียนออนไลน์ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</span>
-                  <span class="fw-bold text-primary d-block d-md-none">ระบบรับสมัครนักเรียนใหม่ SKJ</span>
+                  <!-- Desktop Title -->
+                  <span class="fw-bold text-primary d-none d-md-block" style="font-size: 1.1rem;">
+                    <i class='bx bxs-school me-2'></i>ระบบรับสมัครนักเรียนออนไลน์ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์
+                  </span>
+                  
+                  <!-- Mobile Title with Logo -->
+                  <div class="d-flex align-items-center d-md-none">
+                    <img src="https://skj.ac.th/uploads/logoSchool/LogoSKJ_4.png" alt="Logo" width="32" height="32" class="me-2">
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold text-primary" style="font-size: 0.95rem; line-height: 1.1;">SKJ Admission</span>
+                        <span class="text-muted" style="font-size: 0.75rem;">ระบบรับสมัครนักเรียนใหม่</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <!-- /Search -->
 
               <ul class="navbar-nav flex-row align-items-center ms-auto">
-                <!-- Place this tag where you want the button to render. -->
-                <li class="nav-item lh-1 me-3">
-                  <a
-                    class="github-button"
-                    href="#"
-                    data-icon="octicon-star"
-                    data-size="large"
-                    data-show-count="true"
-                    aria-label="Star themeselection/sneat-html-admin-template-free on GitHub"
-                    >ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?></a
-                  >
+                <!-- Academic Year Badge -->
+                <li class="nav-item lh-1 me-0">
+                  <span class="badge bg-label-primary rounded-pill px-3 py-2">
+                    <i class='bx bx-calendar me-1'></i>ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?>
+                  </span>
                 </li>
               </ul>
             </div>
@@ -404,10 +468,6 @@
               </div>
             </footer>
             <!-- / Footer -->
-                </div>
-              </div>
-            </footer>
-            <!-- / Footer -->
 
             <div class="content-backdrop fade"></div>
           </div>
@@ -423,12 +483,13 @@
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
+
     <script src="<?= base_url('public/sneat-assets/vendor/libs/jquery/jquery.js') ?>"></script>
     <script src="<?= base_url('public/sneat-assets/vendor/libs/popper/popper.js') ?>"></script>
     <script src="<?= base_url('public/sneat-assets/vendor/js/bootstrap.js') ?>"></script>
     <script src="<?= base_url('public/sneat-assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') ?>"></script>
-
     <script src="<?= base_url('public/sneat-assets/vendor/js/menu.js') ?>"></script>
+
     <!-- endbuild -->
 
     <!-- Vendors JS -->
@@ -436,9 +497,6 @@
 
     <!-- Main JS -->
     <script src="<?= base_url('public/sneat-assets/js/main.js') ?>"></script>
-
-    <!-- Page JS -->
-    <script src="<?= base_url('public/sneat-assets/js/dashboards-analytics.js') ?>"></script>
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -450,7 +508,7 @@
         disabledLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 if (this.classList.contains('disabled-link')) {
-                    e.preventDefault(); // Prevent navigation
+                    e.preventDefault();
                     const message = this.dataset.disabledMessage || 'ไม่สามารถใช้งานได้ในขณะนี้';
                     Swal.fire({
                         icon: 'warning',

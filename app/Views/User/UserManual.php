@@ -3,54 +3,53 @@
 <?= $this->section('styles') ?>
 <style>
     /* Timeline Styles */
+    /* Timeline Styles */
     .timeline {
         position: relative;
-        padding: 2rem 0;
+        padding: 1rem 0;
     }
     .timeline::before {
         content: '';
         position: absolute;
-        left: 50px;
+        left: 40px;
         top: 0;
         bottom: 0;
-        width: 4px;
+        width: 3px;
         background: linear-gradient(180deg, #ff9eb5 0%, #84d2f6 100%);
         border-radius: 10px;
     }
     .timeline-item {
         position: relative;
-        padding-left: 100px;
-        margin-bottom: 3rem;
+        padding-left: 80px;
+        margin-bottom: 2.5rem;
     }
     .timeline-icon {
         position: absolute;
         left: 0;
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
         background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%);
-        border-radius: 20px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2.5rem;
+        font-size: 2rem;
         color: white;
-        box-shadow: 0 8px 20px rgba(255, 158, 181, 0.3);
+        box-shadow: 0 4px 15px rgba(255, 158, 181, 0.3);
         z-index: 2;
         transition: all 0.3s ease;
+        border: 4px solid #fff;
     }
     .timeline-item:nth-child(even) .timeline-icon {
         background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%);
-        box-shadow: 0 8px 20px rgba(132, 210, 246, 0.3);
-    }
-    .timeline-icon:hover {
-        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 4px 15px rgba(132, 210, 246, 0.3);
     }
     .timeline-number {
         position: absolute;
-        bottom: -8px;
-        right: -8px;
-        width: 32px;
-        height: 32px;
+        top: 0;
+        right: 0;
+        width: 24px;
+        height: 24px;
         background: #fff;
         color: #ff9eb5;
         border-radius: 50%;
@@ -58,57 +57,77 @@
         align-items: center;
         justify-content: center;
         font-weight: bold;
-        font-size: 0.9rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        font-size: 0.8rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border: 2px solid #ff9eb5;
     }
     .timeline-item:nth-child(even) .timeline-number {
         color: #84d2f6;
+        border-color: #84d2f6;
     }
     .timeline-content {
         background: #fff;
-        padding: 2rem;
+        padding: 1.5rem;
         border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        border-left: 5px solid #ff9eb5;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border-left: 4px solid #ff9eb5;
         transition: all 0.3s ease;
     }
     .timeline-item:nth-child(even) .timeline-content {
         border-left-color: #84d2f6;
     }
-    .timeline-content:hover {
-        transform: translateX(10px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    }
     .timeline-title {
         color: #ff9eb5;
         font-weight: 700;
-        font-size: 1.3rem;
-        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
     }
     .timeline-item:nth-child(even) .timeline-title {
         color: #84d2f6;
     }
-    .doc-badge {
-        display: inline-block;
-        background: #f8f9fa;
-        padding: 0.5rem 1rem;
-        border-radius: 10px;
-        margin: 0.25rem;
-        border-left: 3px solid #ff9eb5;
-        font-size: 0.9rem;
-    }
     
-    @media (max-width: 768px) {
+    /* Mobile Optimization */
+    @media (max-width: 767.98px) {
         .timeline::before {
-            left: 35px;
+            left: 20px;
         }
         .timeline-item {
-            padding-left: 80px;
+            padding-left: 55px;
+            margin-bottom: 2rem;
         }
         .timeline-icon {
-            width: 70px;
-            height: 70px;
-            font-size: 1.8rem;
+            width: 45px;
+            height: 45px;
+            font-size: 1.2rem;
+            border-width: 3px;
+        }
+        .timeline-number {
+            width: 18px;
+            height: 18px;
+            font-size: 0.6rem;
+            right: -5px;
+            top: -5px;
+            border-width: 1px;
+        }
+        .timeline-content {
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        .timeline-title {
+            font-size: 1rem;
+        }
+        .card-body {
+            padding: 1rem !important;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        p.fs-5 {
+            font-size: 1rem !important;
+        }
+        .doc-badge {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
         }
     }
 </style>
