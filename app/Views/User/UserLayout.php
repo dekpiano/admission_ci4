@@ -224,6 +224,13 @@
               </a>
             </li>
 
+            <li class="menu-item <?= uri_string() == 'new-admission/manual-report' ? 'active' : '' ?>">
+              <a href="<?= base_url('new-admission/manual-report') ?>" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user-check"></i>
+                <div data-i18n="ManualReport">คู่มือการรายงานตัว</div>
+              </a>
+            </li>
+
             <!-- Registration -->
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">สมัครเรียน</span>

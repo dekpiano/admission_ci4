@@ -17,9 +17,9 @@ $routes->group('auth', ['namespace' => 'App\Controllers\User'], function ($route
     $routes->get('logout', 'UserControlAuth::logout');
 });
 
-// New Admission System
 $routes->get('new-admission', 'User\UserControlNewAdmission::index');
 $routes->get('new-admission/manual', 'User\UserControlAdmission::manual');
+$routes->get('new-admission/manual-report', 'User\UserControlAdmission::manual_report');
 $routes->get('new-admission/pre-check/(:num)', 'User\UserControlNewAdmission::pre_check/$1');
 $routes->post('new-admission/check-id', 'User\UserControlNewAdmission::check_id_card');
 $routes->get('new-admission/register/(:num)', 'User\UserControlNewAdmission::register/$1');

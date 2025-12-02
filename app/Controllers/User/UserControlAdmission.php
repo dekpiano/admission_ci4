@@ -774,7 +774,20 @@ class UserControlAdmission extends BaseController
         $data = $this->dataAll();
         $data['title'] = "คู่มือการสมัครเรียน";
         $data['description'] = "ขั้นตอนและวิธีการสมัครเรียนออนไลน์ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์";
+        $data['systemStatus'] = $this->admissionModel->getSystemStatus();
+        $data['quotas'] = $this->admissionModel->getAllQuotas();
         
         return view('User/UserManual', $data);
+    }
+
+    public function manual_report()
+    {
+        $data = $this->dataAll();
+        $data['title'] = "คู่มือการรายงานตัว";
+        $data['description'] = "ขั้นตอนการรายงานตัวและมอบตัวนักเรียนใหม่ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์";
+        $data['systemStatus'] = $this->admissionModel->getSystemStatus();
+        $data['quotas'] = $this->admissionModel->getAllQuotas();
+        
+        return view('User/UserManualReport', $data);
     }
 }
