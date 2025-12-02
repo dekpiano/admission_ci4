@@ -768,4 +768,13 @@ class UserControlAdmission extends BaseController
         $data = $this->admissionModel->getSystemOnOffStatus();
         return $this->response->setJSON($data);
     }
+
+    public function manual()
+    {
+        $data = $this->dataAll();
+        $data['title'] = "คู่มือการสมัครเรียน";
+        $data['description'] = "ขั้นตอนและวิธีการสมัครเรียนออนไลน์ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์";
+        
+        return view('User/UserManual', $data);
+    }
 }
