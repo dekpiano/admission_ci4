@@ -1085,55 +1085,152 @@
         
         if (hasCourses) {
             courseSection.style.display = 'block'; 
-            courseSelects[0].required = true;
             
-            if (isSportsQuota) {
-                // --- Sports Quota Logic ---
-                courseLabel.innerHTML = 'เลือกชนิดกีฬาและรุ่นอายุ <span class="text-danger">*</span>';
-                
-                // Setup Dropdown 1: Sport Type (Branch)
-                courseContainers[0].style.display = 'flex';
-                courseContainers[0].querySelector('.input-group-text').style.display = 'none'; // Hide "Rank 1" label
-                courseSelects[0].innerHTML = '<option value="" selected disabled>-- เลือกชนิดกีฬา --</option>';
-                
-                Object.keys(sportsData).forEach(sport => {
-                    const option = document.createElement('option');
-                    option.value = sportsData[sport].id; // Store course_id directly here
-                    option.text = sport;
-                    courseSelects[0].appendChild(option);
-                });
+            // ใช้ระบบเดียวกันสำหรับทุกโควตา (ทั้งปกติและกีฬา)
+            courseLabel.innerHTML = 'เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) / ส่วนของแผนการเรียนนักฬา (เลือกได้สูงสุด 1 อันดับ) <span class="text-danger">*</span>';
+            ageRadioContainer.style.display = 'none';
+            
+            // Restore names
+            courseSelects[0].setAttribute('name', 'recruit_tpyeRoom1');
+            courseSelects[1].setAttribute('name', 'recruit_tpyeRoom2');
+            courseSelects[2].setAttribute('name', 'recruit_tpyeRoom3');
 
-                // Hide Dropdown 2 & 3
-                courseContainers[1].style.display = 'none';
-                courseContainers[2].style.display = 'none';
-                courseSelects[1].required = false;
-                courseSelects[2].required = false;
-                
-                // Ensure Dropdown 1 submits as recruit_tpyeRoom1
-                courseSelects[0].setAttribute('name', 'recruit_tpyeRoom1');
-                courseSelects[1].removeAttribute('name');
-                courseSelects[2].removeAttribute('name');
+            // Show all ranks
+            courseContainers[0].style.display = 'flex';
+            courseContainers[1].style.display = 'flex';
+            courseContainers[2].style.display = 'flex';
+            
+            // Restore labels
+            courseContainers[0].querySelector('.input-group-text').style.display = 'block';
+            courseContainers[1].querySelector('.input-group-text').style.display = 'block';
+            courseContainers[2].querySelector('.input-group-text').style.display = 'block';
 
-                // Add Event Listener to Dropdown 1 to show Age Radios
-                courseSelects[0].addEventListener('change', function() {
-                    const selectedCourseId = this.value;
-                    // Find the sport data based on ID (a bit inefficient but works)
-                    let selectedSportData = null;
-                    for (const sport in sportsData) {
-                        if (sportsData[sport].id == selectedCourseId) {
-                            selectedSportData = sportsData[sport];
-                            break;
-                        }
+            // Populate all dropdowns
+            courseSelects.forEach((select, index) => {
+                select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 1} --</option>`;
+                coursesData.forEach(course => {
+                    if (allowedCourses.includes(course.course_id.toString())) {
+                        const option = document.createElement('option');
+                        option.value = course.course_id;
+                        // Display: Initials - Branch (e.g., วิทย์-คณิต - ห้องเรียนพิเศษ)
+                        const initials = course.course_initials || course.course_fullname;
+                        const branch = course.course_branch || '';
+                        option.text = `${initials} ${branch ? '(' + branch + ')' : ''}`;
+                        select.appendChild(option);
                     }
+                });
+            });
+            
+            // ให้เลือกได้ทั้ง 3 อันดับ (เริ่มต้น)
+            courseSelects[0].required = true;
+            courseSelects[1].required = true;
+            courseSelects[2].required = true;
+            
+            // เพิ่ม event listener สำหรับอันดับ 1 เพื่อตรวจสอบว่าเป็นกีฬาหรือไม่
+            courseSelects[0].addEventListener('change', function() {
+                const selectedCourseId = this.value;
+                const selectElement = this; // เก็บ reference ของ select element
+                
+                // หาข้อมูลแผนการเรียนที่เลือก
+                const selectedCourse = coursesData.find(c => c.course_id == selectedCourseId);
+                
+                if (!selectedCourse) return;
+                
+                // ตรวจสอบว่าเลือกซ้ำหรือไม่ (เช็คกับอันดับ 2 และ 3)
+                const otherSelects = [courseSelects[1], courseSelects[2]];
+                const isDuplicate = otherSelects.some(s => s.value === selectedCourseId && selectedCourseId !== '');
+                
+                if (isDuplicate) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เลือกซ้ำ',
+                        text: 'ท่านได้เลือกแผนการเรียนนี้ไปแล้ว กรุณาเลือกแผนการเรียนอื่น',
+                        confirmButtonText: 'ตกลง'
+                    });
+                    selectElement.value = '';
+                    return;
+                }
+                
+                // ตรวจสอบเงื่อนไขเกรดเฉลี่ยสำหรับแผนวิทย์-คณิตและวิทย์-เทคโน
+                const courseName = selectedCourse.course_initials || selectedCourse.course_fullname || '';
+                let gradeRequirement = null;
+                let requiredGPA = 0;
+                
+                if (courseName.includes('วิทย์-คณิต') || courseName.includes('วิทย์ - คณิต')) {
+                    gradeRequirement = 'วิทย์-คณิต';
+                    requiredGPA = 3.00;
+                } else if (courseName.includes('วิทย์-เทคโน') || courseName.includes('วิทย์ - เทคโน')) {
+                    gradeRequirement = 'วิทย์-เทคโน';
+                    requiredGPA = 2.75;
+                }
+                
+                // ถ้าเป็นแผนที่ต้องตรวจสอบเกรด ให้แสดง SweetAlert2
+                if (gradeRequirement) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'เงื่อนไขเกรดเฉลี่ย',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-2">แผนการเรียน <strong>${gradeRequirement}</strong> มีเงื่อนไขดังนี้:</p>
+                                <ul class="mb-3">
+                                    <li>เกรดเฉลี่ย 5 ภาคเรียน ต้อง <strong>${requiredGPA.toFixed(2)} ขึ้นไป</strong></li>
+                                </ul>
+                                <p class="text-danger mb-0">
+                                    <i class="bx bx-info-circle"></i> 
+                                    หากเกรดเฉลี่ยของท่านไม่ถึงเกณฑ์ กรุณาเลือกแผนการเรียนอื่น
+                                </p>
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: 'ยืนยัน (เกรดของฉันถึงเกณฑ์)',
+                        cancelButtonText: 'ย้อนกลับเลือกแผนอื่น',
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#6c757d',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            // ผู้ใช้เลือกย้อนกลับ - reset dropdown
+                            selectElement.value = '';
+                            // Reset อันดับ 2 และ 3 ด้วย
+                            courseSelects[1].value = '';
+                            courseSelects[2].value = '';
+                            // ซ่อนช่วงอายุถ้ามี
+                            ageRadioContainer.style.display = 'none';
+                            ageRadioContainer.innerHTML = '';
+                            ageGroupInput.value = '';
+                            return;
+                        }
+                        // ถ้ายืนยัน ให้ดำเนินการต่อตามปกติ
+                        processCourseSelection(selectedCourse);
+                    });
+                } else {
+                    // ไม่ใช่แผนที่ต้องตรวจสอบเกรด ให้ดำเนินการต่อเลย
+                    processCourseSelection(selectedCourse);
+                }
+                
+                // ฟังก์ชันสำหรับดำเนินการหลังจากผ่านการตรวจสอบ
+                function processCourseSelection(selectedCourse) {
+                
+                if (selectedCourse && selectedCourse.course_age && selectedCourse.course_age.trim() !== '') {
+                    // เป็นแผนการเรียนกีฬา - ซ่อนอันดับ 2 และ 3, แสดงช่วงอายุ
+                    courseContainers[1].style.display = 'none';
+                    courseContainers[2].style.display = 'none';
+                    courseSelects[1].required = false;
+                    courseSelects[2].required = false;
+                    courseSelects[1].value = '';
+                    courseSelects[2].value = '';
                     
+                    // แสดงช่วงอายุ
                     ageRadioContainer.innerHTML = '<label class="form-label d-block">เลือกรุ่นอายุ <span class="text-danger">*</span></label>';
-                    ageGroupInput.value = ''; // Reset hidden input
+                    ageGroupInput.value = '';
                     
-                    if (selectedSportData && selectedSportData.ages.length > 0) {
+                    const ages = selectedCourse.course_age.split(',').map(s => s.trim()).filter(s => s !== '');
+                    
+                    if (ages.length > 0) {
                         const rowDiv = document.createElement('div');
                         rowDiv.className = 'row g-2';
                         
-                        selectedSportData.ages.forEach(age => {
+                        ages.forEach(age => {
                             const colDiv = document.createElement('div');
                             colDiv.className = 'col-auto';
                             
@@ -1143,7 +1240,7 @@
                             const radioInput = document.createElement('input');
                             radioInput.className = 'form-check-input';
                             radioInput.type = 'radio';
-                            radioInput.name = 'age_radio_group'; // Temporary name for radio group
+                            radioInput.name = 'age_radio_group';
                             radioInput.id = 'age_' + age;
                             radioInput.value = age;
                             radioInput.required = true;
@@ -1165,51 +1262,159 @@
                         
                         ageRadioContainer.appendChild(rowDiv);
                         ageRadioContainer.style.display = 'block';
-                    } else {
-                        ageRadioContainer.style.display = 'none';
                     }
-                });
-
-            } else {
-                // --- Normal Quota Logic ---
-                courseLabel.innerHTML = 'เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span class="text-danger">*</span>';
-                ageRadioContainer.style.display = 'none';
-                
-                // Restore names
-                courseSelects[0].setAttribute('name', 'recruit_tpyeRoom1');
-                courseSelects[1].setAttribute('name', 'recruit_tpyeRoom2');
-                courseSelects[2].setAttribute('name', 'recruit_tpyeRoom3');
-
-                // Show all ranks
-                courseContainers[0].style.display = 'flex';
-                courseContainers[1].style.display = 'flex';
-                courseContainers[2].style.display = 'flex';
-                
-                // Restore labels
-                courseContainers[0].querySelector('.input-group-text').style.display = 'block';
-                courseContainers[1].querySelector('.input-group-text').style.display = 'block';
-                courseContainers[2].querySelector('.input-group-text').style.display = 'block';
-
-                // Populate Dropdown 1 (and others similarly if we wanted dynamic filtering, but for now just list all)
-                courseSelects.forEach((select, index) => {
-                    select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 1} --</option>`;
-                    coursesData.forEach(course => {
-                        if (allowedCourses.includes(course.course_id.toString())) {
-                            const option = document.createElement('option');
-                            option.value = course.course_id;
-                            // Display: Initials - Branch (e.g., วิทย์-คณิต - ห้องเรียนพิเศษ)
-                            const initials = course.course_initials || course.course_fullname; // Fallback to fullname if initials missing
-                            const branch = course.course_branch || '';
-                            option.text = `${initials} ${branch ? '(' + branch + ')' : ''}`;
-                            select.appendChild(option);
+                } else {
+                    // เป็นแผนการเรียนปกติ - แสดงอันดับ 2 และ 3, ซ่อนช่วงอายุ
+                    courseContainers[1].style.display = 'flex';
+                    courseContainers[2].style.display = 'flex';
+                    courseSelects[1].required = true;
+                    courseSelects[2].required = true;
+                    
+                    ageRadioContainer.style.display = 'none';
+                    ageRadioContainer.innerHTML = '';
+                    ageGroupInput.value = '';
+                    
+                    // Populate อันดับ 2 และ 3 ใหม่ โดยกรองแผนการเรียนกีฬาออก
+                    [courseSelects[1], courseSelects[2]].forEach((select, index) => {
+                        const currentValue = select.value; // เก็บค่าเดิมไว้ (ถ้ามี)
+                        select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 2} --</option>`;
+                        
+                        coursesData.forEach(course => {
+                            if (allowedCourses.includes(course.course_id.toString())) {
+                                // กรองไม่ให้แผนการเรียนกีฬาแสดงในอันดับ 2 และ 3
+                                const isSportsCourse = course.course_age && course.course_age.trim() !== '';
+                                if (!isSportsCourse) {
+                                    const option = document.createElement('option');
+                                    option.value = course.course_id;
+                                    const initials = course.course_initials || course.course_fullname;
+                                    const branch = course.course_branch || '';
+                                    option.text = `${initials} ${branch ? '(' + branch + ')' : ''}`;
+                                    select.appendChild(option);
+                                }
+                            }
+                        });
+                        
+                        // คืนค่าเดิม (ถ้ายังมีอยู่ใน options ใหม่)
+                        if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
+                            select.value = currentValue;
                         }
                     });
-                });
+                }
+                } // ปิด function processCourseSelection
+            });
+            
+            // ฟังก์ชันตรวจสอบเงื่อนไขเกรดเฉลี่ย (ใช้ร่วมกันสำหรับทุกอันดับ)
+            function checkGradeRequirement(selectedCourse, selectElement, callback) {
+                if (!selectedCourse) {
+                    callback(false);
+                    return;
+                }
                 
-                courseSelects[0].required = true;
-                courseSelects[1].required = false;
-                courseSelects[2].required = false;
+                const courseName = selectedCourse.course_initials || selectedCourse.course_fullname || '';
+                let gradeRequirement = null;
+                let requiredGPA = 0;
+                
+                if (courseName.includes('วิทย์-คณิต') || courseName.includes('วิทย์ - คณิต')) {
+                    gradeRequirement = 'วิทย์-คณิต';
+                    requiredGPA = 3.00;
+                } else if (courseName.includes('วิทย์-เทคโน') || courseName.includes('วิทย์ - เทคโน')) {
+                    gradeRequirement = 'วิทย์-เทคโน';
+                    requiredGPA = 2.75;
+                }
+                
+                if (gradeRequirement) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'เงื่อนไขเกรดเฉลี่ย',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-2">แผนการเรียน <strong>${gradeRequirement}</strong> มีเงื่อนไขดังนี้:</p>
+                                <ul class="mb-3">
+                                    <li>เกรดเฉลี่ย 5 ภาคเรียน ต้อง <strong>${requiredGPA.toFixed(2)} ขึ้นไป</strong></li>
+                                </ul>
+                                <p class="text-danger mb-0">
+                                    <i class="bx bx-info-circle"></i> 
+                                    หากเกรดเฉลี่ยของท่านไม่ถึงเกณฑ์ กรุณาเลือกแผนการเรียนอื่น
+                                </p>
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: 'ยืนยัน (เกรดของฉันถึงเกณฑ์)',
+                        cancelButtonText: 'ย้อนกลับเลือกแผนอื่น',
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#6c757d',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            selectElement.value = '';
+                            callback(false);
+                        } else {
+                            callback(true);
+                        }
+                    });
+                } else {
+                    callback(true);
+                }
             }
+            
+            // สร้าง updateOptions function ที่จะใช้ร่วมกัน
+            let updateOptionsFunc = null;
+            
+            // เพิ่ม event listener สำหรับอันดับ 2
+            courseSelects[1].addEventListener('change', function() {
+                const selectedCourseId = this.value;
+                const selectElement = this;
+                const selectedCourse = coursesData.find(c => c.course_id == selectedCourseId);
+                
+                // ตรวจสอบว่าเลือกซ้ำหรือไม่
+                const otherSelects = [courseSelects[0], courseSelects[2]];
+                const isDuplicate = otherSelects.some(s => s.value === selectedCourseId && selectedCourseId !== '');
+                
+                if (isDuplicate) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เลือกซ้ำ',
+                        text: 'ท่านได้เลือกแผนการเรียนนี้ไปแล้ว กรุณาเลือกแผนการเรียนอื่น',
+                        confirmButtonText: 'ตกลง'
+                    });
+                    selectElement.value = '';
+                    return;
+                }
+                
+                checkGradeRequirement(selectedCourse, selectElement, function(confirmed) {
+                    if (confirmed && updateOptionsFunc) {
+                        updateOptionsFunc();
+                    }
+                });
+            });
+            
+            // เพิ่ม event listener สำหรับอันดับ 3
+            courseSelects[2].addEventListener('change', function() {
+                const selectedCourseId = this.value;
+                const selectElement = this;
+                const selectedCourse = coursesData.find(c => c.course_id == selectedCourseId);
+                
+                // ตรวจสอบว่าเลือกซ้ำหรือไม่
+                const otherSelects = [courseSelects[0], courseSelects[1]];
+                const isDuplicate = otherSelects.some(s => s.value === selectedCourseId && selectedCourseId !== '');
+                
+                if (isDuplicate) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เลือกซ้ำ',
+                        text: 'ท่านได้เลือกแผนการเรียนนี้ไปแล้ว กรุณาเลือกแผนการเรียนอื่น',
+                        confirmButtonText: 'ตกลง'
+                    });
+                    selectElement.value = '';
+                    return;
+                }
+                
+                checkGradeRequirement(selectedCourse, selectElement, function(confirmed) {
+                    if (confirmed && updateOptionsFunc) {
+                        updateOptionsFunc();
+                    }
+                });
+            });
         } else {
             courseSection.style.display = 'none';
             courseSelects[0].required = false;
@@ -1244,6 +1449,9 @@
                 });
             });
         }
+        
+        // เชื่อม updateOptionsFunc กับ updateOptions เพื่อให้ event listener อื่นเรียกใช้ได้
+        updateOptionsFunc = updateOptions;
 
         selects.forEach(select => {
             // Remove old listeners to avoid duplicates if called multiple times (though replaceChild handles that mostly)
@@ -1252,6 +1460,9 @@
             // Since we replace elements in the quota change logic, we just need to attach 'change' event.
             select.addEventListener('change', updateOptions);
         });
+        
+        // เรียก updateOptions ทันทีเพื่อ initialize
+        updateOptions();
     }
 
     // Initial setup
