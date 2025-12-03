@@ -208,4 +208,13 @@ class AdmissionModel extends Model
         }
         return $response;
     }
+    public function getAdmissionSchedule($year)
+    {
+        return $this->db->table('tb_admission_schedule')
+            ->where('schedule_year', $year)
+            ->orderBy('schedule_id', 'ASC')
+            ->orderBy('schedule_level', 'ASC')
+            ->get()
+            ->getResult();
+    }
 }

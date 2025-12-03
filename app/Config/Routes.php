@@ -175,6 +175,14 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('service-area-schools/add', 'AdminServiceAreaSchools::add');
     $routes->post('service-area-schools/delete/(:num)', 'AdminServiceAreaSchools::delete/$1');
 
+    // Schedule Management
+    $routes->get('schedules', 'AdminControlSchedule::index');
+    $routes->post('schedules/get', 'AdminControlSchedule::getSchedules');
+    $routes->post('schedules/add', 'AdminControlSchedule::addSchedule');
+    $routes->post('schedules/update', 'AdminControlSchedule::updateSchedule');
+    $routes->post('schedules/delete', 'AdminControlSchedule::deleteSchedule');
+    $routes->post('schedules/toggle-status', 'AdminControlSchedule::toggleStatus');
+
 });
 
 // Compatibility / Legacy Routes (Mapping old CI3 controller names to new CI4 controllers)

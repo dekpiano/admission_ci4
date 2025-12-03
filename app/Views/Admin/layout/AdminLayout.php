@@ -128,6 +128,13 @@
                 <div data-i18n="Courses">การจัดการหลักสูตร</div>
               </a>
             </li>
+
+            <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/schedules') !== false) ? 'active' : '' ?>">
+              <a href="<?= site_url('skjadmin/schedules') ?>" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-calendar-event"></i>
+                <div data-i18n="Schedules">จัดการกำหนดการ</div>
+              </a>
+            </li>
             
             <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/service-area-schools') !== false) ? 'active' : '' ?>">
               <a href="<?= site_url('skjadmin/service-area-schools') ?>" class="menu-link">

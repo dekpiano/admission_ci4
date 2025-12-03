@@ -33,6 +33,10 @@ class UserControlAdmission extends BaseController
         $data['switch'] = $this->admissionModel->getSystemStatus();
         $data['year'] = $this->admissionModel->getRecruitmentYears();
         $data['checkYear'] = $this->admissionModel->getOpenYear();
+        
+        // Use current year + 543 to match the migration data
+        
+        $data['schedules'] = $this->admissionModel->getAdmissionSchedule( $data['checkYear']->openyear_year);
 
         return $data;
     }

@@ -580,71 +580,120 @@
 </div>
 
 <!-- Schedule Table -->
-<div class="row">
-    <div class="col-12">
-        <div class="schedule-card">
-            <div class="schedule-header">
-                <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการรับสมัคร</h5>
+<div class="row g-4">
+    <?php
+    $grouped_schedules = [];
+    if (!empty($schedules)) {
+        foreach ($schedules as $schedule) {
+            $level = $schedule->schedule_level;
+            if (!isset($grouped_schedules[$level])) {
+                $grouped_schedules[$level] = [];
+            }
+            $grouped_schedules[$level][] = $schedule;
+        }
+    }
+    ?>
+
+    <?php if (!empty($grouped_schedules)): ?>
+        <?php foreach ($grouped_schedules as $level => $level_schedules): ?>
+            <div class="col-md-12">
+                <div class="schedule-card h-100">
+                    <div class="schedule-header">
+                        <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการ: <?= $level ?></h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th width="25%"><i class='bx bx-bookmark me-2'></i> รอบการรับสมัคร</th>
+                                    <th width="20%"><i class='bx bx-edit me-2'></i> รับสมัคร</th>
+                                    <th width="15%"><i class='bx bx-pencil me-2'></i> สอบ</th>
+                                    <th width="20%"><i class='bx bx-broadcast me-2'></i> ประกาศผล</th>
+                                    <th width="20%"><i class='bx bx-id-card me-2'></i> รายงานตัว</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($level_schedules as $schedule): ?>
+                                    <tr>
+                                        <td class="align-middle text-center">
+                                            <div class="fw-bold text-primary"><?= $schedule->schedule_round ?></div>
+                                        </td>
+                                        
+                                        <!-- Recruit -->
+                                        <td class="align-middle text-center">
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_recruit_start)) ?> - 
+                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_recruit_end)) ?>
+                                                </span>
+                                                <small class="text-muted" style="font-size: 0.75rem;">Online</small>
+                                            </div>
+                                        </td>
+
+                                        <!-- Exam -->
+                                        <td class="align-middle text-center">
+                                            <?php if($schedule->schedule_exam): ?>
+                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_exam)) ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+
+                                        <!-- Announce -->
+                                        <td class="align-middle text-center">
+                                            <?php if($schedule->schedule_announce): ?>
+                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_announce)) ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+
+                                        <!-- Report -->
+                                        <td class="align-middle text-center">
+                                            <?php if($schedule->schedule_report): ?>
+                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_report)) ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th width="40%"><i class='bx bx-list-ul me-2'></i> กิจกรรม</th>
-                            <th width="35%"><i class='bx bx-calendar me-2'></i> วันที่</th>
-                            <th width="25%"><i class='bx bx-info-circle me-2'></i> หมายเหตุ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="stat-icon success me-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
-                                        <i class='bx bx-calendar-check'></i>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="col-12">
+            <div class="schedule-card">
+                <div class="schedule-header">
+                    <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการรับสมัคร</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="py-4">
+                                        <i class='bx bx-calendar-x fs-1 text-muted mb-3'></i>
+                                        <h5 class="fw-bold text-secondary">ยังไม่มีกำหนดการ</h5>
+                                        <p class="text-muted mb-0">กรุณาติดตามประกาศจากทางโรงเรียนในภายหลัง</p>
                                     </div>
-                                    <div>
-                                        <h5 class="mb-0 fw-bold" style="font-size: 1.25rem; background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                            เปิดรับสมัคร
-                                        </h5>
-                                        <small class="text-muted">เริ่มสมัครเข้าเรียน</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">
-                                <span class="badge bg-success rounded-pill px-4 py-2" style="font-size: 1rem;">
-                                    <i class='bx bx-time me-1'></i>
-                                    <?= isset($systemStatus->onoff_datetime_regis_open) ? date('d/m/Y H:i', strtotime($systemStatus->onoff_datetime_regis_open)) : '-' ?>
-                                </span>
-                            </td>
-                            <td class="align-middle"><span class="badge bg-label-success" style="font-size: 0.9rem;">Online</span></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="stat-icon warning me-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
-                                        <i class='bx bx-calendar-x'></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="mb-0 fw-bold" style="font-size: 1.25rem; background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                            ปิดรับสมัคร
-                                        </h5>
-                                        <small class="text-muted">สิ้นสุดการรับสมัคร</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">
-                                <span class="badge bg-danger rounded-pill px-4 py-2" style="font-size: 1rem;">
-                                    <i class='bx bx-time me-1'></i>
-                                    <?= isset($systemStatus->onoff_datetime_regis_close) ? date('d/m/Y H:i', strtotime($systemStatus->onoff_datetime_regis_close)) : '-' ?>
-                                </span>
-                            </td>
-                            <td class="align-middle"><span class="badge bg-label-danger" style="font-size: 0.9rem;">System Close</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
+    <?php endif; ?>
 </div>
 
 <!-- PDPA Modal -->

@@ -34,6 +34,8 @@ class UserControlNewAdmission extends BaseController
         $data['quotas'] = $this->admissionModel->getAllQuotas();
         $data['courses'] = $this->admissionModel->getAllCourses();
         $data['datethai'] = $this->datethai; // Pass Datethai library to view
+       
+        $data['schedules'] = $this->admissionModel->getAdmissionSchedule($data['checkYear']->openyear_year);
         
         return view('User/UserHome', $data);
     }
