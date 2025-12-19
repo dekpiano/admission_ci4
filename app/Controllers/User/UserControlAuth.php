@@ -55,8 +55,8 @@ class UserControlAuth extends \App\Controllers\BaseController
     protected $logger;
 
     function __construct(){
-        $path = dirname(dirname(dirname(dirname(dirname((dirname(__FILE__)))))));
-		require $path . '/librarie_skj/google_sheet/vendor/autoload.php';
+        // ใช้ SHARED_LIB_PATH จาก Constants.php (รองรับทั้ง Windows และ Linux/Docker)
+		require SHARED_LIB_PATH . '/google_sheet/vendor/autoload.php';
         
         $googleConfig = config('Google');
         $this->googleClient = new \Google_Client();
@@ -135,6 +135,7 @@ class UserControlAuth extends \App\Controllers\BaseController
                     // Fetch roles if any
                     $User2 = $DBrloes->select('admin_rloes_status,GROUP_CONCAT(admin_rloes_nanetype) AS rloesAll')
                                      ->where('admin_rloes_userid', $User['pers_id'])
+                                     ->groupBy('admin_rloes_status')
                                      ->get()->getRowArray();
                     
                     if (empty($User2['admin_rloes_status'])) {
@@ -180,6 +181,7 @@ class UserControlAuth extends \App\Controllers\BaseController
         // Fetch roles if any
         $User2 = $DBrloes->select('admin_rloes_status,GROUP_CONCAT(admin_rloes_nanetype) AS rloesAll')
                          ->where('admin_rloes_userid', $user['pers_id'])
+                         ->groupBy('admin_rloes_status')
                          ->get()->getRowArray();
 
         $data = [

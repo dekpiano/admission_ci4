@@ -128,59 +128,424 @@
             border-color: #ff9eb5;
         }
         
-        /* Sidebar Customization */
+        /* ================================
+           ENHANCED SIDEBAR DESIGN
+           ================================ */
+        
+        /* Sidebar Base with Animated Gradient */
         #layout-menu {
-            background-color: #ff9eb5;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.2' d='M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E"), linear-gradient(180deg, #ff9eb5 0%, #84d2f6 100%);
-            background-repeat: no-repeat, no-repeat;
-            background-position: bottom, center;
-            background-size: 100% 30%, cover;
+            background: linear-gradient(180deg, #ff9eb5 0%, #f8a5b8 25%, #c9aed6 50%, #84d2f6 100%);
+            background-size: 100% 200%;
+            animation: gradientShift 15s ease infinite;
+            position: relative;
+            overflow: hidden;
         }
         
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 0%; }
+            50% { background-position: 0% 100%; }
+        }
+        
+        /* Decorative Wave Overlay */
+        #layout-menu::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.15' d='M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+            background-size: cover;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Floating Bubbles Animation */
+        #layout-menu::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            right: 10px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: floatBubble 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes floatBubble {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+            50% { transform: translateY(-30px) scale(1.1); opacity: 0.5; }
+        }
+        
+        /* App Brand / Logo Section */
+        #layout-menu .app-brand {
+            position: relative;
+            z-index: 1;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+        
+        #layout-menu .app-brand-logo img {
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+        }
+        
+        #layout-menu .app-brand:hover .app-brand-logo img {
+            transform: rotate(10deg) scale(1.1);
+        }
+        
+        #layout-menu .app-brand-text {
+            color: #fff !important;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        #layout-menu .app-brand:hover .app-brand-text {
+            text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        /* Menu Inner Container */
+        #layout-menu .menu-inner {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Menu Link Base Styles */
         #layout-menu .menu-link {
             color: #fff !important;
+            border-radius: 12px;
+            margin: 4px 12px;
+            padding: 0.75rem 1rem !important;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
         }
         
+        /* Menu Link Hover Effect */
+        #layout-menu .menu-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        #layout-menu .menu-link:hover::before {
+            left: 100%;
+        }
+        
+        #layout-menu .menu-link:hover {
+            background: rgba(255,255,255,0.2) !important;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Menu Icon Styles */
+        #layout-menu .menu-icon {
+            color: #fff !important;
+            font-size: 1.3rem !important;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+        }
+        
+        #layout-menu .menu-link:hover .menu-icon {
+            transform: scale(1.2) rotate(-5deg);
+            text-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+        
+        /* Active Menu Item */
         #layout-menu .menu-item.active > .menu-link {
-            background-color: #fff !important;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%) !important;
             color: #ff9eb5 !important;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.5);
+            transform: translateX(5px);
+            border-left: 4px solid #ff9eb5;
         }
         
         #layout-menu .menu-item.active > .menu-link i {
             color: #ff9eb5 !important;
+            animation: iconPulse 2s ease-in-out infinite;
         }
         
-        #layout-menu .menu-icon {
-            color: #fff !important;
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        
+        /* Menu Header / Section Divider */
+        #layout-menu .menu-header {
+            position: relative;
+            padding: 1.25rem 1.5rem 0.5rem !important;
+            margin-top: 0.5rem;
+        }
+        
+        #layout-menu .menu-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 1.5rem;
+            right: 1.5rem;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            border-radius: 2px;
         }
         
         #layout-menu .menu-header-text {
-            color: rgba(255,255,255,0.8) !important;
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 600 !important;
+            font-size: 0.7rem !important;
+            letter-spacing: 1.5px !important;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
         }
         
+        #layout-menu .menu-header-text::after {
+            content: '✦';
+            margin-left: 8px;
+            font-size: 0.6rem;
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+        
+        /* Badge Enhancements */
+        #layout-menu .badge {
+            font-size: 0.65rem !important;
+            padding: 0.3em 0.6em;
+            animation: badgePulse 2s ease-in-out infinite;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        #layout-menu .badge.bg-success {
+            background: linear-gradient(135deg, #28c76f 0%, #48da89 100%) !important;
+        }
+        
+        #layout-menu .badge.bg-danger {
+            background: linear-gradient(135deg, #ea5455 0%, #f08182 100%) !important;
+        }
+        
+        /* ================================
+           ENHANCED NAVBAR DESIGN
+           ================================ */
+        
+        /* Navbar Base with Glassmorphism */
+        #layout-navbar {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: none !important;
+            border-radius: 16px !important;
+            box-shadow: 
+                0 8px 32px rgba(255, 158, 181, 0.15),
+                0 2px 8px rgba(132, 210, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+            margin: 1rem !important;
+            padding: 0.75rem 1.5rem !important;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+        
+        /* Navbar Gradient Border Effect */
+        #layout-navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff9eb5 0%, #c9aed6 50%, #84d2f6 100%);
+            border-radius: 16px 16px 0 0;
+        }
+        
+        /* Hover lift effect */
+        #layout-navbar:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 40px rgba(255, 158, 181, 0.2),
+                0 4px 12px rgba(132, 210, 246, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        /* Menu Toggle Button */
         #layout-navbar .bx-menu {
-            color: #fff !important;
+            color: #ff9eb5 !important;
+            font-size: 1.8rem;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            padding: 8px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255, 158, 181, 0.1) 0%, rgba(132, 210, 246, 0.1) 100%);
         }
         
+        #layout-navbar .bx-menu:hover {
+            transform: scale(1.15) rotate(180deg);
+            background: linear-gradient(135deg, rgba(255, 158, 181, 0.2) 0%, rgba(132, 210, 246, 0.2) 100%);
+            box-shadow: 0 4px 15px rgba(255, 158, 181, 0.3);
+        }
+        
+        /* Navbar Title Styles */
+        #layout-navbar .navbar-title {
+            background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.1rem;
+            position: relative;
+        }
+        
+        #layout-navbar .navbar-title i {
+            -webkit-text-fill-color: #ff9eb5;
+            margin-right: 8px;
+        }
+        
+        /* Nav Links */
         #layout-navbar .nav-link {
-             color: #fff !important;
+            color: #566a7f !important;
+            transition: all 0.3s ease;
+        }
+        
+        #layout-navbar .nav-link:hover {
+            color: #ff9eb5 !important;
         }
         
         #layout-navbar a {
-            color: #fff !important;
+            color: #566a7f !important;
+            transition: all 0.3s ease;
         }
         
-        /* Menu Active State Override */
-        .menu-item.active > .menu-link {
+        #layout-navbar a:hover {
             color: #ff9eb5 !important;
-            background-color: #ffffff !important;
         }
-
+        
+        /* Academic Year Badge Enhancement */
+        #layout-navbar .badge.bg-label-primary {
+            background: linear-gradient(135deg, rgba(255, 158, 181, 0.15) 0%, rgba(132, 210, 246, 0.15) 100%) !important;
+            color: #ff9eb5 !important;
+            border: 1px solid rgba(255, 158, 181, 0.3);
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 158, 181, 0.15);
+        }
+        
+        #layout-navbar .badge.bg-label-primary:hover {
+            background: linear-gradient(135deg, rgba(255, 158, 181, 0.25) 0%, rgba(132, 210, 246, 0.25) 100%) !important;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 158, 181, 0.25);
+        }
+        
+        #layout-navbar .badge.bg-label-primary i {
+            animation: calendarPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes calendarPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Mobile Logo Animation */
+        #layout-navbar .mobile-logo-img {
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        #layout-navbar .mobile-logo-img:hover {
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        /* Menu Toggle Button (Mobile) */
+        #layout-menu .layout-menu-toggle {
+            transition: all 0.3s ease;
+        }
+        
+        #layout-menu .layout-menu-toggle:hover {
+            background: rgba(255,255,255,0.2) !important;
+            border-radius: 50%;
+        }
+        
+        /* Disabled Link */
         .disabled-link {
             pointer-events: none;
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
+            filter: grayscale(30%);
+        }
+        
+        /* Perfect Scrollbar Custom */
+        #layout-menu .ps__thumb-y {
+            background-color: rgba(255,255,255,0.4) !important;
+            width: 4px !important;
+        }
+        
+        #layout-menu .ps__rail-y:hover .ps__thumb-y {
+            background-color: rgba(255,255,255,0.6) !important;
+        }
+
+        /* ================================
+           CONTENT AREA FIXES
+           ================================ */
+        
+        /* Ensure layout page takes full width */
+        .layout-page {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        
+        /* Content wrapper full width */
+        .content-wrapper {
+            width: 100% !important;
+        }
+        
+        /* Container full width on large screens */
+        .container-xxl {
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        
+        /* Fix layout container */
+        .layout-container {
+            display: flex;
+            flex: 1 1 auto;
+            width: 100%;
+        }
+        
+        /* Ensure main content doesn't overflow */
+        .layout-wrapper {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* Override Sneat template padding for full width content */
+        @media (min-width: 1200px) {
+            .layout-menu-fixed:not(.layout-menu-collapsed) .layout-page,
+            .layout-menu-fixed-offcanvas:not(.layout-menu-collapsed) .layout-page {
+                padding-inline-start: 0 !important;
+                padding-left: 0 !important;
+            }
+            
+            /* Ensure sidebar doesn't push content */
+            .layout-menu-fixed .layout-page,
+            .layout-menu-fixed-offcanvas .layout-page {
+                margin-left: 0 !important;
+            }
         }
 
         /* Mobile Responsive Improvements */
@@ -344,11 +709,24 @@
                 $is_junior_high = $level_num <= 3;
                 $menu_link_level = $is_junior_high ? '1' : '4';
                 $current_uri_level = (uri_string() == 'new-admission/pre-check/' . $menu_link_level && service('request')->getGet('level') == $level_num) || uri_string() == 'new-admission/register/' . $menu_link_level;
+                
+                // Destination URL
+                $destination_url = base_url('new-admission/pre-check/' . $menu_link_level . '?level=' . $level_num);
             ?>
             <li class="menu-item <?= $current_uri_level ? 'active' : '' ?>">
-              <a href="<?= base_url('new-admission/pre-check/' . $menu_link_level . '?level=' . $level_num) ?>" class="menu-link">
+              <a 
+                href="<?= $is_system_open ? 'javascript:void(0);' : 'javascript:void(0);' ?>" 
+                class="menu-link <?= !$is_system_open ? 'disabled-link' : 'pdpa-sidebar-btn' ?>"
+                <?= $is_system_open ? 'data-href="' . $destination_url . '"' : '' ?>
+                <?= !$is_system_open ? 'data-bs-toggle="tooltip" data-bs-placement="right" title="ยังไม่เปิดรับสมัคร / ปิดรับสมัครแล้ว"' : '' ?>
+              >
                 <i class="menu-icon tf-icons bx bx-user-plus"></i>
-                <div data-i18n="M.<?= $level_num ?>">ระดับชั้น ม.<?= $level_num ?></div>
+                <div data-i18n="M.<?= $level_num ?>">
+                    ระดับชั้น ม.<?= $level_num ?>
+                    <?php if (!$is_system_open): ?>
+                        <span class="badge bg-danger ms-2">ปิด</span>
+                    <?php endif; ?>
+                </div>
               </a>
             </li>
             <?php endforeach; ?>
@@ -402,38 +780,78 @@
             class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
             id="layout-navbar">
             
-            <!-- Mobile Toggle & Brand (Redesigned) -->
+            <!-- Mobile Toggle Button -->
             <div class="layout-menu-toggle navbar-nav align-items-xl-center me-xl-0 d-xl-none">
               <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-                <i class="bx bx-menu" style="font-size: 1.8rem; color: #ff9eb5 !important;"></i>
+                <i class="bx bx-menu"></i>
               </a>
             </div>
 
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-              <!-- Search/Brand Area -->
+              <!-- Brand/Title Area -->
               <div class="navbar-nav align-items-center flex-grow-1">
                 <div class="nav-item d-flex align-items-center">
-                  <!-- Desktop Title -->
-                  <span class="fw-bold text-primary d-none d-md-block" style="font-size: 1.1rem;">
-                    <i class='bx bxs-school me-2'></i>ระบบรับสมัครนักเรียนออนไลน์ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์
-                  </span>
+                  <!-- Desktop Title with Gradient -->
+                  <div class="d-none d-md-flex align-items-center">
+                    <div class="navbar-brand-icon me-3" style="
+                      width: 45px; 
+                      height: 45px; 
+                      background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+                      border-radius: 12px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      box-shadow: 0 4px 15px rgba(255, 158, 181, 0.3);
+                    ">
+                      <i class='bx bxs-school' style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="d-flex flex-column">
+                      <span class="navbar-title" style="
+                        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                        font-weight: 700;
+                        font-size: 1.15rem;
+                        line-height: 1.2;
+                      ">ระบบรับสมัครนักเรียนออนไลน์</span>
+                      <span style="font-size: 0.8rem; color: #697a8d; font-weight: 500;">โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</span>
+                    </div>
+                  </div>
                   
                   <!-- Mobile Title with Logo -->
                   <div class="d-flex align-items-center d-md-none">
-                    <img src="https://skj.ac.th/uploads/logoSchool/LogoSKJ_4.png" alt="Logo" width="32" height="32" class="me-2">
+                    <img src="https://skj.ac.th/uploads/logoSchool/LogoSKJ_4.png" alt="Logo" width="36" height="36" class="me-2 mobile-logo-img" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
                     <div class="d-flex flex-column">
-                        <span class="fw-bold text-primary" style="font-size: 0.95rem; line-height: 1.1;">SKJ Admission</span>
-                        <span class="text-muted" style="font-size: 0.75rem;">ระบบรับสมัครนักเรียนใหม่</span>
+                        <span class="fw-bold" style="font-size: 0.95rem; line-height: 1.1; background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SKJ Admission</span>
+                        <span class="text-muted" style="font-size: 0.7rem;">ระบบรับสมัครนักเรียนใหม่</span>
                     </div>
                   </div>
                 </div>
               </div>
-              <!-- /Search -->
+              <!-- /Brand -->
 
-              <ul class="navbar-nav flex-row align-items-center ms-auto">
+              <ul class="navbar-nav flex-row align-items-center ms-auto gap-2">
+                <!-- Status Indicator -->
+                <li class="nav-item d-none d-lg-block">
+                  <?php 
+                  $status_open = isset($systemStatus) && $systemStatus->onoff_regis == 'on';
+                  ?>
+                  <span class="badge rounded-pill px-3 py-2" style="
+                    background: <?= $status_open ? 'linear-gradient(135deg, rgba(40, 199, 111, 0.15) 0%, rgba(72, 218, 137, 0.15) 100%)' : 'linear-gradient(135deg, rgba(234, 84, 85, 0.15) 0%, rgba(240, 129, 130, 0.15) 100%)' ?>;
+                    color: <?= $status_open ? '#28c76f' : '#ea5455' ?>;
+                    border: 1px solid <?= $status_open ? 'rgba(40, 199, 111, 0.3)' : 'rgba(234, 84, 85, 0.3)' ?>;
+                    font-weight: 600;
+                    font-size: 0.8rem;
+                  ">
+                    <i class='bx <?= $status_open ? 'bx-check-circle' : 'bx-x-circle' ?> me-1'></i>
+                    <?= $status_open ? 'เปิดรับสมัคร' : 'ปิดรับสมัคร' ?>
+                  </span>
+                </li>
+                
                 <!-- Academic Year Badge -->
                 <li class="nav-item lh-1 me-0">
-                  <span class="badge bg-label-primary rounded-pill px-3 py-2">
+                  <span class="badge bg-label-primary rounded-pill">
                     <i class='bx bx-calendar me-1'></i>ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?>
                   </span>
                 </li>
@@ -519,6 +937,85 @@
                 }
             });
         });
+    });
+    </script>
+    <!-- PDPA Modal (Global) -->
+    <div class="modal fade" id="pdpaModalGlobal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class='bx bx-shield-quarter me-2'></i>ข้อตกลงและเงื่อนไขการใช้ข้อมูลส่วนบุคคล</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p><strong>ข้อตกลงการใช้ข้อมูลส่วนบุคคลในการลงทะเบียนและสมัครเข้าศึกษาต่อในระบบรับสมัครออนไลน์ของโรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</strong></p>
+            <p>โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์ ("โรงเรียน") ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลของผู้สมัคร ("ท่าน") โรงเรียนจึงได้จัดทำข้อตกลงและเงื่อนไขการใช้ข้อมูลส่วนบุคคลฉบับนี้ขึ้น เพื่อแจ้งให้ท่านทราบถึงวิธีการที่โรงเรียนเก็บรวบรวม ใช้ หรือเปิดเผยข้อมูลส่วนบุคคลของท่าน และสิทธิของท่านในฐานะเจ้าของข้อมูลส่วนบุคคล</p>
+            
+            <h6>1. ข้อมูลส่วนบุคคลที่เก็บรวบรวม</h6>
+            <p>โรงเรียนจะเก็บรวบรวมข้อมูลส่วนบุคคลของท่านที่จำเป็นต่อการรับสมัครและการพิจารณาคัดเลือกเข้าศึกษาต่อ ซึ่งรวมถึงแต่ไม่จำกัดเพียง:</p>
+            <ul>
+                <li>ข้อมูลระบุตัวตน เช่น ชื่อ-นามสกุล, เลขประจำตัวประชาชน, วันเดือนปีเกิด</li>
+                <li>ข้อมูลการติดต่อ เช่น ที่อยู่, หมายเลขโทรศัพท์, อีเมล</li>
+                <li>ข้อมูลการศึกษา เช่น ประวัติการศึกษา, ผลการเรียน</li>
+                <li>ข้อมูลผู้ปกครอง</li>
+                <li>ข้อมูลอื่นๆ ที่ท่านให้ไว้ในใบสมัคร</li>
+            </ul>
+    
+            <h6>2. วัตถุประสงค์ในการเก็บรวบรวม ใช้ หรือเปิดเผยข้อมูล</h6>
+            <p>โรงเรียนจะใช้ข้อมูลส่วนบุคคลของท่านเพื่อวัตถุประสงค์ดังต่อไปนี้:</p>
+            <ul>
+                <li>เพื่อดำเนินการตามกระบวนการรับสมัคร และตรวจสอบคุณสมบัติของผู้สมัคร</li>
+                <li>เพื่อใช้ในการติดต่อสื่อสารกับท่านและผู้ปกครองเกี่ยวกับการสมัคร</li>
+                <li>เพื่อใช้ในการพิจารณาคัดเลือกนักเรียนเข้าศึกษาต่อ</li>
+                <li>เพื่อจัดทำทะเบียนนักเรียน และใช้ในกิจกรรมที่เกี่ยวข้องกับการศึกษาของโรงเรียน (กรณีที่ท่านผ่านการคัดเลือก)</li>
+                <li>เพื่อปฏิบัติตามกฎหมายและข้อบังคับที่เกี่ยวข้อง</li>
+            </ul>
+    
+            <h6>3. การเปิดเผยข้อมูลส่วนบุคคล</h6>
+            <p>โรงเรียนจะไม่เปิดเผยข้อมูลส่วนบุคคลของท่านแก่บุคคลภายนอกโดยไม่ได้รับความยินยอมจากท่าน เว้นแต่ในกรณีที่มีกฎหมายกำหนดให้สามารถกระทำได้</p>
+    
+            <h6>4. ระยะเวลาในการเก็บรักษาข้อมูล</h6>
+            <p>โรงเรียนจะเก็บรักษาข้อมูลส่วนบุคคลของท่านไว้เป็นระยะเวลาเท่าที่จำเป็นเพื่อบรรลุวัตถุประสงค์ที่ได้แจ้งไว้ และตามที่กฏหมายกำหนด</p>
+    
+            <h6>5. สิทธิของเจ้าของข้อมูล</h6>
+            <p>ท่านมีสิทธิตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 ซึ่งรวมถึงสิทธิในการขอเข้าถึง ขอแก้ไข ขอให้ลบ หรือจำกัดการใช้ข้อมูลส่วนบุคคลของท่าน</p>
+            
+            <p class="mt-4">การที่ท่านกดปุ่ม "ยอมรับ" และดำเนินการสมัครต่อไป ถือว่าท่านได้อ่านและเข้าใจข้อความข้างต้นโดยละเอียด และยินยอมให้โรงเรียนเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคลของท่านตามวัตถุประสงค์ที่ระบุไว้ในข้อตกลงนี้ทุกประการ</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ไม่ยอมรับ</button>
+            <button type="button" class="btn btn-primary" id="pdpa-global-accept-btn">ยอมรับและดำเนินการต่อ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Sidebar PDPA Navigation
+        const sidebarPdpaBtns = document.querySelectorAll('.pdpa-sidebar-btn');
+        const pdpaModalGlobal = new bootstrap.Modal(document.getElementById('pdpaModalGlobal'));
+        let selectedSidebarHref = '';
+
+        sidebarPdpaBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                selectedSidebarHref = this.getAttribute('data-href');
+                if(selectedSidebarHref) {
+                    pdpaModalGlobal.show();
+                }
+            });
+        });
+
+        // Handle Accept Button in Global Modal
+        const acceptBtn = document.getElementById('pdpa-global-accept-btn');
+        if(acceptBtn) {
+            acceptBtn.addEventListener('click', function() {
+                if (selectedSidebarHref) {
+                    window.location.href = selectedSidebarHref;
+                }
+            });
+        }
     });
     </script>
   </body>

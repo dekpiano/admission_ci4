@@ -35,7 +35,7 @@ class AdminControlReport extends BaseController
         // Fetch Courses (Types)
         $data['courses'] = $this->db->table('tb_course')
             ->select('course_fullname, course_gradelevel')
-            ->groupBy('course_fullname')
+            ->groupBy('course_fullname, course_gradelevel')
             ->get()->getResult();
 
         return view('Admin/PageAdminReport/PageAdminReportIndex', $data);

@@ -108,6 +108,17 @@ class UserControlNewAdmission extends BaseController
         $gradeLevel = ($level == 1) ? 'ม.ต้น' : 'ม.ปลาย';
         $data['courses'] = $this->admissionModel->getCoursesByGradeLevel($gradeLevel);
 
+        // Generate CAPTCHA
+        $num1 = rand(1, 10);
+        $num2 = rand(1, 10);
+        $captchaAnswer = $num1 + $num2;
+        $this->session->set('captcha_answer', $captchaAnswer);
+        $data['captcha_num1'] = $num1;
+        $data['captcha_num2'] = $num2;
+        
+        // Debug logging
+        log_message('debug', 'CAPTCHA Generated - Num1: ' . $num1 . ', Num2: ' . $num2 . ', Answer: ' . $captchaAnswer . ', Session ID: ' . session_id());
+
         return view('User/UserRegister', $data);
     }
 
@@ -145,6 +156,29 @@ class UserControlNewAdmission extends BaseController
         return view('User/UserStatus', $data);
     }
 
+    /**
+     * Refresh CAPTCHA via AJAX
+     * Updates the session with new CAPTCHA answer
+     */
+    public function refresh_captcha()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Request']);
+        }
+
+        $num1 = $this->request->getPost('num1');
+        $num2 = $this->request->getPost('num2');
+
+        if ($num1 !== null && $num2 !== null) {
+            $captchaAnswer = intval($num1) + intval($num2);
+            $this->session->set('captcha_answer', $captchaAnswer);
+            
+            return $this->response->setJSON(['status' => 'success']);
+        }
+
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid parameters']);
+    }
+
     public function save_register()
     {
         if (!$this->request->isAJAX()) {
@@ -152,6 +186,40 @@ class UserControlNewAdmission extends BaseController
         }
 
         $post = $this->request->getPost();
+        
+        // CAPTCHA Validation
+        $captchaAnswer = $this->session->get('captcha_answer');
+        $userCaptcha = isset($post['captcha_answer']) ? trim($post['captcha_answer']) : '';
+        
+        // Debug logging (can be removed in production)
+        log_message('debug', 'CAPTCHA Check - Session Answer: ' . var_export($captchaAnswer, true) . ', User Answer: ' . var_export($userCaptcha, true) . ', Session ID: ' . session_id());
+        
+        // Check if CAPTCHA answer exists in session
+        if ($captchaAnswer === null || $captchaAnswer === '') {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'เซสชันหมดอายุ กรุณารีเฟรชหน้าและลองใหม่อีกครั้ง'
+            ]);
+        }
+        
+        // Check if user provided an answer
+        if ($userCaptcha === '' || !is_numeric($userCaptcha)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'กรุณากรอกคำตอบรหัสยืนยัน (CAPTCHA)'
+            ]);
+        }
+        
+        // Compare answers (cast both to integer)
+        if ((int)$userCaptcha !== (int)$captchaAnswer) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'คำตอบรหัสยืนยันไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง (คำตอบที่กรอก: ' . $userCaptcha . ')'
+            ]);
+        }
+        
+        // Clear CAPTCHA session after successful validation
+        $this->session->remove('captcha_answer');
         
         // Basic Validation
         if (!$this->validate([

@@ -55,7 +55,7 @@ class AdminControlAdmission extends BaseController
 					tb_quota.quota_explain')
             ->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category')
             ->where('recruit_year', $year)
-            ->groupBy('tb_recruitstudent.recruit_category')
+            ->groupBy('tb_recruitstudent.recruit_category, tb_quota.quota_explain')
             ->orderBy('recruit_date', 'ASC')
             ->get()->getResult();
 

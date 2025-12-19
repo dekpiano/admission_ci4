@@ -2,15 +2,16 @@
 
 <?= $this->section('styles') ?>
 <style>
-    /* Hero Section */
+    /* Hero Section - Enhanced with Mascot Animation */
     .hero-section {
         background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
-        border-radius: 20px;
+        border-radius: 25px;
         padding: 3rem 2rem;
         color: white;
         position: relative;
         overflow: hidden;
         margin-bottom: 2rem;
+        min-height: 350px;
     }
     .hero-section::before {
         content: '';
@@ -22,6 +23,15 @@
         background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
         animation: rotate 20s linear infinite;
     }
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(to top, rgba(255,255,255,0.1), transparent);
+    }
     @keyframes rotate {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
@@ -31,39 +41,590 @@
         z-index: 2;
     }
     
-    /* Stats Cards */
-    .stat-card {
+    /* Mascot Animation */
+    .hero-mascot {
+        position: relative;
+        z-index: 3;
+    }
+    .mascot-image {
+        max-width: 420px;
+        width: 100%;
+        height: auto;
+        animation: float 3s ease-in-out infinite, fadeInUp 1s ease-out;
+        filter: drop-shadow(0 20px 35px rgba(0,0,0,0.25));
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(-2deg); }
+        50% { transform: translateY(-15px) rotate(2deg); }
+    }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Welcome Text Animation */
+    .welcome-badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.25);
+        backdrop-filter: blur(10px);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        animation: slideInDown 0.8s ease-out;
+        border: 2px solid rgba(255,255,255,0.3);
+    }
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .hero-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        text-shadow: 2px 4px 8px rgba(0,0,0,0.15);
+        margin-bottom: 0.5rem;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+    .hero-subtitle {
+        font-size: clamp(0.9rem, 4vw, 1.3rem);
+        font-weight: 600;
+        opacity: 0.95;
+        margin-bottom: 1.5rem;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+        text-shadow: 1px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Typing Effect */
+    .typing-text {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 3px solid white;
+        animation: typing 3s steps(40) 1s forwards, blink 0.7s steps(1) infinite;
+    }
+    @keyframes typing {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+    @keyframes blink {
+        50% { border-color: transparent; }
+    }
+    
+    /* Sparkles */
+    .sparkle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: white;
+        border-radius: 50%;
+        opacity: 0;
+        animation: sparkle 2s ease-in-out infinite;
+    }
+    .sparkle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .sparkle:nth-child(2) { top: 60%; left: 85%; animation-delay: 0.5s; }
+    .sparkle:nth-child(3) { top: 30%; left: 70%; animation-delay: 1s; }
+    .sparkle:nth-child(4) { top: 80%; left: 20%; animation-delay: 1.5s; }
+    .sparkle:nth-child(5) { top: 15%; left: 50%; animation-delay: 0.8s; }
+    @keyframes sparkle {
+        0%, 100% { opacity: 0; transform: scale(0); }
+        50% { opacity: 1; transform: scale(1); }
+    }
+    
+    /* Decorative Bubbles */
+    .bubble {
+        position: absolute;
+        background: rgba(255,255,255,0.15);
+        border-radius: 50%;
+        animation: rise 8s ease-in infinite;
+    }
+    .bubble:nth-child(1) { width: 40px; height: 40px; left: 5%; animation-delay: 0s; }
+    .bubble:nth-child(2) { width: 25px; height: 25px; left: 15%; animation-delay: 2s; }
+    .bubble:nth-child(3) { width: 35px; height: 35px; left: 80%; animation-delay: 4s; }
+    .bubble:nth-child(4) { width: 20px; height: 20px; left: 90%; animation-delay: 1s; }
+    @keyframes rise {
+        0% { bottom: -50px; opacity: 0; }
+        50% { opacity: 0.6; }
+        100% { bottom: 110%; opacity: 0; }
+    }
+    
+    /* Hero Buttons Animation */
+    .hero-buttons {
+        animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+    .hero-buttons .btn {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+    }
+    .hero-buttons .btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255,255,255,0.3);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.4s, height 0.4s;
+    }
+    .hero-buttons .btn:hover::after {
+        width: 200px;
+        height: 200px;
+    }
+    .hero-buttons .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    
+    /* Hero Countdown Box - Prominent Design (Mobile First Optimized) */
+    .hero-countdown-box {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 20px;
+        padding: 1rem; /* Compact padding for mobile */
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        animation: fadeInUp 0.8s ease-out 0.5s both, boxPulse 3s infinite alternate;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-top: 1rem;
+        width: 100%; /* Ensure it fits container */
+    }
+    
+    @keyframes boxPulse {
+        0% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 0 0 rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.5); }
+        100% { box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), 0 0 15px rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.8); }
+    }
+
+    .hero-countdown-box p {
+        font-size: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.8rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .hero-countdown-box .countdown-container ul {
+        gap: 6px; /* Tight gap for mobile */
+        justify-content: center;
+        display: flex;
+        flex-wrap: nowrap; /* Force single row if possible, or careful wrap */
+    }
+
+    .hero-countdown-box .countdown-container li {
+        flex: 1; /* Distribute space evenly */
+        min-width: 60px; /* Small enough for 320px screens */
+        padding: 0.8rem 0.2rem;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 14px;
+        color: #333;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-countdown-box .countdown-container li::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px; /* Thinner line for mobile */
+        background: linear-gradient(90deg, #ff9eb5 0%, #84d2f6 100%);
+    }
+
+    .hero-countdown-box .countdown-container li span {
+        font-size: 1.8rem; /* readable on mobile */
+        font-weight: 800;
+        line-height: 1;
+        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: block;
+        margin-bottom: 2px;
+        font-family: 'K2D', sans-serif;
+    }
+
+    .hero-countdown-box .countdown-container li .label {
+        font-size: 0.65rem;
+        margin-top: 0;
+        color: #666;
+        font-weight: 600;
+        white-space: nowrap; /* Prevent breaking 'ชั่วโมง' */
+    }
+    
+    /* Hero Status Badge - Mobile First */
+    /* Hero Status Badge - Prominent Application Open Design */
+    .hero-status-badge {
+        display: inline-block;
+        padding: 1.2rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 1.5rem;
+        animation: fadeInUp 0.8s ease-out 0.5s both;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 450px;
+    }
+    
+    .hero-status-badge.open {
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        animation: fadeInUp 0.8s ease-out 0.5s both, pulseGreen 2s infinite;
+    }
+    
+    .hero-status-badge.open i {
+        font-size: 1.4em;
+        vertical-align: middle;
+        margin-right: 8px;
+        animation: rotateSuccess 5s linear infinite;
+    }
+    
+    @keyframes pulseGreen {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+        70% { transform: scale(1.03); box-shadow: 0 0 0 20px rgba(52, 211, 153, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+    
+    @keyframes rotateSuccess {
+        0% { transform: rotate(0deg); }
+        10% { transform: rotate(15deg); }
+        20% { transform: rotate(-15deg); }
+        30% { transform: rotate(10deg); }
+        40% { transform: rotate(-10deg); }
+        50% { transform: rotate(0deg); }
+        100% { transform: rotate(0deg); }
+    }
+    
+    .hero-status-badge.closed {
+        background: rgba(245, 101, 101, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(245, 101, 101, 0.6);
+        color: #e53e3e;
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    /* Hero Date Info - Mobile First */
+    .hero-date-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        animation: fadeInUp 0.8s ease-out 0.55s both;
+    }
+    .hero-date-info .date-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.3rem 0.6rem;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.15);
+    }
+    .hero-date-info .date-item i {
+        font-size: 0.9rem;
+    }
+    .hero-date-info .date-item.open i { color: #48BB78; }
+    .hero-date-info .date-item.close i { color: #F56565; }
+    
+    /* Tablet (min-width: 576px) */
+    @media (min-width: 576px) {
+        .hero-buttons .btn {
+            font-size: 0.95rem;
+            padding: 0.8rem 1.5rem;
+        }
+        
+        .hero-countdown-box {
+            padding: 2rem;
+            max-width: 550px;
+            margin-left: 0; /* Align left or center depending on layout */
+        }
+        .hero-countdown-box p {
+            font-size: 1.25rem;
+        }
+        .hero-countdown-box .countdown-container ul {
+            gap: 20px;
+        }
+        .hero-countdown-box .countdown-container li {
+            min-width: 90px;
+            padding: 1.2rem 0.8rem;
+        }
+        .hero-countdown-box .countdown-container li span {
+            font-size: 3rem;
+        }
+        .hero-countdown-box .countdown-container li .label {
+            font-size: 0.85rem;
+        }
+        
+        .hero-status-badge {
+            font-size: 1.1rem;
+            padding: 0.8rem 1.5rem;
+            max-width: 300px;
+        }
+        .hero-date-info {
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+        .hero-date-info .date-item {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+        }
+    }
+    
+    /* Desktop (min-width: 992px) */
+    @media (min-width: 992px) {
+        .hero-buttons .btn {
+            font-size: 1rem;
+            padding: 1rem 1.8rem;
+        }
+        .hero-countdown-box {
+            padding: 2rem 2.5rem;
+            max-width: none; /* Allow full width if needed, or restrict */
+        }
+        .hero-countdown-box p {
+            font-size: 1.4rem;
+        }
+        .hero-countdown-box .countdown-container ul {
+            gap: 24px;
+        }
+        .hero-countdown-box .countdown-container li {
+            min-width: 110px;
+            padding: 1.5rem 1rem;
+        }
+        .hero-countdown-box .countdown-container li span {
+            font-size: 4rem;
+            margin-bottom: 8px;
+        }
+        .hero-countdown-box .countdown-container li .label {
+            font-size: 0.95rem;
+        }
+        
+        .hero-status-badge {
+            font-size: 1.2rem;
+            padding: 1rem 2rem;
+            max-width: 350px;
+        }
+        .hero-status-badge.open {
+            font-size: 1.4rem;
+        }
+        .hero-date-info .date-item {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+        .hero-date-info .date-item i {
+            font-size: 1.1rem;
+        }
+    }
+    
+    @media (max-width: 991px) {
+        .hero-section {
+            min-height: auto;
+            padding: 2rem 1.5rem;
+        }
+        .mascot-image {
+            max-width: 320px;
+            margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            font-size: 1.6rem;
+        }
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 1.4rem;
+        }
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+        .mascot-image {
+            max-width: 160px;
+        }
+    }
+    
+    /* Excellence Section - Mobile First */
+    .excellence-section {
         background: white;
         border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
-        border-left: 5px solid;
-        height: 100%;
+        padding: 1rem;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
     }
-    .stat-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    .excellence-icon-wrapper {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: white;
+        box-shadow: 0 5px 15px rgba(255, 158, 181, 0.3);
     }
-    .stat-card.primary { border-left-color: #ff9eb5; }
-    .stat-card.success { border-left-color: #84d2f6; }
-    .stat-card.warning { border-left-color: #ffc4d6; }
-    .stat-card.info { border-left-color: #a8e0ff; }
+    .excellence-header h4 {
+        color: #333;
+        font-size: 0.95rem;
+    }
+    .excellence-header h4 i {
+        color: #ff9eb5;
+    }
+    .excellence-header p {
+        font-size: 0.8rem;
+    }
     
-    .stat-icon {
-        width: 60px;
-        height: 60px;
+    /* Excellence Cards - Mobile First */
+    .excellence-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.8rem 0.5rem;
+        background: #f8f9fa;
         border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        height: 100%;
+        width: 100%;
+        cursor: pointer;
+        outline: none;
+    }
+    .excellence-card:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 158, 181, 0.3);
+    }
+    .excellence-card:active {
+        transform: scale(0.95);
+        background: white;
+    }
+    .excellence-card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
-        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        color: white;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
     }
-    .stat-icon.primary { background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%); color: white; }
-    .stat-icon.success { background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%); color: white; }
-    .stat-icon.warning { background: linear-gradient(135deg, #ffb3c6 0%, #ffd4e0 100%); color: white; }
-    .stat-icon.info { background: linear-gradient(135deg, #b8e5fb 0%, #d4f1ff 100%); color: white; }
+    .excellence-card-icon.academic { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
+    .excellence-card-icon.sport { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); }
+    .excellence-card-icon.art { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+    .excellence-card-icon.career { background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); }
+    .excellence-card-icon.language { background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%); }
+    
+    .excellence-card-title {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        line-height: 1.2;
+    }
+    
+    /* Tablet and up (min-width: 576px) */
+    @media (min-width: 576px) {
+        .excellence-section {
+            padding: 1.5rem;
+            border-radius: 18px;
+        }
+        .excellence-icon-wrapper {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+        .excellence-header h4 {
+            font-size: 1.1rem;
+        }
+        .excellence-header p {
+            font-size: 0.85rem;
+        }
+        .excellence-card {
+            padding: 1rem 0.6rem;
+        }
+        .excellence-card-icon {
+            width: 45px;
+            height: 45px;
+            font-size: 1.3rem;
+        }
+        .excellence-card-title {
+            font-size: 0.75rem;
+        }
+    }
+    
+    /* Desktop (min-width: 992px) */
+    @media (min-width: 992px) {
+        .excellence-section {
+            padding: 2rem;
+            border-radius: 20px;
+        }
+        .excellence-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+        .excellence-header h4 {
+            font-size: 1.25rem;
+        }
+        .excellence-header p {
+            font-size: 0.9rem;
+        }
+        .excellence-card {
+            padding: 1.2rem 0.8rem;
+            border-radius: 15px;
+        }
+        .excellence-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            background: white;
+        }
+        .excellence-card:hover .excellence-card-icon {
+            transform: scale(1.1);
+        }
+        .excellence-card:hover .excellence-card-title {
+            color: #ff9eb5;
+        }
+        .excellence-card-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+        .excellence-card-title {
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+    }
     
     /* Announcement Card */
     .announcement-card {
@@ -270,200 +831,246 @@
 
 <!-- Hero Section -->
 <div class="hero-section">
-    <div class="hero-content text-center">
-        <h1 class="display-4 fw-bold mb-3">
-            <i class='bx bx-graduation'></i> ระบบรับสมัครนักเรียนออนไลน์
-        </h1>
-        <p class="lead mb-4">โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</p>
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="<?= base_url('new-admission/manual') ?>" class="btn btn-light btn-lg rounded-pill px-4">
-                <i class='bx bx-book-open me-2'></i> คู่มือการสมัคร
-            </a>
-            <a href="<?= base_url('new-admission/status') ?>" class="btn btn-outline-light btn-lg rounded-pill px-4">
-                <i class='bx bx-search-alt me-2'></i> ตรวจสอบสถานะ
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- Stats Cards -->
-<div class="row g-3 mb-4">
-    <div class="col-md-3 col-sm-6 col-6">
-        <div class="stat-card primary">
-            <div class="stat-icon primary">
-                <i class='bx bx-calendar'></i>
+    <!-- Decorative Elements -->
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- Mascot Image -->
+            <div class="col-lg-5 text-center hero-mascot order-lg-1 order-2">
+                <img src="<?= base_url('public/assets/images/student_welcome.png') ?>" 
+                     alt="นักเรียนต้อนรับ" 
+                     class="mascot-image">
             </div>
-            <h6 class="text-muted mb-1">ปีการศึกษา</h6>
-            <h3 class="fw-bold mb-0"><?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?></h3>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6 col-6">
-        <div class="stat-card success">
-            <div class="stat-icon success">
-                <i class='bx bx-user-check'></i>
-            </div>
-            <h6 class="text-muted mb-1">สถานะระบบ</h6>
-            <h5 class="fw-bold mb-0">
-                <?php if(isset($systemStatus->onoff_regis) && $systemStatus->onoff_regis == 'on'): ?>
-                    <span class="text-success">เปิดรับสมัคร</span>
-                <?php else: ?>
-                    <span class="text-danger">ปิดรับสมัคร</span>
-                <?php endif; ?>
-            </h5>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6 col-6">
-        <div class="stat-card warning">
-            <div class="stat-icon warning">
-                <i class='bx bx-folder-open'></i>
-            </div>
-            <h6 class="text-muted mb-1">รอบที่เปิด</h6>
-            <h6 class="fw-bold mb-0">
-                <?php
-                $activeRounds = [];
-                if (!empty($quotas)) {
-                    foreach ($quotas as $quota) {
-                        if (isset($quota->quota_status) && $quota->quota_status == 'on') {
-                            $activeRounds[] = $quota->quota_explain;
-                        }
-                    }
-                }
+            
+            <!-- Welcome Text Content -->
+            <div class="col-lg-7 text-center text-lg-start hero-content order-lg-2 order-1 mb-4 mb-lg-0">
+                <div class="welcome-badge">
+                    <i class='bx bx-heart me-1'></i> ยินดีต้อนรับสู่ครอบครัว สกจ.
+                </div>
                 
-                if (!empty($activeRounds)) {
-                    // Display first round name
-                    echo '<span class="text-success">' . $activeRounds[0] . '</span>';
-                } else {
-                    echo '<span class="text-muted">ไม่มีรอบเปิด</span>';
+                <h1 class="hero-title">
+                    <i class='bx bx-graduation me-2'></i>ระบบรับสมัครนักเรียนออนไลน์
+                </h1>
+                
+                <p class="hero-subtitle">
+                    <i class='bx bx-building-house me-2'></i>โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์
+                </p>
+                
+                <?php 
+                // Check registration status
+                $is_not_open = false;
+                $is_closed = false;
+                $is_open = false;
+                
+                if (isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)) {
+                    $is_not_open = true;
+                } elseif (isset($systemStatus->onoff_datetime_regis_close) && time() > strtotime($systemStatus->onoff_datetime_regis_close)) {
+                    $is_closed = true;
+                } elseif (isset($systemStatus->onoff_regis) && $systemStatus->onoff_regis == 'on') {
+                    $is_open = true;
                 }
                 ?>
-            </h6>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6 col-6">
-        <div class="stat-card info">
-            <div class="stat-icon info">
-                <i class='bx bx-clipboard'></i>
-            </div>
-            <h6 class="text-muted mb-1">การรายงานตัว</h6>
-            <h5 class="fw-bold mb-0">
-                <?php
-                if(isset($systemStatus->onoff_report) && $systemStatus->onoff_report == 'on') {
-                    echo '<span class="text-success">เปิดรายงานตัว</span>';
-                } else {
-                    echo '<span class="text-muted">ยังไม่เปิด</span>';
-                }
-                ?>
-            </h5>
-        </div>
-    </div>
-</div>
-
-<!-- Announcement -->
-<div class="row mb-4">
-    <div class="col-12">
-        <?php 
-        $hasActiveQuota = false;
-        if (!empty($quotas)) {
-            foreach ($quotas as $quota) {
-                if (isset($quota->quota_status) && $quota->quota_status == 'on') {
-                    $hasActiveQuota = true;
-                    $is_closed_announce = false;
-                    if (isset($systemStatus->onoff_datetime_regis_close)) {
-                        if (time() > strtotime($systemStatus->onoff_datetime_regis_close)) {
-                            $is_closed_announce = true;
+                
+                <?php if($is_not_open): ?>
+                <!-- Countdown to Open -->
+                <div class="hero-countdown-box my-4">
+                    <p class="mb-3">
+                        <i class='bx bxs-time-five me-2 text-warning' style="font-size: 1.2em;"></i>
+                        นับถอยหลังสู่การรับสมัคร
+                    </p>
+                    <div class="countdown-container" data-target="<?= $systemStatus->onoff_datetime_regis_open ?>">
+                        <ul>
+                            <li><span class="days">0</span><div class="label">วัน</div></li>
+                            <li><span class="hours">0</span><div class="label">ชั่วโมง</div></li>
+                            <li><span class="minutes">0</span><div class="label">นาที</div></li>
+                            <li><span class="seconds">0</span><div class="label">วินาที</div></li>
+                        </ul>
+                    </div>
+                </div>
+                <?php elseif($is_open): ?>
+                <!-- Currently Open - Clickable to Scroll -->
+                <?php 
+                $activeQuotas = [];
+                if(isset($quotas) && is_array($quotas)) {
+                    foreach($quotas as $q) {
+                        if(isset($q->quota_status) && $q->quota_status == 'on') {
+                            $activeQuotas[] = isset($q->quota_explain) ? $q->quota_explain : (isset($q->quota_name) ? $q->quota_name : 'N/A'); 
                         }
                     }
-                    ?>
-                    <?php if ($systemStatus->onoff_regis == 'on'): ?>
-                    <div class="announcement-card">
-                        <div class="text-center">
-                            <h2 class="fw-bold mb-3">
-                                <i class='bx bx-broadcast me-2'></i> <?= $quota->quota_explain ?>
-                                <?php if($is_closed_announce): ?>
-                                    <span class="badge bg-danger ms-2">ปิดรับสมัครแล้ว</span>
-                                <?php elseif(isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)): ?>
-                                    <span class="badge bg-warning text-dark ms-2">รอเปิดรับสมัคร</span>
-                                <?php else: ?>
-                                    <span class="badge bg-success ms-2">กำลังรับสมัคร</span>
-                                <?php endif; ?>
-                            </h2>
-                            
-                            <?php if(isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)): ?>
-                                <p class="fs-5 mb-3"><i class='bx bx-time-five'></i> กำลังจะเปิดรับสมัครในอีก...</p>
-                                <div class="countdown-container mb-4" data-target="<?= $systemStatus->onoff_datetime_regis_open ?>">
-                                    <ul>
-                                        <li><span class="days">0</span><div class="label">วัน</div></li>
-                                        <li><span class="hours">0</span><div class="label">ชั่วโมง</div></li>
-                                        <li><span class="minutes">0</span><div class="label">นาที</div></li>
-                                        <li><span class="seconds">0</span><div class="label">วินาที</div></li>
-                                    </ul>
-                                </div>
-                            <?php endif; ?>
-
-                            <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap mt-3">
-                                <div class="text-white d-flex align-items-center gap-2 px-3 py-2" style="background: rgba(72, 187, 120, 0.3); border: 2px solid rgba(72, 187, 120, 0.5); border-radius: 10px; backdrop-filter: blur(5px);">
-                                    <i class='bx bx-calendar-check' style="font-size: 1.5rem;"></i>
-                                    <div>
-                                        <div style="font-size: 0.85rem; font-weight: 600;">เปิดรับสมัคร</div>
-                                        <div class="fw-bold" style="font-size: 0.95rem;">
-                                            <?= isset($systemStatus->onoff_datetime_regis_open) ? $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_open)) : '-' ?>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-white d-flex align-items-center gap-2 px-3 py-2" style="background: rgba(245, 101, 101, 0.3); border: 2px solid rgba(245, 101, 101, 0.5); border-radius: 10px; backdrop-filter: blur(5px);">
-                                    <i class='bx bx-calendar-x' style="font-size: 1.5rem;"></i>
-                                    <div>
-                                        <div style="font-size: 0.85rem; font-weight: 600;">ปิดรับสมัคร</div>
-                                        <div class="fw-bold" style="font-size: 0.95rem;">
-                                            <?= isset($systemStatus->onoff_datetime_regis_close) ? $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_close)) : '-' ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                }
+                $quotaNames = !empty($activeQuotas) ? implode(', ', $activeQuotas) : 'รับสมัครนักเรียนใหม่';
+                ?>
+                <a href="#apply-section" class="hero-status-badge open my-4 text-decoration-none smooth-scroll d-inline-flex flex-column justify-content-center align-items-center py-3 px-5 h-auto">
+                    <span class="fs-6 fw-normal mb-1 opacity-75"><i class='bx bxs-check-circle me-1'></i> เปิดรับสมัครแล้ว</span>
+                    <span class="fs-3 fw-bolder text-white text-uppercase" style="line-height: 1.2;"><?= $quotaNames ?></span>
+                </a>
+                <?php elseif($is_closed): ?>
+                <!-- Closed -->
+                <div class="hero-status-badge closed mb-3">
+                    <i class='bx bx-x-circle me-1'></i> ปิดรับสมัครแล้ว
+                </div>
+                <?php endif; ?>
+                
+                <!-- Date Info -->
+                <?php if(isset($systemStatus->onoff_datetime_regis_open) || isset($systemStatus->onoff_datetime_regis_close)): ?>
+                <div class="hero-date-info d-flex flex-row flex-nowrap justify-content-center justify-content-lg-start gap-2 mb-3 overflow-auto" style="white-space: nowrap;">
+                    <?php if(isset($systemStatus->onoff_datetime_regis_open)): ?>
+                    <div class="date-item open flex-fill text-center">
+                        <i class='bx bx-calendar-check'></i>
+                        <span>เปิด: <?= $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_open)) ?></span>
                     </div>
                     <?php endif; ?>
-                    <?php
-                    break;
-                }
-            }
-        }
-       
-            if (!$hasActiveQuota) {
-                if (isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)) {
-                    ?>
-                    <div class="announcement-card">
-                        <div class="text-center">
-                        <h2 class="fw-bold mb-3">
-                            <i class='bx bx-time-five'></i> ระบบรับสมัครนักเรียนออนไลน์
-                            <span class="badge bg-warning text-dark ms-2">รอเปิดรับสมัคร</span>
-                        </h2>
-                        <p class="fs-5 mb-3">กำลังจะเปิดรับสมัครในอีก...</p>
-                        <div class="countdown-container" data-target="<?= $systemStatus->onoff_datetime_regis_open ?>">
-                            <ul>
-                                <li><span class="days">0</span><div class="label">วัน</div></li>
-                                <li><span class="hours">0</span><div class="label">ชั่วโมง</div></li>
-                                <li><span class="minutes">0</span><div class="label">นาที</div></li>
-                                <li><span class="seconds">0</span><div class="label">วินาที</div></li>
-                            </ul>
-                        </div>
+                    <?php if(isset($systemStatus->onoff_datetime_regis_close)): ?>
+                    <div class="date-item close flex-fill text-center">
+                        <i class='bx bx-calendar-x'></i>
+                        <span>ปิด: <?= $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_close)) ?></span>
                     </div>
+                    <?php endif; ?>
                 </div>
-                <?php
-            } else {
-                ?>
-                <div class="announcement-card text-center">
-                    <i class='bx bx-info-circle fs-1 mb-3'></i>
-                    <h3 class="fw-bold">ยังไม่มีประกาศรับสมัครในขณะนี้</h3>
-                    <p class="mb-0">กรุณาติดตามประกาศจากทางโรงเรียน</p>
+                <?php endif; ?>
+                
+                <div class="hero-buttons d-flex justify-content-center justify-content-lg-start gap-2 flex-wrap">
+                    <a href="<?= base_url('new-admission/manual') ?>" class="btn btn-light btn-lg rounded-pill px-4">
+                        <i class='bx bx-book-open me-2'></i> คู่มือการสมัคร
+                    </a>
+                    <a href="<?= base_url('new-admission/status') ?>" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                        <i class='bx bx-search-alt me-2'></i> ตรวจสอบสถานะ
+                    </a>
                 </div>
-                <?php
-            }
-        }
-    
-        ?>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Excellence Section -->
+<div class="excellence-section mb-4">
+    <div class="excellence-header text-center mb-3">
+        <div class="excellence-icon-wrapper mb-2">
+            <i class='bx bx-star'></i>
+        </div>
+        <h4 class="fw-bold mb-2">
+            <i class='bx bx-info-circle me-1'></i> กรุณาอ่านระเบียบการรับสมัครก่อนสมัคร
+        </h4>
+        <p class="text-muted mb-0">เลือกประเภทความเป็นเลิศที่ต้องการศึกษารายละเอียด</p>
+    </div>
+    
+    <div class="row g-3 justify-content-center">
+        <div class="col-6 col-md-4 col-lg">
+            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal" 
+                    data-title="ด้านวิชาการ" data-image="<?= base_url('public/assets/banner/academic.jpg') ?>">
+                <div class="excellence-card-icon academic">
+                    <i class='bx bx-book-reader'></i>
+                </div>
+                <span class="excellence-card-title">ด้านวิชาการ</span>
+            </button>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal"
+                    data-title="ด้านกีฬา" data-image="<?= base_url('public/assets/banner/sport.jpg') ?>">
+                <div class="excellence-card-icon sport">
+                    <i class='bx bx-football'></i>
+                </div>
+                <span class="excellence-card-title">ด้านกีฬา</span>
+            </button>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal"
+                    data-title="ด้านศิลปะ ดนตรี การแสดง" data-image="<?= base_url('public/assets/banner/art.jpg') ?>">
+                <div class="excellence-card-icon art">
+                    <i class='bx bx-palette'></i>
+                </div>
+                <span class="excellence-card-title">ด้านศิลปะ ดนตรี การแสดง</span>
+            </button>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal"
+                    data-title="ด้านวิชาชีพ" data-image="<?= base_url('public/assets/banner/career.jpg') ?>">
+                <div class="excellence-card-icon career">
+                    <i class='bx bx-briefcase'></i>
+                </div>
+                <span class="excellence-card-title">ด้านวิชาชีพ</span>
+            </button>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal"
+                    data-title="ด้านภาษา" data-image="<?= base_url('public/assets/banner/language.jpg') ?>">
+                <div class="excellence-card-icon language">
+                    <i class='bx bx-globe'></i>
+                </div>
+                <span class="excellence-card-title">ด้านภาษา</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Excellence Modal -->
+<div class="modal fade" id="excellenceModal" tabindex="-1" aria-labelledby="excellenceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 25px 50px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%); border: none; padding: 1.25rem 1.5rem;">
+                <h5 class="modal-title text-white fw-bold" id="excellenceModalLabel">
+                    <i class='bx bx-star me-2'></i><span id="modalTitleText">รายละเอียด</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 position-relative">
+                <img id="excellenceImage" src="" alt="Excellence Image" class="w-100" style="display: block; max-height: 80vh; object-fit: contain; background: #f8f9fa;">
+            </div>
+            <div class="modal-footer justify-content-center gap-2" style="border: none; background: #f8f9fa;">
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="zoomImageBtn">
+                    <i class='bx bx-zoom-in me-1'></i> ซูมดูรูปภาพ
+                </button>
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class='bx bx-x me-1'></i> ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fullscreen Image Modal (for zoom) -->
+<div class="modal fade" id="fullscreenImageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content" style="background: rgba(0,0,0,0.95);">
+            <div class="modal-header border-0 position-absolute w-100" style="z-index: 10; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);">
+                <h5 class="modal-title text-white fw-bold">
+                    <i class='bx bx-image me-2'></i><span id="fullscreenTitleText">รายละเอียด</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex align-items-center justify-content-center p-0" id="zoomableContainer" style="overflow: auto; cursor: grab;">
+                <img id="fullscreenImage" src="" alt="Fullscreen Image" class="zoomable-image" style="max-width: none; max-height: none; transform-origin: center center; transition: transform 0.3s ease;">
+            </div>
+            <div class="modal-footer border-0 position-absolute w-100 bottom-0 justify-content-center" style="z-index: 10; background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-light rounded-start-pill px-3" id="zoomOutBtn">
+                        <i class='bx bx-zoom-out'></i> ย่อ
+                    </button>
+                    <button type="button" class="btn btn-outline-light px-3" id="zoomResetBtn">
+                        <i class='bx bx-reset'></i> รีเซ็ต
+                    </button>
+                    <button type="button" class="btn btn-outline-light rounded-end-pill px-3" id="zoomInBtn">
+                        <i class='bx bx-zoom-in'></i> ขยาย
+                    </button>
+                </div>
+                <button type="button" class="btn btn-light rounded-pill px-4 ms-3" data-bs-dismiss="modal">
+                    <i class='bx bx-x me-1'></i> ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <!-- Application Cards -->
 <div class="row justify-content-center g-4 mb-4" id="apply-section">
@@ -812,6 +1419,165 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = selectedHref;
         }
     });
+
+    // Excellence Modal - Set title and image dynamically
+    const excellenceModal = document.getElementById('excellenceModal');
+    let currentImageSrc = '';
+    let currentTitle = '';
+    
+    if (excellenceModal) {
+        excellenceModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            currentTitle = button.getAttribute('data-title');
+            currentImageSrc = button.getAttribute('data-image');
+            
+            document.getElementById('modalTitleText').textContent = currentTitle;
+            document.getElementById('excellenceImage').src = currentImageSrc;
+            document.getElementById('excellenceImage').alt = currentTitle;
+        });
+    }
+
+    // Fullscreen Zoom Modal
+    const zoomImageBtn = document.getElementById('zoomImageBtn');
+    const fullscreenModal = document.getElementById('fullscreenImageModal');
+    const fullscreenImage = document.getElementById('fullscreenImage');
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const zoomResetBtn = document.getElementById('zoomResetBtn');
+    const zoomableContainer = document.getElementById('zoomableContainer');
+    
+    let currentZoom = 1;
+    const zoomStep = 0.25;
+    const minZoom = 0.5;
+    const maxZoom = 4;
+
+    if (zoomImageBtn) {
+        zoomImageBtn.addEventListener('click', function() {
+            // Hide excellence modal and show fullscreen modal
+            const excellenceModalInstance = bootstrap.Modal.getInstance(excellenceModal);
+            excellenceModalInstance.hide();
+            
+            // Set fullscreen modal content
+            document.getElementById('fullscreenTitleText').textContent = currentTitle;
+            fullscreenImage.src = currentImageSrc;
+            fullscreenImage.alt = currentTitle;
+            
+            // Reset zoom
+            currentZoom = 1;
+            updateZoom();
+            
+            // Show fullscreen modal
+            const fullscreenModalInstance = new bootstrap.Modal(fullscreenModal);
+            fullscreenModalInstance.show();
+        });
+    }
+
+    // Zoom controls
+    if (zoomInBtn) {
+        zoomInBtn.addEventListener('click', function() {
+            if (currentZoom < maxZoom) {
+                currentZoom += zoomStep;
+                updateZoom();
+            }
+        });
+    }
+
+    if (zoomOutBtn) {
+        zoomOutBtn.addEventListener('click', function() {
+            if (currentZoom > minZoom) {
+                currentZoom -= zoomStep;
+                updateZoom();
+            }
+        });
+    }
+
+    if (zoomResetBtn) {
+        zoomResetBtn.addEventListener('click', function() {
+            currentZoom = 1;
+            updateZoom();
+        });
+    }
+
+    function updateZoom() {
+        if (fullscreenImage) {
+            fullscreenImage.style.transform = `scale(${currentZoom})`;
+        }
+    }
+
+    // Drag to pan functionality
+    let isDragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+
+    if (zoomableContainer) {
+        zoomableContainer.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            zoomableContainer.style.cursor = 'grabbing';
+            startX = e.pageX - zoomableContainer.offsetLeft;
+            startY = e.pageY - zoomableContainer.offsetTop;
+            scrollLeft = zoomableContainer.scrollLeft;
+            scrollTop = zoomableContainer.scrollTop;
+        });
+
+        zoomableContainer.addEventListener('mouseleave', function() {
+            isDragging = false;
+            zoomableContainer.style.cursor = 'grab';
+        });
+
+        zoomableContainer.addEventListener('mouseup', function() {
+            isDragging = false;
+            zoomableContainer.style.cursor = 'grab';
+        });
+
+        zoomableContainer.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - zoomableContainer.offsetLeft;
+            const y = e.pageY - zoomableContainer.offsetTop;
+            const walkX = (x - startX) * 2;
+            const walkY = (y - startY) * 2;
+            zoomableContainer.scrollLeft = scrollLeft - walkX;
+            zoomableContainer.scrollTop = scrollTop - walkY;
+        });
+
+        // Mouse wheel zoom
+        zoomableContainer.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                // Zoom in
+                if (currentZoom < maxZoom) {
+                    currentZoom += zoomStep;
+                    updateZoom();
+                }
+            } else {
+                // Zoom out
+                if (currentZoom > minZoom) {
+                    currentZoom -= zoomStep;
+                    updateZoom();
+                }
+            }
+        });
+    }
+
+    // Smooth Scroll for Status Badge
+    document.querySelector('.smooth-scroll')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+            targetElement.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+
+    // Reset zoom when fullscreen modal is hidden
+    if (fullscreenModal) {
+        fullscreenModal.addEventListener('hidden.bs.modal', function() {
+            currentZoom = 1;
+            updateZoom();
+        });
+    }
 });
 </script>
 <?= $this->endSection() ?>

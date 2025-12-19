@@ -27,7 +27,7 @@ class UserControlStatistic extends BaseController
 					tb_quota.quota_explain')
             ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category')
             ->where('recruit_year', $year)
-            ->groupBy('tb_recruitstudent.recruit_category')
+            ->groupBy('tb_recruitstudent.recruit_category, tb_quota.quota_explain')
             ->orderBy('recruit_date', 'ASC')
             ->get()->getResult();
 
@@ -42,7 +42,7 @@ class UserControlStatistic extends BaseController
             ->where('recruit_year', $year)
             ->where('recruit_category', 3)
             ->where('recruit_date BETWEEN "2024-03-09" AND "2024-03-15"')
-            ->groupBy('tb_recruitstudent.recruit_date')
+            ->groupBy('tb_recruitstudent.recruit_date, tb_quota.quota_explain')
             ->orderBy('recruit_date', 'ASC')
             ->get()->getResult();
 
@@ -136,9 +136,9 @@ class UserControlStatistic extends BaseController
         $data['StatisticViewQuotaSportFM'] = $this->db->table('tb_recruitstudent')
             ->select('SUM(CASE WHEN recruit_prefix = "เด็กหญิง" or recruit_prefix = "นางสาว" THEN 1 ELSE 0 END) AS female,
 					SUM(CASE WHEN recruit_prefix = "เด็กชาย" or recruit_prefix = "นาย" THEN 1 ELSE 0 END) AS male,
-					tb_recruitstudent.recruit_regLevel
-					,tb_recruitstudent.recruit_year
-					,tb_recruitstudent.recruit_date')
+					MAX(tb_recruitstudent.recruit_regLevel) as recruit_regLevel
+					,MAX(tb_recruitstudent.recruit_year) as recruit_year
+					,MAX(tb_recruitstudent.recruit_date) as recruit_date')
             ->where('recruit_year', $Year)
             ->where('recruit_category', 5)
             ->get()->getRow();
@@ -156,7 +156,7 @@ class UserControlStatistic extends BaseController
 					,tb_recruitstudent.recruit_date')
             ->where('recruit_year', $Year)
             ->where("recruit_date BETWEEN '2025-01-01' AND '2025-01-31'", NULL, FALSE)
-            ->groupBy('recruit_date')
+            ->groupBy('recruit_date, recruit_regLevel, recruit_year')
             ->orderBy('recruit_date', 'ASC')
             ->get()->getResultArray();
 
@@ -173,7 +173,7 @@ class UserControlStatistic extends BaseController
 					,tb_recruitstudent.recruit_date')
             ->where('recruit_year', $Year)
             ->where("recruit_date BETWEEN '2025-03-25' AND '2025-03-31'", NULL, FALSE)
-            ->groupBy('recruit_date')
+            ->groupBy('recruit_date, recruit_regLevel, recruit_year')
             ->orderBy('recruit_date', 'ASC')
             ->get()->getResultArray();
 
@@ -185,9 +185,9 @@ class UserControlStatistic extends BaseController
         $data['StatisticGeneralTotal'] = $this->db->table('tb_recruitstudent')
             ->select('SUM(CASE WHEN recruit_prefix = "เด็กหญิง" or recruit_prefix = "นางสาว" THEN 1 ELSE 0 END) AS female,
 					SUM(CASE WHEN recruit_prefix = "เด็กชาย" or recruit_prefix = "นาย" THEN 1 ELSE 0 END) AS male,
-					tb_recruitstudent.recruit_regLevel
-					,tb_recruitstudent.recruit_year
-					,tb_recruitstudent.recruit_date')
+					MAX(tb_recruitstudent.recruit_regLevel) as recruit_regLevel
+					,MAX(tb_recruitstudent.recruit_year) as recruit_year
+					,MAX(tb_recruitstudent.recruit_date) as recruit_date')
             ->where('recruit_year', $Year)
             ->where('recruit_category', 3)
             ->get()->getRow();

@@ -26,6 +26,7 @@ $routes->get('new-admission/register/(:num)', 'User\UserControlNewAdmission::reg
 $routes->get('new-admission/status', 'User\UserControlNewAdmission::status');
 $routes->get('new-admission/school-search', 'User\UserControlNewAdmission::ajax_school_search'); // Route for Select2 school search
 $routes->post('new-admission/save', 'User\UserControlNewAdmission::save_register');
+$routes->post('new-admission/refresh-captcha', 'User\UserControlNewAdmission::refresh_captcha');
 
 // Image Proxy for remote images
 $routes->get('image-proxy', 'User\ImageProxy::index');

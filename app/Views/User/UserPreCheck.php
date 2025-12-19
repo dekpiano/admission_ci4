@@ -33,8 +33,12 @@
                         </div>
                     <?php endif; ?>
 
-                    <button type="submit" class="btn btn-primary w-100 btn-lg">ตรวจสอบ</button>
-                    <a href="<?= base_url('new-admission') ?>" class="btn btn-outline-secondary w-100 mt-2">ย้อนกลับ</a>
+                    <button type="submit" class="btn btn-primary w-100 btn-lg" id="checkIdBtn">
+                        <i class='bx bx-search-alt me-2'></i>ตรวจสอบ
+                    </button>
+                    <a href="<?= base_url('new-admission') ?>" class="btn btn-outline-secondary w-100 mt-2" id="backBtn">
+                        <i class='bx bx-arrow-back me-2'></i>ย้อนกลับ
+                    </a>
                 </form>
             </div>
         </div>
@@ -55,10 +59,13 @@
 <script>
     function checkThaiID(id) {
         if(id.length != 13) return false;
-        for(i=0, sum=0; i < 12; i++)
-            sum += parseFloat(id.charAt(i))*(13-i);
-        if((11-sum%11)%10!=parseFloat(id.charAt(12)))
+        let sum = 0;
+        for(let i = 0; i < 12; i++) {
+            sum += parseFloat(id.charAt(i)) * (13 - i);
+        }
+        if((11 - sum % 11) % 10 != parseFloat(id.charAt(12))) {
             return false;
+        }
         return true;
     }
 
@@ -82,7 +89,10 @@
     });
 
     document.querySelector('form').addEventListener('submit', function(e) {
+        const form = this;
         const idInput = document.getElementById('recruit_idCard');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const backBtn = form.querySelector('a.btn-outline-secondary');
         const rawId = idInput.value.replace(/-/g, '');
         
         if (!checkThaiID(rawId)) {
@@ -94,7 +104,22 @@
                 confirmButtonText: 'ตกลง'
             });
             idInput.classList.add('is-invalid');
+            return;
         }
+        
+        // Show loading state on button only
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังตรวจสอบ...';
+        
+        // Disable back button too
+        if (backBtn) {
+            backBtn.classList.add('disabled');
+            backBtn.style.pointerEvents = 'none';
+        }
+        
+        // Use readonly instead of disabled - readonly still submits the value!
+        idInput.readOnly = true;
+        idInput.style.backgroundColor = '#e9ecef';
     });
 
 
