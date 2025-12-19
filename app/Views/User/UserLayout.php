@@ -669,10 +669,21 @@
             
             // Check System Status & Date Time
             $is_system_open = false;
+            
             if (isset($systemStatus) && $systemStatus->onoff_regis == 'on') {
                 $is_system_open = true;
-                if (isset($systemStatus->onoff_datetime_regis_close)) {
-                    if (time() > strtotime($systemStatus->onoff_datetime_regis_close)) {
+                $current_time_layout = time();
+                
+                // Check Open Time
+                if (isset($systemStatus->onoff_datetime_regis_open) && !empty($systemStatus->onoff_datetime_regis_open)) {
+                     if ($current_time_layout < strtotime($systemStatus->onoff_datetime_regis_open)) {
+                         $is_system_open = false;
+                     }
+                }
+                
+                // Check Close Time
+                if (isset($systemStatus->onoff_datetime_regis_close) && !empty($systemStatus->onoff_datetime_regis_close)) {
+                    if ($current_time_layout > strtotime($systemStatus->onoff_datetime_regis_close)) {
                         $is_system_open = false;
                     }
                 }
@@ -715,10 +726,9 @@
             ?>
             <li class="menu-item <?= $current_uri_level ? 'active' : '' ?>">
               <a 
-                href="<?= $is_system_open ? 'javascript:void(0);' : 'javascript:void(0);' ?>" 
-                class="menu-link <?= !$is_system_open ? 'disabled-link' : 'pdpa-sidebar-btn' ?>"
+                href="javascript:void(0);" 
+                class="menu-link <?= !$is_system_open ? 'closed-sidebar-btn text-muted' : 'pdpa-sidebar-btn' ?>"
                 <?= $is_system_open ? 'data-href="' . $destination_url . '"' : '' ?>
-                <?= !$is_system_open ? 'data-bs-toggle="tooltip" data-bs-placement="right" title="ยังไม่เปิดรับสมัคร / ปิดรับสมัครแล้ว"' : '' ?>
               >
                 <i class="menu-icon tf-icons bx bx-user-plus"></i>
                 <div data-i18n="M.<?= $level_num ?>">
@@ -1004,6 +1014,24 @@
                 if(selectedSidebarHref) {
                     pdpaModalGlobal.show();
                 }
+            });
+        });
+
+        // Handle Closed Sidebar Links
+        const closedSidebarBtns = document.querySelectorAll('.closed-sidebar-btn');
+        closedSidebarBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ระบบยังไม่เปิดรับสมัคร',
+                    text: 'กรุณาติดตามกำหนดการรับสมัคร หรือรอประกาศจากทางโรงเรียน',
+                    confirmButtonText: 'รับทราบ',
+                    confirmButtonColor: '#ffc107',
+                    customClass: {
+                        confirmButton: 'btn btn-warning text-white'
+                    }
+                });
             });
         });
 

@@ -46,11 +46,25 @@ class UserControlNewAdmission extends BaseController
             return redirect()->to('new-admission');
         }
 
+        // Security Check: System Status & Time
+        $systemStatus = $this->admissionModel->getSystemStatus();
+        $currentTime = time();
+        $openTime = isset($systemStatus->onoff_datetime_regis_open) ? strtotime($systemStatus->onoff_datetime_regis_open) : 0;
+        $closeTime = isset($systemStatus->onoff_datetime_regis_close) ? strtotime($systemStatus->onoff_datetime_regis_close) : 0;
+
+        if (
+            ($systemStatus->onoff_regis != 'on') ||
+            ($openTime > 0 && $currentTime < $openTime) ||
+            ($closeTime > 0 && $currentTime > $closeTime)
+        ) {
+            return redirect()->to('new-admission')->with('error', 'ระบบปิดรับสมัคร หรือไม่ได้อยู่ในช่วงเวลาการรับสมัคร');
+        }
+
         $data['title'] = "ตรวจสอบสิทธิ์การสมัคร " . ($level == 1 ? "ม.1" : "ม.4");
         $data['level'] = $level;
         $data['checkYear'] = $this->admissionModel->getOpenYear();
         $data['quotas'] = $this->admissionModel->getAllQuotas(); // Add quotas for menu generation
-        $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
+        $data['systemStatus'] = $systemStatus; // Pass system status
         
         return view('User/UserPreCheck', $data);
     }
