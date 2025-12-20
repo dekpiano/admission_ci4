@@ -339,6 +339,7 @@
 $(document).ready(function() {
     var reportType = 'application'; // default
     var studentsData = [];
+    var dataTable = null; // DataTable instance
     
     // Store all course options for filtering
     var allCourseOptions = $('#course option').clone();
@@ -404,7 +405,7 @@ $(document).ready(function() {
                 <?= csrf_token() ?>: '<?= csrf_hash() ?>'
             },
             success: function(response) {
-                $btn.prop('disabled', false).html('<i class="bx bx-search me-1"></i> โหลดข้อมูล');
+                $btn.prop('disabled', false).html('<i class="bx bx-search me-1"></i> โหลด');
                 
                 if (response.success) {
                     studentsData = response.data;
@@ -416,23 +417,30 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                $btn.prop('disabled', false).html('<i class="bx bx-search me-1"></i> โหลดข้อมูล');
+                $btn.prop('disabled', false).html('<i class="bx bx-search me-1"></i> โหลด');
                 Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
             }
         });
     });
     
-    // Render Table
+    // Render Table with DataTable
     function renderTable(data) {
+        // Destroy existing DataTable if exists
+        if (dataTable !== null) {
+            dataTable.destroy();
+            dataTable = null;
+        }
+        
         var html = '';
+        var defaultImg = '<?= base_url('sneat-assets/img/avatars/1.png') ?>';
         
         if (data.length === 0) {
             html = '<tr><td colspan="6" class="text-center text-muted py-5"><i class="bx bx-info-circle bx-lg mb-2"></i><p>ไม่พบข้อมูล</p></td></tr>';
+            $('#studentsBody').html(html);
         } else {
             data.forEach(function(student) {
                 var statusClass = student.can_print ? 'bg-label-success' : 'bg-label-warning';
                 var statusText = student.status_text;
-                var defaultImg = '<?= base_url('sneat-assets/img/avatars/1.png') ?>';
                 
                 html += '<tr data-id="' + student.id + '">';
                 html += '<td><input type="checkbox" class="form-check-input student-check" value="' + student.id + '" ' + (student.can_print ? '' : 'disabled') + '></td>';
@@ -443,9 +451,37 @@ $(document).ready(function() {
                 html += '<td><span class="badge ' + statusClass + '">' + statusText + '</span></td>';
                 html += '</tr>';
             });
+            
+            $('#studentsBody').html(html);
+            
+            // Initialize DataTable
+            dataTable = $('#studentsTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "ทั้งหมด"]],
+                language: {
+                    search: "ค้นหา:",
+                    lengthMenu: "แสดง _MENU_ รายการ",
+                    info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                    infoEmpty: "แสดง 0 ถึง 0 จาก 0 รายการ",
+                    infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
+                    paginate: {
+                        first: "หน้าแรก",
+                        last: "หน้าสุดท้าย",
+                        next: "ถัดไป",
+                        previous: "ก่อนหน้า"
+                    },
+                    zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+                    emptyTable: "ไม่มีข้อมูลในตาราง"
+                },
+                columnDefs: [
+                    { orderable: false, targets: [0, 1] }, // Disable sorting on checkbox and image columns
+                    { searchable: false, targets: [0, 1] }  // Disable search on checkbox and image columns
+                ],
+                order: [[2, 'asc']] // Order by name column
+            });
         }
         
-        $('#studentsBody').html(html);
         $('#checkAll').prop('checked', false); // Reset check all checkbox
     }
     

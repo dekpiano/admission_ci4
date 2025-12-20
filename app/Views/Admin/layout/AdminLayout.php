@@ -70,11 +70,11 @@
 
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
           <div class="app-brand demo">
-            <a href="index.html" class="app-brand-link">
+            <a href="<?= site_url('skjadmin/dashboard') ?>" class="app-brand-link">
               <span class="app-brand-logo demo">
-                
+                <img src="<?= base_url('public/assets/images/LogoSKJ_4.png') ?>" alt="Logo" style="width: 35px; height: auto;">
               </span>
-              <span class="app-brand-text demo menu-text fw-bolder ms-2">SKJ Admin</span>
+              <span class="app-brand-text demo menu-text fw-bolder ms-2">SKJ Admission</span>
             </a>
 
             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -183,6 +183,7 @@
             </div>
 
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+              <span class="badge bg-label-primary rounded-pill px-3 py-2">สำหรับเจ้าหน้าที่</span>
               <ul class="navbar-nav flex-row align-items-center ms-auto">
 <?php
     // Retrieve user's position from tb_admin_rloes
@@ -219,7 +220,7 @@
     <li>
       <a class="dropdown-item" href="<?= site_url('admin/logout') ?>">
         <i class="bx bx-power-off me-2"></i>
-        <span class="align-middle">Log Out</span>
+        <span class="align-middle">ออกจากระบบ</span>
       </a>
     </li>
   </ul>
@@ -249,7 +250,7 @@
                     document.write(new Date().getFullYear());
                   </script>
                   , made with ❤️ by
-                  <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder">ThemeSelection</a>
+                  <a href="https://facebook.com/dekpiano" target="_blank" class="footer-link fw-bolder">Dekpiano</a>
                 </div>
               </div>
             </footer>
