@@ -164,6 +164,13 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
 
     // Reports
     $routes->get('reports', 'AdminControlReport::index');
+    $routes->post('reports/get-students', 'AdminControlReport::getStudents');
+    $routes->post('reports/get-courses', 'AdminControlReport::getCourses');
+    $routes->add('reports/init-batch', 'AdminControlReport::initBatch');
+    $routes->add('reports/process-batch', 'AdminControlReport::processBatch');
+    $routes->add('reports/cancel-batch', 'AdminControlReport::cancelBatch');
+    $routes->get('reports/finish-batch', 'AdminControlReport::finishBatch');
+    $routes->get('reports/print-batch', 'AdminControlReport::printBatch');
     $routes->get('reports/print_all', 'AdminControlReport::print_all');
 
     // Surrender

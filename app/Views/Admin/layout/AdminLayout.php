@@ -86,7 +86,7 @@
 
           <ul class="menu-inner py-1">
             <!-- Dashboard -->
-            <li class="menu-item <?= (uri_string() == 'skjadmin/dashboard' || uri_string() == 'skjadmin') ? 'active' : '' ?>">
+            <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/dashboard') !== false || uri_string() == 'skjadmin' || uri_string() == 'skjadmin/') ? 'active' : '' ?>">
               <a href="<?= site_url('skjadmin/dashboard') ?>" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Analytics">Dashboard</div>

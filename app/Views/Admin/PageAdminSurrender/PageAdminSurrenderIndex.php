@@ -374,7 +374,7 @@
                             ?>
                             <tr data-status="<?= $isConfirmed ? 'confirmed' : 'pending' ?>">
                                 <td>
-                                    <img src="<?= $imgSrc ?>" class="recruit-avatar" alt="Avatar" onerror="this.onerror=null;this.src='<?= $defaultImg ?>';">
+                                    <img src="<?= $imgSrc ?>" class="recruit-avatar" alt="Avatar" loading="lazy" onerror="this.onerror=null;this.src='<?= $defaultImg ?>';">
                                 </td>
                                 <td>
                                     <div class="fw-semibold"><?= esc($student->recruit_prefix . $student->recruit_firstName) ?></div>

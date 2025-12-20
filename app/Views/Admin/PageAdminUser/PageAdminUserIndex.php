@@ -28,7 +28,7 @@
                             <div class="d-flex align-items-center">
                                 <div class="avatar avatar-sm me-3">
                                     <?php if(!empty($user->pers_img)): ?>
-                                        <img src="https://skj.ac.th/uploads/personnel/<?= $user->pers_img ?>" alt="Avatar" class="rounded-circle">
+                                        <img src="https://skj.ac.th/uploads/personnel/<?= $user->pers_img ?>" alt="Avatar" class="rounded-circle" loading="lazy">
                                     <?php else: ?>
                                         <span class="avatar-initial rounded-circle bg-label-primary"><?= mb_substr($user->pers_firstname, 0, 1) ?></span>
                                     <?php endif; ?>

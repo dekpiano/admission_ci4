@@ -323,10 +323,10 @@ class AdminControlRecruit extends BaseController
                 $statusClass = 'status-rejected';
             }
 
-            // Generate avatar
+            // Generate avatar with lazy loading
             $imgSrc = base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '1') . '/img/' . ($recruit['recruit_img'] ?? 'default.png'));
             $defaultImg = base_url('sneat-assets/img/avatars/1.png');
-            $avatar = '<img src="' . $imgSrc . '" class="recruit-avatar" alt="Avatar" onerror="this.onerror=null;this.src=\'' . $defaultImg . '\';">';
+            $avatar = '<img src="' . $imgSrc . '" class="recruit-avatar" alt="Avatar" loading="lazy" onerror="this.onerror=null;this.src=\'' . $defaultImg . '\';">';
 
             // Generate action buttons
             $actions = '
@@ -409,15 +409,14 @@ class AdminControlRecruit extends BaseController
             return "ไม่พบข้อมูลผู้สมัคร";
         }
 
-        // Load mPDF
-        $path = dirname(dirname(dirname(dirname(dirname((dirname(__FILE__)))))));
-        if (file_exists($path . '/librarie_skj/mpdf/vendor/autoload.php')) {
-            require_once $path . '/librarie_skj/mpdf/vendor/autoload.php';
+        // Load mPDF using SHARED_LIB_PATH
+        if (file_exists(SHARED_LIB_PATH . '/mpdf/vendor/autoload.php')) {
+            require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
         } else {
-            return "mPDF library not found.";
+            return "mPDF library not found at: " . SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
         }
 
-        $customFontDir = $path . '/librarie_skj/vendor/mpdf/mpdf/ttfonts';
+        $customFontDir = SHARED_LIB_PATH . '/vendor/mpdf/mpdf/ttfonts';
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
         $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();

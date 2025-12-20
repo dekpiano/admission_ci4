@@ -117,6 +117,7 @@
                              <img src="<?= base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '') . '/img/' . ($recruit['recruit_img'] ?? 'default.png')) ?>" 
                                  alt="Applicant Photo" 
                                  class="img-fluid rounded" 
+                                 loading="lazy"
                                  style="width: 100px; height: 100px; object-fit: cover;"
                                  onerror="this.onerror=null;this.src='<?= base_url('sneat-assets/img/avatars/1.png') ?>';">
                         </div>
