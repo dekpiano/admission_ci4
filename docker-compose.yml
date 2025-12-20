@@ -8,6 +8,7 @@ services:
       - "8083:443"  # HTTPS port for admission2025
     volumes:
       - .:/var/www/html:cached
+      - /var/www/html/vendor
       - D:/librarie_skj:/home/skjacth/domains/skj.ac.th/public_html/librarie_skj:cached
     environment:
       # Database connection settings for CodeIgniter

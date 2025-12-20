@@ -203,6 +203,9 @@ class UserControlConfirmation extends BaseController
         $data['OtherCkeck'] = !empty($data['OtherConf']) ? 1 : 0;
         $data['isStudentSaved'] = $isStudentSaved ? 1 : 0;
 
+        // Add system status for sidebar
+        $data['systemStatus'] = $this->admissionModel->getSystemStatus();
+
         return view('User/PageUserConfirmation/Dashboard', $data);
     }
 
@@ -465,10 +468,8 @@ class UserControlConfirmation extends BaseController
 
         $studentId = $this->session->get('confirmation_student_id');
         
-        // Load mPDF
-        // require_once ROOTPATH . 'librarie_skj/mpdf/vendor/autoload.php';
-        $path = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-        require_once $path . '/librarie_skj/mpdf/vendor/autoload.php';
+        // Load mPDF using SHARED_LIB_PATH
+        require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
 
         // Fetch Data
         $checkYear = $this->db->table('tb_openyear')->get()->getRow();

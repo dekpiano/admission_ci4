@@ -43,6 +43,10 @@ RUN a2ensite default-ssl
 # Set working directory
 WORKDIR /var/www/html
 
+# Copy composer files first to leverage Docker cache
+COPY composer.json composer.lock ./
+RUN composer install
+
 # Generate Self-Signed Certificate
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout /etc/ssl/private/apache-selfsigned.key \

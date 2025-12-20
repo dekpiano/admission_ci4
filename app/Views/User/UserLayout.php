@@ -607,6 +607,11 @@
             }
         }
     </style>
+    <style>
+      .swal2-container {
+        z-index: 100000 !important;
+      }
+    </style>
     <?= $this->renderSection('styles') ?>
 
     <!-- Helpers -->
@@ -754,8 +759,7 @@
             <?php
             $is_confirmation_open = false;
             $confirmation_status_text = 'ปิดรับรายงานตัว';
-
-            if (isset($systemStatus) && isset($systemStatus->onoff_confirmation) && $systemStatus->onoff_confirmation == 'on') {
+            if (isset($systemStatus) && isset($systemStatus->onoff_report) && $systemStatus->onoff_report == 'on') {
                 $is_confirmation_open = true;
                 $confirmation_status_text = 'เปิดรับรายงานตัว';
             }
@@ -862,7 +866,15 @@
                 <!-- Academic Year Badge -->
                 <li class="nav-item lh-1 me-0">
                   <span class="badge bg-label-primary rounded-pill">
-                    <i class='bx bx-calendar me-1'></i>ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y')+543 ?>
+                    <i class='bx bx-calendar me-1'></i>ปีการศึกษา <?php 
+                      if (isset($checkYear) && is_array($checkYear) && isset($checkYear[0]->openyear_year)) {
+                        echo $checkYear[0]->openyear_year;
+                      } elseif (isset($checkYear->openyear_year)) {
+                        echo $checkYear->openyear_year;
+                      } else {
+                        echo date('Y') + 543;
+                      }
+                    ?>
                   </span>
                 </li>
               </ul>
@@ -1045,6 +1057,26 @@
             });
         }
     });
+    </script>
+    <script>
+      $(document).ready(function() {
+        $('form').on('submit', function() {
+            var $form = $(this);
+            if ($form[0].checkValidity()) {
+                var $btn = $form.find('button[type="submit"]');
+                var $clickedBtn = $(document.activeElement);
+                if ($clickedBtn.length && $clickedBtn.is('button[type="submit"]') && $form.has($clickedBtn).length) {
+                     $btn = $clickedBtn;
+                }
+                
+                if ($btn.length > 0) {
+                    $btn.addClass('disabled');
+                    $btn.css('pointer-events', 'none');
+                    $btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังบันทึก...');
+                }
+            }
+        });
+      });
     </script>
   </body>
 </html>

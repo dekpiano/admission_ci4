@@ -33,6 +33,10 @@
       body {
         font-family: 'K2D', sans-serif !important;
       }
+      /* SweetAlert2 Highest Priority */
+      .swal2-container {
+        z-index: 100000 !important;
+      }
     </style>
 
     <!-- Icons. Uncomment required icon fonts -->
@@ -288,5 +292,29 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    
+    <script>
+      $(document).ready(function() {
+        $('form').on('submit', function() {
+            var $form = $(this);
+            // Check HTML5 validation
+            if ($form[0].checkValidity()) {
+                var $btn = $form.find('button[type="submit"]');
+                    // Check if there is an active element (clicked button) to be more precise
+                var $clickedBtn = $(document.activeElement);
+                if ($clickedBtn.length && $clickedBtn.is('button[type="submit"]') && $form.has($clickedBtn).length) {
+                     $btn = $clickedBtn;
+                }
+                
+                if ($btn.length > 0) {
+                    $btn.addClass('disabled');
+                    $btn.css('pointer-events', 'none');
+                    // Keep original width if possible or just replace text
+                    $btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังบันทึก...');
+                }
+            }
+        });
+      });
+    </script>
   </body>
 </html>

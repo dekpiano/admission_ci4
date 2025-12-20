@@ -50,8 +50,8 @@
                     <hr>
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <div>
-                            <h6 class="mb-0">ระบบประกาศผล (Report/Result)</h6>
-                            <small class="text-muted">เปิด/ปิด การประกาศผลสอบ/สถานะ</small>
+                            <h6 class="mb-0">ระบบรายงานตัว (Confirmation)</h6>
+                            <small class="text-muted">เปิด/ปิด การรายงานตัวนักเรียนใหม่</small>
                         </div>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="switchReport" 
