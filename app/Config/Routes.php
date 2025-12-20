@@ -130,6 +130,7 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->get('recruits/delete/(:num)', 'AdminControlRecruit::delete/$1');
     $routes->post('recruits/update-status', 'AdminControlRecruit::updateStatus');
     $routes->get('recruits/print/(:num)', 'AdminControlRecruit::print/$1');
+    $routes->post('recruits/stats', 'AdminControlRecruit::getStats');
 
     // Course Management
     $routes->get('courses', 'AdminControlCourse::index');

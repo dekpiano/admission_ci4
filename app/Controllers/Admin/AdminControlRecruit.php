@@ -238,6 +238,7 @@ class AdminControlRecruit extends BaseController
         $searchValue = $search['value'] ?? '';
         
         $year = $request->getVar('year') ?? date('Y');
+        $statusFilter = $request->getVar('status_filter') ?? '';
 
         // 1. Get Total Records (for this year)
         $totalRecords = $model->where('recruit_year', $year)->countAllResults();
@@ -248,6 +249,15 @@ class AdminControlRecruit extends BaseController
                 ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
                 ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                 ->where('tb_recruitstudent.recruit_year', $year);
+
+        // Apply status filter
+        if (!empty($statusFilter)) {
+            if ($statusFilter === 'ไม่ผ่าน') {
+                $builder->like('tb_recruitstudent.recruit_status', 'ไม่ผ่าน');
+            } else {
+                $builder->where('tb_recruitstudent.recruit_status', $statusFilter);
+            }
+        }
 
         if (!empty($searchValue)) {
             $builder->groupStart()
@@ -266,10 +276,19 @@ class AdminControlRecruit extends BaseController
 
         // 3. Fetch Data
         $builder = $model->builder();
-        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_initials, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status')
+        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_initials, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status')
                 ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
                 ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
                 ->where('tb_recruitstudent.recruit_year', $year);
+
+        // Apply status filter
+        if (!empty($statusFilter)) {
+            if ($statusFilter === 'ไม่ผ่าน') {
+                $builder->like('tb_recruitstudent.recruit_status', 'ไม่ผ่าน');
+            } else {
+                $builder->where('tb_recruitstudent.recruit_status', $statusFilter);
+            }
+        }
 
         if (!empty($searchValue)) {
             $builder->groupStart()
@@ -297,31 +316,42 @@ class AdminControlRecruit extends BaseController
         $data = [];
         foreach ($recruits as $recruit) {
             $status = $recruit['recruit_status'] ?? 'รอตรวจสอบ';
-            $statusClass = 'bg-label-primary';
+            $statusClass = 'status-pending';
             if ($status === 'ผ่านการตรวจสอบ') {
-                $statusClass = 'bg-label-success';
+                $statusClass = 'status-approved';
             } elseif ($status !== 'รอตรวจสอบ') {
-                $statusClass = 'bg-label-danger';
+                $statusClass = 'status-rejected';
             }
 
-            $actions = '<div class="dropdown">
-                          <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                            <i class="bx bx-dots-vertical-rounded"></i>
-                          </button>
-                          <div class="dropdown-menu">
-                            <a class="dropdown-item" href="' . site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) . '"><i class="bx bx-show-alt me-1"></i> ดูรายละเอียด</a>
-                            <a class="dropdown-item" href="' . site_url('skjadmin/recruits/edit/' . $recruit['recruit_id']) . '"><i class="bx bx-edit-alt me-1"></i> แก้ไข</a>
-                            <a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-1"></i> พิมพ์ใบสมัคร</a>
-                            <a class="dropdown-item" href="' . site_url('skjadmin/recruits/delete/' . $recruit['recruit_id']) . '" onclick="return confirm(\'คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลผู้สมัครนี้?\')"><i class="bx bx-trash me-1"></i> ลบ</a>
-                          </div>
-                        </div>';
+            // Generate avatar
+            $imgSrc = base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '1') . '/img/' . ($recruit['recruit_img'] ?? 'default.png'));
+            $defaultImg = base_url('sneat-assets/img/avatars/1.png');
+            $avatar = '<img src="' . $imgSrc . '" class="recruit-avatar" alt="Avatar" onerror="this.onerror=null;this.src=\'' . $defaultImg . '\';">';
+
+            // Generate action buttons
+            $actions = '
+                <div class="d-flex gap-1 justify-content-center">
+                    <a href="' . site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) . '" class="action-btn view-btn" data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                        <i class="bx bx-show"></i>
+                    </a>
+                    <a href="' . site_url('skjadmin/recruits/edit/' . $recruit['recruit_id']) . '" class="action-btn edit-btn" data-bs-toggle="tooltip" title="แก้ไข">
+                        <i class="bx bx-edit"></i>
+                    </a>
+                    <a href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank" class="action-btn print-btn" data-bs-toggle="tooltip" title="พิมพ์ใบสมัคร">
+                        <i class="bx bx-printer"></i>
+                    </a>
+                    <button type="button" class="action-btn delete-btn" data-bs-toggle="tooltip" title="ลบ" onclick="confirmDelete(' . $recruit['recruit_id'] . ')">
+                        <i class="bx bx-trash"></i>
+                    </button>
+                </div>';
 
             $data[] = [
-                'recruit_id' => esc($recruit['recruit_id'] ?? ''),
-                'name' => '<strong>' . esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '') . ' ' . ($recruit['recruit_lastName'] ?? '')) . '</strong>',
-                'category' => esc($recruit['quota_explain'] ?? $recruit['recruit_category']),
-                'course' => esc($recruit['course_initials'] ?? $recruit['course_fullname'] ?? $recruit['recruit_tpyeRoom']),
-                'status' => '<span class="badge ' . $statusClass . ' me-1">' . esc($status) . '</span>',
+                'avatar' => $avatar,
+                'recruit_id' => '<span class="badge bg-label-secondary">' . esc(sprintf('%04d', $recruit['recruit_id'] ?? 0)) . '</span>',
+                'name' => '<div class="fw-semibold">' . esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '')) . '</div><small class="text-muted">' . esc($recruit['recruit_lastName'] ?? '') . '</small>',
+                'category' => '<small>' . esc($recruit['quota_explain'] ?? $recruit['recruit_category']) . '</small>',
+                'course' => '<span class="badge bg-label-info">' . esc($recruit['course_initials'] ?? $recruit['course_fullname'] ?? $recruit['recruit_tpyeRoom']) . '</span>',
+                'status' => '<span class="status-badge ' . $statusClass . '">' . esc($status) . '</span>',
                 'actions' => $actions
             ];
         }
@@ -334,6 +364,36 @@ class AdminControlRecruit extends BaseController
         ];
 
         return $this->response->setJSON($output);
+    }
+
+    /**
+     * Get statistics for the recruits
+     */
+    public function getStats()
+    {
+        $request = service('request');
+        $model = new AdmissionModel();
+        
+        $year = $request->getVar('year') ?? date('Y');
+        
+        // Get counts
+        $total = $model->where('recruit_year', $year)->countAllResults(false);
+        $approved = $model->where('recruit_year', $year)
+                          ->where('recruit_status', 'ผ่านการตรวจสอบ')
+                          ->countAllResults(false);
+        $pending = $model->where('recruit_year', $year)
+                         ->where('recruit_status', 'รอตรวจสอบ')
+                         ->countAllResults(false);
+        $rejected = $model->where('recruit_year', $year)
+                          ->like('recruit_status', 'ไม่ผ่าน')
+                          ->countAllResults(false);
+        
+        return $this->response->setJSON([
+            'total' => $total,
+            'approved' => $approved,
+            'pending' => $pending,
+            'rejected' => $rejected
+        ]);
     }
 
     public function print($id)

@@ -53,8 +53,9 @@ class AdminControlSurrender extends BaseController
         $data['selected_year'] = $year;
 
         $builder = $this->db->table('tb_recruitstudent');
-        $builder->select('tb_recruitstudent.*, tb_quota.quota_explain, skjacth_personnel.tb_students.stu_UpdateConfirm');
+        $builder->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials, skjacth_personnel.tb_students.stu_UpdateConfirm');
         $builder->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left');
+        $builder->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left');
         $builder->join('skjacth_personnel.tb_students', 'tb_recruitstudent.recruit_idCard = skjacth_personnel.tb_students.stu_iden', 'left');
         $builder->where('recruit_year', $year);
         $builder->orderBy('recruit_id', 'DESC');
