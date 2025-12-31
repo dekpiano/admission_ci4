@@ -33,10 +33,10 @@ class UserControlAdmission extends BaseController
         $data['switch'] = $this->admissionModel->getSystemStatus();
         $data['year'] = $this->admissionModel->getRecruitmentYears();
         $data['checkYear'] = $this->admissionModel->getOpenYear();
-        
+
         // Use current year + 543 to match the migration data
-        
-        $data['schedules'] = $this->admissionModel->getAdmissionSchedule( $data['checkYear']->openyear_year);
+
+        $data['schedules'] = $this->admissionModel->getAdmissionSchedule($data['checkYear']->openyear_year);
 
         return $data;
     }
@@ -68,7 +68,7 @@ class UserControlAdmission extends BaseController
         if (empty($idcard) || empty($day) || empty($month) || empty($year)) {
             return $this->response->setJSON(['success' => false, 'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน']);
         }
-        
+
         $current_year_obj = $this->admissionModel->getOpenYear();
         $current_year = $current_year_obj ? $current_year_obj->openyear_year : date('Y') + 543;
 
@@ -76,11 +76,22 @@ class UserControlAdmission extends BaseController
         $birthday = $year . '-' . $month . '-' . $day;
 
         $student = $this->admissionModel->findStudentForStatusCheck($idcard, $birthday, $current_year);
-        
+
+        // ตรวจสอบสถานะการเปิด-ปิดรายงานตัว
+        $systemStatus = $this->admissionModel->getSystemStatus();
+        $is_confirmation_open = false;
+        if ($systemStatus && isset($systemStatus->onoff_report) && $systemStatus->onoff_report == 'on') {
+            $is_confirmation_open = true;
+        }
+
         if ($student) {
-            return $this->response->setJSON(['success' => true, 'student' => $student]);
+            return $this->response->setJSON([
+                'success' => true,
+                'student' => $student,
+                'is_confirmation_open' => $is_confirmation_open
+            ]);
         } else {
-            return $this->response->setJSON(['success' => false, 'message' => 'ไม่พบข้อมูลนักเรียน หรือข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง','Do' => $student]);
+            return $this->response->setJSON(['success' => false, 'message' => 'ไม่พบข้อมูลนักเรียน หรือข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง', 'Do' => $student]);
         }
     }
 
@@ -89,7 +100,7 @@ class UserControlAdmission extends BaseController
         $data = $this->dataAll();
         $data['title'] = "แก้ไขข้อมูลการสมัคร";
         $data['description'] = "แบบฟอร์มแก้ไขข้อมูลสำหรับนักเรียน";
-        
+
         // Fetch the existing student data
         $student = $this->admissionModel->find($id);
 
@@ -179,13 +190,16 @@ class UserControlAdmission extends BaseController
 
             // Handle Course Ranks
             $ranks = [];
-            if (!empty($post['recruit_tpyeRoom1'])) $ranks[] = $post['recruit_tpyeRoom1'];
-            if (!empty($post['recruit_tpyeRoom2'])) $ranks[] = $post['recruit_tpyeRoom2'];
-            if (!empty($post['recruit_tpyeRoom3'])) $ranks[] = $post['recruit_tpyeRoom3'];
+            if (!empty($post['recruit_tpyeRoom1']))
+                $ranks[] = $post['recruit_tpyeRoom1'];
+            if (!empty($post['recruit_tpyeRoom2']))
+                $ranks[] = $post['recruit_tpyeRoom2'];
+            if (!empty($post['recruit_tpyeRoom3']))
+                $ranks[] = $post['recruit_tpyeRoom3'];
             $majorOrder = implode('|', $ranks);
 
             $courseDetails1 = $this->admissionModel->getCourseDetails($post['recruit_tpyeRoom1'] ?? '');
-            
+
             $data_update = [
                 'recruit_prefix' => $post['recruit_prefix'],
                 'recruit_firstName' => $post['recruit_firstName'],
@@ -215,21 +229,21 @@ class UserControlAdmission extends BaseController
             ];
 
             // --- Handle File Uploads ---
-            
+
             // Profile Image (from cropper)
             if (!empty($post['recruit_img_cropped'])) {
                 $base64Image = $post['recruit_img_cropped'];
                 $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64Image));
                 $fileName = $openyear . '-' . $post['recruit_idCard'] . '-' . uniqid() . '.png';
-                
+
                 $tempFile = tempnam(sys_get_temp_dir(), 'img');
                 file_put_contents($tempFile, $imageData);
 
                 $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/img';
-                
+
                 $remoteUpload = new RemoteUpload();
                 $result = $remoteUpload->upload($tempFile, $subPath, $fileName);
-                
+
                 if ($result && $result['status'] === 'success') {
                     $data_update['recruit_img'] = $result['filename'];
                     // Delete old image
@@ -253,7 +267,7 @@ class UserControlAdmission extends BaseController
                 if ($file && $file->isValid() && !$file->hasMoved()) {
                     $folder = $folder_map[$field];
                     $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder;
-                    
+
                     $remoteUpload = new RemoteUpload();
                     $result = $remoteUpload->upload($file, $subPath);
 
@@ -276,7 +290,7 @@ class UserControlAdmission extends BaseController
             } else {
                 $this->db->transCommit();
                 return $this->response->setJSON([
-                    'status' => 'success', 
+                    'status' => 'success',
                     'message' => 'แก้ไขข้อมูลสำเร็จแล้ว กรุณารอการตรวจสอบอีกครั้ง',
                     'redirect_url' => base_url('new-admission/status')
                 ]);
@@ -295,7 +309,7 @@ class UserControlAdmission extends BaseController
         $data['description'] = "แบบฟอร์กรอกข้อมูลสำหรับนักเรียน";
         $data['banner'] = base_url() . "asset/img/banner-admission64.png";
         $data['url'] = "welcome";
-        
+
         $quotaData = $this->admissionModel->getQuotaByKey($quota);
         $data['TypeQuota'] = $quotaData ? [$quotaData] : []; // Keep as array for view compatibility
 
@@ -322,15 +336,15 @@ class UserControlAdmission extends BaseController
         $chk_id = $this->admissionModel->getLatestRecruitId();
 
         if (empty($chk_id)) {
-            $year =  $openyear->openyear_year;
+            $year = $openyear->openyear_year;
             return $year . "0001";
         } else {
             if (strpos($chk_id->recruit_id, $openyear->openyear_year) === 0) {
-                 $number = substr($chk_id->recruit_id, strlen($openyear->openyear_year));
-                 $s = sprintf("%04d", $number + 1);
-                 return $openyear->openyear_year . $s;
+                $number = substr($chk_id->recruit_id, strlen($openyear->openyear_year));
+                $s = sprintf("%04d", $number + 1);
+                return $openyear->openyear_year . $s;
             } else {
-                 return $openyear->openyear_year . "0001";
+                return $openyear->openyear_year . "0001";
             }
         }
     }
@@ -360,7 +374,7 @@ class UserControlAdmission extends BaseController
             $course_fullname = $post['recruit_tpyeRoom'];
             $course_branch = $post['recruit_major'];
         }
-        
+
         // hCaptcha verification (Secret key should be in .env)
         $hcaptchaResponse = $post['h-captcha-response'];
         $secretKey = getenv('HCAPTCHA_SECRET_KEY') ?: 'ES_47c9a8452c844bf6b5bf834237aacb8d'; // Fallback for local dev
@@ -369,24 +383,24 @@ class UserControlAdmission extends BaseController
 
         $options = [
             'http' => [
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
                 'content' => http_build_query($verify_data),
             ],
         ];
-        $context  = stream_context_create($options);
+        $context = stream_context_create($options);
         $response = file_get_contents($url, false, $context);
         $responseData = json_decode($response);
 
         if ($responseData && $responseData->success) {
-            
+
             $isRegistered = $this->admissionModel->isIdCardRegistered($post['recruit_idCard'], $data['checkYear']->openyear_year);
 
             if ($isRegistered) {
                 $this->session->setFlashdata(['msg' => 'NO', 'messge' => 'คุณได้ลงทะเบียนแล้ว กรุณาตรวจสอบการสมัครปีการศึกษานี้แล้ว', 'status' => 'error']);
                 return redirect()->to('welcome');
             } else {
-                
+
                 $fileName = '';
                 if (!empty($post['recruit_img'])) {
                     $fileName = $data['checkYear']->openyear_year . '-' . $post['recruit_idCard'] . '-' . uniqid() . '.png';
@@ -395,7 +409,7 @@ class UserControlAdmission extends BaseController
                 $recruit_birthday = ($post['recruit_birthdayY'] - 543) . '-' . $post['recruit_birthdayM'] . '-' . $post['recruit_birthdayD'];
 
                 $data_insert = [
-                    'recruit_id'  => $this->NumberID(),
+                    'recruit_id' => $this->NumberID(),
                     'recruit_year' => $data['checkYear']->openyear_year,
                     'recruit_regLevel' => $post['recruit_regLevel'],
                     'recruit_prefix' => $post['recruit_prefix'],
@@ -425,7 +439,7 @@ class UserControlAdmission extends BaseController
                     'recruit_agegroup' => isset($post['recruit_agegroup']) ? $post['recruit_agegroup'] : 0,
                     'recruit_img' => $fileName,
                     'recruit_status' => "รอการตรวจสอบ",
-                    'recruit_date'    => date('Y-m-d H:i:s'),
+                    'recruit_date' => date('Y-m-d H:i:s'),
                     'recruit_dateUpdate' => date('Y-m-d H:i:s'),
                     'recruit_address' => '',
                     'recruit_copyAddress' => '',
@@ -448,23 +462,23 @@ class UserControlAdmission extends BaseController
                     if ($fileName !== '') {
                         $image = $post['recruit_img'];
                         $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $image));
-                        
+
                         $tempFile = tempnam(sys_get_temp_dir(), 'img');
                         file_put_contents($tempFile, $imageData);
 
                         $remoteUpload = new RemoteUpload();
                         $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/img';
                         $result = $remoteUpload->upload($tempFile, $subPath, $fileName);
-                        
+
                         // If upload failed, we might want to log it or handle it, but the record is already inserted.
                         // Ideally we should update the record if filename changed, but here we used $fileName for insert.
                         // If remote upload changes name, we need to update DB.
                         if ($result && $result['status'] === 'success') {
-                             if ($result['filename'] !== $fileName) {
-                                 $this->admissionModel->student_update($student_id, ['recruit_img' => $result['filename']]);
-                             }
+                            if ($result['filename'] !== $fileName) {
+                                $this->admissionModel->student_update($student_id, ['recruit_img' => $result['filename']]);
+                            }
                         } else {
-                             // Upload failed
+                            // Upload failed
                         }
                         @unlink($tempFile);
                     }
@@ -473,10 +487,10 @@ class UserControlAdmission extends BaseController
                     $update_data = [];
                     $filesAbility = $this->request->getFileMultiple('recruit_certificateAbility');
                     if ($filesAbility) {
-                         $abilityFiles = $this->UploadCertificateAbility($filesAbility, $post['recruit_regLevel']);
-                         if ($abilityFiles) {
-                             $update_data['recruit_certificateAbility'] = $abilityFiles;
-                         }
+                        $abilityFiles = $this->UploadCertificateAbility($filesAbility, $post['recruit_regLevel']);
+                        if ($abilityFiles) {
+                            $update_data['recruit_certificateAbility'] = $abilityFiles;
+                        }
                     }
                     $file_fields = ['recruit_certificateEdu', 'recruit_certificateEduB', 'recruit_copyidCard', 'recruit_copyAddress'];
                     $folder_map = [
@@ -490,10 +504,10 @@ class UserControlAdmission extends BaseController
                         if ($file && $file->isValid() && !$file->hasMoved()) {
                             $folder = $folder_map[$field];
                             $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder;
-                            
+
                             $remoteUpload = new RemoteUpload();
                             $result = $remoteUpload->upload($file, $subPath);
-                            
+
                             if ($result && $result['status'] === 'success') {
                                 $update_data[$field] = $result['filename'];
                             }
@@ -523,7 +537,7 @@ class UserControlAdmission extends BaseController
 
         foreach ($files as $file) {
             if ($file->isValid() && !$file->hasMoved()) {
-                
+
                 // Resize locally first
                 $tempName = $file->getTempName();
                 try {
@@ -566,7 +580,7 @@ class UserControlAdmission extends BaseController
         if ($status['success']) {
             $search_stu = $this->request->getPost('search_stu');
             $student = $this->admissionModel->where('recruit_idCard', $search_stu)->first();
-            
+
             if (!$student) {
                 $this->session->setFlashdata(['alert1' => 'success', 'msg' => 'NO', 'messge' => 'ไม่มีข้อมูลในระบบ หรือ ยังไม่ได้ลงทะเบียนเรียน']);
                 return redirect()->to('StudentLogin');
@@ -582,8 +596,9 @@ class UserControlAdmission extends BaseController
     function notify_message($message, $token)
     {
         // LINE_API constant and token should be in .env
-        if (!defined('LINE_API')) define('LINE_API', 'https://notify-api.line.me/api/notify');
-        
+        if (!defined('LINE_API'))
+            define('LINE_API', 'https://notify-api.line.me/api/notify');
+
         $queryData = array('message' => $message);
         $queryData = http_build_query($queryData, '', '&');
         $headerOptions = array(
@@ -633,15 +648,11 @@ class UserControlAdmission extends BaseController
 
     public function pdf($id)
     {
-        // 1. Load mPDF (Logic from AdminControlReport)
-        $path = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-        if (file_exists($path . '/librarie_skj/mpdf/vendor/autoload.php')) {
-            require_once $path . '/librarie_skj/mpdf/vendor/autoload.php';
+        // 1. Load mPDF using SHARED_LIB_PATH
+        if (file_exists(SHARED_LIB_PATH . '/mpdf/vendor/autoload.php')) {
+            require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
         } else {
-            // Fallback to vendor if custom path fails
-            if (file_exists(FCPATH . '../vendor/autoload.php')) {
-                require_once FCPATH . '../vendor/autoload.php';
-            }
+            return "mPDF library not found at: " . SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
         }
 
         if (!class_exists('\Mpdf\Mpdf')) {
@@ -650,7 +661,7 @@ class UserControlAdmission extends BaseController
 
         // 2. Database Connections
         $db = \Config\Database::connect();
-        
+
         // 3. Fetch Student Data
         // We use $id passed to the function, NOT session, to allow status check printing
         $builder = $db->table('tb_recruitstudent');
@@ -673,7 +684,8 @@ class UserControlAdmission extends BaseController
 
         // 5. Initialize mPDF (Card Format [210, 90])
         // Clean output buffer
-        if (ob_get_length()) ob_clean();
+        if (ob_get_length())
+            ob_clean();
 
         $mpdf = new \Mpdf\Mpdf([
             'mode' => 'utf-8',
@@ -711,14 +723,15 @@ class UserControlAdmission extends BaseController
                     // Detect MIME type from content, not extension
                     $finfo = new \finfo(FILEINFO_MIME_TYPE);
                     $mime = $finfo->buffer($imageData);
-                    
+
                     // Allow only valid image types
                     $allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
-                    
+
                     if (in_array($mime, $allowedMimes)) {
                         $base64 = base64_encode($imageData);
                         $img_src = 'data:' . $mime . ';base64,' . $base64;
-                        $img_tag = '<img style="width:120px;height:100px;" src="' . $img_src . '">';
+                        // รูปถ่ายสัดส่วน 3:4 (แนวตั้ง) กว้าง 105px สูง 140px
+                        $img_tag = '<img style="width:105px;height:140px;object-fit:cover;" src="' . $img_src . '">';
                     }
                 }
             } catch (\Exception $e) {
@@ -732,21 +745,21 @@ class UserControlAdmission extends BaseController
         $html .= '<div style="position:absolute;top:100px;left:480px; width:100%">' . $student->recruit_lastName . '</div>'; // Surname
         $html .= '<div style="position:absolute;top:127px;left:400px; width:100%">' . $student->recruit_idCard . '</div>'; // ID Card
         $html .= '<div style="position:absolute;top:155px;left:270px; width:100%"> ' . $student->recruit_tpyeRoom . '</div>'; // Program
-        
+
         // License Image (Signature/Stamp)
         $license_path = FCPATH . 'public/asset/img/license.png'; // Adjusted path assuming public/asset
         if (!file_exists($license_path)) {
-             $license_path = FCPATH . 'asset/img/license.png'; // Try alternate path
+            $license_path = FCPATH . 'asset/img/license.png'; // Try alternate path
         }
         if (file_exists($license_path)) {
-             $html .= '<div style="position:absolute;top:200px;left:340px; width:100%"><img style="width:120px;height:100px;" src="' . $license_path . '"></div>';
+            $html .= '<div style="position:absolute;top:200px;left:340px; width:100%"><img style="width:120px;height:100px;" src="' . $license_path . '"></div>';
         }
 
         $html .= '<div style="position:absolute;top:255px;left:360px; width:100%">' . $date_D_regis . ' ' . $TH_Month[$date_M_regis - 1] . ' ' . $date_Y_regis . '</div>'; // Date
 
         // 7. Set Template
         $templatePath = FCPATH . 'uploads/recruitstudent/pdf_registudentForStudent.pdf';
-        
+
         if (file_exists($templatePath)) {
             $mpdf->SetDocTemplate($templatePath, true);
         } else {
@@ -754,7 +767,7 @@ class UserControlAdmission extends BaseController
         }
 
         $mpdf->WriteHTML($html);
-        
+
         $this->response->setHeader('Content-Type', 'application/pdf');
         $mpdf->Output('Reg_' . $student->recruit_idCard . '.pdf', 'I');
         exit(); // Prevent CI4 from interfering with the output
@@ -780,7 +793,7 @@ class UserControlAdmission extends BaseController
         $data['description'] = "ขั้นตอนและวิธีการสมัครเรียนออนไลน์ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์";
         $data['systemStatus'] = $this->admissionModel->getSystemStatus();
         $data['quotas'] = $this->admissionModel->getAllQuotas();
-        
+
         return view('User/UserManual', $data);
     }
 
@@ -791,7 +804,7 @@ class UserControlAdmission extends BaseController
         $data['description'] = "ขั้นตอนการรายงานตัวและมอบตัวนักเรียนใหม่ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์";
         $data['systemStatus'] = $this->admissionModel->getSystemStatus();
         $data['quotas'] = $this->admissionModel->getAllQuotas();
-        
+
         return view('User/UserManualReport', $data);
     }
 }

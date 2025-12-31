@@ -1751,79 +1751,87 @@
         const dataList = document.getElementById('confirm-data-list');
         dataList.innerHTML = '';
 
-        const fieldLabels = {
-            recruit_category: 'ประเภทโควตา',
-            recruit_tpyeRoom1: 'แผนการเรียนอันดับ 1',
-            recruit_tpyeRoom2: 'แผนการเรียนอันดับ 2',
-            recruit_tpyeRoom3: 'แผนการเรียนอันดับ 3',
-            recruit_img_validator: 'รูปถ่ายนักเรียน',
-            recruit_prefix: 'คำนำหน้า',
-            recruit_firstName: 'ชื่อ',
-            recruit_lastName: 'นามสกุล',
-            recruit_idCard: 'เลขบัตรประชาชน',
-            recruit_birthday: 'วันเกิด',
-            recruit_race: 'เชื้อชาติ',
-            recruit_nationality: 'สัญชาติ',
-            recruit_religion: 'ศาสนา',
-            recruit_phone: 'เบอร์โทรศัพท์',
-            recruit_homeNumber: 'บ้านเลขที่',
-            recruit_homeGroup: 'หมู่ที่',
-            recruit_homeRoad: 'ถนน',
-            recruit_homeSubdistrict: 'ตำบล/แขวง',
-            recruit_homedistrict: 'อำเภอ/เขต',
-            recruit_homeProvince: 'จังหวัด',
-            recruit_homePostcode: 'รหัสไปรษณีย์',
-            recruit_oldSchool: 'โรงเรียนเดิม',
-            recruit_district: 'อำเภอ รร. เดิม',
-            recruit_province: 'จังหวัด รร. เดิม',
-            recruit_grade: 'เกรดเฉลี่ย',
-            recruit_certificateEdu: 'ปพ.1 (หน้า)',
-            recruit_certificateEduB: 'ปพ.1 (หลัง)',
-            recruit_copyidCard: 'สำเนาบัตรประชาชน',
-        };
-
-        let html = '<dl class="row">';
-
         const birthday = formData.get('recruit_birthdayD') + '/' + formData.get('recruit_birthdayM') + '/' + formData.get('recruit_birthdayY');
 
-        for (const [key, label] of Object.entries(fieldLabels)) {
-            let value;
+        // Helper function to get field value
+        function getFieldValue(key) {
             const element = document.querySelector(`[name="${key}"]`);
-
             if (key === 'recruit_birthday') {
-                value = birthday;
+                return birthday;
             } else if (element && element.tagName === 'SELECT') {
                 if (element.value !== "") {
-                    // Check if it's a course selection
                     if (key.startsWith('recruit_tpyeRoom')) {
                         const courseId = element.value;
                         const course = coursesData.find(c => c.course_id == courseId);
                         if (course) {
-                            // Display: Initials - Branch (e.g., วิทย์-คณิต - ห้องเรียนพิเศษ)
-                            // Handle potential null/empty values gracefully
                             const initials = course.course_initials || course.course_fullname;
                             const branch = course.course_branch || '';
-                            value = `${initials} ${branch ? '(' + branch + ')' : ''}`;
-                        } else {
-                            value = element.options[element.selectedIndex].text;
+                            return `${initials} ${branch ? '(' + branch + ')' : ''}`;
                         }
-                    } else {
-                        value = element.options[element.selectedIndex].text;
                     }
-                } else {
-                    value = 'ไม่ได้เลือก';
+                    return element.options[element.selectedIndex].text;
                 }
+                return '<span class="text-muted">-</span>';
             } else if (key.endsWith('_validator')) {
-                value = formData.get('recruit_img_cropped') ? '<span class="text-success">อัปโหลดแล้ว</span>' : '<span class="text-danger">ยังไม่ได้อัปโหลด</span>';
+                return formData.get('recruit_img_cropped') ? '<i class="bx bx-check-circle text-success"></i>' : '<i class="bx bx-x-circle text-danger"></i>';
             } else if (element && element.type === 'file') {
-                value = element.files.length > 0 ? `<span class="text-success">ไฟล์: ${element.files[0].name}</span>` : 'ไม่ได้เลือก';
-            } else {
-                value = formData.get(key) || '-';
+                return element.files.length > 0 ? '<i class="bx bx-check-circle text-success"></i>' : '<span class="text-muted">-</span>';
             }
-
-            html += `<dt class="col-sm-4">${label}</dt><dd class="col-sm-8">${value}</dd>`;
+            return formData.get(key) || '<span class="text-muted">-</span>';
         }
-        html += '</dl>';
+
+        // Create data item HTML
+        function createDataItem(label, value) {
+            return `<div class="data-item"><span class="data-label">${label}</span><span class="data-value">${value}</span></div>`;
+        }
+
+        // Build grouped HTML
+        let html = '';
+
+        // Group 1: ข้อมูลการสมัคร
+        html += '<div class="data-group">';
+        html += '<div class="data-group-title"><i class="bx bx-bookmark text-primary"></i>ข้อมูลการสมัคร</div>';
+        html += createDataItem('ประเภทโควตา', getFieldValue('recruit_category'));
+        html += createDataItem('แผนการเรียน 1', getFieldValue('recruit_tpyeRoom1'));
+        const plan2 = getFieldValue('recruit_tpyeRoom2');
+        const plan3 = getFieldValue('recruit_tpyeRoom3');
+        if (plan2 && !plan2.includes('text-muted')) html += createDataItem('แผนการเรียน 2', plan2);
+        if (plan3 && !plan3.includes('text-muted')) html += createDataItem('แผนการเรียน 3', plan3);
+        html += '</div>';
+
+        // Group 2: ข้อมูลส่วนตัว
+        html += '<div class="data-group">';
+        html += '<div class="data-group-title"><i class="bx bx-user text-success"></i>ข้อมูลส่วนตัว</div>';
+        html += createDataItem('ชื่อ-นามสกุล', getFieldValue('recruit_prefix') + getFieldValue('recruit_firstName') + ' ' + getFieldValue('recruit_lastName'));
+        html += createDataItem('เลขบัตรประชาชน', getFieldValue('recruit_idCard'));
+        html += createDataItem('วันเกิด', getFieldValue('recruit_birthday'));
+        html += createDataItem('เบอร์โทรศัพท์', getFieldValue('recruit_phone'));
+        html += createDataItem('เชื้อชาติ/สัญชาติ', getFieldValue('recruit_race') + '/' + getFieldValue('recruit_nationality'));
+        html += createDataItem('ศาสนา', getFieldValue('recruit_religion'));
+        html += '</div>';
+
+        // Group 3: ที่อยู่
+        html += '<div class="data-group">';
+        html += '<div class="data-group-title"><i class="bx bx-home text-warning"></i>ที่อยู่ปัจจุบัน</div>';
+        const homeNumber = getFieldValue('recruit_homeNumber');
+        const homeGroup = getFieldValue('recruit_homeGroup');
+        const homeRoad = getFieldValue('recruit_homeRoad');
+        let address = homeNumber;
+        if (homeGroup && !homeGroup.includes('text-muted')) address += ' หมู่ ' + homeGroup;
+        if (homeRoad && !homeRoad.includes('text-muted')) address += ' ถ.' + homeRoad;
+        html += createDataItem('บ้านเลขที่', address);
+        html += createDataItem('ตำบล/อำเภอ', getFieldValue('recruit_homeSubdistrict') + '/' + getFieldValue('recruit_homedistrict'));
+        html += createDataItem('จังหวัด', getFieldValue('recruit_homeProvince') + ' ' + getFieldValue('recruit_homePostcode'));
+        html += '</div>';
+
+        // Group 4: โรงเรียนเดิม
+        html += '<div class="data-group">';
+        html += '<div class="data-group-title"><i class="bx bx-building text-info"></i>โรงเรียนเดิม</div>';
+        html += createDataItem('โรงเรียน', getFieldValue('recruit_oldSchool'));
+        html += createDataItem('อำเภอ/จังหวัด', getFieldValue('recruit_district') + ', ' + getFieldValue('recruit_province'));
+        html += createDataItem('เกรดเฉลี่ย', '<strong class="text-primary">' + getFieldValue('recruit_grade') + '</strong>');
+        html += '</div>';
+
         dataList.innerHTML = html;
 
         // Set image preview in modal
@@ -2033,60 +2041,158 @@
 
 </script>
 
-<!-- Confirmation Modal -->
+<!-- Confirmation Modal - Mobile Friendly -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true"
     data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-fullscreen-sm-down modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmModalLabel">โปรดตรวจสอบข้อมูลการสมัครของท่าน</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p class="text-danger">**กรุณาตรวจสอบข้อมูลให้ถูกต้องครบถ้วน หากยืนยันการสมัครแล้ว
-                    จะไม่สามารถกลับมาแก้ไขได้**</p>
-                <div id="confirm-data-list" class="list-group">
-                    <!-- Data will be injected here by JS -->
+            <div class="modal-header bg-primary text-white py-3">
+                <div>
+                    <h5 class="modal-title mb-1" id="confirmModalLabel">
+                        <i class="bx bx-check-shield me-2"></i>ตรวจสอบข้อมูลการสมัคร
+                    </h5>
+                    <small class="opacity-75">กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนยืนยัน</small>
                 </div>
-                <!-- Image preview placeholder -->
-                <div class="mt-3">
-                    <h6 class="fw-bold border-bottom pb-2">รูปถ่ายนักเรียน</h6>
-                    <div class="text-center" id="confirm-image-wrapper">
-                        <img id="confirm_image" src="#" alt="รูปถ่ายนักเรียน" class="img-thumbnail d-none"
-                            style="max-width:200px; max-height:250px; object-fit:contain;" />
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Warning Alert -->
+                <div class="alert alert-warning rounded-0 mb-0 py-2 px-3 border-0 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <i class="bx bx-error-circle fs-4 me-2"></i>
+                        <small class="fw-medium">หากยืนยันการสมัครแล้ว จะไม่สามารถกลับมาแก้ไขได้</small>
                     </div>
                 </div>
 
-                <div class="mt-3">
-                    <h6 class="fw-bold border-bottom pb-2">เอกสารหลักฐาน</h6>
-                    <div class="row">
-                        <div class="col-md-4 text-center mb-3">
-                            <p class="small mb-1 fw-bold">ปพ.1 (หน้า)</p>
-                            <img id="confirm_certificate" src="#" class="img-thumbnail d-none"
-                                style="max-height:150px; width: auto;">
-                            <p id="confirm_certificate_name" class="small text-muted d-none"></p>
-                        </div>
-                        <div class="col-md-4 text-center mb-3">
-                            <p class="small mb-1 fw-bold">ปพ.1 (หลัง)</p>
-                            <img id="confirm_certificateB" src="#" class="img-thumbnail d-none"
-                                style="max-height:150px; width: auto;">
-                            <p id="confirm_certificateB_name" class="small text-muted d-none"></p>
-                        </div>
-                        <div class="col-md-4 text-center mb-3">
-                            <p class="small mb-1 fw-bold">สำเนาบัตรประชาชน</p>
-                            <img id="confirm_idcard" src="#" class="img-thumbnail d-none"
-                                style="max-height:150px; width: auto;">
-                            <p id="confirm_idcard_name" class="small text-muted d-none"></p>
+                <!-- Student Photo Section -->
+                <div class="text-center p-3 bg-light border-bottom">
+                    <img id="confirm_image" src="#" alt="รูปถ่ายนักเรียน"
+                        class="rounded-circle border border-3 border-primary shadow-sm d-none"
+                        style="width:100px; height:100px; object-fit:cover;" />
+                    <p class="mb-0 mt-2 fw-bold text-primary small">รูปถ่ายนักเรียน</p>
+                </div>
+
+                <!-- Data List -->
+                <div id="confirm-data-list" class="px-3 py-2">
+                    <!-- Data will be injected here by JS -->
+                </div>
+
+                <!-- Documents Section -->
+                <div class="px-3 pb-3">
+                    <div class="bg-light rounded-3 p-3">
+                        <h6 class="fw-bold mb-3 d-flex align-items-center">
+                            <i class="bx bx-file text-primary me-2"></i>เอกสารหลักฐาน
+                        </h6>
+                        <div class="row g-2">
+                            <div class="col-4 text-center">
+                                <div class="bg-white rounded p-2 h-100">
+                                    <img id="confirm_certificate" src="#" class="img-fluid rounded d-none mb-1"
+                                        style="max-height:80px; width: auto;">
+                                    <p id="confirm_certificate_name" class="small text-muted d-none mb-0"></p>
+                                    <small class="text-muted d-block">ปพ.1 (หน้า)</small>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="bg-white rounded p-2 h-100">
+                                    <img id="confirm_certificateB" src="#" class="img-fluid rounded d-none mb-1"
+                                        style="max-height:80px; width: auto;">
+                                    <p id="confirm_certificateB_name" class="small text-muted d-none mb-0"></p>
+                                    <small class="text-muted d-block">ปพ.1 (หลัง)</small>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="bg-white rounded p-2 h-100">
+                                    <img id="confirm_idcard" src="#" class="img-fluid rounded d-none mb-1"
+                                        style="max-height:80px; width: auto;">
+                                    <p id="confirm_idcard_name" class="small text-muted d-none mb-0"></p>
+                                    <small class="text-muted d-block">สำเนาบัตร</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">แก้ไขข้อมูล</button>
-                <button type="button" class="btn btn-success" id="confirmSubmitBtn">ยืนยันและสมัครเรียน</button>
+            <div class="modal-footer flex-column flex-sm-row gap-2 p-3 bg-light">
+                <button type="button" class="btn btn-outline-secondary w-100 w-sm-auto order-2 order-sm-1"
+                    data-bs-dismiss="modal">
+                    <i class="bx bx-edit me-1"></i>แก้ไขข้อมูล
+                </button>
+                <button type="button" class="btn btn-success w-100 w-sm-auto order-1 order-sm-2 py-2"
+                    id="confirmSubmitBtn">
+                    <i class="bx bx-check-circle me-1"></i>ยืนยันและสมัครเรียน
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Mobile-friendly Modal Styles */
+    @media (max-width: 575.98px) {
+        #confirmModal .modal-footer {
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        #confirmModal .modal-footer .btn {
+            font-size: 1rem;
+            padding: 0.75rem;
+        }
+    }
+
+    /* Data List Styles */
+    #confirm-data-list .data-group {
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    #confirm-data-list .data-group-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    #confirm-data-list .data-group-title i {
+        margin-right: 0.5rem;
+        font-size: 1rem;
+    }
+
+    #confirm-data-list .data-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 0.35rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        gap: 0.5rem;
+    }
+
+    #confirm-data-list .data-item:last-child {
+        border-bottom: none;
+    }
+
+    #confirm-data-list .data-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        flex-shrink: 0;
+        max-width: 45%;
+    }
+
+    #confirm-data-list .data-value {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #212529;
+        text-align: right;
+        word-break: break-word;
+    }
+</style>
 
 <?= $this->endSection() ?>

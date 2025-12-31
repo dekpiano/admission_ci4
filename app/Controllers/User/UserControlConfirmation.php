@@ -30,6 +30,15 @@ class UserControlConfirmation extends BaseController
         $data['title'] = 'รายงานตัวออนไลน์';
         $data['quotas'] = $this->admissionModel->getAllQuotas();
         $data['systemStatus'] = $this->admissionModel->getSystemStatus();
+        $data['checkYear'] = $this->admissionModel->getOpenYear();
+
+        // ตรวจสอบว่าระบบรายงานตัวเปิดหรือไม่
+        if (!$data['systemStatus'] || $data['systemStatus']->onoff_report != 'on') {
+            // ระบบปิด - แสดงหน้าแจ้งเตือน
+            $data['title'] = 'ระบบยังไม่เปิดให้รายงานตัว';
+            return view('User/PageUserConfirmation/Closed', $data);
+        }
+
         return view('User/PageUserConfirmation/Login', $data);
     }
 
@@ -38,6 +47,12 @@ class UserControlConfirmation extends BaseController
      */
     public function checkStudent()
     {
+        // ตรวจสอบว่าระบบรายงานตัวเปิดหรือไม่
+        $systemStatus = $this->admissionModel->getSystemStatus();
+        if (!$systemStatus || $systemStatus->onoff_report != 'on') {
+            return redirect()->to('confirmation/login')->with('error', 'ระบบยังไม่เปิดให้รายงานตัว');
+        }
+
         $idCardInput = $this->request->getPost('idenStu');
         $year = $this->admissionModel->getOpenYear()->openyear_year;
 
@@ -46,7 +61,7 @@ class UserControlConfirmation extends BaseController
             if (is_array($idCardInput)) {
                 // Usually the last one is the hidden one (plain)
                 // But let's just take the first one and clean it ourselves to be safe
-                $idCardInput = $idCardInput[0]; 
+                $idCardInput = $idCardInput[0];
             }
 
             $plainId = str_replace('-', '', $idCardInput);
@@ -61,12 +76,12 @@ class UserControlConfirmation extends BaseController
             // Check if student exists in recruit table for the current year
             // Check both plain and formatted ID to be safe
             $recruit = $this->db->table('tb_recruitstudent')
-                                ->groupStart()
-                                    ->where('recruit_idCard', $plainId)
-                                    ->orWhere('recruit_idCard', $formattedId)
-                                ->groupEnd()
-                                ->where('recruit_year', $year)
-                                ->get()->getRow();
+                ->groupStart()
+                ->where('recruit_idCard', $plainId)
+                ->orWhere('recruit_idCard', $formattedId)
+                ->groupEnd()
+                ->where('recruit_year', $year)
+                ->get()->getRow();
 
             if ($recruit) {
                 // You might want to check recruit_status here as well
@@ -89,6 +104,12 @@ class UserControlConfirmation extends BaseController
      */
     public function form()
     {
+        // ตรวจสอบว่าระบบรายงานตัวเปิดหรือไม่
+        $systemStatus = $this->admissionModel->getSystemStatus();
+        if (!$systemStatus || $systemStatus->onoff_report != 'on') {
+            return redirect()->to('confirmation/login')->with('error', 'ระบบยังไม่เปิดให้รายงานตัว');
+        }
+
         if (!$this->session->has('confirmation_student_id')) {
             return redirect()->to('confirmation/login');
         }
@@ -98,9 +119,9 @@ class UserControlConfirmation extends BaseController
 
         // Fetch Recruit Data
         $recruit = $this->db->table('tb_recruitstudent')
-                            ->where('recruit_idCard', $studentId)
-                            ->where('recruit_year', $year)
-                            ->get()->getResult(); // View expects array of objects for $stu[0]
+            ->where('recruit_idCard', $studentId)
+            ->where('recruit_year', $year)
+            ->get()->getResult(); // View expects array of objects for $stu[0]
 
         if (empty($recruit)) {
             return redirect()->to('confirmation/login')->with('error', 'ไม่พบข้อมูล');
@@ -108,9 +129,9 @@ class UserControlConfirmation extends BaseController
 
         // Fetch Personnel Data (tb_students)
         $studentPers = $this->db->table('skjacth_personnel.tb_students')
-                                ->where('stu_iden', $studentId)
-                                ->get()->getResult();
-        
+            ->where('stu_iden', $studentId)
+            ->get()->getResult();
+
         $isStudentSaved = !empty($studentPers);
 
         // Pre-fill from Recruit Data if Personnel Data is empty
@@ -178,21 +199,27 @@ class UserControlConfirmation extends BaseController
 
         // Fetch Parent Data
         $parents = $this->db->table('skjacth_personnel.tb_parent')
-                            ->where('par_stuID', $studentId)
-                            ->get()->getResult();
+            ->where('par_stuID', $studentId)
+            ->get()->getResult();
 
         $data['title'] = 'กรอกข้อมูลรายงานตัว';
         $data['stu'] = $recruit; // Maps to $stu in view
-        
+
         // Prepare data for forms (using array_values to reindex)
         $data['stuConf'] = $studentPers;
-        $data['FatherConf'] = array_values(array_filter($parents, function($p) { return $p->par_relationKey == 'พ่อ'; }));
-        $data['MotherConf'] = array_values(array_filter($parents, function($p) { return $p->par_relationKey == 'แม่'; }));
-        $data['OtherConf'] = array_values(array_filter($parents, function($p) { return $p->par_relationKey == 'ผู้ปกครอง'; }));
+        $data['FatherConf'] = array_values(array_filter($parents, function ($p) {
+            return $p->par_relationKey == 'พ่อ';
+        }));
+        $data['MotherConf'] = array_values(array_filter($parents, function ($p) {
+            return $p->par_relationKey == 'แม่';
+        }));
+        $data['OtherConf'] = array_values(array_filter($parents, function ($p) {
+            return $p->par_relationKey == 'ผู้ปกครอง';
+        }));
 
         $data['checkYear'] = [$this->admissionModel->getOpenYear()];
         $data['datethai'] = $this->datethai;
-        
+
         // Flags for print button
         $data['Ckeckstu'] = !empty($studentPers) ? 1 : 0;
         $data['OtherCkeck'] = !empty($parents) ? 1 : 0; // Simplified check
@@ -246,7 +273,7 @@ class UserControlConfirmation extends BaseController
         $data['stu_phone'] = str_replace('-', '', $data['stu_phone']);
         $data['stu_phoneUrgent'] = str_replace('-', '', $data['stu_phoneUrgent']);
         $data['stu_phoneFriend'] = str_replace('-', '', $data['stu_phoneFriend']);
-        
+
         // Construct birthdate for validation
         $birthDate = ($data['stu_year'] - 543) . '-' . sprintf('%02d', $data['stu_month']) . '-' . sprintf('%02d', $data['stu_day']);
         $data['stu_birthDay'] = $birthDate;
@@ -309,7 +336,7 @@ class UserControlConfirmation extends BaseController
             'stu_hTambon' => $saveData['stu_hTambon'],
             'stu_hDistrict' => $saveData['stu_hDistrict'],
             'stu_hProvince' => $saveData['stu_hProvince'],
-            'stu_hPostCode' => $saveData['stu_hPostCode'], 
+            'stu_hPostCode' => $saveData['stu_hPostCode'],
             'stu_cNumber' => $saveData['stu_cNumber'],
             'stu_cMoo' => $saveData['stu_cMoo'],
             'stu_cRoad' => $saveData['stu_cRoad'],
@@ -350,8 +377,10 @@ class UserControlConfirmation extends BaseController
 
         // Map fields based on relation key
         $suffix = '';
-        if ($relationKey == 'แม่') $suffix = 'M';
-        if ($relationKey == 'ผู้ปกครอง') $suffix = 'O';
+        if ($relationKey == 'แม่')
+            $suffix = 'M';
+        if ($relationKey == 'ผู้ปกครอง')
+            $suffix = 'O';
 
         // Clean data for validation
         $data['par_IdNumber' . $suffix] = str_replace('-', '', $data['par_IdNumber' . $suffix] ?? '');
@@ -418,14 +447,14 @@ class UserControlConfirmation extends BaseController
         try {
             // Check if parent record exists for this student and relation
             $existing = $this->db->table('skjacth_personnel.tb_parent')
-                                 ->where('par_stuID', $studentId)
-                                 ->where('par_relationKey', $relationKey)
-                                 ->get()->getRow();
+                ->where('par_stuID', $studentId)
+                ->where('par_relationKey', $relationKey)
+                ->get()->getRow();
 
             if ($existing) {
                 $this->db->table('skjacth_personnel.tb_parent')
-                         ->where('par_id', $existing->par_id)
-                         ->update($parentData);
+                    ->where('par_id', $existing->par_id)
+                    ->update($parentData);
             } else {
                 $this->db->table('skjacth_personnel.tb_parent')->insert($parentData);
             }
@@ -436,7 +465,8 @@ class UserControlConfirmation extends BaseController
         }
     }
 
-    private function extractServiceName($input) {
+    private function extractServiceName($input)
+    {
         if (is_array($input)) {
             foreach ($input as $val) {
                 if (!empty(trim($val))) {
@@ -464,7 +494,7 @@ class UserControlConfirmation extends BaseController
         }
 
         $studentId = $this->session->get('confirmation_student_id');
-        
+
         // Load mPDF using SHARED_LIB_PATH
         require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
 
@@ -473,13 +503,13 @@ class UserControlConfirmation extends BaseController
         $Year = $checkYear->openyear_year;
 
         $recruit = $this->db->table('tb_recruitstudent')
-                            ->where('recruit_idCard', $studentId)
-                            ->where('recruit_year', $Year)
-                            ->get()->getResult();
+            ->where('recruit_idCard', $studentId)
+            ->where('recruit_year', $Year)
+            ->get()->getResult();
 
         $confrim = $this->db->table('skjacth_personnel.tb_students')
-                            ->where('stu_iden', $studentId)
-                            ->get()->getResult();
+            ->where('stu_iden', $studentId)
+            ->get()->getResult();
 
         if (empty($recruit) || empty($confrim)) {
             return "Data not found";
@@ -488,13 +518,13 @@ class UserControlConfirmation extends BaseController
         $idstu = str_replace('-', '', $confrim[0]->stu_iden); // Split 13 digits
 
         $TH_Month = array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฏาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
-        
+
         $date_Y = date('Y') + 543;
-        $date_D = (int)date('d');
+        $date_D = (int) date('d');
         $date_M = date('n');
 
         $date_Y_birt = date('Y', strtotime($confrim[0]->stu_birthDay)) + 543;
-        $date_D_birt = (int)date('d', strtotime($confrim[0]->stu_birthDay));
+        $date_D_birt = (int) date('d', strtotime($confrim[0]->stu_birthDay));
         $date_M_birt = date('n', strtotime($confrim[0]->stu_birthDay));
 
         $mpdf = new \Mpdf\Mpdf([
@@ -525,9 +555,9 @@ class UserControlConfirmation extends BaseController
         $html .= '<div style="position:absolute;top:463px;left:550px; width:100%">' . $date_Y . '</div>';
 
         $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . base_url('image-proxy?file=recruitstudent/m' . $recruit[0]->recruit_regLevel . '/img/' . $recruit[0]->recruit_img) . '"></div>';
-        
+
         $regLevel = $confrim[0]->stu_regLevel ?? $recruit[0]->recruit_regLevel;
-        
+
         $html .= '<div style="position:absolute;top:105px;left:230px; width:100%">' . $regLevel . '</div>';
         $html .= '<div style="position:absolute;top:105px;left:470px; width:100%">' . $Year . '</div>';
         $html .= '<div style="position:absolute;top:130px;left:140px; width:100%">' . $confrim[0]->stu_prefix . $confrim[0]->stu_fristName . '</div>';
@@ -564,18 +594,27 @@ class UserControlConfirmation extends BaseController
         $html .= '<div style="position:absolute;top:710px;left:640px; width:100%">' . $confrim[0]->stu_talent . '</div>';
 
         $checkMark = '<div style="position:absolute;top:%dpx;left:%dpx; width:100%%"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>';
-        
-        if ($confrim[0]->stu_parenalStatus == 'อยู่ด้วยกัน') $html .= sprintf($checkMark, 740, 178);
-        else if ($confrim[0]->stu_parenalStatus == 'แยกกันอยู่') $html .= sprintf($checkMark, 740, 270);
-        else if ($confrim[0]->stu_parenalStatus == 'หย่าร้าง') $html .= sprintf($checkMark, 740, 365);
-        else if ($confrim[0]->stu_parenalStatus == 'บิดาถึงแก่กรรม') $html .= sprintf($checkMark, 740, 448);
-        else if ($confrim[0]->stu_parenalStatus == 'มารดาถึงแก่กรรม') $html .= sprintf($checkMark, 740, 565);
-        else if ($confrim[0]->stu_parenalStatus == 'บิดาหรือมารดาแต่งงานใหม่') $html .= sprintf($checkMark, 765, 178);
 
-        if ($confrim[0]->stu_presentLife == 'อยู่กับบิดาและมารดา') $html .= sprintf($checkMark, 790, 225);
-        else if ($confrim[0]->stu_presentLife == 'อยู่กับบิดาหรือมารดา') $html .= sprintf($checkMark, 790, 360);
-        else if ($confrim[0]->stu_presentLife == 'บุคคลอื่น') $html .= sprintf($checkMark, 790, 510);
-        
+        if ($confrim[0]->stu_parenalStatus == 'อยู่ด้วยกัน')
+            $html .= sprintf($checkMark, 740, 178);
+        else if ($confrim[0]->stu_parenalStatus == 'แยกกันอยู่')
+            $html .= sprintf($checkMark, 740, 270);
+        else if ($confrim[0]->stu_parenalStatus == 'หย่าร้าง')
+            $html .= sprintf($checkMark, 740, 365);
+        else if ($confrim[0]->stu_parenalStatus == 'บิดาถึงแก่กรรม')
+            $html .= sprintf($checkMark, 740, 448);
+        else if ($confrim[0]->stu_parenalStatus == 'มารดาถึงแก่กรรม')
+            $html .= sprintf($checkMark, 740, 565);
+        else if ($confrim[0]->stu_parenalStatus == 'บิดาหรือมารดาแต่งงานใหม่')
+            $html .= sprintf($checkMark, 765, 178);
+
+        if ($confrim[0]->stu_presentLife == 'อยู่กับบิดาและมารดา')
+            $html .= sprintf($checkMark, 790, 225);
+        else if ($confrim[0]->stu_presentLife == 'อยู่กับบิดาหรือมารดา')
+            $html .= sprintf($checkMark, 790, 360);
+        else if ($confrim[0]->stu_presentLife == 'บุคคลอื่น')
+            $html .= sprintf($checkMark, 790, 510);
+
         $html .= '<div style="position:absolute;top:787px;left:620px; width:100%">' . $confrim[0]->stu_personOther . '</div>';
 
         $html .= '<div style="position:absolute;top:814px;left:310px; width:100%">' . $confrim[0]->stu_hCode . '</div>';
@@ -598,12 +637,18 @@ class UserControlConfirmation extends BaseController
         $html .= '<div style="position:absolute;top:905px;left:490px; width:100%">' . $confrim[0]->stu_cPostcode . '</div>';
         $html .= '<div style="position:absolute;top:905px;left:640px; width:100%">' . $confrim[0]->stu_phone . '</div>';
 
-        if ($confrim[0]->stu_natureRoom == 'บ้านตนเอง') $html .= sprintf($checkMark, 935, 130);
-        else if ($confrim[0]->stu_natureRoom == 'เช่าอยู่') $html .= sprintf($checkMark, 935, 227);
-        else if ($confrim[0]->stu_natureRoom == 'อาศัยผู้อื่นอยู่') $html .= sprintf($checkMark, 935, 300);
-        else if ($confrim[0]->stu_natureRoom == 'บ้านพักราชการ') $html .= sprintf($checkMark, 935, 405);
-        else if ($confrim[0]->stu_natureRoom == 'วัด') $html .= sprintf($checkMark, 935, 525);
-        else if ($confrim[0]->stu_natureRoom == 'หอพัก') $html .= sprintf($checkMark, 935, 570);
+        if ($confrim[0]->stu_natureRoom == 'บ้านตนเอง')
+            $html .= sprintf($checkMark, 935, 130);
+        else if ($confrim[0]->stu_natureRoom == 'เช่าอยู่')
+            $html .= sprintf($checkMark, 935, 227);
+        else if ($confrim[0]->stu_natureRoom == 'อาศัยผู้อื่นอยู่')
+            $html .= sprintf($checkMark, 935, 300);
+        else if ($confrim[0]->stu_natureRoom == 'บ้านพักราชการ')
+            $html .= sprintf($checkMark, 935, 405);
+        else if ($confrim[0]->stu_natureRoom == 'วัด')
+            $html .= sprintf($checkMark, 935, 525);
+        else if ($confrim[0]->stu_natureRoom == 'หอพัก')
+            $html .= sprintf($checkMark, 935, 570);
 
         $html .= '<div style="position:absolute;top:950px;left:250px; width:100%">' . $confrim[0]->stu_farSchool . '</div>';
         $html .= '<div style="position:absolute;top:950px;left:470px; width:100%">' . $confrim[0]->stu_travel . '</div>';
@@ -614,9 +659,11 @@ class UserControlConfirmation extends BaseController
         $html .= '<div style="position:absolute;top:999px;left:450px; width:100%">' . $confrim[0]->stu_schoolDistrict . '</div>';
         $html .= '<div style="position:absolute;top:999px;left:630px; width:100%">' . $confrim[0]->stu_schoolProvince . '</div>';
 
-        if ($confrim[0]->stu_usedStudent == 'ไม่เคย') $html .= sprintf($checkMark, 1030, 487);
-        else if ($confrim[0]->stu_usedStudent == 'เคย') $html .= sprintf($checkMark, 1030, 560);
-        
+        if ($confrim[0]->stu_usedStudent == 'ไม่เคย')
+            $html .= sprintf($checkMark, 1030, 487);
+        else if ($confrim[0]->stu_usedStudent == 'เคย')
+            $html .= sprintf($checkMark, 1030, 560);
+
         $html .= '<div style="position:absolute;top:1026px;left:690px; width:100%">' . $confrim[0]->stu_inputLevel . '</div>';
 
         $html .= '<div style="position:absolute;top:1055px;left:200px; width:100%">' . $confrim[0]->stu_phoneUrgent . '</div>';
@@ -632,7 +679,7 @@ class UserControlConfirmation extends BaseController
         $mpdf->WriteHTML($html);
 
         $mpdf->AddPage();
-        
+
         // Father Data
         $confrimFa = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "พ่อ")->get()->getResult();
         $father = $confrimFa[0] ?? null;
@@ -666,11 +713,16 @@ class UserControlConfirmation extends BaseController
         $html2 .= '<div style="position:absolute;top:605px;left:245px; width:100%">' . ($father->par_cProvince ?? '') . '</div>';
         $html2 .= '<div style="position:absolute;top:628px;left:280px; width:100%">' . ($father->par_cPostcode ?? '') . '</div>';
 
-        if (($father->par_rest ?? '') == 'บ้านตนเอง') $html2 .= sprintf($checkMark, 655, 200);
-        else if (($father->par_rest ?? '') == 'เช่าบ้าน') $html2 .= sprintf($checkMark, 680, 200);
-        else if (($father->par_rest ?? '') == 'อาศัยผู้อื่น') $html2 .= sprintf($checkMark, 705, 200);
-        else if (($father->par_rest ?? '') == 'บ้านพักสวัสดิการ') $html2 .= sprintf($checkMark, 730, 200);
-        else if (($father->par_rest ?? '') == 'อื่นๆ') $html2 .= sprintf($checkMark, 755, 200);
+        if (($father->par_rest ?? '') == 'บ้านตนเอง')
+            $html2 .= sprintf($checkMark, 655, 200);
+        else if (($father->par_rest ?? '') == 'เช่าบ้าน')
+            $html2 .= sprintf($checkMark, 680, 200);
+        else if (($father->par_rest ?? '') == 'อาศัยผู้อื่น')
+            $html2 .= sprintf($checkMark, 705, 200);
+        else if (($father->par_rest ?? '') == 'บ้านพักสวัสดิการ')
+            $html2 .= sprintf($checkMark, 730, 200);
+        else if (($father->par_rest ?? '') == 'อื่นๆ')
+            $html2 .= sprintf($checkMark, 755, 200);
 
         $html2 .= '<div style="position:absolute;top:750px;left:280px; width:100%">' . ($father->par_restOrthor ?? '') . '</div>';
 
@@ -688,8 +740,10 @@ class UserControlConfirmation extends BaseController
             $html2 .= '<div style="position:absolute;top:845px;left:285px; width:100%">' . ($father->par_serviceName ?? '') . '</div>';
         }
 
-        if (($father->par_claim ?? '') == 'เบิกได้') $html2 .= sprintf($checkMark, 875, 200);
-        else if (($father->par_claim ?? '') == 'เบิกไม่ได้') $html2 .= sprintf($checkMark, 875, 270);
+        if (($father->par_claim ?? '') == 'เบิกได้')
+            $html2 .= sprintf($checkMark, 875, 200);
+        else if (($father->par_claim ?? '') == 'เบิกไม่ได้')
+            $html2 .= sprintf($checkMark, 875, 270);
 
         // Mother Data
         $confrimMa = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "แม่")->get()->getResult();
@@ -723,11 +777,16 @@ class UserControlConfirmation extends BaseController
         $html2 .= '<div style="position:absolute;top:605px;left:450px; width:100%">' . ($mother->par_cProvince ?? '') . '</div>';
         $html2 .= '<div style="position:absolute;top:628px;left:480px; width:100%">' . ($mother->par_cPostcode ?? '') . '</div>';
 
-        if (($mother->par_rest ?? '') == 'บ้านตนเอง') $html2 .= sprintf($checkMark, 655, 400);
-        else if (($mother->par_rest ?? '') == 'เช่าบ้าน') $html2 .= sprintf($checkMark, 680, 400);
-        else if (($mother->par_rest ?? '') == 'อาศัยผู้อื่น') $html2 .= sprintf($checkMark, 705, 400);
-        else if (($mother->par_rest ?? '') == 'บ้านพักสวัสดิการ') $html2 .= sprintf($checkMark, 730, 400);
-        else if (($mother->par_rest ?? '') == 'อื่นๆ') $html2 .= sprintf($checkMark, 755, 400);
+        if (($mother->par_rest ?? '') == 'บ้านตนเอง')
+            $html2 .= sprintf($checkMark, 655, 400);
+        else if (($mother->par_rest ?? '') == 'เช่าบ้าน')
+            $html2 .= sprintf($checkMark, 680, 400);
+        else if (($mother->par_rest ?? '') == 'อาศัยผู้อื่น')
+            $html2 .= sprintf($checkMark, 705, 400);
+        else if (($mother->par_rest ?? '') == 'บ้านพักสวัสดิการ')
+            $html2 .= sprintf($checkMark, 730, 400);
+        else if (($mother->par_rest ?? '') == 'อื่นๆ')
+            $html2 .= sprintf($checkMark, 755, 400);
 
         $html2 .= '<div style="position:absolute;top:750px;left:480px; width:100%">' . ($mother->par_restOrthor ?? '') . '</div>';
 
@@ -745,8 +804,10 @@ class UserControlConfirmation extends BaseController
             $html2 .= '<div style="position:absolute;top:845px;left:485px; width:100%">' . ($mother->par_serviceName ?? '') . '</div>';
         }
 
-        if (($mother->par_claim ?? '') == 'เบิกได้') $html2 .= sprintf($checkMark, 875, 400);
-        else if (($mother->par_claim ?? '') == 'เบิกไม่ได้') $html2 .= sprintf($checkMark, 875, 470);
+        if (($mother->par_claim ?? '') == 'เบิกได้')
+            $html2 .= sprintf($checkMark, 875, 400);
+        else if (($mother->par_claim ?? '') == 'เบิกไม่ได้')
+            $html2 .= sprintf($checkMark, 875, 470);
 
         // Guardian Data
         $confrimPu = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "ผู้ปกครอง")->get()->getResult();
@@ -781,11 +842,16 @@ class UserControlConfirmation extends BaseController
         $html2 .= '<div style="position:absolute;top:602px;left:650px; width:100%">' . ($guardian->par_cProvince ?? '') . '</div>';
         $html2 .= '<div style="position:absolute;top:625px;left:680px; width:100%">' . ($guardian->par_cPostcode ?? '') . '</div>';
 
-        if (($guardian->par_rest ?? '') == 'บ้านตนเอง') $html2 .= sprintf($checkMark, 655, 600);
-        else if (($guardian->par_rest ?? '') == 'เช่าบ้าน') $html2 .= sprintf($checkMark, 680, 600);
-        else if (($guardian->par_rest ?? '') == 'อาศัยผู้อื่น') $html2 .= sprintf($checkMark, 705, 600);
-        else if (($guardian->par_rest ?? '') == 'บ้านพักสวัสดิการ') $html2 .= sprintf($checkMark, 730, 600);
-        else if (($guardian->par_rest ?? '') == 'อื่นๆ') $html2 .= sprintf($checkMark, 755, 600);
+        if (($guardian->par_rest ?? '') == 'บ้านตนเอง')
+            $html2 .= sprintf($checkMark, 655, 600);
+        else if (($guardian->par_rest ?? '') == 'เช่าบ้าน')
+            $html2 .= sprintf($checkMark, 680, 600);
+        else if (($guardian->par_rest ?? '') == 'อาศัยผู้อื่น')
+            $html2 .= sprintf($checkMark, 705, 600);
+        else if (($guardian->par_rest ?? '') == 'บ้านพักสวัสดิการ')
+            $html2 .= sprintf($checkMark, 730, 600);
+        else if (($guardian->par_rest ?? '') == 'อื่นๆ')
+            $html2 .= sprintf($checkMark, 755, 600);
 
         $html2 .= '<div style="position:absolute;top:747px;left:680px; width:100%">' . ($guardian->par_restOrthor ?? '') . '</div>';
 
