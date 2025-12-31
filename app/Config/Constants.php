@@ -26,22 +26,6 @@ defined('APP_NAMESPACE') || define('APP_NAMESPACE', 'App');
 defined('COMPOSER_PATH') || define('COMPOSER_PATH', ROOTPATH . 'vendor/autoload.php');
 
 /*
- | --------------------------------------------------------------------------
- | Shared Library Path
- | --------------------------------------------------------------------------
- |
- | ตรวจสอบ OS ว่าเป็น Windows หรือไม่ (Windows ใช้ \ เป็นตัวคั่น path, Linux ใช้ /)
- | เพื่อกำหนด path ของ shared library ที่ถูกต้อง
- */
-if (DIRECTORY_SEPARATOR === '\\') {
-    // โค้ดกำลังรันบนเครื่องคอมพิวเตอร์ของคุณ (Windows / Local XAMPP)
-    defined('SHARED_LIB_PATH') || define('SHARED_LIB_PATH', 'D:\xampp\librarie_skj');
-} else {
-    // โค้ดกำลังรันบน Linux (Docker หรือ Production Server)
-    defined('SHARED_LIB_PATH') || define('SHARED_LIB_PATH', '/home/skjacth/domains/skj.ac.th/public_html/librarie_skj');
-}
-
-/*
  |--------------------------------------------------------------------------
  | Timing Constants
  |--------------------------------------------------------------------------
@@ -108,3 +92,12 @@ define('EVENT_PRIORITY_NORMAL', 100);
  * @deprecated Use \CodeIgniter\Events\Events::PRIORITY_HIGH instead.
  */
 define('EVENT_PRIORITY_HIGH', 10);
+
+// ตรวจสอบ OS ว่าเป็น Windows หรือไม่ (Windows ใช้ \ เป็นตัวคั่น path, Linux ใช้ /)
+if (DIRECTORY_SEPARATOR === '\\') {
+    // โค้ดกำลังรันบนเครื่องคอมพิวเตอร์ของคุณ (Windows / Local XAMPP)
+    defined('SHARED_LIB_PATH') OR define('SHARED_LIB_PATH', 'D:\xampp\librarie_skj');
+} else {
+    // โค้ดกำลังรันบน Linux (Docker หรือ Production Server)
+    defined('SHARED_LIB_PATH') OR define('SHARED_LIB_PATH', '/home/skjacth/domains/skj.ac.th/public_html/librarie_skj');
+}

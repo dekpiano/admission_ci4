@@ -203,9 +203,6 @@ class UserControlConfirmation extends BaseController
         $data['OtherCkeck'] = !empty($data['OtherConf']) ? 1 : 0;
         $data['isStudentSaved'] = $isStudentSaved ? 1 : 0;
 
-        // Add system status for sidebar
-        $data['systemStatus'] = $this->admissionModel->getSystemStatus();
-
         return view('User/PageUserConfirmation/Dashboard', $data);
     }
 

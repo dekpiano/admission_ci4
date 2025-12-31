@@ -5,11 +5,12 @@ services:
       dockerfile: Dockerfile
     container_name: admission2025_app
     ports:
-      - "8083:443"  # HTTPS port for admission2025
+      - "8083:443" # HTTPS port for admission2025
     volumes:
-      - .:/var/www/html:cached
+      - .:/var/www/html:delegated
       - /var/www/html/vendor
-      - D:/librarie_skj:/home/skjacth/domains/skj.ac.th/public_html/librarie_skj:cached
+      - /var/www/html/writable
+      - D:/xampp/librarie_skj:/home/skjacth/domains/skj.ac.th/public_html/librarie_skj:delegated
     environment:
       # Database connection settings for CodeIgniter
       DB_HOST: skj2025_db

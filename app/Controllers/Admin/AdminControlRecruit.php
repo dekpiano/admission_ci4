@@ -516,15 +516,16 @@ class AdminControlRecruit extends BaseController
             $html .= '</div>';
         }
 
-        // Documents Checkmarks
+        // Documents Checkmarks (using dejavusans font which is built-in to mPDF)
+        $checkEmoji = '<span style="font-family: dejavusans; font-size: 30px; line-height: 1;">✔</span>';
         if (!empty($recruit['recruit_certificateEdu'])) {
-            $html .= '<div style="position:absolute;top:795px;left:110px; width:100%"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>';
+            $html .= '<div style="position:absolute;top:785px;left:110px; width:100%;">'.$checkEmoji.'</div>';
         }
         if (!empty($recruit['recruit_copyidCard'])) {
-            $html .= '<div style="position:absolute;top:795px;left:330x; width:100%"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>';
+            $html .= '<div style="position:absolute;top:785px;left:328px; width:100%;">'.$checkEmoji.'</div>';
         }
         if (!empty($recruit['recruit_img'])) {
-            $html .= '<div style="position:absolute;top:795px;left:560px; width:100%"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>';
+            $html .= '<div style="position:absolute;top:788px;left:560px; width:100%;">'.$checkEmoji.'</div>';
         }
 
         $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ.pdf', true);

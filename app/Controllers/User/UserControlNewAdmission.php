@@ -34,9 +34,9 @@ class UserControlNewAdmission extends BaseController
         $data['quotas'] = $this->admissionModel->getAllQuotas();
         $data['courses'] = $this->admissionModel->getAllCourses();
         $data['datethai'] = $this->datethai; // Pass Datethai library to view
-       
+
         $data['schedules'] = $this->admissionModel->getAdmissionSchedule($data['checkYear']->openyear_year);
-        
+
         return view('User/UserHome', $data);
     }
 
@@ -65,7 +65,7 @@ class UserControlNewAdmission extends BaseController
         $data['checkYear'] = $this->admissionModel->getOpenYear();
         $data['quotas'] = $this->admissionModel->getAllQuotas(); // Add quotas for menu generation
         $data['systemStatus'] = $systemStatus; // Pass system status
-        
+
         return view('User/UserPreCheck', $data);
     }
 
@@ -101,10 +101,10 @@ class UserControlNewAdmission extends BaseController
 
         // Check if ID Card is passed from pre-check
         $preCheckIdCard = $this->session->getFlashdata('pre_check_idCard');
-        
+
         // If no ID Card in session (direct access), redirect to pre-check
         if (!$preCheckIdCard) {
-             return redirect()->to('new-admission/pre-check/' . $level);
+            return redirect()->to('new-admission/pre-check/' . $level);
         }
 
         $data['title'] = "สมัครเรียน " . ($level == 1 ? "ม.1" : "ม.4");
@@ -117,7 +117,7 @@ class UserControlNewAdmission extends BaseController
         $data['preCheckDistrict'] = $this->session->getFlashdata('pre_check_district');
         $data['preCheckProvince'] = $this->session->getFlashdata('pre_check_province');
         $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
-        
+
         // Get courses based on level
         $gradeLevel = ($level == 1) ? 'ม.ต้น' : 'ม.ปลาย';
         $data['courses'] = $this->admissionModel->getCoursesByGradeLevel($gradeLevel);
@@ -129,7 +129,7 @@ class UserControlNewAdmission extends BaseController
         $this->session->set('captcha_answer', $captchaAnswer);
         $data['captcha_num1'] = $num1;
         $data['captcha_num2'] = $num2;
-        
+
         // Debug logging
         log_message('debug', 'CAPTCHA Generated - Num1: ' . $num1 . ', Num2: ' . $num2 . ', Answer: ' . $captchaAnswer . ', Session ID: ' . session_id());
 
@@ -142,15 +142,15 @@ class UserControlNewAdmission extends BaseController
         $isServiceArea = $this->request->getVar('is_service_area');
 
         if ($isServiceArea === 'true') {
-             $response = $this->admissionModel->getServiceAreaSchools($searchTerm);
+            $response = $this->admissionModel->getServiceAreaSchools($searchTerm);
         } else {
-             // The getSchool method already exists in AdmissionModel
-             $response = $this->admissionModel->getSchool(['search' => $searchTerm]);
+            // The getSchool method already exists in AdmissionModel
+            $response = $this->admissionModel->getSchool(['search' => $searchTerm]);
         }
 
         // Re-format for Select2.js, which expects 'id' and 'text' keys
         $select2_data = [];
-        foreach($response as $item) {
+        foreach ($response as $item) {
             $select2_data[] = [
                 'id' => $item['value'],      // schoola_id
                 'text' => $item['label'],    // schoola_name
@@ -186,7 +186,7 @@ class UserControlNewAdmission extends BaseController
         if ($num1 !== null && $num2 !== null) {
             $captchaAnswer = intval($num1) + intval($num2);
             $this->session->set('captcha_answer', $captchaAnswer);
-            
+
             return $this->response->setJSON(['status' => 'success']);
         }
 
@@ -200,14 +200,14 @@ class UserControlNewAdmission extends BaseController
         }
 
         $post = $this->request->getPost();
-        
+
         // CAPTCHA Validation
         $captchaAnswer = $this->session->get('captcha_answer');
         $userCaptcha = isset($post['captcha_answer']) ? trim($post['captcha_answer']) : '';
-        
+
         // Debug logging (can be removed in production)
         log_message('debug', 'CAPTCHA Check - Session Answer: ' . var_export($captchaAnswer, true) . ', User Answer: ' . var_export($userCaptcha, true) . ', Session ID: ' . session_id());
-        
+
         // Check if CAPTCHA answer exists in session
         if ($captchaAnswer === null || $captchaAnswer === '') {
             return $this->response->setJSON([
@@ -215,7 +215,7 @@ class UserControlNewAdmission extends BaseController
                 'message' => 'เซสชันหมดอายุ กรุณารีเฟรชหน้าและลองใหม่อีกครั้ง'
             ]);
         }
-        
+
         // Check if user provided an answer
         if ($userCaptcha === '' || !is_numeric($userCaptcha)) {
             return $this->response->setJSON([
@@ -223,45 +223,47 @@ class UserControlNewAdmission extends BaseController
                 'message' => 'กรุณากรอกคำตอบรหัสยืนยัน (CAPTCHA)'
             ]);
         }
-        
+
         // Compare answers (cast both to integer)
-        if ((int)$userCaptcha !== (int)$captchaAnswer) {
+        if ((int) $userCaptcha !== (int) $captchaAnswer) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'คำตอบรหัสยืนยันไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง (คำตอบที่กรอก: ' . $userCaptcha . ')'
             ]);
         }
-        
+
         // Clear CAPTCHA session after successful validation
         $this->session->remove('captcha_answer');
-        
+
         // Basic Validation
-        if (!$this->validate([
-            'recruit_idCard' => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'กรุณากรอกเลขบัตรประชาชน',
+        if (
+            !$this->validate([
+                'recruit_idCard' => [
+                    'rules' => 'required',
+                    'errors' => [
+                        'required' => 'กรุณากรอกเลขบัตรประชาชน',
+                    ]
+                ],
+                'recruit_firstName' => [
+                    'rules' => 'required',
+                    'errors' => [
+                        'required' => 'กรุณากรอกชื่อ',
+                    ]
+                ],
+                'recruit_lastName' => [
+                    'rules' => 'required',
+                    'errors' => [
+                        'required' => 'กรุณากรอกนามสกุล',
+                    ]
+                ],
+                'recruit_category' => [
+                    'rules' => 'required',
+                    'errors' => [
+                        'required' => 'กรุณาเลือกประเภทโควตา',
+                    ]
                 ]
-            ],
-            'recruit_firstName' => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'กรุณากรอกชื่อ',
-                ]
-            ],
-            'recruit_lastName' => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'กรุณากรอกนามสกุล',
-                ]
-            ],
-            'recruit_category' => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'กรุณาเลือกประเภทโควตา',
-                ]
-            ]
-        ])) {
+            ])
+        ) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน',
@@ -305,7 +307,7 @@ class UserControlNewAdmission extends BaseController
 
         // Prepare Data
         $data_insert = [
-            'recruit_id'  => $recruit_id,
+            'recruit_id' => $recruit_id,
             'recruit_year' => $year,
             'recruit_regLevel' => $post['recruit_regLevel'],
             'recruit_prefix' => $post['recruit_prefix'],
@@ -331,11 +333,12 @@ class UserControlNewAdmission extends BaseController
             'recruit_category' => $post['recruit_category'],
             'recruit_tpyeRoom' => $course_fullname,
             'recruit_tpyeRoom_id' => $post['recruit_tpyeRoom1'],
-            'recruit_major' => $course_branch, 
+            'recruit_major' => $course_branch,
             'recruit_majorOrder' => $majorOrder,
             'recruit_agegroup' => isset($post['recruit_agegroup']) ? $post['recruit_agegroup'] : 0,
+            'recruit_address' => "เลขที่ " . $post['recruit_homeNumber'] . " หมู่ที่ " . (!empty($post['recruit_homeGroup']) ? $post['recruit_homeGroup'] : '-') . " ถนน " . (!empty($post['recruit_homeRoad']) ? $post['recruit_homeRoad'] : '-') . " ตำบล" . $post['recruit_homeSubdistrict'] . " อำเภอ" . $post['recruit_homedistrict'] . " จังหวัด" . $post['recruit_homeProvince'] . " " . $post['recruit_homePostcode'],
             'recruit_status' => "รอการตรวจสอบ",
-            'recruit_date'    => date('Y-m-d H:i:s'),
+            'recruit_date' => date('Y-m-d H:i:s'),
             'recruit_dateUpdate' => date('Y-m-d H:i:s'),
             'recruit_statusSurrender' => '',
             'recruit_StatusQuiz' => 'รอเข้าสอบ'
@@ -346,9 +349,43 @@ class UserControlNewAdmission extends BaseController
         $folder_map = [
             'recruit_img' => 'img',
             'recruit_certificateEdu' => 'certificate',
-            'recruit_certificateEduB' => 'certificate',
+            'recruit_certificateEduB' => 'certificateB', // Fixed to match admin delete logic
             'recruit_copyidCard' => 'copyidCard'
         ];
+
+        // Server-side validation for mandatory files
+        $core_files = [
+            'recruit_certificateEdu' => 'ปพ.1 (หน้า)',
+            'recruit_certificateEduB' => 'ปพ.1 (หลัง)',
+            'recruit_copyidCard' => 'สำเนาบัตรประชาชน'
+        ];
+        foreach ($core_files as $cf => $label) {
+            $f = $this->request->getFile($cf);
+            if (!$f || !$f->isValid()) {
+                $reason = 'ไม่พบไฟล์หรือไฟล์ไม่ถูกต้อง';
+                if ($f) {
+                    $error = $f->getError();
+                    if ($error == UPLOAD_ERR_INI_SIZE || $error == UPLOAD_ERR_FORM_SIZE) {
+                        $reason = 'ไฟล์มีขนาดใหญ่เกินไป';
+                    } elseif ($error == UPLOAD_ERR_NO_FILE) {
+                        $reason = 'ยังไม่ได้เลือกไฟล์';
+                    } else {
+                        $reason = 'ข้อผิดพลาด: ' . $f->getErrorString();
+                    }
+                }
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => "❌ ข้อมูลไม่ครบถ้วน: กรุณาอัปโหลดไฟล์ **{$label}** ({$reason})"
+                ]);
+            }
+        }
+
+        if (empty($post['recruit_img_cropped'])) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => '❌ ข้อมูลไม่ครบถ้วน: กรุณาอัปโหลดรูปถ่ายนักเรียน'
+            ]);
+        }
 
         $uploadedFiles = []; // Keep track to rollback if needed
 
@@ -356,59 +393,61 @@ class UserControlNewAdmission extends BaseController
             $file = $this->request->getFile($field);
             // Check if file is uploaded or if there's a base64 string for image
             if ($field === 'recruit_img' && !empty($post['recruit_img_cropped'])) {
-                 // Handle Base64 Image
-                 $base64Image = $post['recruit_img_cropped'];
-                 $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64Image));
-                 $fileName = $year . '-' . $post['recruit_idCard'] . '-' . uniqid() . '.png';
-                 
-                 $tempFile = tempnam(sys_get_temp_dir(), 'img');
-                 file_put_contents($tempFile, $imageData);
+                // Handle Base64 Image
+                $base64Image = $post['recruit_img_cropped'];
+                $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64Image));
+                $fileName = $year . '-' . $post['recruit_idCard'] . '-' . uniqid() . '.png';
 
-                 $remoteUpload = new RemoteUpload();
-                 $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/img';
-                 
-                 $result = $remoteUpload->upload($tempFile, $subPath, $fileName);
-                 @unlink($tempFile);
+                $tempFile = tempnam(sys_get_temp_dir(), 'img');
+                file_put_contents($tempFile, $imageData);
 
-                 if ($result && $result['status'] === 'success') {
-                     $data_insert[$field] = $result['filename'];
-                     $uploadedFiles[] = ['path' => $subPath, 'file' => $result['filename']];
-                 } else {
-                     return $this->response->setJSON([
-                         'status' => 'error', 
-                         'message' => 'เกิดข้อผิดพลาดในการอัปโหลดรูปถ่าย: ' . ($result['message'] ?? 'ไม่ทราบสาเหตุ')
-                     ]);
-                 }
-
-            } elseif ($file && $file->isValid() && !$file->hasMoved()) {
-                $folder = $folder_map[$field];
-                $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder;
-                
                 $remoteUpload = new RemoteUpload();
-                $result = $remoteUpload->upload($file, $subPath);
-                
+                $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/img';
+
+                $result = $remoteUpload->upload($tempFile, $subPath, $fileName);
+                @unlink($tempFile);
+
                 if ($result && $result['status'] === 'success') {
                     $data_insert[$field] = $result['filename'];
                     $uploadedFiles[] = ['path' => $subPath, 'file' => $result['filename']];
                 } else {
-                     // Rollback previous uploads? For now just return error
-                     return $this->response->setJSON([
-                         'status' => 'error', 
-                         'message' => 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์ ' . $field . ': ' . ($result['message'] ?? 'ไม่ทราบสาเหตุ')
-                     ]);
+                    return $this->response->setJSON([
+                        'status' => 'error',
+                        'message' => 'เกิดข้อผิดพลาดในการอัปโหลดรูปถ่าย: ' . ($result['message'] ?? 'ไม่ทราบสาเหตุ')
+                    ]);
+                }
+
+            } elseif ($file && $file->isValid() && !$file->hasMoved()) {
+                $folder = $folder_map[$field];
+                $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder;
+
+                $remoteUpload = new RemoteUpload();
+                $result = $remoteUpload->upload($file, $subPath);
+
+                if ($result && $result['status'] === 'success') {
+                    $data_insert[$field] = $result['filename'];
+                    $uploadedFiles[] = ['path' => $subPath, 'file' => $result['filename']];
+                } else {
+                    // Rollback previous uploads? For now just return error
+                    return $this->response->setJSON([
+                        'status' => 'error',
+                        'message' => 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์ ' . $field . ': ' . ($result['message'] ?? 'ไม่ทราบสาเหตุ')
+                    ]);
                 }
             }
         }
+
+
 
         // Insert
         $this->db->transBegin();
         try {
             $this->admissionModel->insert($data_insert);
-            
+
             if ($this->db->transStatus() === FALSE) {
                 throw new \Exception('Database Insert Failed');
             }
-            
+
             $this->db->transCommit();
             return $this->response->setJSON([
                 'status' => 'success',
@@ -418,10 +457,16 @@ class UserControlNewAdmission extends BaseController
 
         } catch (\Exception $e) {
             $this->db->transRollback();
-            // Ideally delete uploaded files here if transaction failed
+
+            // Delete uploaded files from remote server since DB failed
+            $remoteUpload = new RemoteUpload();
+            foreach ($uploadedFiles as $uf) {
+                $remoteUpload->delete($uf['file'], $uf['path']);
+            }
+
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง'
+                'message' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage() . ' (ข้อมูลยังไม่ถูกส่ง กรุณาลองใหม่อีกครั้ง)'
             ]);
         }
     }
@@ -432,15 +477,15 @@ class UserControlNewAdmission extends BaseController
         $chk_id = $this->admissionModel->getLatestRecruitId();
 
         if (empty($chk_id)) {
-            $year =  $openyear->openyear_year;
+            $year = $openyear->openyear_year;
             return $year . "0001";
         } else {
             if (strpos($chk_id->recruit_id, $openyear->openyear_year) === 0) {
-                 $number = substr($chk_id->recruit_id, strlen($openyear->openyear_year));
-                 $s = sprintf("%04d", $number + 1);
-                 return $openyear->openyear_year . $s;
+                $number = substr($chk_id->recruit_id, strlen($openyear->openyear_year));
+                $s = sprintf("%04d", $number + 1);
+                return $openyear->openyear_year . $s;
             } else {
-                 return $openyear->openyear_year . "0001";
+                return $openyear->openyear_year . "0001";
             }
         }
     }

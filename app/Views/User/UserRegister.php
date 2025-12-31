@@ -2,7 +2,8 @@
 
 <?= $this->section('styles') ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <style>
     /* Custom Wizard CSS */
     .step-indicator {
@@ -12,6 +13,7 @@
         position: relative;
         padding: 0 20px;
     }
+
     .step-indicator::before {
         content: '';
         position: absolute;
@@ -23,12 +25,14 @@
         z-index: 0;
         margin: 0 40px;
     }
+
     .step {
         position: relative;
         z-index: 1;
         text-align: center;
         width: 20%;
     }
+
     .step-icon {
         width: 40px;
         height: 40px;
@@ -44,45 +48,61 @@
         transition: all 0.3s;
         font-size: 1.2rem;
     }
+
     .step.active .step-icon {
         border-color: #74b9ff;
         background: #74b9ff;
         color: #fff;
         box-shadow: 0 0 0 4px rgba(116, 185, 255, 0.2);
     }
+
     .step.completed .step-icon {
         border-color: #71dd37;
         background: #71dd37;
         color: #fff;
     }
+
     .step-label {
         font-size: 0.85rem;
         color: #697a8d;
         font-weight: 500;
         display: block;
     }
+
     .step.active .step-label {
         color: #74b9ff;
         font-weight: 700;
     }
+
     .step.completed .step-label {
         color: #71dd37;
     }
+
     .form-step {
         display: none;
         animation: fadeIn 0.5s;
     }
+
     .form-step.active {
         display: block;
     }
+
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     /* Spacing & Typography Balance */
     .card-body {
-        padding: 2.5rem; /* More breathing room on desktop */
+        padding: 2.5rem;
+        /* More breathing room on desktop */
     }
 
     .divider {
@@ -91,15 +111,17 @@
 
     .form-label {
         margin-bottom: 0.5rem;
-        color: #566a7f; /* Soft text color for readability */
+        color: #566a7f;
+        /* Soft text color for readability */
         font-weight: 500;
     }
 
     /* Consistent Row Spacing */
     .row.mb-3 {
-        margin-bottom: 1.5rem !important; /* Increase gap between rows for better separation */
+        margin-bottom: 1.5rem !important;
+        /* Increase gap between rows for better separation */
     }
-    
+
     /* Input Group Styling */
     .input-group-text {
         background-color: #f5f7f9;
@@ -112,14 +134,17 @@
             padding: 0;
             margin-bottom: 2rem;
         }
+
         .step-indicator::before {
             top: 15px;
             margin: 0 10px;
         }
+
         .step {
             width: auto;
             flex: 1;
         }
+
         .step-icon {
             width: 32px;
             height: 32px;
@@ -127,9 +152,11 @@
             margin-bottom: 5px;
             border-width: 2px;
         }
+
         .step-label {
             display: none;
         }
+
         .step.active .step-label {
             display: block;
             font-size: 0.8rem;
@@ -140,30 +167,36 @@
             width: max-content;
             bottom: -25px;
         }
-        
+
         /* Refined Mobile Spacing */
         .card-body {
-            padding: 1.5rem !important; /* Balanced mobile padding */
+            padding: 1.5rem !important;
+            /* Balanced mobile padding */
         }
-        
+
         .divider {
             margin: 1.5rem 0 1rem 0;
         }
-        
+
         .row.mb-3 {
-            margin-bottom: 1.25rem !important; /* Optimal spacing for mobile scrolling */
+            margin-bottom: 1.25rem !important;
+            /* Optimal spacing for mobile scrolling */
         }
-        
+
         /* Button Adjustments */
         .row.justify-content-between.mt-4 {
             flex-direction: column-reverse;
             gap: 12px;
             margin-top: 1.5rem !important;
         }
+
         .row.justify-content-between.mt-4 .col-auto {
             width: 100%;
         }
-        #prevBtn, #nextBtn, #submitBtn {
+
+        #prevBtn,
+        #nextBtn,
+        #submitBtn {
             width: 100%;
             padding: 0.8rem;
             font-size: 1rem;
@@ -173,7 +206,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         /* Mobile Friendly Radio Buttons for Age Selection */
         .form-check-inline {
             display: flex;
@@ -185,12 +218,14 @@
             border-radius: 50rem;
             border: 1px solid #d9dee3;
         }
+
         .form-check-input {
             width: 1.2em;
             height: 1.2em;
             margin-top: 0;
             margin-right: 0.5rem;
         }
+
         .form-check-label {
             font-size: 1rem;
             cursor: pointer;
@@ -205,11 +240,13 @@
     <div class="col-xl-10">
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center border-bottom">
-                <h5 class="mb-0 text-primary"><i class='bx bx-edit me-2'></i>แบบฟอร์มสมัครเรียน ชั้นมัธยมศึกษาปีที่ <?= $level ?> (Registration Form)</h5>
+                <h5 class="mb-0 text-primary"><i class='bx bx-edit me-2'></i>แบบฟอร์มสมัครเรียน ชั้นมัธยมศึกษาปีที่
+                    <?= $level ?> (Registration Form)
+                </h5>
                 <small class="text-muted">กรุณากรอกข้อมูลให้ครบถ้วน</small>
             </div>
             <div class="card-body pt-4">
-                
+
                 <!-- Step Indicators -->
                 <div class="step-indicator">
                     <div class="step active" id="step-indicator-1">
@@ -234,7 +271,8 @@
                     </div>
                 </div>
 
-                <form action="<?= base_url('new-admission/save') ?>" method="post" enctype="multipart/form-data" id="regisForm" class="needs-validation" novalidate>
+                <form action="<?= base_url('new-admission/save') ?>" method="post" enctype="multipart/form-data"
+                    id="regisForm" class="needs-validation" novalidate>
                     <?= csrf_field() ?>
                     <input type="hidden" name="recruit_regLevel" value="<?= $level ?>">
 
@@ -243,17 +281,19 @@
                         <div class="divider text-start">
                             <div class="divider-text text-primary fw-bold fs-5">1. เลือกประเภทโควตาและแผนการเรียน</div>
                         </div>
-                        
+
                         <div class="row mb-3">
                             <div class="col-sm-12">
-                                <label for="recruit_category" class="form-label">ประเภทโควตา <span class="text-danger">*</span></label>
+                                <label for="recruit_category" class="form-label">ประเภทโควตา <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-star'></i></span>
                                     <select class="form-select" name="recruit_category" id="recruit_category" required>
                                         <option value="" disabled selected>-- กรุณาเลือกประเภทโควตา --</option>
-                                        <?php foreach($quotas as $quota): ?>
-                                            <?php if($quota->quota_status == 'on' && strpos($quota->quota_level, (string)$level) !== false): ?>
-                                                <option value="<?= $quota->quota_id ?>" data-courses="<?= $quota->quota_course ?>">
+                                        <?php foreach ($quotas as $quota): ?>
+                                            <?php if ($quota->quota_status == 'on' && strpos($quota->quota_level, (string) $level) !== false): ?>
+                                                <option value="<?= $quota->quota_id ?>"
+                                                    data-courses="<?= $quota->quota_course ?>">
                                                     <?= $quota->quota_explain ?>
                                                 </option>
                                             <?php endif; ?>
@@ -267,40 +307,47 @@
                         <div class="row mb-3" id="service_area_section" style="display:none;">
                             <div class="col-sm-12">
                                 <div class="alert alert-info">
-                                    <i class='bx bx-info-circle me-1'></i> สำหรับโควตาเขตพื้นที่บริการ กรุณาระบุโรงเรียนเดิมของท่านเพื่อตรวจสอบสิทธิ์
+                                    <i class='bx bx-info-circle me-1'></i> สำหรับโควตาเขตพื้นที่บริการ
+                                    กรุณาระบุโรงเรียนเดิมของท่านเพื่อตรวจสอบสิทธิ์
                                 </div>
-                                <label for="service_area_school_search" class="form-label">ค้นหาโรงเรียนเดิม (เฉพาะในเขตพื้นที่บริการ) <span class="text-danger">*</span></label>
+                                <label for="service_area_school_search" class="form-label">ค้นหาโรงเรียนเดิม
+                                    (เฉพาะในเขตพื้นที่บริการ) <span class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bxs-school'></i></span>
                                     <select class="form-select" id="service_area_school_search" style="width: 100%;">
                                         <option value="">-- พิมพ์ชื่อโรงเรียนเพื่อค้นหา --</option>
                                     </select>
                                 </div>
-                                <div class="form-text text-danger">* ต้องเลือกโรงเรียนจากรายการที่ปรากฏเท่านั้น หากไม่พบแสดงว่าไม่อยู่ในเขตพื้นที่บริการ</div>
+                                <div class="form-text text-danger">* ต้องเลือกโรงเรียนจากรายการที่ปรากฏเท่านั้น
+                                    หากไม่พบแสดงว่าไม่อยู่ในเขตพื้นที่บริการ</div>
                             </div>
                         </div>
 
                         <div class="row mb-3" id="course_section" style="display:none;">
                             <div class="col-sm-12">
-                                <label class="form-label">เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span class="text-danger">*</span></label>
-                                
+                                <label class="form-label">เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span
+                                        class="text-danger">*</span></label>
+
                                 <div class="mb-2 input-group flex-nowrap">
                                     <span class="input-group-text" style="min-width: 80px;">อันดับ 1</span>
-                                    <select class="form-select course-select" name="recruit_tpyeRoom1" id="recruit_tpyeRoom1" required>
+                                    <select class="form-select course-select" name="recruit_tpyeRoom1"
+                                        id="recruit_tpyeRoom1" required>
                                         <option value="" selected disabled>-- เลือกอันดับ 1 --</option>
                                     </select>
                                 </div>
 
                                 <div class="mb-2 input-group flex-nowrap">
                                     <span class="input-group-text" style="min-width: 80px;">อันดับ 2</span>
-                                    <select class="form-select course-select" name="recruit_tpyeRoom2" id="recruit_tpyeRoom2">
+                                    <select class="form-select course-select" name="recruit_tpyeRoom2"
+                                        id="recruit_tpyeRoom2">
                                         <option value="" selected disabled>-- เลือกอันดับ 2 --</option>
                                     </select>
                                 </div>
 
                                 <div class="mb-2 input-group flex-nowrap">
                                     <span class="input-group-text" style="min-width: 80px;">อันดับ 3</span>
-                                    <select class="form-select course-select" name="recruit_tpyeRoom3" id="recruit_tpyeRoom3">
+                                    <select class="form-select course-select" name="recruit_tpyeRoom3"
+                                        id="recruit_tpyeRoom3">
                                         <option value="" selected disabled>-- เลือกอันดับ 3 --</option>
                                     </select>
                                 </div>
@@ -317,19 +364,26 @@
                         <!-- Student Photo Upload (Top Center) -->
                         <div class="row justify-content-center mb-4">
                             <div class="col-md-4 text-center">
-                                <label class="form-label fw-bold">รูปถ่ายนักเรียน (ชุดนักเรียน) <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold">รูปถ่ายนักเรียน (ชุดนักเรียน) <span
+                                        class="text-danger">*</span></label>
                                 <div class="card shadow-sm">
                                     <div class="card-body text-center p-3">
                                         <div class="mb-3">
-                                            <img id="preview_img_display" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="รูปถ่ายนักเรียน" class="d-block rounded mx-auto" style="width: 150px; height: 200px; object-fit: contain; border: 2px dashed #d9dee3;">
+                                            <img id="preview_img_display"
+                                                src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                                                alt="รูปถ่ายนักเรียน" class="d-block rounded mx-auto"
+                                                style="width: 150px; height: 200px; object-fit: contain; border: 2px dashed #d9dee3;">
                                         </div>
-                                        <button type="button" class="btn btn-primary btn-sm w-100" onclick="document.getElementById('recruit_img_input').click()">
+                                        <button type="button" class="btn btn-primary btn-sm w-100"
+                                            onclick="document.getElementById('recruit_img_input').click()">
                                             <i class='bx bx-camera me-1'></i> อัปโหลดรูปถ่าย
                                         </button>
-                                        <input type="file" id="recruit_img_input" accept="image/*" class="d-none" onchange="handleImageSelect(this)">
+                                        <input type="file" id="recruit_img_input" accept="image/*" class="d-none"
+                                            onchange="handleImageSelect(this)">
                                         <input type="hidden" name="recruit_img_cropped" id="recruit_img_cropped">
                                         <!-- Hidden input for validation -->
-                                        <input type="text" id="recruit_img_validator" name="recruit_img_validator" style="opacity: 0; position: absolute; width: 1px; height: 1px;" required>
+                                        <input type="text" id="recruit_img_validator" name="recruit_img_validator"
+                                            style="opacity: 0; position: absolute; width: 1px; height: 1px;" required>
                                     </div>
                                 </div>
                                 <div class="form-text mt-2">รูปถ่ายหน้าตรง ชุดนักเรียน ขนาด 1.5 นิ้ว</div>
@@ -338,7 +392,8 @@
 
                         <div class="row mb-3">
                             <div class="col-sm-3">
-                                <label for="recruit_prefix" class="form-label">คำนำหน้า <span class="text-danger">*</span></label>
+                                <label for="recruit_prefix" class="form-label">คำนำหน้า <span
+                                        class="text-danger">*</span></label>
                                 <select class="form-select" name="recruit_prefix" id="recruit_prefix" required>
                                     <option value="">เลือก</option>
                                     <option value="เด็กชาย">เด็กชาย</option>
@@ -348,27 +403,34 @@
                                 </select>
                             </div>
                             <div class="col-sm-4">
-                                <label for="recruit_firstName" class="form-label">ชื่อ <span class="text-danger">*</span></label>
+                                <label for="recruit_firstName" class="form-label">ชื่อ <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-user'></i></span>
-                                    <input type="text" class="form-control" name="recruit_firstName" id="recruit_firstName" placeholder="ชื่อจริง" required>
+                                    <input type="text" class="form-control" name="recruit_firstName"
+                                        id="recruit_firstName" placeholder="ชื่อจริง" required>
                                 </div>
                             </div>
                             <div class="col-sm-5">
-                                <label for="recruit_lastName" class="form-label">นามสกุล <span class="text-danger">*</span></label>
+                                <label for="recruit_lastName" class="form-label">นามสกุล <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-user'></i></span>
-                                    <input type="text" class="form-control" name="recruit_lastName" id="recruit_lastName" placeholder="นามสกุล" required>
+                                    <input type="text" class="form-control" name="recruit_lastName"
+                                        id="recruit_lastName" placeholder="นามสกุล" required>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-sm-12">
-                                <label for="recruit_idCard" class="form-label">เลขบัตรประชาชน (13 หลัก) <span class="text-danger">*</span></label>
+                                <label for="recruit_idCard" class="form-label">เลขบัตรประชาชน (13 หลัก) <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-id-card'></i></span>
-                                    <input type="text" class="form-control" name="recruit_idCard" id="recruit_idCard" maxlength="13" required placeholder="เลขบัตรประชาชน 13 หลัก" value="<?= isset($preCheckIdCard) ? $preCheckIdCard : '' ?>" readonly>
+                                    <input type="text" class="form-control" name="recruit_idCard" id="recruit_idCard"
+                                        maxlength="17" required placeholder="เลขบัตรประชาชน 13 หลัก"
+                                        value="<?= isset($preCheckIdCard) ? $preCheckIdCard : '' ?>" readonly>
                                 </div>
                             </div>
                         </div>
@@ -378,7 +440,7 @@
                             <div class="col-sm-3">
                                 <select class="form-select" name="recruit_birthdayD" id="recruit_birthdayD" required>
                                     <option value="">วัน</option>
-                                    <?php for($i=1; $i<=31; $i++): ?>
+                                    <?php for ($i = 1; $i <= 31; $i++): ?>
                                         <option value="<?= sprintf('%02d', $i) ?>"><?= $i ?></option>
                                     <?php endfor; ?>
                                 </select>
@@ -403,7 +465,8 @@
                             <div class="col-sm-4">
                                 <select class="form-select" name="recruit_birthdayY" id="recruit_birthdayY" required>
                                     <option value="">ปี (พ.ศ.)</option>
-                                    <?php $curYear = date('Y')+543; for($i=$curYear-20; $i<=$curYear-10; $i++): ?>
+                                    <?php $curYear = date('Y') + 543;
+                                    for ($i = $curYear - 20; $i <= $curYear - 10; $i++): ?>
                                         <option value="<?= $i ?>"><?= $i ?></option>
                                     <?php endfor; ?>
                                 </select>
@@ -412,7 +475,8 @@
 
                         <div class="row mb-3">
                             <div class="col-sm-4">
-                                <label for="recruit_race" class="form-label">เชื้อชาติ <span class="text-danger">*</span></label>
+                                <label for="recruit_race" class="form-label">เชื้อชาติ <span
+                                        class="text-danger">*</span></label>
                                 <select class="form-select" name="recruit_race" id="recruit_race" required>
                                     <option value="ไทย" selected>ไทย</option>
                                     <option value="จีน">จีน</option>
@@ -428,8 +492,10 @@
                                 </select>
                             </div>
                             <div class="col-sm-4">
-                                <label for="recruit_nationality" class="form-label">สัญชาติ <span class="text-danger">*</span></label>
-                                <select class="form-select" name="recruit_nationality" id="recruit_nationality" required>
+                                <label for="recruit_nationality" class="form-label">สัญชาติ <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" name="recruit_nationality" id="recruit_nationality"
+                                    required>
                                     <option value="ไทย" selected>ไทย</option>
                                     <option value="จีน">จีน</option>
                                     <option value="ญี่ปุ่น">ญี่ปุ่น</option>
@@ -444,7 +510,8 @@
                                 </select>
                             </div>
                             <div class="col-sm-4">
-                                <label for="recruit_religion" class="form-label">ศาสนา <span class="text-danger">*</span></label>
+                                <label for="recruit_religion" class="form-label">ศาสนา <span
+                                        class="text-danger">*</span></label>
                                 <select class="form-select" name="recruit_religion" id="recruit_religion" required>
                                     <option value="พุทธ" selected>พุทธ</option>
                                     <option value="อิสลาม">อิสลาม</option>
@@ -459,10 +526,12 @@
 
                         <div class="row mb-3">
                             <div class="col-sm-12">
-                                <label for="recruit_phone" class="form-label">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
+                                <label for="recruit_phone" class="form-label">เบอร์โทรศัพท์ <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-phone'></i></span>
-                                    <input type="tel" class="form-control" name="recruit_phone" id="recruit_phone" placeholder="0x-xxxx-xxxx" maxlength="12" required>
+                                    <input type="tel" class="form-control" name="recruit_phone" id="recruit_phone"
+                                        placeholder="0x-xxxx-xxxx" maxlength="12" required>
                                 </div>
                             </div>
                         </div>
@@ -476,43 +545,56 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="recruit_homeNumber" class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                <label for="recruit_homeNumber" class="form-label">บ้านเลขที่ <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-home'></i></span>
-                                    <input type="text" class="form-control" name="recruit_homeNumber" id="recruit_homeNumber" placeholder="บ้านเลขที่" required>
+                                    <input type="text" class="form-control" name="recruit_homeNumber"
+                                        id="recruit_homeNumber" placeholder="บ้านเลขที่" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label for="recruit_homeGroup" class="form-label">หมู่ที่ <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="recruit_homeGroup" id="recruit_homeGroup" placeholder="หมู่ที่" required>
+                                <label for="recruit_homeGroup" class="form-label">หมู่ที่ <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="recruit_homeGroup" id="recruit_homeGroup"
+                                    placeholder="หมู่ที่" required>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="recruit_homeRoad" class="form-label">ถนน</label>
-                                <input type="text" class="form-control" name="recruit_homeRoad" id="recruit_homeRoad" placeholder="ถนน">
+                                <input type="text" class="form-control" name="recruit_homeRoad" id="recruit_homeRoad"
+                                    placeholder="ถนน">
                             </div>
                             <div class="col-md-6">
-                                <label for="recruit_homeSubdistrict" class="form-label">ตำบล/แขวง <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="recruit_homeSubdistrict" id="recruit_homeSubdistrict" placeholder="ตำบล/แขวง" required>
+                                <label for="recruit_homeSubdistrict" class="form-label">ตำบล/แขวง <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="recruit_homeSubdistrict"
+                                    id="recruit_homeSubdistrict" placeholder="ตำบล/แขวง" required>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="recruit_homedistrict" class="form-label">อำเภอ/เขต <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="recruit_homedistrict" id="recruit_homedistrict" placeholder="อำเภอ/เขต" required>
+                                <label for="recruit_homedistrict" class="form-label">อำเภอ/เขต <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="recruit_homedistrict"
+                                    id="recruit_homedistrict" placeholder="อำเภอ/เขต" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="recruit_homeProvince" class="form-label">จังหวัด <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="recruit_homeProvince" id="recruit_homeProvince" placeholder="จังหวัด" required>
+                                <label for="recruit_homeProvince" class="form-label">จังหวัด <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="recruit_homeProvince"
+                                    id="recruit_homeProvince" placeholder="จังหวัด" required>
                             </div>
                         </div>
                         <div class="row mb-3">
-                             <div class="col-md-6">
-                                <label for="recruit_homePostcode" class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                            <div class="col-md-6">
+                                <label for="recruit_homePostcode" class="form-label">รหัสไปรษณีย์ <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-map-pin'></i></span>
-                                    <input type="text" class="form-control" name="recruit_homePostcode" id="recruit_homePostcode" placeholder="รหัสไปรษณีย์" required>
+                                    <input type="text" class="form-control" name="recruit_homePostcode"
+                                        id="recruit_homePostcode" placeholder="รหัสไปรษณีย์" required>
                                 </div>
                             </div>
                         </div>
@@ -526,12 +608,14 @@
 
                         <div class="row mb-3">
                             <div class="col-sm-12">
-                                <label for="recruit_oldSchool_select" class="form-label">ค้นหาโรงเรียนเดิม <span class="text-danger">*</span></label>
+                                <label for="recruit_oldSchool_select" class="form-label">ค้นหาโรงเรียนเดิม <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bxs-school'></i></span>
-                                    <?php if(isset($preCheckOldSchool) && !empty($preCheckOldSchool)): ?>
+                                    <?php if (isset($preCheckOldSchool) && !empty($preCheckOldSchool)): ?>
                                         <input type="text" class="form-control" value="<?= $preCheckOldSchool ?>" readonly>
-                                        <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool" value="<?= $preCheckOldSchool ?>">
+                                        <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool"
+                                            value="<?= $preCheckOldSchool ?>">
                                     <?php else: ?>
                                         <select class="form-select" id="recruit_oldSchool_select" required>
                                             <option value="">-- พิมพ์เพื่อค้นหาชื่อโรงเรียน --</option>
@@ -543,20 +627,30 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-sm-6">
-                                <label for="recruit_district" class="form-label">อำเภอที่ตั้งโรงเรียน <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="recruit_district" id="recruit_district" placeholder="อำเภอ" required value="<?= isset($preCheckDistrict) ? $preCheckDistrict : '' ?>" <?= isset($preCheckDistrict) && !empty($preCheckDistrict) ? 'readonly' : '' ?>>
+                                <label for="recruit_district" class="form-label">อำเภอที่ตั้งโรงเรียน <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="recruit_district" id="recruit_district"
+                                    placeholder="อำเภอ" required
+                                    value="<?= isset($preCheckDistrict) ? $preCheckDistrict : '' ?>"
+                                    <?= isset($preCheckDistrict) && !empty($preCheckDistrict) ? 'readonly' : '' ?>>
                             </div>
                             <div class="col-sm-6">
-                                <label for="recruit_province" class="form-label">จังหวัดที่ตั้งโรงเรียน <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="recruit_province" id="recruit_province" placeholder="จังหวัด" required value="<?= isset($preCheckProvince) ? $preCheckProvince : '' ?>" <?= isset($preCheckProvince) && !empty($preCheckProvince) ? 'readonly' : '' ?>>
+                                <label for="recruit_province" class="form-label">จังหวัดที่ตั้งโรงเรียน <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="recruit_province" id="recruit_province"
+                                    placeholder="จังหวัด" required
+                                    value="<?= isset($preCheckProvince) ? $preCheckProvince : '' ?>"
+                                    <?= isset($preCheckProvince) && !empty($preCheckProvince) ? 'readonly' : '' ?>>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-sm-12">
-                                <label for="recruit_grade" class="form-label">เกรดเฉลี่ยสะสม (GPAX) <span class="text-danger">*</span></label>
+                                <label for="recruit_grade" class="form-label">เกรดเฉลี่ยสะสม (GPAX) <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bx-bar-chart-alt-2'></i></span>
-                                    <input type="number" step="0.01" min="0" max="4.00" class="form-control" name="recruit_grade" id="recruit_grade" placeholder="เช่น 3.50" required>
+                                    <input type="number" step="0.01" min="0" max="4.00" class="form-control"
+                                        name="recruit_grade" id="recruit_grade" placeholder="เช่น 3.50" required>
                                 </div>
                             </div>
                         </div>
@@ -569,51 +663,69 @@
                         </div>
 
                         <div class="alert alert-warning" role="alert">
-                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพ (.jpg, .png) หรือ PDF ขนาดไม่เกิน 2MB
+                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพ (.jpg, .png) หรือ PDF
                         </div>
 
                         <div class="row">
 
                             <div class="col-md-6 mb-3">
-                                <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า) <span class="text-danger">*</span></label>
-                                <input class="form-control" type="file" id="recruit_certificateEdu" name="recruit_certificateEdu" accept="image/*,.pdf" required onchange="previewImage(this, 'preview_certificate')">
+                                <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า) <span
+                                        class="text-danger">*</span></label>
+                                <input class="form-control" type="file" id="recruit_certificateEdu"
+                                    name="recruit_certificateEdu" accept="image/*,.pdf" required
+                                    onchange="previewImage(this, 'preview_certificate')">
                                 <div class="mt-2 text-center">
-                                    <img id="preview_certificate" src="#" alt="ตัวอย่าง ปพ.1 (หน้า)" class="img-thumbnail d-none" style="max-height: 200px;">
+                                    <img id="preview_certificate" src="#" alt="ตัวอย่าง ปพ.1 (หน้า)"
+                                        class="img-thumbnail d-none" style="max-height: 200px;">
                                     <p id="preview_certificate_name" class="d-none text-muted small"></p>
                                 </div>
                             </div>
-                             <div class="col-md-6 mb-3">
-                                <label for="recruit_certificateEduB" class="form-label">ปพ.1 (หลัง) <span class="text-danger">*</span></label>
-                                <input class="form-control" type="file" id="recruit_certificateEduB" name="recruit_certificateEduB" accept="image/*,.pdf" required onchange="previewImage(this, 'preview_certificateB')">
+                            <div class="col-md-6 mb-3">
+                                <label for="recruit_certificateEduB" class="form-label">ปพ.1 (หลัง) <span
+                                        class="text-danger">*</span></label>
+                                <input class="form-control" type="file" id="recruit_certificateEduB"
+                                    name="recruit_certificateEduB" accept="image/*,.pdf" required
+                                    onchange="previewImage(this, 'preview_certificateB')">
                                 <div class="mt-2 text-center">
-                                    <img id="preview_certificateB" src="#" alt="ตัวอย่าง ปพ.1 (หลัง)" class="img-thumbnail d-none" style="max-height: 200px;">
+                                    <img id="preview_certificateB" src="#" alt="ตัวอย่าง ปพ.1 (หลัง)"
+                                        class="img-thumbnail d-none" style="max-height: 200px;">
                                     <p id="preview_certificateB_name" class="d-none text-muted small"></p>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="recruit_copyidCard" class="form-label">สำเนาบัตรประชาชน <span class="text-danger">*</span></label>
-                                <input class="form-control" type="file" id="recruit_copyidCard" name="recruit_copyidCard" accept="image/*,.pdf" required onchange="previewImage(this, 'preview_idcard')">
+                                <label for="recruit_copyidCard" class="form-label">สำเนาบัตรประชาชน <span
+                                        class="text-danger">*</span></label>
+                                <input class="form-control" type="file" id="recruit_copyidCard"
+                                    name="recruit_copyidCard" accept="image/*,.pdf" required
+                                    onchange="previewImage(this, 'preview_idcard')">
                                 <div class="mt-2 text-center">
-                                    <img id="preview_idcard" src="#" alt="ตัวอย่างบัตรประชาชน" class="img-thumbnail d-none" style="max-height: 200px;">
+                                    <img id="preview_idcard" src="#" alt="ตัวอย่างบัตรประชาชน"
+                                        class="img-thumbnail d-none" style="max-height: 200px;">
                                     <p id="preview_idcard_name" class="d-none text-muted small"></p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- CAPTCHA Section -->
-                        <div class="mt-4 p-4" style="background: linear-gradient(135deg, rgba(255, 158, 181, 0.1) 0%, rgba(132, 210, 246, 0.1) 100%); border-radius: 15px; border: 2px solid rgba(255, 158, 181, 0.2);">
+                        <div class="mt-4 p-4"
+                            style="background: linear-gradient(135deg, rgba(255, 158, 181, 0.1) 0%, rgba(132, 210, 246, 0.1) 100%); border-radius: 15px; border: 2px solid rgba(255, 158, 181, 0.2);">
                             <div class="row align-items-center">
                                 <div class="col-12">
                                     <label class="form-label fw-bold text-primary mb-3">
-                                        <i class='bx bx-shield-quarter me-2'></i>ยืนยันว่าคุณไม่ใช่โปรแกรมอัตโนมัติ (CAPTCHA) <span class="text-danger">*</span>
+                                        <i class='bx bx-shield-quarter me-2'></i>ยืนยันว่าคุณไม่ใช่โปรแกรมอัตโนมัติ
+                                        (CAPTCHA) <span class="text-danger">*</span>
                                     </label>
                                 </div>
                                 <div class="col-md-6 mb-3 mb-md-0">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="captcha-question p-3 rounded-3 text-center" style="background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%); min-width: 180px;">
-                                            <span class="text-white fw-bold fs-4" id="captcha_question"><?= $captcha_num1 ?> + <?= $captcha_num2 ?> = ?</span>
+                                        <div class="captcha-question p-3 rounded-3 text-center"
+                                            style="background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%); min-width: 180px;">
+                                            <span class="text-white fw-bold fs-4"
+                                                id="captcha_question"><?= $captcha_num1 ?> + <?= $captcha_num2 ?> =
+                                                ?</span>
                                         </div>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="refreshCaptchaBtn" title="รีเฟรช CAPTCHA">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                            id="refreshCaptchaBtn" title="รีเฟรช CAPTCHA">
                                             <i class='bx bx-refresh fs-5'></i>
                                         </button>
                                     </div>
@@ -623,7 +735,8 @@
                                 <div class="col-md-6">
                                     <div class="input-group">
                                         <span class="input-group-text"><i class='bx bx-calculator'></i></span>
-                                        <input type="number" class="form-control" name="captcha_answer" id="captcha_answer" placeholder="กรอกคำตอบ" required min="0" max="100">
+                                        <input type="number" class="form-control" name="captcha_answer"
+                                            id="captcha_answer" placeholder="กรอกคำตอบ" required min="0" max="100">
                                     </div>
                                     <small class="text-muted">กรุณากรอกผลลัพธ์ของการคำนวณ</small>
                                 </div>
@@ -678,10 +791,14 @@
 
 <?= $this->section('scripts') ?>
 <!-- Thailand Address Auto Complete Dependencies -->
-<script type="text/javascript" src="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dependencies/JQL.min.js"></script>
-<script type="text/javascript" src="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dependencies/typeahead.bundle.js"></script>
-<link rel="stylesheet" href="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dist/jquery.Thailand.min.css">
-<script type="text/javascript" src="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dist/jquery.Thailand.min.js"></script>
+<script type="text/javascript"
+    src="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dependencies/JQL.min.js"></script>
+<script type="text/javascript"
+    src="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dependencies/typeahead.bundle.js"></script>
+<link rel="stylesheet"
+    href="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dist/jquery.Thailand.min.css">
+<script type="text/javascript"
+    src="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dist/jquery.Thailand.min.js"></script>
 
 <!-- Cropper.js Dependencies -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
@@ -691,37 +808,37 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
 
         // CAPTCHA Refresh Functionality
-        $('#refreshCaptchaBtn').on('click', function() {
+        $('#refreshCaptchaBtn').on('click', function () {
             const num1 = Math.floor(Math.random() * 10) + 1;
             const num2 = Math.floor(Math.random() * 10) + 1;
             const answer = num1 + num2;
-            
+
             // Update UI
             $('#captcha_question').text(num1 + ' + ' + num2 + ' = ?');
             $('#captcha_num1').val(num1);
             $('#captcha_num2').val(num2);
             $('#captcha_answer').val('');
-            
+
             // Disable submit button immediately
             if (typeof checkCaptchaClientSide === 'function') {
                 checkCaptchaClientSide();
             } else {
-                 // Fallback if function not defined yet (should be fine as it's defined later but hoisted)
-                 // Or we can just disable manually
-                 $('#submitBtn').prop('disabled', true);
+                // Fallback if function not defined yet (should be fine as it's defined later but hoisted)
+                // Or we can just disable manually
+                $('#submitBtn').prop('disabled', true);
             }
-            
+
             // Update server session via AJAX
             $.ajax({
                 url: '<?= base_url('new-admission/refresh-captcha') ?>',
                 type: 'POST',
                 data: { num1: num1, num2: num2 },
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     if (response.status === 'success') {
                         // Animate refresh button
                         $('#refreshCaptchaBtn i').addClass('bx-spin');
@@ -730,7 +847,7 @@
                         }, 500);
                     }
                 },
-                error: function() {
+                error: function () {
                     console.log('Failed to refresh CAPTCHA on server');
                 }
             });
@@ -772,16 +889,16 @@
             $('#recruit_province').trigger('change');
         });
 
-        $('#confirmSubmitBtn').on('click', function() {
+        $('#confirmSubmitBtn').on('click', function () {
             const $btn = $(this);
             const originalBtnText = $btn.html();
-            
+
             // Disable button and show loading
             $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังบันทึก...');
-            
+
             // Hide modal
             confirmModal.hide();
-            
+
             // Show loading
             Swal.fire({
                 title: 'กำลังบันทึกข้อมูล...',
@@ -799,7 +916,7 @@
                 processData: false,
                 contentType: false,
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     if (response.status === 'success') {
                         Swal.fire({
                             icon: 'success',
@@ -813,11 +930,11 @@
                     } else {
                         // Check if it's a CAPTCHA error
                         var isCaptchaError = response.message && (
-                            response.message.includes('CAPTCHA') || 
+                            response.message.includes('CAPTCHA') ||
                             response.message.includes('รหัสยืนยัน') ||
                             response.message.includes('เซสชัน')
                         );
-                        
+
                         Swal.fire({
                             icon: 'error',
                             title: isCaptchaError ? 'CAPTCHA ไม่ถูกต้อง' : 'เกิดข้อผิดพลาด',
@@ -831,33 +948,33 @@
                                 $('#captcha_answer').val('').focus();
                             }
                         });
-                        
+
                         // Reset button
                         $btn.prop('disabled', false).html(originalBtnText);
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     Swal.fire({
                         icon: 'error',
                         title: 'เกิดข้อผิดพลาด',
                         text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้: ' + error,
                         confirmButtonText: 'ตกลง'
                     });
-                    
+
                     // Reset button
                     $btn.prop('disabled', false).html(originalBtnText);
                 }
             });
         });
 
-        $('#submitBtn').on('click', function(e) {
+        $('#submitBtn').on('click', function (e) {
             e.preventDefault(); // Prevent default button action
             const $btn = $(this);
             const originalText = $btn.html();
-            
+
             // Show loading
             $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status"></span>กำลังตรวจสอบ...');
-            
+
             setTimeout(() => {
                 if (validateStep(currentStep)) {
                     // Reset button before showing modal
@@ -900,12 +1017,12 @@
 
             const reader = new FileReader();
 
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 imageToCrop.src = e.target.result;
                 cropModal.show();
             };
 
-            reader.onerror = function(error) {
+            reader.onerror = function (error) {
                 console.error('Error reading image file:', error);
                 Swal.fire({
                     icon: 'error',
@@ -915,16 +1032,16 @@
                 });
                 input.value = ''; // Clear the input
             };
-            
+
             reader.readAsDataURL(file);
-            
+
             input.value = ''; // Clear the input after processing to allow selecting same file again if needed
         }
     }
 
     document.getElementById('cropModal').addEventListener('shown.bs.modal', function () {
         cropper = new Cropper(imageToCrop, {
-            aspectRatio: 3 / 4, 
+            aspectRatio: 3 / 4,
             viewMode: 1,
             autoCropArea: 1,
         });
@@ -937,7 +1054,7 @@
         }
     });
 
-    document.getElementById('crop_btn').addEventListener('click', function() {
+    document.getElementById('crop_btn').addEventListener('click', function () {
         if (cropper) {
             const canvas = cropper.getCroppedCanvas({
                 width: 450,
@@ -957,22 +1074,22 @@
     function previewImage(input, previewId) {
         const preview = document.getElementById(previewId);
         const namePreview = document.getElementById(previewId + '_name');
-        
+
         if (input.files && input.files[0]) {
             const file = input.files[0];
             const reader = new FileReader();
 
             if (file.type.match('image.*')) {
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     preview.src = e.target.result;
                     preview.classList.remove('d-none');
-                    if(namePreview) namePreview.classList.add('d-none');
+                    if (namePreview) namePreview.classList.add('d-none');
                 }
                 reader.readAsDataURL(file);
             } else {
                 preview.src = '#';
                 preview.classList.add('d-none');
-                if(namePreview) {
+                if (namePreview) {
                     namePreview.textContent = 'ไฟล์ที่เลือก: ' + file.name;
                     namePreview.classList.remove('d-none');
                 }
@@ -980,19 +1097,49 @@
         } else {
             preview.src = '#';
             preview.classList.add('d-none');
-            if(namePreview) namePreview.classList.add('d-none');
+            if (namePreview) namePreview.classList.add('d-none');
+        }
+    }
+
+    function previewMultipleFiles(input, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                const col = document.createElement('div');
+                col.className = 'col-3 text-center';
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        col.innerHTML = `
+                            <img src="${e.target.result}" class="img-thumbnail" style="height: 60px; width: 100%; object-fit: cover;">
+                            <p class="small text-truncate mb-0" style="font-size: 10px;">${file.name}</p>
+                        `;
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    col.innerHTML = `
+                        <div class="p-1 border rounded bg-light" style="height: 60px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                            <i class='bx bxs-file-pdf fs-3 text-danger'></i>
+                        </div>
+                        <p class="small text-truncate mb-0" style="font-size: 10px;">${file.name}</p>
+                    `;
+                }
+                container.appendChild(col);
+            });
         }
     }
 
     $.Thailand({
-        $district: $('#recruit_homeSubdistrict'), 
+        $district: $('#recruit_homeSubdistrict'),
         $amphoe: $('#recruit_homedistrict'),
         $province: $('#recruit_homeProvince'),
         $zipcode: $('#recruit_homePostcode'),
     });
 
     const coursesData = <?= json_encode($courses) ?>;
-    
+
     // Initialize Service Area School Search (Step 1)
     $('#service_area_school_search').select2({
         theme: 'bootstrap-5',
@@ -1021,12 +1168,12 @@
     // Handle Service Area School Selection
     $('#service_area_school_search').on('select2:select', function (e) {
         var data = e.params.data;
-        
+
         // Auto-fill Step 4 fields
         var step4Select = $('#recruit_oldSchool_select');
         if (step4Select.find("option[value='" + data.id + "']").length) {
             step4Select.val(data.id).trigger('change');
-        } else { 
+        } else {
             var newOption = new Option(data.text, data.id, true, true);
             step4Select.append(newOption).trigger('change');
         }
@@ -1034,24 +1181,24 @@
         $('#recruit_oldSchool').val(data.text);
         $('#recruit_district').val(data.amphur);
         $('#recruit_province').val(data.province);
-        
+
         // Show Course Section after school is selected (if quota is service area)
         const quotaText = $('#recruit_category option:selected').text();
         if (quotaText.includes('เขตพื้นที่บริการ')) {
-             $('#course_section').slideDown();
+            $('#course_section').slideDown();
         }
     });
 
-    document.getElementById('recruit_category').addEventListener('change', function() {
+    document.getElementById('recruit_category').addEventListener('change', function () {
         const selectedOption = this.options[this.selectedIndex];
         const quotaText = selectedOption.text;
         const allowedCourses = selectedOption.getAttribute('data-courses').split('|');
-        
+
         // Handle Service Area Logic
         const serviceAreaSection = document.getElementById('service_area_section');
         const serviceAreaSearch = document.getElementById('service_area_school_search');
         const courseSection = document.getElementById('course_section');
-        
+
         // Reset Step 4 fields state first
         $('#recruit_oldSchool').val('');
         $('#recruit_district').val('');
@@ -1067,8 +1214,8 @@
         if (quotaText.includes('เขตพื้นที่บริการ')) {
             // --- Service Area Quota ---
             serviceAreaSection.style.display = 'block';
-            serviceAreaSearch.setAttribute('data-required', 'true'); 
-            
+            serviceAreaSearch.setAttribute('data-required', 'true');
+
             if (!$('#service_area_school_search').val()) {
                 courseSection.style.display = 'none';
             } else {
@@ -1079,7 +1226,7 @@
             // --- Old School Quota (M.3 Original School) ---
             serviceAreaSection.style.display = 'none';
             serviceAreaSearch.removeAttribute('data-required');
-            
+
             // Auto-fill Step 4 with Fixed School
             const fixedSchoolName = "สวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์";
             const fixedDistrict = "เมืองนครสวรรค์";
@@ -1095,7 +1242,7 @@
             var step4Select = $('#recruit_oldSchool_select');
             if (step4Select.find("option[value='" + fixedSchoolName + "']").length) {
                 step4Select.val(fixedSchoolName).trigger('change');
-            } else { 
+            } else {
                 var newOption = new Option(fixedSchoolName, fixedSchoolName, true, true);
                 step4Select.append(newOption).trigger('change');
             }
@@ -1112,8 +1259,8 @@
             // --- Other Quotas ---
             serviceAreaSection.style.display = 'none';
             serviceAreaSearch.removeAttribute('data-required');
-            $('#service_area_school_search').val(null).trigger('change'); 
-            
+            $('#service_area_school_search').val(null).trigger('change');
+
             // Show course section immediately
             courseSection.style.display = 'block';
         }
@@ -1129,10 +1276,10 @@
             courseSelects[1].closest('.input-group'),
             courseSelects[2].closest('.input-group')
         ];
-        
+
 
         const courseLabel = courseSection.querySelector('label.form-label'); // Get the label element
-        
+
         // Create container for age radio buttons if it doesn't exist
         let ageRadioContainer = document.getElementById('age_radio_container');
         if (!ageRadioContainer) {
@@ -1142,7 +1289,7 @@
             ageRadioContainer.style.display = 'none';
             courseSection.appendChild(ageRadioContainer);
         }
-        
+
         // Create hidden input for recruit_agegroup if it doesn't exist
         let ageGroupInput = document.querySelector('input[name="recruit_agegroup"]');
         if (!ageGroupInput) {
@@ -1161,7 +1308,7 @@
             select.parentNode.replaceChild(newSelect, select);
             courseSelects[index] = newSelect; // Update reference
         });
-        
+
         // Clear radio container
         ageRadioContainer.innerHTML = '';
         ageGroupInput.value = '';
@@ -1186,10 +1333,10 @@
                 }
             }
         });
-        
+
         if (hasCourses) {
-            courseSection.style.display = 'block'; 
-            
+            courseSection.style.display = 'block';
+
             // ตรวจสอบว่าเป็นโควตานักกีฬาหรือไม่จากการเลือก recruit_category
             const selectedQuotaOption = document.getElementById('recruit_category').selectedOptions[0];
             const selectedQuotaName = selectedQuotaOption ? selectedQuotaOption.text : '';
@@ -1199,28 +1346,28 @@
             if (isSportsQuotaCategory) {
                 // โควตานักกีฬา - เลือกได้ 1 อันดับ
                 courseLabel.innerHTML = 'เลือกแผนการเรียน (เลือกได้สูงสุด 1 อันดับ) <span class="text-danger">*</span>';
-                
+
                 // ซ่อนอันดับ 2 และ 3
                 courseContainers[1].style.display = 'none';
                 courseContainers[2].style.display = 'none';
-                
+
                 // ปิด required และเคลียร์ค่า
                 courseSelects[1].required = false;
                 courseSelects[2].required = false;
                 courseSelects[1].value = '';
                 courseSelects[2].value = '';
-                
+
                 // เคลียร์ name ของอันดับ 2-3 (ป้องกันการส่งค่าว่างไปกวนถ้า controller เช็ค)
                 // หรือคงไว้ตามเดิมถ้า controller รับค่าว่างได้
             } else {
                 // โควตาปกติ - เลือกได้สูงสุด 3 อันดับ
                 courseLabel.innerHTML = 'เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span class="text-danger">*</span>';
-                
+
                 // แสดงทั้ง 3 อันดับ
                 courseContainers[0].style.display = 'flex';
                 courseContainers[1].style.display = 'flex';
                 courseContainers[2].style.display = 'flex';
-                
+
                 // เปิด required
                 courseSelects[0].required = true;
                 courseSelects[1].required = true;
@@ -1231,7 +1378,7 @@
             courseSelects[0].setAttribute('name', 'recruit_tpyeRoom1');
             courseSelects[1].setAttribute('name', 'recruit_tpyeRoom2');
             courseSelects[2].setAttribute('name', 'recruit_tpyeRoom3');
-            
+
             // Restore input group text visibility (just in case)
             courseContainers[0].querySelector('.input-group-text').style.display = 'block';
             courseContainers[1].querySelector('.input-group-text').style.display = 'block';
@@ -1244,7 +1391,7 @@
                 // ถ้าเป็นโควตานักกีฬา และเป็น index 1 หรือ 2 (อันดับ 2-3) ข้ามการ populate ก็ได้ หรือ populate ทิ้งไว้แต่ซ่อน
                 if (isSportsQuotaCategory && index > 0) {
                     select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 1} --</option>`;
-                    return; 
+                    return;
                 }
 
                 select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 1} --</option>`;
@@ -1260,41 +1407,41 @@
                     }
                 });
             });
-            
+
             // Event Listeners และ Logic อื่นๆ (เหมือนเดิม)
-            
+
             // เพิ่ม event listener สำหรับอันดับ 1 เพื่อตรวจสอบว่าเป็นกีฬาหรือไม่ (เฉพาะ Logic รายวิชาที่อาจจะมี age)
-            courseSelects[0].addEventListener('change', function() {
+            courseSelects[0].addEventListener('change', function () {
                 const selectedCourseId = this.value;
-                const selectElement = this; 
-                
+                const selectElement = this;
+
                 const selectedCourse = coursesData.find(c => c.course_id == selectedCourseId);
-                
+
                 if (!selectedCourse) return;
-                
+
                 // ... (Logic ตรวจสอบเกรดหรือ duplicate เหมือนเดิม) ...
                 // แต่ถ้าเป็นโควตานักกีฬา เราไม่จำเป็นต้องเช็ค Duplicate กับอันดับ 2-3 เพราะมันซ่อนอยู่
-                
+
                 if (!isSportsQuotaCategory) {
                     const otherSelects = [courseSelects[1], courseSelects[2]];
                     const isDuplicate = otherSelects.some(s => s.value === selectedCourseId && selectedCourseId !== '');
                     if (isDuplicate) {
                         Swal.fire({
-                             icon: 'error',
-                             title: 'เลือกซ้ำ',
-                             text: 'ท่านได้เลือกแผนการเรียนนี้ไปแล้ว กรุณาเลือกแผนการเรียนอื่น',
-                             confirmButtonText: 'ตกลง'
+                            icon: 'error',
+                            title: 'เลือกซ้ำ',
+                            text: 'ท่านได้เลือกแผนการเรียนนี้ไปแล้ว กรุณาเลือกแผนการเรียนอื่น',
+                            confirmButtonText: 'ตกลง'
                         });
                         selectElement.value = '';
                         return;
                     }
                 }
-                
+
                 // Logic ตรวจสอบเกรด
                 const courseName = selectedCourse.course_initials || selectedCourse.course_fullname || '';
                 let gradeRequirement = null;
                 let requiredGPA = 0;
-                
+
                 if (courseName.includes('วิทย์-คณิต') || courseName.includes('วิทย์ - คณิต')) {
                     gradeRequirement = 'วิทย์-คณิต';
                     requiredGPA = 3.00;
@@ -1302,10 +1449,10 @@
                     gradeRequirement = 'วิทย์-เทคโน';
                     requiredGPA = 2.75;
                 }
-                
+
                 // ... (SweetAlert เกรดเฉลี่ย) ...
                 if (gradeRequirement) {
-                     Swal.fire({
+                    Swal.fire({
                         icon: 'warning',
                         title: 'เงื่อนไขเกรดเฉลี่ย',
                         html: `
@@ -1329,10 +1476,10 @@
                     }).then((result) => {
                         if (!result.isConfirmed) {
                             selectElement.value = '';
-                             if (!isSportsQuotaCategory) {
+                            if (!isSportsQuotaCategory) {
                                 courseSelects[1].value = '';
                                 courseSelects[2].value = '';
-                             }
+                            }
                             ageRadioContainer.style.display = 'none';
                             ageRadioContainer.innerHTML = '';
                             ageGroupInput.value = '';
@@ -1346,26 +1493,26 @@
 
                 function processCourseSelection(selectedCourse) {
                     // Logic เดิมของการแสดง Age (ถ้า Course มี course_age)
-                    
+
                     if (selectedCourse && selectedCourse.course_age && selectedCourse.course_age.trim() !== '') {
                         // ถ้า Course มีอายุ (เช่นแผนนักกีฬา)
                         // แสดงช่วงอายุ
                         ageRadioContainer.innerHTML = '<label class="form-label d-block">เลือกรุ่นอายุ <span class="text-danger">*</span></label>';
                         ageGroupInput.value = '';
-                        
+
                         const ages = selectedCourse.course_age.split(',').map(s => s.trim()).filter(s => s !== '');
-                        
+
                         if (ages.length > 0) {
                             const rowDiv = document.createElement('div');
                             rowDiv.className = 'row g-2';
-                            
+
                             ages.forEach(age => {
                                 const colDiv = document.createElement('div');
                                 colDiv.className = 'col-auto';
-                                
+
                                 const radioDiv = document.createElement('div');
                                 radioDiv.className = 'form-check form-check-inline';
-                                
+
                                 const radioInput = document.createElement('input');
                                 radioInput.className = 'form-check-input';
                                 radioInput.type = 'radio';
@@ -1373,22 +1520,22 @@
                                 radioInput.id = 'age_' + age;
                                 radioInput.value = age;
                                 radioInput.required = true;
-                                
-                                radioInput.addEventListener('change', function() {
+
+                                radioInput.addEventListener('change', function () {
                                     ageGroupInput.value = this.value;
                                 });
-                                
+
                                 const radioLabel = document.createElement('label');
                                 radioLabel.className = 'form-check-label';
                                 radioLabel.htmlFor = 'age_' + age;
                                 radioLabel.innerText = age + ' ปี';
-                                
+
                                 radioDiv.appendChild(radioInput);
                                 radioDiv.appendChild(radioLabel);
                                 colDiv.appendChild(radioDiv);
                                 rowDiv.appendChild(colDiv);
                             });
-                            
+
                             ageRadioContainer.appendChild(rowDiv);
                             ageRadioContainer.style.display = 'block';
                         }
@@ -1401,7 +1548,7 @@
 
                     // ถ้าไม่ใช่โควตานักกีฬา (isSportsQuotaCategory = false) เราต้องจัดการ reset options อันดับ 2-3 ด้วย
                     if (!isSportsQuotaCategory) {
-                         // Populate อันดับ 2 และ 3 ใหม่ โดยกรองแผนการเรียนกีฬาออก (เหมือนเดิม)
+                        // Populate อันดับ 2 และ 3 ใหม่ โดยกรองแผนการเรียนกีฬาออก (เหมือนเดิม)
                         [courseSelects[1], courseSelects[2]].forEach((select, index) => {
                             const currentValue = select.value;
                             select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 2} --</option>`;
@@ -1409,7 +1556,7 @@
                                 if (allowedCourses.includes(course.course_id.toString())) {
                                     const isSportsCourse = course.course_age && course.course_age.trim() !== '';
                                     if (!isSportsCourse) {
-                                         const option = document.createElement('option');
+                                        const option = document.createElement('option');
                                         option.value = course.course_id;
                                         const initials = course.course_initials || course.course_fullname;
                                         const branch = course.course_branch || '';
@@ -1425,18 +1572,18 @@
                     }
                 }
             });
-            
+
             // ฟังก์ชันตรวจสอบเงื่อนไขเกรดเฉลี่ย (ใช้ร่วมกันสำหรับทุกอันดับ)
             function checkGradeRequirement(selectedCourse, selectElement, callback) {
                 if (!selectedCourse) {
                     callback(false);
                     return;
                 }
-                
+
                 const courseName = selectedCourse.course_initials || selectedCourse.course_fullname || '';
                 let gradeRequirement = null;
                 let requiredGPA = 0;
-                
+
                 if (courseName.includes('วิทย์-คณิต') || courseName.includes('วิทย์ - คณิต')) {
                     gradeRequirement = 'วิทย์-คณิต';
                     requiredGPA = 3.00;
@@ -1444,7 +1591,7 @@
                     gradeRequirement = 'วิทย์-เทคโน';
                     requiredGPA = 2.75;
                 }
-                
+
                 if (gradeRequirement) {
                     Swal.fire({
                         icon: 'warning',
@@ -1479,20 +1626,20 @@
                     callback(true);
                 }
             }
-            
+
             // สร้าง updateOptions function ที่จะใช้ร่วมกัน
             let updateOptionsFunc = null;
-            
+
             // เพิ่ม event listener สำหรับอันดับ 2
-            courseSelects[1].addEventListener('change', function() {
+            courseSelects[1].addEventListener('change', function () {
                 const selectedCourseId = this.value;
                 const selectElement = this;
                 const selectedCourse = coursesData.find(c => c.course_id == selectedCourseId);
-                
+
                 // ตรวจสอบว่าเลือกซ้ำหรือไม่
                 const otherSelects = [courseSelects[0], courseSelects[2]];
                 const isDuplicate = otherSelects.some(s => s.value === selectedCourseId && selectedCourseId !== '');
-                
+
                 if (isDuplicate) {
                     Swal.fire({
                         icon: 'error',
@@ -1503,24 +1650,24 @@
                     selectElement.value = '';
                     return;
                 }
-                
-                checkGradeRequirement(selectedCourse, selectElement, function(confirmed) {
+
+                checkGradeRequirement(selectedCourse, selectElement, function (confirmed) {
                     if (confirmed && updateOptionsFunc) {
                         updateOptionsFunc();
                     }
                 });
             });
-            
+
             // เพิ่ม event listener สำหรับอันดับ 3
-            courseSelects[2].addEventListener('change', function() {
+            courseSelects[2].addEventListener('change', function () {
                 const selectedCourseId = this.value;
                 const selectElement = this;
                 const selectedCourse = coursesData.find(c => c.course_id == selectedCourseId);
-                
+
                 // ตรวจสอบว่าเลือกซ้ำหรือไม่
                 const otherSelects = [courseSelects[0], courseSelects[1]];
                 const isDuplicate = otherSelects.some(s => s.value === selectedCourseId && selectedCourseId !== '');
-                
+
                 if (isDuplicate) {
                     Swal.fire({
                         icon: 'error',
@@ -1531,8 +1678,8 @@
                     selectElement.value = '';
                     return;
                 }
-                
-                checkGradeRequirement(selectedCourse, selectElement, function(confirmed) {
+
+                checkGradeRequirement(selectedCourse, selectElement, function (confirmed) {
                     if (confirmed && updateOptionsFunc) {
                         updateOptionsFunc();
                     }
@@ -1541,17 +1688,17 @@
         } else {
             courseSection.style.display = 'none';
             courseSelects[0].required = false;
-            if(ageRadioContainer) ageRadioContainer.style.display = 'none';
-            if(ageRadioContainer) ageRadioContainer.style.display = 'none';
+            if (ageRadioContainer) ageRadioContainer.style.display = 'none';
+            if (ageRadioContainer) ageRadioContainer.style.display = 'none';
         }
-        
+
         // Re-attach duplicate prevention logic
         setupCourseSelectionLogic();
     });
 
     function setupCourseSelectionLogic() {
         const selects = document.querySelectorAll('.course-select');
-        
+
         function updateOptions() {
             const selectedValues = Array.from(selects)
                 .map(s => s.value)
@@ -1560,8 +1707,8 @@
             selects.forEach(s => {
                 const currentVal = s.value;
                 Array.from(s.options).forEach(opt => {
-                    if (opt.value === "") return; 
-                    
+                    if (opt.value === "") return;
+
                     // Disable if selected in OTHER selects
                     // But keep enabled if it's the currently selected value of THIS select
                     if (selectedValues.includes(opt.value) && opt.value !== currentVal) {
@@ -1572,7 +1719,7 @@
                 });
             });
         }
-        
+
         // เชื่อม updateOptionsFunc กับ updateOptions เพื่อให้ event listener อื่นเรียกใช้ได้
         updateOptionsFunc = updateOptions;
 
@@ -1583,7 +1730,7 @@
             // Since we replace elements in the quota change logic, we just need to attach 'change' event.
             select.addEventListener('change', updateOptions);
         });
-        
+
         // เรียก updateOptions ทันทีเพื่อ initialize
         updateOptions();
     }
@@ -1598,11 +1745,11 @@
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const submitBtn = document.getElementById('submitBtn');
-    
+
     function showConfirmationModal(confirmModal) {
         const formData = new FormData(document.getElementById('regisForm'));
         const dataList = document.getElementById('confirm-data-list');
-        dataList.innerHTML = ''; 
+        dataList.innerHTML = '';
 
         const fieldLabels = {
             recruit_category: 'ประเภทโควตา',
@@ -1642,11 +1789,11 @@
         for (const [key, label] of Object.entries(fieldLabels)) {
             let value;
             const element = document.querySelector(`[name="${key}"]`);
-            
+
             if (key === 'recruit_birthday') {
                 value = birthday;
-            } else if(element && element.tagName === 'SELECT') {
-                 if (element.value !== "") {
+            } else if (element && element.tagName === 'SELECT') {
+                if (element.value !== "") {
                     // Check if it's a course selection
                     if (key.startsWith('recruit_tpyeRoom')) {
                         const courseId = element.value;
@@ -1663,17 +1810,17 @@
                     } else {
                         value = element.options[element.selectedIndex].text;
                     }
-                 } else {
+                } else {
                     value = 'ไม่ได้เลือก';
-                 }
+                }
             } else if (key.endsWith('_validator')) {
-                 value = formData.get('recruit_img_cropped') ? '<span class="text-success">อัปโหลดแล้ว</span>' : '<span class="text-danger">ยังไม่ได้อัปโหลด</span>';
+                value = formData.get('recruit_img_cropped') ? '<span class="text-success">อัปโหลดแล้ว</span>' : '<span class="text-danger">ยังไม่ได้อัปโหลด</span>';
             } else if (element && element.type === 'file') {
-                 value = element.files.length > 0 ? `<span class="text-success">ไฟล์: ${element.files[0].name}</span>` : 'ไม่ได้เลือก';
+                value = element.files.length > 0 ? `<span class="text-success">ไฟล์: ${element.files[0].name}</span>` : 'ไม่ได้เลือก';
             } else {
                 value = formData.get(key) || '-';
             }
-            
+
             html += `<dt class="col-sm-4">${label}</dt><dd class="col-sm-8">${value}</dd>`;
         }
         html += '</dl>';
@@ -1691,23 +1838,23 @@
 
         // Helper function to set document previews
         const setDocPreview = (srcImgId, srcTxtId, targetImgId, targetTxtId) => {
-             const srcImg = document.getElementById(srcImgId);
-             const srcTxt = document.getElementById(srcTxtId);
-             const targetImg = document.getElementById(targetImgId);
-             const targetTxt = document.getElementById(targetTxtId);
-             
-             if(srcImg && !srcImg.classList.contains('d-none')) {
-                 targetImg.src = srcImg.src;
-                 targetImg.classList.remove('d-none');
-                 targetTxt.classList.add('d-none');
-             } else if(srcTxt && !srcTxt.classList.contains('d-none')) {
-                 targetTxt.textContent = srcTxt.textContent;
-                 targetTxt.classList.remove('d-none');
-                 targetImg.classList.add('d-none');
-             } else {
-                 targetImg.classList.add('d-none');
-                 targetTxt.classList.add('d-none');
-             }
+            const srcImg = document.getElementById(srcImgId);
+            const srcTxt = document.getElementById(srcTxtId);
+            const targetImg = document.getElementById(targetImgId);
+            const targetTxt = document.getElementById(targetTxtId);
+
+            if (srcImg && !srcImg.classList.contains('d-none')) {
+                targetImg.src = srcImg.src;
+                targetImg.classList.remove('d-none');
+                targetTxt.classList.add('d-none');
+            } else if (srcTxt && !srcTxt.classList.contains('d-none')) {
+                targetTxt.textContent = srcTxt.textContent;
+                targetTxt.classList.remove('d-none');
+                targetImg.classList.add('d-none');
+            } else {
+                targetImg.classList.add('d-none');
+                targetTxt.classList.add('d-none');
+            }
         };
 
         setDocPreview('preview_certificate', 'preview_certificate_name', 'confirm_certificate', 'confirm_certificate_name');
@@ -1720,7 +1867,7 @@
     function showStep(step) {
         document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
         document.getElementById('step-' + step).classList.add('active');
-        
+
         document.querySelectorAll('.step').forEach((el, index) => {
             if (index + 1 < step) {
                 el.classList.add('completed');
@@ -1735,7 +1882,7 @@
 
         prevBtn.style.display = (step === 1) ? 'none' : 'inline-block';
         nextBtn.style.display = (step === totalSteps) ? 'none' : 'inline-block';
-        
+
         if (step === totalSteps) {
             submitBtn.style.display = 'inline-block';
             checkCaptchaClientSide(); // Initial check when showing step
@@ -1785,7 +1932,7 @@
         const originalText = nextBtn.innerHTML;
         nextBtn.disabled = true;
         nextBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>กำลังตรวจสอบ...';
-        
+
         // Small delay for visual feedback
         setTimeout(() => {
             if (validateStep(currentStep)) {
@@ -1809,7 +1956,7 @@
         const originalText = prevBtn.innerHTML;
         prevBtn.disabled = true;
         prevBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>กำลังโหลด...';
-        
+
         // Small delay for visual feedback
         setTimeout(() => {
             currentStep--;
@@ -1821,7 +1968,7 @@
     });
 
     document.querySelectorAll('input, select').forEach(input => {
-        input.addEventListener('input', function() {
+        input.addEventListener('input', function () {
             if (this.value) {
                 this.classList.remove('is-invalid');
                 this.classList.add('is-valid');
@@ -1838,7 +1985,7 @@
         const num2 = parseInt($('#captcha_num2').val()) || 0;
         const userAnswer = parseInt($('#captcha_answer').val());
         const expectedAnswer = num1 + num2;
-        
+
         const submitBtn = document.getElementById('submitBtn');
         if (!submitBtn) return;
 
@@ -1848,20 +1995,20 @@
         } else {
             submitBtn.disabled = true;
             if ($('#captcha_answer').val().length > 0) {
-                 if(userAnswer.toString().length >= expectedAnswer.toString().length) {
-                     $('#captcha_answer').addClass('is-invalid');
-                 }
+                if (userAnswer.toString().length >= expectedAnswer.toString().length) {
+                    $('#captcha_answer').addClass('is-invalid');
+                }
             } else {
-                $('#captcha_answer').removeClass('is-invalid is-valid');    
+                $('#captcha_answer').removeClass('is-invalid is-valid');
             }
         }
     }
-    
+
     // Listen to CAPTCHA input
-    $('#captcha_answer').on('input keyup', function() {
+    $('#captcha_answer').on('input keyup', function () {
         checkCaptchaClientSide();
     });
-    
+
     // Initialize step
     showStep(1);
 
@@ -1887,53 +2034,59 @@
 </script>
 
 <!-- Confirmation Modal -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmModalLabel">โปรดตรวจสอบข้อมูลการสมัครของท่าน</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p class="text-danger">**กรุณาตรวจสอบข้อมูลให้ถูกต้องครบถ้วน หากยืนยันการสมัครแล้ว จะไม่สามารถกลับมาแก้ไขได้**</p>
-        <div id="confirm-data-list" class="list-group">
-            <!-- Data will be injected here by JS -->
-        </div>
-        <!-- Image preview placeholder -->
-        <div class="mt-3">
-            <h6 class="fw-bold border-bottom pb-2">รูปถ่ายนักเรียน</h6>
-            <div class="text-center" id="confirm-image-wrapper">
-                <img id="confirm_image" src="#" alt="รูปถ่ายนักเรียน" class="img-thumbnail d-none" style="max-width:200px; max-height:250px; object-fit:contain;" />
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true"
+    data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">โปรดตรวจสอบข้อมูลการสมัครของท่าน</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        </div>
+            <div class="modal-body">
+                <p class="text-danger">**กรุณาตรวจสอบข้อมูลให้ถูกต้องครบถ้วน หากยืนยันการสมัครแล้ว
+                    จะไม่สามารถกลับมาแก้ไขได้**</p>
+                <div id="confirm-data-list" class="list-group">
+                    <!-- Data will be injected here by JS -->
+                </div>
+                <!-- Image preview placeholder -->
+                <div class="mt-3">
+                    <h6 class="fw-bold border-bottom pb-2">รูปถ่ายนักเรียน</h6>
+                    <div class="text-center" id="confirm-image-wrapper">
+                        <img id="confirm_image" src="#" alt="รูปถ่ายนักเรียน" class="img-thumbnail d-none"
+                            style="max-width:200px; max-height:250px; object-fit:contain;" />
+                    </div>
+                </div>
 
-        <div class="mt-3">
-            <h6 class="fw-bold border-bottom pb-2">เอกสารหลักฐาน</h6>
-            <div class="row">
-                <div class="col-md-4 text-center mb-3">
-                    <p class="small mb-1 fw-bold">ปพ.1 (หน้า)</p>
-                    <img id="confirm_certificate" src="#" class="img-thumbnail d-none" style="max-height:150px; width: auto;">
-                    <p id="confirm_certificate_name" class="small text-muted d-none"></p>
-                </div>
-                <div class="col-md-4 text-center mb-3">
-                    <p class="small mb-1 fw-bold">ปพ.1 (หลัง)</p>
-                    <img id="confirm_certificateB" src="#" class="img-thumbnail d-none" style="max-height:150px; width: auto;">
-                    <p id="confirm_certificateB_name" class="small text-muted d-none"></p>
-                </div>
-                <div class="col-md-4 text-center mb-3">
-                    <p class="small mb-1 fw-bold">สำเนาบัตรประชาชน</p>
-                    <img id="confirm_idcard" src="#" class="img-thumbnail d-none" style="max-height:150px; width: auto;">
-                    <p id="confirm_idcard_name" class="small text-muted d-none"></p>
+                <div class="mt-3">
+                    <h6 class="fw-bold border-bottom pb-2">เอกสารหลักฐาน</h6>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <p class="small mb-1 fw-bold">ปพ.1 (หน้า)</p>
+                            <img id="confirm_certificate" src="#" class="img-thumbnail d-none"
+                                style="max-height:150px; width: auto;">
+                            <p id="confirm_certificate_name" class="small text-muted d-none"></p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <p class="small mb-1 fw-bold">ปพ.1 (หลัง)</p>
+                            <img id="confirm_certificateB" src="#" class="img-thumbnail d-none"
+                                style="max-height:150px; width: auto;">
+                            <p id="confirm_certificateB_name" class="small text-muted d-none"></p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <p class="small mb-1 fw-bold">สำเนาบัตรประชาชน</p>
+                            <img id="confirm_idcard" src="#" class="img-thumbnail d-none"
+                                style="max-height:150px; width: auto;">
+                            <p id="confirm_idcard_name" class="small text-muted d-none"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">แก้ไขข้อมูล</button>
+                <button type="button" class="btn btn-success" id="confirmSubmitBtn">ยืนยันและสมัครเรียน</button>
+            </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">แก้ไขข้อมูล</button>
-        <button type="button" class="btn btn-success" id="confirmSubmitBtn">ยืนยันและสมัครเรียน</button>
-      </div>
     </div>
-  </div>
 </div>
 
 <?= $this->endSection() ?>

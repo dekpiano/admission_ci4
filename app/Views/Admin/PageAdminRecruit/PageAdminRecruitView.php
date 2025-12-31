@@ -17,30 +17,30 @@
                 <div class="card-body">
                     <div class="user-avatar-section">
                         <div class="d-flex align-items-center flex-column">
-                            <img class="img-fluid rounded my-4" 
-                                 src="<?= base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '') . '/img/' . ($recruit['recruit_img'] ?? 'default.png')) ?>" 
-                                 height="110" width="110" 
-                                 alt="User avatar"
-                                 loading="lazy"
-                                 style="object-fit: cover;"
-                                 onerror="this.onerror=null;this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>';">
+                            <img class="img-fluid rounded my-4"
+                                src="<?= base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '') . '/img/' . ($recruit['recruit_img'] ?? 'default.png')) ?>"
+                                height="110" width="110" alt="User avatar" loading="lazy" style="object-fit: cover;"
+                                onerror="this.onerror=null;this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>';">
                             <div class="user-info text-center">
-                                <h4 class="mb-2"><?= esc($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']) ?></h4>
-                                <span class="badge bg-label-secondary mt-1">รหัสผู้สมัคร: <?= esc($recruit['recruit_id']) ?></span>
+                                <h4 class="mb-2">
+                                    <?= esc($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']) ?>
+                                </h4>
+                                <span class="badge bg-label-secondary mt-1">รหัสผู้สมัคร:
+                                    <?= esc($recruit['recruit_id']) ?></span>
                             </div>
                         </div>
                     </div>
                     <div class="d-flex justify-content-around flex-wrap my-4 py-3 border-top border-bottom">
-                        <?php 
-                          $status = $recruit['recruit_status'] ?? 'รอตรวจสอบ';
-                          $statusClass = 'bg-label-primary'; // Default for "รอตรวจสอบ"
-
-                          if ($status === 'ผ่านการตรวจสอบ') {
-                              $statusClass = 'bg-label-success';
-                          } elseif ($status !== 'รอตรวจสอบ') {
-                              // Any status other than 'ผ่านการตรวจสอบ' or 'รอตรวจสอบ' is considered a variation of "not passed"
-                              $statusClass = 'bg-label-danger';
-                          }
+                        <?php
+                        $status = $recruit['recruit_status'] ?? 'รอตรวจสอบ';
+                        $statusClass = 'bg-label-primary'; // Default for "รอตรวจสอบ"
+                        
+                        if ($status === 'ผ่านการตรวจสอบ') {
+                            $statusClass = 'bg-label-success';
+                        } elseif ($status !== 'รอตรวจสอบ') {
+                            // Any status other than 'ผ่านการตรวจสอบ' or 'รอตรวจสอบ' is considered a variation of "not passed"
+                            $statusClass = 'bg-label-danger';
+                        }
                         ?>
                         <div class="d-flex align-items-start me-4 mt-3 gap-3">
                             <span class="badge <?= $statusClass ?> p-2 rounded"><i class="bx bx-check"></i></span>
@@ -82,7 +82,8 @@
                             </button>
                         </div>
                         <div class="d-flex justify-content-center pt-3 border-top">
-                            <a href="<?= site_url('skjadmin/recruits/edit/' . $recruit['recruit_id']) ?>" class="btn btn-primary me-3">แก้ไขข้อมูล</a>
+                            <a href="<?= site_url('skjadmin/recruits/edit/' . $recruit['recruit_id']) ?>"
+                                class="btn btn-primary me-3">แก้ไขข้อมูล</a>
                             <a href="<?= site_url('skjadmin/recruits') ?>" class="btn btn-label-secondary">ย้อนกลับ</a>
                         </div>
                     </div>
@@ -98,17 +99,23 @@
             <div class="nav-align-top mb-4">
                 <ul class="nav nav-pills mb-3" role="tablist">
                     <li class="nav-item">
-                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-personal" aria-controls="navs-pills-top-personal" aria-selected="true">
+                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                            data-bs-target="#navs-pills-top-personal" aria-controls="navs-pills-top-personal"
+                            aria-selected="true">
                             <i class="bx bx-user me-1"></i> ข้อมูลส่วนตัว
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-education" aria-controls="navs-pills-top-education" aria-selected="false">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                            data-bs-target="#navs-pills-top-education" aria-controls="navs-pills-top-education"
+                            aria-selected="false">
                             <i class="bx bx-book-open me-1"></i> การศึกษา/การสมัคร
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-documents" aria-controls="navs-pills-top-documents" aria-selected="false">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                            data-bs-target="#navs-pills-top-documents" aria-controls="navs-pills-top-documents"
+                            aria-selected="false">
                             <i class="bx bx-file me-1"></i> เอกสารหลักฐาน
                         </button>
                     </li>
@@ -125,7 +132,9 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">วันเกิด</label>
-                                    <p class="form-control-static"><?= !empty($recruit['recruit_birthday']) ? esc($datethai->thai_date_fullmonth(strtotime($recruit['recruit_birthday']))) : '' ?></p>
+                                    <p class="form-control-static">
+                                        <?= !empty($recruit['recruit_birthday']) ? esc($datethai->thai_date_fullmonth(strtotime($recruit['recruit_birthday']))) : '' ?>
+                                    </p>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">เชื้อชาติ</label>
@@ -154,11 +163,13 @@
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">ถนน</label>
-                                        <p class="form-control-static"><?= esc($recruit['recruit_homeRoad'] ?? '-') ?></p>
+                                        <p class="form-control-static"><?= esc($recruit['recruit_homeRoad'] ?? '-') ?>
+                                        </p>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">ตำบล/แขวง</label>
-                                        <p class="form-control-static"><?= esc($recruit['recruit_homeSubdistrict']) ?></p>
+                                        <p class="form-control-static"><?= esc($recruit['recruit_homeSubdistrict']) ?>
+                                        </p>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">อำเภอ/เขต</label>
@@ -192,7 +203,9 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">เกรดเฉลี่ยสะสม (GPAX)</label>
-                                    <p class="form-control-static"><span class="badge bg-label-info fs-6"><?= esc($recruit['recruit_grade']) ?></span></p>
+                                    <p class="form-control-static"><span
+                                            class="badge bg-label-info fs-6"><?= esc($recruit['recruit_grade']) ?></span>
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -210,26 +223,27 @@
                                 </div>
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">แผนการเรียนที่สมัคร (หลัก)</label>
-                                    <p class="form-control-static text-primary fw-bold"><?= esc($recruit['recruit_tpyeRoom']) ?></p>
+                                    <p class="form-control-static text-primary fw-bold">
+                                        <?= esc($recruit['recruit_tpyeRoom']) ?></p>
                                 </div>
                                 <?php if (!empty($recruit['recruit_major'])): ?>
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">สาขาวิชา</label>
-                                    <p class="form-control-static"><?= esc($recruit['recruit_major']) ?></p>
-                                </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">สาขาวิชา</label>
+                                        <p class="form-control-static"><?= esc($recruit['recruit_major']) ?></p>
+                                    </div>
                                 <?php endif; ?>
                                 <?php if (!empty($recruit['majorOrderList'])): ?>
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">อันดับแผนการเรียนที่เลือก</label>
-                                    <ul class="list-group list-group-flush">
-                                        <?php foreach ($recruit['majorOrderList'] as $index => $major): ?>
-                                            <li class="list-group-item d-flex align-items-center">
-                                                <span class="badge bg-primary rounded-pill me-3"><?= $index + 1 ?></span>
-                                                <?= esc($major) ?>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">อันดับแผนการเรียนที่เลือก</label>
+                                        <ul class="list-group list-group-flush">
+                                            <?php foreach ($recruit['majorOrderList'] as $index => $major): ?>
+                                                <li class="list-group-item d-flex align-items-center">
+                                                    <span class="badge bg-primary rounded-pill me-3"><?= $index + 1 ?></span>
+                                                    <?= esc($major) ?>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -240,10 +254,10 @@
                         <h5 class="card-header">เอกสารหลักฐานประกอบการสมัคร</h5>
                         <div class="card-body">
                             <div class="row g-3">
-                                <?php 
+                                <?php
                                 $docs = [
                                     ['name' => 'ปพ.1 ด้านหน้า', 'file' => $recruit['recruit_certificateEdu'], 'icon' => 'bx-file', 'folder' => 'certificate'],
-                                    ['name' => 'ปพ.1 ด้านหลัง', 'file' => $recruit['recruit_certificateEduB'], 'icon' => 'bx-file', 'folder' => 'certificate'],
+                                    ['name' => 'ปพ.1 ด้านหลัง', 'file' => $recruit['recruit_certificateEduB'], 'icon' => 'bx-file', 'folder' => 'certificateB'],
                                     ['name' => 'สำเนาบัตรประชาชน', 'file' => $recruit['recruit_copyidCard'], 'icon' => 'bx-id-card', 'folder' => 'copyidCard'],
                                     ['name' => 'สำเนาทะเบียนบ้าน', 'file' => $recruit['recruit_copyAddress'], 'icon' => 'bx-home', 'folder' => 'copyAddress'],
                                     ['name' => 'เอกสารความสามารถพิเศษ', 'file' => $recruit['recruit_certificateAbility'], 'icon' => 'bx-medal', 'folder' => 'certificateAbility'],
@@ -256,10 +270,9 @@
                                                 <i class="bx <?= $doc['icon'] ?> bx-lg mb-3 text-secondary"></i>
                                                 <h6 class="card-title"><?= $doc['name'] ?></h6>
                                                 <?php if (!empty($doc['file'])): ?>
-                                                    <a href="<?= base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/' . $doc['folder'] . '/' . $doc['file']) ?>" 
-                                                       target="_blank" 
-                                                       class="btn btn-sm btn-outline-primary">
-                                                       <i class="bx bx-show me-1"></i> ดูเอกสาร
+                                                    <a href="<?= base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/' . $doc['folder'] . '/' . $doc['file']) ?>"
+                                                        target="_blank" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bx bx-show me-1"></i> ดูเอกสาร
                                                     </a>
                                                 <?php else: ?>
                                                     <span class="badge bg-label-secondary">ไม่มีเอกสาร</span>
@@ -342,7 +355,7 @@
                 id: '<?= $recruit['recruit_id'] ?>',
                 status: statusValue
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     Swal.fire(
                         'สำเร็จ!',
@@ -359,7 +372,7 @@
                     );
                 }
             },
-            error: function() {
+            error: function () {
                 Swal.fire(
                     'ผิดพลาด!',
                     'เกิดข้อผิดพลาดในการเชื่อมต่อ',

@@ -34,6 +34,8 @@ RUN { \
     echo 'opcache.enable_cli=1'; \
     echo 'realpath_cache_size=4096k'; \
     echo 'realpath_cache_ttl=600'; \
+    echo 'upload_max_filesize=100M'; \
+    echo 'post_max_size=110M'; \
     } > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 # Enable Apache mod_rewrite and mod_ssl
