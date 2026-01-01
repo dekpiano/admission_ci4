@@ -1202,6 +1202,10 @@
                         class="btn btn-outline-light btn-lg rounded-pill px-4">
                         <i class='bx bx-search-alt me-2'></i> ตรวจสอบสถานะ
                     </a>
+                <a href="<?= base_url('new-admission/statistics') ?>"
+                        class="btn btn-outline-light btn-lg rounded-pill px-4">
+                        <i class='bx bx-bar-chart-alt-2 me-2'></i> สถิติการสมัคร
+                    </a>
                 </div>
             </div>
         </div>
@@ -1371,85 +1375,85 @@
     ?>
 
     <?php if (isset($systemStatus) && $systemStatus->onoff_regis == 'on'): ?>
-        <?php if (!empty($open_levels)): ?>
-            <?php foreach ($open_levels as $level_num): ?>
-                <?php
-                $is_junior_high = $level_num <= 3;
-                $pre_check_url_level = $is_junior_high ? '1' : '4';
-                $subtitle = $is_junior_high ? 'สำหรับนักเรียนที่จบการศึกษาชั้น ป.6 หรือเทียบเท่า' : 'สำหรับนักเรียนที่จบการศึกษาชั้น ม.3 หรือเทียบเท่า';
-                $btn_class = $is_junior_high ? 'btn-primary' : 'btn-info text-white';
-                $card_class = $is_junior_high ? '' : 'm4';
-                ?>
-                <div class="col-md-6 col-lg-5">
-                    <div class="app-card <?= $card_class ?>">
-                        <div class="text-center">
-                            <div class="level-badge">
-                                <i class='bx bx-bookmark me-1'></i> มัธยมศึกษาปีที่ <?= $level_num ?>
-                            </div>
-                            <p class="text-muted mb-3"><?= $subtitle ?></p>
-                            <div class="mb-4">
-                                <i class='bx bx-calendar fs-1 text-primary mb-2'></i>
-                                <p class="fw-bold text-dark mb-0">
-                                    ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y') + 543 ?>
-                                </p>
-                            </div>
-
+            <?php if (!empty($open_levels)): ?>
+                    <?php foreach ($open_levels as $level_num): ?>
                             <?php
-                            $is_closed = false;
-                            $is_not_open = false;
-                            $open_time = 0;
-
-                            if (isset($systemStatus->onoff_datetime_regis_open)) {
-                                $open_time = strtotime($systemStatus->onoff_datetime_regis_open);
-                                if (time() < $open_time) {
-                                    $is_not_open = true;
-                                }
-                            }
-
-                            if (isset($systemStatus->onoff_datetime_regis_close)) {
-                                $close_time = strtotime($systemStatus->onoff_datetime_regis_close);
-                                if (time() > $close_time) {
-                                    $is_closed = true;
-                                }
-                            }
+                            $is_junior_high = $level_num <= 3;
+                            $pre_check_url_level = $is_junior_high ? '1' : '4';
+                            $subtitle = $is_junior_high ? 'สำหรับนักเรียนที่จบการศึกษาชั้น ป.6 หรือเทียบเท่า' : 'สำหรับนักเรียนที่จบการศึกษาชั้น ม.3 หรือเทียบเท่า';
+                            $btn_class = $is_junior_high ? 'btn-primary' : 'btn-info text-white';
+                            $card_class = $is_junior_high ? '' : 'm4';
                             ?>
+                            <div class="col-md-6 col-lg-5">
+                                <div class="app-card <?= $card_class ?>">
+                                    <div class="text-center">
+                                        <div class="level-badge">
+                                            <i class='bx bx-bookmark me-1'></i> มัธยมศึกษาปีที่ <?= $level_num ?>
+                                        </div>
+                                        <p class="text-muted mb-3"><?= $subtitle ?></p>
+                                        <div class="mb-4">
+                                            <i class='bx bx-calendar fs-1 text-primary mb-2'></i>
+                                            <p class="fw-bold text-dark mb-0">
+                                                ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y') + 543 ?>
+                                            </p>
+                                        </div>
 
-                            <?php if ($is_closed): ?>
-                                <button class="apply-button btn btn-secondary" disabled>
-                                    <i class='bx bx-x-circle me-2'></i> ปิดรับสมัครแล้ว
-                                </button>
-                            <?php elseif ($is_not_open): ?>
-                                <button class="apply-button btn btn-warning" disabled>
-                                    <i class='bx bx-time-five me-2'></i> ยังไม่ถึงวันรับสมัคร
-                                </button>
-                            <?php else: ?>
-                                <button type="button" class="apply-button btn <?= $btn_class ?> apply-btn"
-                                    data-href="<?= base_url('new-admission/pre-check/' . $pre_check_url_level . '?level=' . $level_num) ?>">
-                                    <i class='bx bx-edit-alt me-2'></i> สมัครเรียน ม.<?= $level_num ?>
-                                </button>
-                            <?php endif; ?>
+                                        <?php
+                                        $is_closed = false;
+                                        $is_not_open = false;
+                                        $open_time = 0;
+
+                                        if (isset($systemStatus->onoff_datetime_regis_open)) {
+                                            $open_time = strtotime($systemStatus->onoff_datetime_regis_open);
+                                            if (time() < $open_time) {
+                                                $is_not_open = true;
+                                            }
+                                        }
+
+                                        if (isset($systemStatus->onoff_datetime_regis_close)) {
+                                            $close_time = strtotime($systemStatus->onoff_datetime_regis_close);
+                                            if (time() > $close_time) {
+                                                $is_closed = true;
+                                            }
+                                        }
+                                        ?>
+
+                                        <?php if ($is_closed): ?>
+                                                <button class="apply-button btn btn-secondary" disabled>
+                                                    <i class='bx bx-x-circle me-2'></i> ปิดรับสมัครแล้ว
+                                                </button>
+                                        <?php elseif ($is_not_open): ?>
+                                                <button class="apply-button btn btn-warning" disabled>
+                                                    <i class='bx bx-time-five me-2'></i> ยังไม่ถึงวันรับสมัคร
+                                                </button>
+                                        <?php else: ?>
+                                                <button type="button" class="apply-button btn <?= $btn_class ?> apply-btn"
+                                                    data-href="<?= base_url('new-admission/pre-check/' . $pre_check_url_level . '?level=' . $level_num) ?>">
+                                                    <i class='bx bx-edit-alt me-2'></i> สมัครเรียน ม.<?= $level_num ?>
+                                                </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                    <?php endforeach; ?>
+            <?php else: ?>
+                    <div class="col-12">
+                        <div class="announcement-card text-center">
+                            <i class='bx bx-info-circle fs-1 mb-3'></i>
+                            <h4 class="fw-bold">ยังไม่เปิดรับสมัคร</h4>
+                            <p class="mb-0">ยังไม่มีระดับชั้นที่เปิดรับสมัครในขณะนี้ กรุณาติดตามประกาศจากทางโรงเรียน</p>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="col-12">
-                <div class="announcement-card text-center">
-                    <i class='bx bx-info-circle fs-1 mb-3'></i>
-                    <h4 class="fw-bold">ยังไม่เปิดรับสมัคร</h4>
-                    <p class="mb-0">ยังไม่มีระดับชั้นที่เปิดรับสมัครในขณะนี้ กรุณาติดตามประกาศจากทางโรงเรียน</p>
-                </div>
-            </div>
-        <?php endif; ?>
+            <?php endif; ?>
 
     <?php else: ?>
-        <div class="col-12">
-            <div class="announcement-card text-center">
-                <i class='bx bx-lock-alt fs-1 mb-3'></i>
-                <h4 class="fw-bold">ปิดระบบรับสมัคร</h4>
-                <p class="mb-0">ระบบรับสมัครนักเรียนออนไลน์ยังไม่เปิดให้บริการ กรุณาติดตามประกาศจากทางโรงเรียน</p>
+            <div class="col-12">
+                <div class="announcement-card text-center">
+                    <i class='bx bx-lock-alt fs-1 mb-3'></i>
+                    <h4 class="fw-bold">ปิดระบบรับสมัคร</h4>
+                    <p class="mb-0">ระบบรับสมัครนักเรียนออนไลน์ยังไม่เปิดให้บริการ กรุณาติดตามประกาศจากทางโรงเรียน</p>
+                </div>
             </div>
-        </div>
     <?php endif; ?>
 </div>
 
@@ -1469,105 +1473,105 @@
     ?>
 
     <?php if (!empty($grouped_schedules)): ?>
-        <?php foreach ($grouped_schedules as $level => $level_schedules): ?>
-            <div class="col-md-12">
-                <div class="schedule-card h-100">
+            <?php foreach ($grouped_schedules as $level => $level_schedules): ?>
+                    <div class="col-md-12">
+                        <div class="schedule-card h-100">
+                            <div class="schedule-header">
+                                <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการ: <?= $level ?></h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light text-center">
+                                        <tr>
+                                            <th width="25%"><i class='bx bx-bookmark me-2'></i> รอบการรับสมัคร</th>
+                                            <th width="20%"><i class='bx bx-edit me-2'></i> รับสมัคร</th>
+                                            <th width="15%"><i class='bx bx-pencil me-2'></i> สอบ</th>
+                                            <th width="20%"><i class='bx bx-broadcast me-2'></i> ประกาศผล</th>
+                                            <th width="20%"><i class='bx bx-id-card me-2'></i> รายงานตัว</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($level_schedules as $schedule): ?>
+                                                <tr>
+                                                    <td class="align-middle text-center">
+                                                        <div class="fw-bold text-primary"><?= $schedule->schedule_round ?></div>
+                                                    </td>
+
+                                                    <!-- Recruit -->
+                                                    <td class="align-middle text-center">
+                                                        <div class="d-flex flex-column">
+                                                            <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                                <?= $datethai->thai_date_short(strtotime($schedule->schedule_recruit_start)) ?>
+                                                                -
+                                                                <?= $datethai->thai_date_short(strtotime($schedule->schedule_recruit_end)) ?>
+                                                            </span>
+                                                            <small class="text-muted" style="font-size: 0.75rem;">Online</small>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- Exam -->
+                                                    <td class="align-middle text-center">
+                                                        <?php if ($schedule->schedule_exam): ?>
+                                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_exam)) ?>
+                                                                </span>
+                                                        <?php else: ?>
+                                                                <span class="text-muted">-</span>
+                                                        <?php endif; ?>
+                                                    </td>
+
+                                                    <!-- Announce -->
+                                                    <td class="align-middle text-center">
+                                                        <?php if ($schedule->schedule_announce): ?>
+                                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_announce)) ?>
+                                                                </span>
+                                                        <?php else: ?>
+                                                                <span class="text-muted">-</span>
+                                                        <?php endif; ?>
+                                                    </td>
+
+                                                    <!-- Report -->
+                                                    <td class="align-middle text-center">
+                                                        <?php if ($schedule->schedule_report): ?>
+                                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_report)) ?>
+                                                                </span>
+                                                        <?php else: ?>
+                                                                <span class="text-muted">-</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+            <?php endforeach; ?>
+    <?php else: ?>
+            <div class="col-12">
+                <div class="schedule-card">
                     <div class="schedule-header">
-                        <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการ: <?= $level ?></h5>
+                        <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการรับสมัคร</h5>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light text-center">
-                                <tr>
-                                    <th width="25%"><i class='bx bx-bookmark me-2'></i> รอบการรับสมัคร</th>
-                                    <th width="20%"><i class='bx bx-edit me-2'></i> รับสมัคร</th>
-                                    <th width="15%"><i class='bx bx-pencil me-2'></i> สอบ</th>
-                                    <th width="20%"><i class='bx bx-broadcast me-2'></i> ประกาศผล</th>
-                                    <th width="20%"><i class='bx bx-id-card me-2'></i> รายงานตัว</th>
-                                </tr>
-                            </thead>
+                        <table class="table mb-0">
                             <tbody>
-                                <?php foreach ($level_schedules as $schedule): ?>
-                                    <tr>
-                                        <td class="align-middle text-center">
-                                            <div class="fw-bold text-primary"><?= $schedule->schedule_round ?></div>
-                                        </td>
-
-                                        <!-- Recruit -->
-                                        <td class="align-middle text-center">
-                                            <div class="d-flex flex-column">
-                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_recruit_start)) ?>
-                                                    -
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_recruit_end)) ?>
-                                                </span>
-                                                <small class="text-muted" style="font-size: 0.75rem;">Online</small>
-                                            </div>
-                                        </td>
-
-                                        <!-- Exam -->
-                                        <td class="align-middle text-center">
-                                            <?php if ($schedule->schedule_exam): ?>
-                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_exam)) ?>
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
-                                        </td>
-
-                                        <!-- Announce -->
-                                        <td class="align-middle text-center">
-                                            <?php if ($schedule->schedule_announce): ?>
-                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_announce)) ?>
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
-                                        </td>
-
-                                        <!-- Report -->
-                                        <td class="align-middle text-center">
-                                            <?php if ($schedule->schedule_report): ?>
-                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_report)) ?>
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
+                                <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="py-4">
+                                            <i class='bx bx-calendar-x fs-1 text-muted mb-3'></i>
+                                            <h5 class="fw-bold text-secondary">ยังไม่มีกำหนดการ</h5>
+                                            <p class="text-muted mb-0">กรุณาติดตามประกาศจากทางโรงเรียนในภายหลัง</p>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <div class="col-12">
-            <div class="schedule-card">
-                <div class="schedule-header">
-                    <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการรับสมัคร</h5>
-                </div>
-                <div class="table-responsive">
-                    <table class="table mb-0">
-                        <tbody>
-                            <tr>
-                                <td colspan="5" class="text-center py-5">
-                                    <div class="py-4">
-                                        <i class='bx bx-calendar-x fs-1 text-muted mb-3'></i>
-                                        <h5 class="fw-bold text-secondary">ยังไม่มีกำหนดการ</h5>
-                                        <p class="text-muted mb-0">กรุณาติดตามประกาศจากทางโรงเรียนในภายหลัง</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     <?php endif; ?>
 </div>
 

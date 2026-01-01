@@ -9,14 +9,47 @@ class AdmissionModel extends Model
     protected $table = 'tb_recruitstudent';
     protected $primaryKey = 'recruit_id';
     protected $allowedFields = [
-        'recruit_id', 'recruit_year', 'recruit_regLevel', 'recruit_prefix', 'recruit_firstName', 'recruit_lastName',
-        'recruit_idCard', 'recruit_birthday', 'recruit_race', 'recruit_nationality', 'recruit_religion', 'recruit_phone',
-        'recruit_homeNumber', 'recruit_homeGroup', 'recruit_homeRoad', 'recruit_homeSubdistrict', 'recruit_homedistrict',
-        'recruit_homeProvince', 'recruit_homePostcode', 'recruit_oldSchool', 'recruit_district', 'recruit_province',
-        'recruit_grade', 'recruit_category', 'recruit_tpyeRoom', 'recruit_tpyeRoom_id', 'recruit_major', 'recruit_majorOrder', 'recruit_agegroup',
-        'recruit_img', 'recruit_status', 'recruit_date', 'recruit_dateUpdate', 'recruit_address', 'recruit_copyAddress',
-        'recruit_statusSurrender', 'recruit_StatusQuiz', 'recruit_certificateAbility', 'recruit_certificateEdu',
-        'recruit_certificateEduB', 'recruit_copyidCard'
+        'recruit_id',
+        'recruit_year',
+        'recruit_regLevel',
+        'recruit_prefix',
+        'recruit_firstName',
+        'recruit_lastName',
+        'recruit_idCard',
+        'recruit_birthday',
+        'recruit_race',
+        'recruit_nationality',
+        'recruit_religion',
+        'recruit_phone',
+        'recruit_homeNumber',
+        'recruit_homeGroup',
+        'recruit_homeRoad',
+        'recruit_homeSubdistrict',
+        'recruit_homedistrict',
+        'recruit_homeProvince',
+        'recruit_homePostcode',
+        'recruit_oldSchool',
+        'recruit_district',
+        'recruit_province',
+        'recruit_grade',
+        'recruit_category',
+        'recruit_tpyeRoom',
+        'recruit_tpyeRoom_id',
+        'recruit_major',
+        'recruit_majorOrder',
+        'recruit_agegroup',
+        'recruit_img',
+        'recruit_status',
+        'recruit_date',
+        'recruit_dateUpdate',
+        'recruit_address',
+        'recruit_copyAddress',
+        'recruit_statusSurrender',
+        'recruit_StatusQuiz',
+        'recruit_certificateAbility',
+        'recruit_certificateEdu',
+        'recruit_certificateEduB',
+        'recruit_copyidCard'
     ];
 
     public function student_insert($data)
@@ -60,8 +93,8 @@ class AdmissionModel extends Model
     public function isIdCardRegistered($idcard, $year)
     {
         return $this->where('recruit_idCard', $idcard)
-                    ->where('recruit_year', $year)
-                    ->countAllResults() > 0;
+            ->where('recruit_year', $year)
+            ->countAllResults() > 0;
     }
 
     public function getLatestRecruitId()
@@ -74,14 +107,14 @@ class AdmissionModel extends Model
         $year = $this->getOpenYear()->openyear_year;
         return $this->isIdCardRegistered($idCard, $year);
     }
-    
+
     public function findStudentForStatusCheck($idcard, $birthday, $year)
     {
         return $this->where('recruit_idCard', $idcard)
-                    ->where('recruit_birthday', $birthday)
-                    ->where('recruit_year', $year)
-                    ->get()
-                    ->getRow();
+            ->where('recruit_birthday', $birthday)
+            ->where('recruit_year', $year)
+            ->get()
+            ->getRow();
     }
 
     public function getCourseById($id, $gradeLevel)
@@ -93,7 +126,7 @@ class AdmissionModel extends Model
             ->get()
             ->getRow();
     }
-    
+
     public function getQuotaByKey($key)
     {
         return $this->db->table('tb_quota')->where('quota_key', $key)->get()->getRow();
@@ -141,7 +174,7 @@ class AdmissionModel extends Model
             ->get()
             ->getRow();
     }
-    
+
     public function getAllQuotas()
     {
         return $this->db->table('tb_quota')->get()->getResult();
@@ -151,7 +184,7 @@ class AdmissionModel extends Model
     {
         return $this->db->table('tb_course')->get()->getResult();
     }
-    
+
     public function getCoursesByGradeLevel($level)
     {
         return $this->db->table("tb_course")
@@ -214,6 +247,82 @@ class AdmissionModel extends Model
             ->where('schedule_year', $year)
             ->orderBy('schedule_id', 'ASC')
             ->orderBy('schedule_level', 'ASC')
+            ->get()
+            ->getResult();
+    }
+
+    /**
+     * Get admission statistics for a specific year
+     */
+    public function getAdmissionStats($year)
+    {
+        // Total by level and gender
+        $totalByLevel = $this->db->table($this->table)
+            ->select('recruit_regLevel, 
+                     COUNT(*) as total,
+                     SUM(CASE WHEN recruit_prefix IN ("เด็กชาย", "นาย") THEN 1 ELSE 0 END) as male,
+                     SUM(CASE WHEN recruit_prefix IN ("เด็กหญิง", "นางสาว") THEN 1 ELSE 0 END) as female')
+            ->where('recruit_year', $year)
+            ->groupBy('recruit_regLevel')
+            ->get()
+            ->getResult();
+
+        // Total by status
+        $totalByStatus = $this->db->table($this->table)
+            ->select('recruit_status, COUNT(*) as total')
+            ->where('recruit_year', $year)
+            ->groupBy('recruit_status')
+            ->get()
+            ->getResult();
+
+        // Total by Program/Room and gender
+        $totalByRoom = $this->db->table($this->table)
+            ->select('recruit_regLevel, recruit_tpyeRoom, 
+                     COUNT(*) as total,
+                     SUM(CASE WHEN recruit_prefix IN ("เด็กชาย", "นาย") THEN 1 ELSE 0 END) as male,
+                     SUM(CASE WHEN recruit_prefix IN ("เด็กหญิง", "นางสาว") THEN 1 ELSE 0 END) as female')
+            ->where('recruit_year', $year)
+            ->groupBy('recruit_regLevel, recruit_tpyeRoom')
+            ->orderBy('recruit_regLevel', 'ASC')
+            ->get()
+            ->getResult();
+
+        return [
+            'total_by_level' => $totalByLevel,
+            'total_by_status' => $totalByStatus,
+            'total_by_room' => $totalByRoom,
+            'grand_total' => $this->where('recruit_year', $year)->countAllResults()
+        ];
+    }
+
+    /**
+     * Get daily registration statistics
+     */
+    public function getDailyStats($year)
+    {
+        return $this->db->table($this->table)
+            ->select('DATE(recruit_date) as date, 
+                     COUNT(*) as total,
+                     SUM(CASE WHEN recruit_regLevel = 1 THEN 1 ELSE 0 END) as m1,
+                     SUM(CASE WHEN recruit_regLevel = 4 THEN 1 ELSE 0 END) as m4,
+                     SUM(CASE WHEN recruit_prefix IN ("เด็กชาย", "นาย") THEN 1 ELSE 0 END) as male,
+                     SUM(CASE WHEN recruit_prefix IN ("เด็กหญิง", "นางสาว") THEN 1 ELSE 0 END) as female')
+            ->where('recruit_year', $year)
+            ->groupBy('DATE(recruit_date)')
+            ->orderBy('DATE(recruit_date)', 'ASC')
+            ->get()
+            ->getResult();
+    }
+
+    /**
+     * Get statistics grouped by level and status
+     */
+    public function getStatsByLevelAndStatus($year)
+    {
+        return $this->db->table($this->table)
+            ->select('recruit_regLevel, recruit_status, COUNT(*) as total')
+            ->where('recruit_year', $year)
+            ->groupBy('recruit_regLevel, recruit_status')
             ->get()
             ->getResult();
     }

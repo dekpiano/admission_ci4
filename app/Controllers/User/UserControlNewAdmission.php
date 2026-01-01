@@ -36,6 +36,7 @@ class UserControlNewAdmission extends BaseController
         $data['datethai'] = $this->datethai; // Pass Datethai library to view
 
         $data['schedules'] = $this->admissionModel->getAdmissionSchedule($data['checkYear']->openyear_year);
+        $data['stats'] = $this->admissionModel->getAdmissionStats($data['checkYear']->openyear_year);
 
         return view('User/UserHome', $data);
     }
@@ -168,6 +169,23 @@ class UserControlNewAdmission extends BaseController
         $data['quotas'] = $this->admissionModel->getAllQuotas(); // Add quotas for menu generation
         $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
         return view('User/UserStatus', $data);
+    }
+
+    public function statistics()
+    {
+        $checkYear = $this->admissionModel->getOpenYear();
+        $year = $checkYear->openyear_year;
+
+        $data['title'] = "สถิติการรับสมัครปีการศึกษา " . $year;
+        $data['checkYear'] = $checkYear;
+        $data['systemStatus'] = $this->admissionModel->getSystemStatus();
+        $data['quotas'] = $this->admissionModel->getAllQuotas();
+        $data['stats'] = $this->admissionModel->getAdmissionStats($year);
+        $data['dailyStats'] = $this->admissionModel->getDailyStats($year);
+        $data['statusByLevel'] = $this->admissionModel->getStatsByLevelAndStatus($year);
+        $data['datethai'] = $this->datethai;
+
+        return view('User/UserStatistics', $data);
     }
 
     /**
