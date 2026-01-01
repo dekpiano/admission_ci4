@@ -133,6 +133,10 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->get('recruits/print/(:num)', 'AdminControlRecruit::print/$1');
     $routes->post('recruits/stats', 'AdminControlRecruit::getStats');
 
+    // Statistic
+    $routes->get('statistics', 'AdminControlStatistic::index');
+    $routes->get('statistics/(:num)', 'AdminControlStatistic::index/$1');
+
     // Course Management
     $routes->get('courses', 'AdminControlCourse::index');
     $routes->get('courses/add', 'AdminControlCourse::add');
@@ -192,6 +196,14 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('schedules/update', 'AdminControlSchedule::updateSchedule');
     $routes->post('schedules/delete', 'AdminControlSchedule::deleteSchedule');
     $routes->post('schedules/toggle-status', 'AdminControlSchedule::toggleStatus');
+
+    // Cleanup Management
+    $routes->get('cleanup', 'AdminControlCleanup::index');
+    $routes->post('cleanup/scan', 'AdminControlCleanup::scan');
+    $routes->post('cleanup/delete', 'AdminControlCleanup::delete');
+    $routes->post('cleanup/clean_local', 'AdminControlCleanup::clean_local');
+    $routes->post('cleanup/scan_orphans', 'AdminControlCleanup::scan_orphans');
+    $routes->post('cleanup/delete_orphans', 'AdminControlCleanup::delete_orphans');
 
 });
 

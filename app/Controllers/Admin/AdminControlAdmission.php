@@ -34,7 +34,7 @@ class AdminControlAdmission extends BaseController
 
     private function checkAuth()
     {
-        if (!$this->session->has('login_id')) {
+        if (!$this->session->has('login_id') && !$this->session->has('pers_id')) {
             return redirect()->to('loginAdmin');
         }
         return null;

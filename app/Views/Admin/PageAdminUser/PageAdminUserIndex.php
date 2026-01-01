@@ -23,32 +23,34 @@
                 </thead>
                 <tbody class="table-border-bottom-0">
                     <?php foreach ($users as $user): ?>
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="avatar avatar-sm me-3">
-                                    <?php if(!empty($user->pers_img)): ?>
-                                        <img src="https://skj.ac.th/uploads/personnel/<?= $user->pers_img ?>" alt="Avatar" class="rounded-circle" loading="lazy">
-                                    <?php else: ?>
-                                        <span class="avatar-initial rounded-circle bg-label-primary"><?= mb_substr($user->pers_firstname, 0, 1) ?></span>
-                                    <?php endif; ?>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar avatar-sm me-3">
+                                            <?php
+                                            $userImg = !empty($user->pers_img)
+                                                ? "https://personnel.skj.ac.th/uploads/admin/Personnal/" . $user->pers_img
+                                                : base_url('public/sneat-assets/img/avatars/1.png');
+                                            ?>
+                                            <img src="<?= $userImg ?>" alt="Avatar" class="rounded-circle" loading="lazy"
+                                            onerror="this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>'">
+                                    </div>
+                                    <div>
+                                        <strong><?= $user->pers_prefix . $user->pers_firstname . ' ' . $user->pers_lastname ?></strong>
+                                        <div class="text-muted small"><?= $user->pers_username ?></div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <strong><?= $user->pers_prefix . $user->pers_firstname . ' ' . $user->pers_lastname ?></strong>
-                                    <div class="text-muted small"><?= $user->pers_username ?></div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-label-primary me-1"><?= $user->admin_rloes_status ?></span></td>
-                        <td><?= $user->admin_rloes_academic_position ?></td>
-                        <td>
-                            <a href="<?= base_url('skjadmin/users/delete/' . $user->admin_rloes_id) ?>" 
-                               class="btn btn-sm btn-icon btn-outline-danger"
-                               onclick="return confirm('ยืนยันการลบสิทธิ์ผู้ใช้งานนี้?');">
-                                <i class="bx bx-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
+                            </td>
+                            <td><span class="badge bg-label-primary me-1"><?= $user->admin_rloes_status ?></span></td>
+                            <td><?= $user->admin_rloes_academic_position ?></td>
+                            <td>
+                                <a href="<?= base_url('skjadmin/users/delete/' . $user->admin_rloes_id) ?>"
+                                    class="btn btn-sm btn-icon btn-outline-danger"
+                                    onclick="return confirm('ยืนยันการลบสิทธิ์ผู้ใช้งานนี้?');">
+                                    <i class="bx bx-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
@@ -93,11 +95,12 @@
 
 <?= $this->section('scripts') ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#usersTable').DataTable({
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json"
@@ -148,7 +151,7 @@
                 role: role,
                 position: position
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     $('#addUserModal').modal('hide');
                     Swal.fire('สำเร็จ', response.msg, 'success').then(() => location.reload());
@@ -156,7 +159,7 @@
                     Swal.fire('ผิดพลาด', response.msg, 'error');
                 }
             },
-            error: function() {
+            error: function () {
                 Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
             }
         });

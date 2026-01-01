@@ -108,6 +108,13 @@
             </a>
           </li>
 
+          <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/statistics') !== false) ? 'active' : '' ?>">
+            <a href="<?= site_url('skjadmin/statistics') ?>" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
+              <div data-i18n="Statistics">สถิติการรับสมัคร</div>
+            </a>
+          </li>
+
           <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/reports') !== false) ? 'active' : '' ?>">
             <a href="<?= site_url('skjadmin/reports') ?>" class="menu-link">
               <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
@@ -141,6 +148,13 @@
             <a href="<?= site_url('skjadmin/schedules') ?>" class="menu-link">
               <i class="menu-icon tf-icons bx bx-calendar-event"></i>
               <div data-i18n="Schedules">จัดการกำหนดการ</div>
+            </a>
+          </li>
+
+          <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/cleanup') !== false) ? 'active' : '' ?>">
+            <a href="<?= site_url('skjadmin/cleanup') ?>" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-trash"></i>
+              <div data-i18n="Cleanup">จัดการไฟล์ขยะ</div>
             </a>
           </li>
 
@@ -195,8 +209,13 @@
               <li class="nav-item navbar-dropdown dropdown-user dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                   <div class="avatar avatar-online">
-                    <img src="<?= base_url('public/sneat-assets/img/avatars/1.png') ?>" alt
-                      class="w-px-40 h-auto rounded-circle" />
+                    <?php
+                    $topUserImg = session()->get('user_img')
+                      ? "https://personnel.skj.ac.th/uploads/admin/Personnal/" . session()->get('user_img')
+                      : base_url('public/sneat-assets/img/avatars/1.png');
+                    ?>
+                    <img src="<?= $topUserImg ?>" alt class="w-px-40 h-auto rounded-circle"
+                      onerror="this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>'" />
                   </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -205,8 +224,8 @@
                       <div class="d-flex">
                         <div class="flex-shrink-0 me-3">
                           <div class="avatar avatar-online">
-                            <img src="<?= base_url('public/sneat-assets/img/avatars/1.png') ?>" alt
-                              class="w-px-40 h-auto rounded-circle" />
+                            <img src="<?= $topUserImg ?>" alt class="w-px-40 h-auto rounded-circle"
+                              onerror="this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>'" />
                           </div>
                         </div>
                         <div class="flex-grow-1">

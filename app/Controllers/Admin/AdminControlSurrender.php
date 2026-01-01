@@ -19,7 +19,7 @@ class AdminControlSurrender extends BaseController
 
     private function checkAuth()
     {
-        if (!$this->session->has('login_id')) {
+        if (!$this->session->has('login_id') && !$this->session->has('pers_id')) {
             return redirect()->to('loginAdmin');
         }
         return null;
@@ -29,7 +29,7 @@ class AdminControlSurrender extends BaseController
     {
         $request = service('request');
         $year = $request->getVar('year') ?? date('Y');
-        
+
         $data['title'] = 'ข้อมูลการรายงานตัว';
         $data['selected_year'] = $year;
 
@@ -47,7 +47,7 @@ class AdminControlSurrender extends BaseController
                     $year = $data['years'][0]->recruit_year;
                 }
             } else {
-                 $year = date('Y') + 543;
+                $year = date('Y') + 543;
             }
         }
         $data['selected_year'] = $year;
@@ -59,7 +59,7 @@ class AdminControlSurrender extends BaseController
         $builder->join('skjacth_personnel.tb_students', 'tb_recruitstudent.recruit_idCard = skjacth_personnel.tb_students.stu_iden', 'left');
         $builder->where('recruit_year', $year);
         $builder->orderBy('recruit_id', 'DESC');
-        
+
         $data['students'] = $builder->get()->getResult();
 
         return view('Admin/PageAdminSurrender/PageAdminSurrenderIndex', $data);
@@ -70,7 +70,7 @@ class AdminControlSurrender extends BaseController
         $recruit_id = $this->request->getPost('recruit_id');
         $data = ['recruit_statusSurrender' => date('Y-m-d H:i:s')];
         $result = $this->db->table('tb_recruitstudent')->where('recruit_id', $recruit_id)->update($data);
-        
+
         return $this->response->setJSON(['success' => $result]);
     }
 
@@ -88,14 +88,14 @@ class AdminControlSurrender extends BaseController
         if (empty($recruit)) {
             return "ไม่พบข้อมูลผู้สมัคร";
         }
-        
+
         $studentId = $recruit[0]->recruit_idCard;
         $Year = $recruit[0]->recruit_year;
 
         // Fetch Confirmation Data (tb_students)
         $confrim = $this->db->table('skjacth_personnel.tb_students')
-                            ->where('stu_iden', $studentId)
-                            ->get()->getResult();
+            ->where('stu_iden', $studentId)
+            ->get()->getResult();
 
         if (empty($confrim)) {
             return "ไม่พบข้อมูลการรายงานตัว กรุณาให้นักเรียนกรอกข้อมูลรายงานตัวก่อน";
@@ -104,13 +104,13 @@ class AdminControlSurrender extends BaseController
         $idstu = str_replace('-', '', $confrim[0]->stu_iden);
 
         $TH_Month = array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฏาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
-        
+
         $date_Y = date('Y') + 543;
-        $date_D = (int)date('d');
+        $date_D = (int) date('d');
         $date_M = date('n');
 
         $date_Y_birt = date('Y', strtotime($confrim[0]->stu_birthDay)) + 543;
-        $date_D_birt = (int)date('d', strtotime($confrim[0]->stu_birthDay));
+        $date_D_birt = (int) date('d', strtotime($confrim[0]->stu_birthDay));
         $date_M_birt = date('n', strtotime($confrim[0]->stu_birthDay));
 
         $mpdf = new \Mpdf\Mpdf([
@@ -141,9 +141,9 @@ class AdminControlSurrender extends BaseController
         $html .= '<div style="position:absolute;top:463px;left:550px; width:100%">' . $date_Y . '</div>';
 
         $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . base_url('image-proxy?file=recruitstudent/m' . $recruit[0]->recruit_regLevel . '/img/' . $recruit[0]->recruit_img) . '"></div>';
-        
+
         $regLevel = $confrim[0]->stu_regLevel ?? $recruit[0]->recruit_regLevel;
-        
+
         $html .= '<div style="position:absolute;top:105px;left:230px; width:100%">' . $regLevel . '</div>';
         $html .= '<div style="position:absolute;top:105px;left:470px; width:100%">' . $Year . '</div>';
         $html .= '<div style="position:absolute;top:130px;left:140px; width:100%">' . $confrim[0]->stu_prefix . $confrim[0]->stu_fristName . '</div>';
@@ -180,18 +180,27 @@ class AdminControlSurrender extends BaseController
         $html .= '<div style="position:absolute;top:710px;left:640px; width:100%">' . $confrim[0]->stu_talent . '</div>';
 
         $checkMark = '<div style="position:absolute;top:%dpx;left:%dpx; width:100%%"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>';
-        
-        if ($confrim[0]->stu_parenalStatus == 'อยู่ด้วยกัน') $html .= sprintf($checkMark, 740, 178);
-        else if ($confrim[0]->stu_parenalStatus == 'แยกกันอยู่') $html .= sprintf($checkMark, 740, 270);
-        else if ($confrim[0]->stu_parenalStatus == 'หย่าร้าง') $html .= sprintf($checkMark, 740, 365);
-        else if ($confrim[0]->stu_parenalStatus == 'บิดาถึงแก่กรรม') $html .= sprintf($checkMark, 740, 448);
-        else if ($confrim[0]->stu_parenalStatus == 'มารดาถึงแก่กรรม') $html .= sprintf($checkMark, 740, 565);
-        else if ($confrim[0]->stu_parenalStatus == 'บิดาหรือมารดาแต่งงานใหม่') $html .= sprintf($checkMark, 765, 178);
 
-        if ($confrim[0]->stu_presentLife == 'อยู่กับบิดาและมารดา') $html .= sprintf($checkMark, 790, 225);
-        else if ($confrim[0]->stu_presentLife == 'อยู่กับบิดาหรือมารดา') $html .= sprintf($checkMark, 790, 360);
-        else if ($confrim[0]->stu_presentLife == 'บุคคลอื่น') $html .= sprintf($checkMark, 790, 510);
-        
+        if ($confrim[0]->stu_parenalStatus == 'อยู่ด้วยกัน')
+            $html .= sprintf($checkMark, 740, 178);
+        else if ($confrim[0]->stu_parenalStatus == 'แยกกันอยู่')
+            $html .= sprintf($checkMark, 740, 270);
+        else if ($confrim[0]->stu_parenalStatus == 'หย่าร้าง')
+            $html .= sprintf($checkMark, 740, 365);
+        else if ($confrim[0]->stu_parenalStatus == 'บิดาถึงแก่กรรม')
+            $html .= sprintf($checkMark, 740, 448);
+        else if ($confrim[0]->stu_parenalStatus == 'มารดาถึงแก่กรรม')
+            $html .= sprintf($checkMark, 740, 565);
+        else if ($confrim[0]->stu_parenalStatus == 'บิดาหรือมารดาแต่งงานใหม่')
+            $html .= sprintf($checkMark, 765, 178);
+
+        if ($confrim[0]->stu_presentLife == 'อยู่กับบิดาและมารดา')
+            $html .= sprintf($checkMark, 790, 225);
+        else if ($confrim[0]->stu_presentLife == 'อยู่กับบิดาหรือมารดา')
+            $html .= sprintf($checkMark, 790, 360);
+        else if ($confrim[0]->stu_presentLife == 'บุคคลอื่น')
+            $html .= sprintf($checkMark, 790, 510);
+
         $html .= '<div style="position:absolute;top:787px;left:620px; width:100%">' . $confrim[0]->stu_personOther . '</div>';
 
         $html .= '<div style="position:absolute;top:814px;left:310px; width:100%">' . $confrim[0]->stu_hCode . '</div>';
@@ -214,12 +223,18 @@ class AdminControlSurrender extends BaseController
         $html .= '<div style="position:absolute;top:905px;left:490px; width:100%">' . $confrim[0]->stu_cPostcode . '</div>';
         $html .= '<div style="position:absolute;top:905px;left:640px; width:100%">' . $confrim[0]->stu_phone . '</div>';
 
-        if ($confrim[0]->stu_natureRoom == 'บ้านตนเอง') $html .= sprintf($checkMark, 935, 130);
-        else if ($confrim[0]->stu_natureRoom == 'เช่าอยู่') $html .= sprintf($checkMark, 935, 227);
-        else if ($confrim[0]->stu_natureRoom == 'อาศัยผู้อื่นอยู่') $html .= sprintf($checkMark, 935, 300);
-        else if ($confrim[0]->stu_natureRoom == 'บ้านพักราชการ') $html .= sprintf($checkMark, 935, 405);
-        else if ($confrim[0]->stu_natureRoom == 'วัด') $html .= sprintf($checkMark, 935, 525);
-        else if ($confrim[0]->stu_natureRoom == 'หอพัก') $html .= sprintf($checkMark, 935, 570);
+        if ($confrim[0]->stu_natureRoom == 'บ้านตนเอง')
+            $html .= sprintf($checkMark, 935, 130);
+        else if ($confrim[0]->stu_natureRoom == 'เช่าอยู่')
+            $html .= sprintf($checkMark, 935, 227);
+        else if ($confrim[0]->stu_natureRoom == 'อาศัยผู้อื่นอยู่')
+            $html .= sprintf($checkMark, 935, 300);
+        else if ($confrim[0]->stu_natureRoom == 'บ้านพักราชการ')
+            $html .= sprintf($checkMark, 935, 405);
+        else if ($confrim[0]->stu_natureRoom == 'วัด')
+            $html .= sprintf($checkMark, 935, 525);
+        else if ($confrim[0]->stu_natureRoom == 'หอพัก')
+            $html .= sprintf($checkMark, 935, 570);
 
         $html .= '<div style="position:absolute;top:950px;left:250px; width:100%">' . $confrim[0]->stu_farSchool . '</div>';
         $html .= '<div style="position:absolute;top:950px;left:470px; width:100%">' . $confrim[0]->stu_travel . '</div>';
@@ -230,9 +245,11 @@ class AdminControlSurrender extends BaseController
         $html .= '<div style="position:absolute;top:999px;left:450px; width:100%">' . $confrim[0]->stu_schoolDistrict . '</div>';
         $html .= '<div style="position:absolute;top:999px;left:630px; width:100%">' . $confrim[0]->stu_schoolProvince . '</div>';
 
-        if ($confrim[0]->stu_usedStudent == 'ไม่เคย') $html .= sprintf($checkMark, 1030, 487);
-        else if ($confrim[0]->stu_usedStudent == 'เคย') $html .= sprintf($checkMark, 1030, 560);
-        
+        if ($confrim[0]->stu_usedStudent == 'ไม่เคย')
+            $html .= sprintf($checkMark, 1030, 487);
+        else if ($confrim[0]->stu_usedStudent == 'เคย')
+            $html .= sprintf($checkMark, 1030, 560);
+
         $html .= '<div style="position:absolute;top:1026px;left:690px; width:100%">' . $confrim[0]->stu_inputLevel . '</div>';
 
         $html .= '<div style="position:absolute;top:1055px;left:200px; width:100%">' . $confrim[0]->stu_phoneUrgent . '</div>';
@@ -248,7 +265,7 @@ class AdminControlSurrender extends BaseController
         $mpdf->WriteHTML($html);
 
         $mpdf->AddPage();
-        
+
         // Father Data
         $confrimFa = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "พ่อ")->get()->getResult();
         $father = $confrimFa[0] ?? null;
@@ -282,11 +299,16 @@ class AdminControlSurrender extends BaseController
         $html2 .= '<div style="position:absolute;top:605px;left:245px; width:100%">' . ($father->par_cProvince ?? '') . '</div>';
         $html2 .= '<div style="position:absolute;top:628px;left:280px; width:100%">' . ($father->par_cPostcode ?? '') . '</div>';
 
-        if (($father->par_rest ?? '') == 'บ้านตนเอง') $html2 .= sprintf($checkMark, 655, 200);
-        else if (($father->par_rest ?? '') == 'เช่าบ้าน') $html2 .= sprintf($checkMark, 680, 200);
-        else if (($father->par_rest ?? '') == 'อาศัยผู้อื่น') $html2 .= sprintf($checkMark, 705, 200);
-        else if (($father->par_rest ?? '') == 'บ้านพักสวัสดิการ') $html2 .= sprintf($checkMark, 730, 200);
-        else if (($father->par_rest ?? '') == 'อื่นๆ') $html2 .= sprintf($checkMark, 755, 200);
+        if (($father->par_rest ?? '') == 'บ้านตนเอง')
+            $html2 .= sprintf($checkMark, 655, 200);
+        else if (($father->par_rest ?? '') == 'เช่าบ้าน')
+            $html2 .= sprintf($checkMark, 680, 200);
+        else if (($father->par_rest ?? '') == 'อาศัยผู้อื่น')
+            $html2 .= sprintf($checkMark, 705, 200);
+        else if (($father->par_rest ?? '') == 'บ้านพักสวัสดิการ')
+            $html2 .= sprintf($checkMark, 730, 200);
+        else if (($father->par_rest ?? '') == 'อื่นๆ')
+            $html2 .= sprintf($checkMark, 755, 200);
 
         $html2 .= '<div style="position:absolute;top:750px;left:280px; width:100%">' . ($father->par_restOrthor ?? '') . '</div>';
 
@@ -304,8 +326,10 @@ class AdminControlSurrender extends BaseController
             $html2 .= '<div style="position:absolute;top:845px;left:285px; width:100%">' . ($father->par_serviceName ?? '') . '</div>';
         }
 
-        if (($father->par_claim ?? '') == 'เบิกได้') $html2 .= sprintf($checkMark, 875, 200);
-        else if (($father->par_claim ?? '') == 'เบิกไม่ได้') $html2 .= sprintf($checkMark, 875, 270);
+        if (($father->par_claim ?? '') == 'เบิกได้')
+            $html2 .= sprintf($checkMark, 875, 200);
+        else if (($father->par_claim ?? '') == 'เบิกไม่ได้')
+            $html2 .= sprintf($checkMark, 875, 270);
 
         // Mother Data
         $confrimMa = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "แม่")->get()->getResult();
@@ -339,11 +363,16 @@ class AdminControlSurrender extends BaseController
         $html2 .= '<div style="position:absolute;top:605px;left:450px; width:100%">' . ($mother->par_cProvince ?? '') . '</div>';
         $html2 .= '<div style="position:absolute;top:628px;left:480px; width:100%">' . ($mother->par_cPostcode ?? '') . '</div>';
 
-        if (($mother->par_rest ?? '') == 'บ้านตนเอง') $html2 .= sprintf($checkMark, 655, 400);
-        else if (($mother->par_rest ?? '') == 'เช่าบ้าน') $html2 .= sprintf($checkMark, 680, 400);
-        else if (($mother->par_rest ?? '') == 'อาศัยผู้อื่น') $html2 .= sprintf($checkMark, 705, 400);
-        else if (($mother->par_rest ?? '') == 'บ้านพักสวัสดิการ') $html2 .= sprintf($checkMark, 730, 400);
-        else if (($mother->par_rest ?? '') == 'อื่นๆ') $html2 .= sprintf($checkMark, 755, 400);
+        if (($mother->par_rest ?? '') == 'บ้านตนเอง')
+            $html2 .= sprintf($checkMark, 655, 400);
+        else if (($mother->par_rest ?? '') == 'เช่าบ้าน')
+            $html2 .= sprintf($checkMark, 680, 400);
+        else if (($mother->par_rest ?? '') == 'อาศัยผู้อื่น')
+            $html2 .= sprintf($checkMark, 705, 400);
+        else if (($mother->par_rest ?? '') == 'บ้านพักสวัสดิการ')
+            $html2 .= sprintf($checkMark, 730, 400);
+        else if (($mother->par_rest ?? '') == 'อื่นๆ')
+            $html2 .= sprintf($checkMark, 755, 400);
 
         $html2 .= '<div style="position:absolute;top:750px;left:480px; width:100%">' . ($mother->par_restOrthor ?? '') . '</div>';
 
@@ -361,8 +390,10 @@ class AdminControlSurrender extends BaseController
             $html2 .= '<div style="position:absolute;top:845px;left:485px; width:100%">' . ($mother->par_serviceName ?? '') . '</div>';
         }
 
-        if (($mother->par_claim ?? '') == 'เบิกได้') $html2 .= sprintf($checkMark, 875, 400);
-        else if (($mother->par_claim ?? '') == 'เบิกไม่ได้') $html2 .= sprintf($checkMark, 875, 470);
+        if (($mother->par_claim ?? '') == 'เบิกได้')
+            $html2 .= sprintf($checkMark, 875, 400);
+        else if (($mother->par_claim ?? '') == 'เบิกไม่ได้')
+            $html2 .= sprintf($checkMark, 875, 470);
 
         // Guardian Data
         $confrimPu = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "ผู้ปกครอง")->get()->getResult();
@@ -397,11 +428,16 @@ class AdminControlSurrender extends BaseController
         $html2 .= '<div style="position:absolute;top:602px;left:650px; width:100%">' . ($guardian->par_cProvince ?? '') . '</div>';
         $html2 .= '<div style="position:absolute;top:625px;left:680px; width:100%">' . ($guardian->par_cPostcode ?? '') . '</div>';
 
-        if (($guardian->par_rest ?? '') == 'บ้านตนเอง') $html2 .= sprintf($checkMark, 655, 600);
-        else if (($guardian->par_rest ?? '') == 'เช่าบ้าน') $html2 .= sprintf($checkMark, 680, 600);
-        else if (($guardian->par_rest ?? '') == 'อาศัยผู้อื่น') $html2 .= sprintf($checkMark, 705, 600);
-        else if (($guardian->par_rest ?? '') == 'บ้านพักสวัสดิการ') $html2 .= sprintf($checkMark, 730, 600);
-        else if (($guardian->par_rest ?? '') == 'อื่นๆ') $html2 .= sprintf($checkMark, 755, 600);
+        if (($guardian->par_rest ?? '') == 'บ้านตนเอง')
+            $html2 .= sprintf($checkMark, 655, 600);
+        else if (($guardian->par_rest ?? '') == 'เช่าบ้าน')
+            $html2 .= sprintf($checkMark, 680, 600);
+        else if (($guardian->par_rest ?? '') == 'อาศัยผู้อื่น')
+            $html2 .= sprintf($checkMark, 705, 600);
+        else if (($guardian->par_rest ?? '') == 'บ้านพักสวัสดิการ')
+            $html2 .= sprintf($checkMark, 730, 600);
+        else if (($guardian->par_rest ?? '') == 'อื่นๆ')
+            $html2 .= sprintf($checkMark, 755, 600);
 
         $html2 .= '<div style="position:absolute;top:747px;left:680px; width:100%">' . ($guardian->par_restOrthor ?? '') . '</div>';
 

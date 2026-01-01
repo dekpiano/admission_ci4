@@ -18,7 +18,7 @@ class AdminControlNews extends BaseController
 
     private function checkAuth()
     {
-        if (!$this->session->has('login_id')) {
+        if (!$this->session->has('login_id') && !$this->session->has('pers_id')) {
             return redirect()->to('loginAdmin');
         }
         return null;
@@ -34,7 +34,8 @@ class AdminControlNews extends BaseController
 
     public function index()
     {
-        if ($redir = $this->checkAuth()) return $redir;
+        if ($redir = $this->checkAuth())
+            return $redir;
 
         $data = $this->all();
         $data['title'] = "ประชาสัมพันธ์";
@@ -44,7 +45,8 @@ class AdminControlNews extends BaseController
 
     public function add()
     {
-        if ($redir = $this->checkAuth()) return $redir;
+        if ($redir = $this->checkAuth())
+            return $redir;
 
         $data = $this->all();
         $data['title'] = "เพิ่มประชาสัมพันธ์";

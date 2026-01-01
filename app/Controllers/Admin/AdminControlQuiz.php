@@ -19,7 +19,7 @@ class AdminControlQuiz extends BaseController
 
     private function checkAuth()
     {
-        if (!$this->session->has('login_id')) {
+        if (!$this->session->has('login_id') && !$this->session->has('pers_id')) {
             return redirect()->to('loginAdmin');
         }
         return null;
@@ -27,12 +27,13 @@ class AdminControlQuiz extends BaseController
 
     public function PageQuizMain($year)
     {
-        if ($redir = $this->checkAuth()) return $redir;
+        if ($redir = $this->checkAuth())
+            return $redir;
 
         // $ConnPers = \Config\Database::connect('skjpers'); // Used in join, CI4 handles this in query builder if configured correctly or using multiple DB connections manually.
         // In CI3 code: $this->db->join('skjacth_personnel.tb_students', ...)
         // This implies cross-database join. In MySQL, if the user has access to both DBs, this works with standard query builder using 'database.table'.
-        
+
         $data['switch'] = $this->db->table("tb_onoffsys")->get()->getResult();
         $data['title'] = $this->title;
 
@@ -70,10 +71,10 @@ class AdminControlQuiz extends BaseController
     {
         $recruit_id = $this->request->getPost('recruit_id');
         $status = $this->request->getPost('recruit_StatusQuiz');
-        
+
         $data = ['recruit_StatusQuiz' => $status];
         $this->db->table('tb_recruitstudent')->where('recruit_id', $recruit_id)->update($data);
-        
+
         if ($status == "ผ่าน") {
             echo 1;
         } else {
