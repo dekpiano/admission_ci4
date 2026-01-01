@@ -73,13 +73,13 @@ $routes->group('confirmation', ['namespace' => 'App\Controllers\User'], function
 $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
     $routes->get('/', 'AdminControlDashboard::index'); // Updated to use Dashboard controller directly
     // Print (Legacy/Admission)
-    $routes->get('Print/(:any)/(:any)/(:num)', 'AdminControlAdmission::pdf_type_all/$1/$2/$3'); 
+    $routes->get('Print/(:any)/(:any)/(:num)', 'AdminControlAdmission::pdf_type_all/$1/$2/$3');
 
     // Admission / Recruitment
-    $routes->get('Student/Update/(:any)', 'AdminControlAdmission::update_recruitstudent/$1'); 
+    $routes->get('Student/Update/(:any)', 'AdminControlAdmission::update_recruitstudent/$1');
     $routes->get('Recruitment/(:num)', 'AdminControlAdmission::index/$1');
     $routes->get('Recruitment/CheckData/(:any)', 'AdminControlAdmission::edit_recruitstudent/$1');
-    
+
     // Admission Actions (POST)
     $routes->post('admission/switch_regis', 'AdminControlAdmission::switch_regis');
     $routes->post('admission/switch_system', 'AdminControlAdmission::switch_system');
@@ -92,7 +92,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($rou
     $routes->post('admission/SchoolList', 'AdminControlAdmission::SchoolList');
     $routes->post('admission/SelectThailand', 'AdminControlAdmission::SelectThailand');
     $routes->post('admission/DataRecruitment', 'AdminControlAdmission::DataRecruitment');
-    
+
     // Surrender
     $routes->get('Surrender/(:any)', 'AdminControlSurrender::PageSurrenderMain/$1');
     $routes->post('surrender/UpdateSurrender', 'AdminControlSurrender::UpdateSurrender');
@@ -111,7 +111,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($rou
     // News
     $routes->get('news', 'AdminControlNews::index');
     $routes->get('news/add', 'AdminControlNews::add');
-    
+
     $routes->get('logout', 'AdminControlAdmission::logout');
 });
 
@@ -208,3 +208,4 @@ $routes->post('control_admission/SchoolList', 'User\UserControlAdmission::School
 $routes->get('control_admission/pdf/(:num)', 'User\UserControlAdmission::pdf/$1'); // Added PDF route
 $routes->post('control_admission/data_user', 'User\UserControlAdmission::data_user');
 $routes->post('control_login/validlogin', 'User\UserControlLogin::validlogin');
+

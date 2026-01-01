@@ -47,7 +47,7 @@ class AdminControlAdmission extends BaseController
         // I'll use Control_Statistic's logic as it seems more complete for a dashboard.
         // However, if the view 'admin/admin_admission_main.php' expects specific variables, I might need to check the view.
         // I'll use the logic from Control_Statistic for now.
-        
+
         $data['StatisticAll'] = $this->db->table('tb_recruitstudent')
             ->select('COUNT(tb_recruitstudent.recruit_category) AS num,
 					SUM(CASE WHEN recruit_prefix = "เด็กหญิง" or recruit_prefix = "นางสาว" THEN 1 END) AS Girl,
@@ -59,24 +59,25 @@ class AdminControlAdmission extends BaseController
             ->orderBy('recruit_date', 'ASC')
             ->get()->getResult();
 
-         // ... (Include other queries from Control_Statistic if needed)
-         // For brevity, I'll include the main ones.
-         
-         return $data;
+        // ... (Include other queries from Control_Statistic if needed)
+        // For brevity, I'll include the main ones.
+
+        return $data;
     }
 
     public function index($year = null)
     {
-        if ($redir = $this->checkAuth()) return $redir;
+        if ($redir = $this->checkAuth())
+            return $redir;
         if ($year === null) {
             // Default to current year or handle error
-            $year = date('Y') + 543; 
+            $year = date('Y') + 543;
         }
 
         $data['switch'] = $this->db->table("tb_onoffsys")->get()->getResult();
         $data = array_merge($data ?? [], $this->report_student($year));
         $data['title'] = $this->title;
-        
+
         $data['checkYear'] = $this->db->table('tb_openyear')->get()->getResult();
         $data['year'] = $this->db->table('tb_recruitstudent')->select('recruit_year')->groupBy('recruit_year')->orderBy('recruit_year', 'DESC')->get()->getResult();
 
@@ -95,7 +96,7 @@ class AdminControlAdmission extends BaseController
         foreach ($recruit as $record) {
             $Sub = explode('|', $record->recruit_majorOrder);
             $recruit_tpyeRoom = $this->db->table('tb_course')->select('course_initials')->where('course_id', $Sub[0])->get()->getRow();
-            
+
             $tpyeRoom = $recruit_tpyeRoom ? $recruit_tpyeRoom->course_initials : $record->recruit_tpyeRoom;
 
             $data[] = array(
@@ -125,7 +126,6 @@ class AdminControlAdmission extends BaseController
         $mode = $this->request->getPost('mode');
         $data = [
             'onoff_regis' => ($mode == 'true') ? 'on' : 'off',
-            'onoff_datetime_regis_close' => date('Y-m-d H:i:s'),
             'onoff_user_regis' => $this->session->get('login_id'),
             'onoff_comment' => ($mode == 'true') ? "" : $this->request->getPost('onoff_comment')
         ];
@@ -136,45 +136,50 @@ class AdminControlAdmission extends BaseController
     // ... switch_system, switch_report, quotaType, switch_year follow similar pattern ...
     // I'll implement them briefly.
 
-    public function switch_system() {
+    public function switch_system()
+    {
         $mode = $this->request->getPost('mode');
         $data = ['onoff_system' => ($mode == 'true') ? 'on' : 'off', 'onoff_datetime_system' => date('Y-m-d H:i:s'), 'onoff_user_system' => $this->session->get('login_id')];
         $this->db->table('tb_onoffsys')->where('onoff_id', '1')->update($data);
         echo ($mode == 'true') ? "เปิด" : "ปิด";
     }
 
-    public function switch_report() {
+    public function switch_report()
+    {
         $mode = $this->request->getPost('mode');
         $data = ['onoff_report' => ($mode == 'true') ? 'on' : 'off', 'onoff_user_report' => $this->session->get('login_id')];
         $this->db->table('tb_onoffsys')->where('onoff_id', '1')->update($data);
         echo ($mode == 'true') ? "เปิด" : "ปิด";
     }
 
-    public function quotaType() {
+    public function quotaType()
+    {
         $mode = $this->request->getPost('mode');
         $data = ['quota_status' => ($mode == 'true') ? 'on' : 'off'];
         $this->db->table('tb_quota')->where('quota_id', $this->request->getPost('ID'))->update($data);
         echo ($mode == 'true') ? "เปิด" : "ปิด";
     }
 
-    public function switch_year() {
+    public function switch_year()
+    {
         $data = ['openyear_year' => $this->request->getPost('mode'), 'openyear_userid' => $this->session->get('login_id')];
         $this->db->table('tb_openyear')->where('openyear_id', '1')->update($data);
     }
 
     public function edit_recruitstudent($id)
     {
-        if ($redir = $this->checkAuth()) return $redir;
+        if ($redir = $this->checkAuth())
+            return $redir;
 
         $data['switch'] = $this->db->table("tb_onoffsys")->get()->getResult();
         $data['checkYear'] = $this->db->table('tb_openyear')->get()->getResult();
         $data['year'] = $this->db->table('tb_recruitstudent')->select('recruit_year')->groupBy('recruit_year')->orderBy('recruit_year', 'DESC')->get()->getResult();
-        
+
         $data['title'] = $this->title;
         $data['icon'] = '<i class="fas fa-edit"></i>';
         $data['color'] = 'warning';
         $data['breadcrumbs'] = array(base_url('admin/recruitstudent') => 'จัดการ' . $this->title, '#' => 'แก้ไข' . $this->title);
-        
+
         $data['recruit'] = $this->db->table('tb_recruitstudent')->where('recruit_id', $id)->get()->getResult();
         $data['action'] = 'update_recruitstudent';
 
@@ -189,11 +194,12 @@ class AdminControlAdmission extends BaseController
 
     public function update_recruitstudent($id)
     {
-        if ($redir = $this->checkAuth()) return $redir;
+        if ($redir = $this->checkAuth())
+            return $redir;
 
         $post = $this->request->getPost();
         $recruit_birthday = ($post['recruit_birthdayY'] - 543) . '-' . $post['recruit_birthdayM'] . '-' . $post['recruit_birthdayD'];
-        
+
         $majorOrder = "";
         if (isset($post['recruit_majorOrder']) && is_array($post['recruit_majorOrder'])) {
             $CheckCourse = $this->db->table('tb_course')->where('course_id', $post['recruit_majorOrder'][0])->get()->getRow();
@@ -215,24 +221,24 @@ class AdminControlAdmission extends BaseController
             'recruit_major' => $recruit_major,
             'recruit_majorOrder' => $majorOrder,
             // ... Add other fields ...
-             'recruit_oldSchool' => $post['recruit_oldSchool'],
-             'recruit_district' => $post['recruit_district'],
-             'recruit_province' => $post['recruit_province'],
-             'recruit_race' => $post['recruit_race'],
-             'recruit_nationality' => $post['recruit_nationality'], 
-             'recruit_religion' => $post['recruit_religion'],
-             'recruit_idCard' => $post['recruit_idCard'],
-             'recruit_phone' => $post['recruit_phone'],
-             'recruit_homeNumber' => $post['recruit_homeNumber'],
-             'recruit_homeGroup' => $post['recruit_homeGroup'],
-             'recruit_homeRoad' => $post['recruit_homeRoad'],
-             'recruit_homeSubdistrict' => $post['recruit_homeSubdistrict'],
-             'recruit_homedistrict' => $post['recruit_homedistrict'],
-             'recruit_homeProvince' => $post['recruit_homeProvince'],
-             'recruit_homePostcode' => $post['recruit_homePostcode'],
-             'recruit_grade' => $post['recruit_grade'],
-             'recruit_year' => $post['recruit_year'],
-             'recruit_agegroup' => $post['recruit_agegroup']
+            'recruit_oldSchool' => $post['recruit_oldSchool'],
+            'recruit_district' => $post['recruit_district'],
+            'recruit_province' => $post['recruit_province'],
+            'recruit_race' => $post['recruit_race'],
+            'recruit_nationality' => $post['recruit_nationality'],
+            'recruit_religion' => $post['recruit_religion'],
+            'recruit_idCard' => $post['recruit_idCard'],
+            'recruit_phone' => $post['recruit_phone'],
+            'recruit_homeNumber' => $post['recruit_homeNumber'],
+            'recruit_homeGroup' => $post['recruit_homeGroup'],
+            'recruit_homeRoad' => $post['recruit_homeRoad'],
+            'recruit_homeSubdistrict' => $post['recruit_homeSubdistrict'],
+            'recruit_homedistrict' => $post['recruit_homedistrict'],
+            'recruit_homeProvince' => $post['recruit_homeProvince'],
+            'recruit_homePostcode' => $post['recruit_homePostcode'],
+            'recruit_grade' => $post['recruit_grade'],
+            'recruit_year' => $post['recruit_year'],
+            'recruit_agegroup' => $post['recruit_agegroup']
         ];
 
         // File Uploads
@@ -243,7 +249,7 @@ class AdminControlAdmission extends BaseController
             'recruit_certificateEduB' => 'certificateB',
             'recruit_copyidCard' => 'copyidCard'
         ];
-        
+
         $data_R = $this->db->table('tb_recruitstudent')->where('recruit_id', $id)->get()->getRow();
         $remoteUpload = new RemoteUpload(); // Instantiate once
 
@@ -277,7 +283,8 @@ class AdminControlAdmission extends BaseController
 
     public function delete_recruitstudent($id)
     {
-        if ($redir = $this->checkAuth()) return $redir;
+        if ($redir = $this->checkAuth())
+            return $redir;
 
         $recruit_data = $this->db->table('tb_recruitstudent')->where('recruit_id', $id)->get()->getRow();
 
@@ -327,16 +334,16 @@ class AdminControlAdmission extends BaseController
             echo "mPDF library not found.";
             return;
         }
-        
+
         // ... Fetch data and generate PDF ...
         // Similar to other PDF methods.
         // I'll skip detailed implementation for brevity but it should be migrated.
-        
+
         $mpdf = new \Mpdf\Mpdf(['default_font_size' => 16, 'default_font' => 'sarabun']);
         $mpdf->WriteHTML("PDF Content for ID: $id");
         $mpdf->Output();
     }
-    
+
     public function logout()
     {
         delete_cookie('username');
@@ -351,17 +358,17 @@ class AdminControlAdmission extends BaseController
             return;
         }
 
-        $thpa = 'thailandpa'; 
+        $thpa = 'thailandpa';
 
         $datapdf_all = $this->db->table('skjacth_admission.tb_recruitstudent')
             ->select('skjacth_admission.tb_recruitstudent.*,
                             skjacth_admission.tb_quota.quota_explain,
-                            '.$thpa.'.province.PROVINCE_NAME,
-                            '.$thpa.'.district.DISTRICT_NAME,
-                            '.$thpa.'.amphur.AMPHUR_NAME')
-            ->join($thpa.'.province', 'skjacth_admission.tb_recruitstudent.recruit_homeProvince = '.$thpa.'.province.PROVINCE_ID', 'INNER')
-            ->join($thpa.'.district', 'skjacth_admission.tb_recruitstudent.recruit_homeSubdistrict = '.$thpa.'.district.DISTRICT_ID', 'INNER')
-            ->join($thpa.'.amphur', 'skjacth_admission.tb_recruitstudent.recruit_homedistrict = '.$thpa.'.amphur.AMPHUR_ID', 'INNER')
+                            ' . $thpa . '.province.PROVINCE_NAME,
+                            ' . $thpa . '.district.DISTRICT_NAME,
+                            ' . $thpa . '.amphur.AMPHUR_NAME')
+            ->join($thpa . '.province', 'skjacth_admission.tb_recruitstudent.recruit_homeProvince = ' . $thpa . '.province.PROVINCE_ID', 'INNER')
+            ->join($thpa . '.district', 'skjacth_admission.tb_recruitstudent.recruit_homeSubdistrict = ' . $thpa . '.district.DISTRICT_ID', 'INNER')
+            ->join($thpa . '.amphur', 'skjacth_admission.tb_recruitstudent.recruit_homedistrict = ' . $thpa . '.amphur.AMPHUR_ID', 'INNER')
             ->join('skjacth_admission.tb_quota', 'skjacth_admission.tb_quota.quota_key = skjacth_admission.tb_recruitstudent.recruit_category')
             ->where('recruit_year', $year)
             ->where('recruit_tpyeRoom', urldecode($type))
@@ -382,26 +389,26 @@ class AdminControlAdmission extends BaseController
             $sch = explode("โรงเรียน", $datapdf->recruit_oldSchool);
 
             $mpdf->SetTitle($datapdf->recruit_prefix . $datapdf->recruit_firstName . ' ' . $datapdf->recruit_lastName);
-            
-            $html = '<div style="position:absolute;top:60px;left:635px; width:100%"><img style="width: 120px;hight:100px;" src="'.base_url('uploads/recruitstudent/m'.$datapdf->recruit_regLevel.'/img/'.$datapdf->recruit_img).'"></div>';
-            $html .= '<div style="position:absolute;top:18px;left:100px; width:100%">รอบ '.$datapdf->quota_explain.'</div>';
-            $html .= '<div style="position:absolute;top:18px;left:690px; width:100%">'.sprintf("%04d",$datapdf->recruit_id).'</div>';
-            $html .= '<div style="position:absolute;top:232px;left:180px; width:100%">'.$datapdf->recruit_prefix.$datapdf->recruit_firstName.'</div>';
-            $html .= '<div style="position:absolute;top:232px;left:470px; width:100%">'.$datapdf->recruit_lastName.'</div>';
-            $html .= '<div style="position:absolute;top:262px;left:340px; width:100%">'.($sch[0] == '' ? $sch[1] : $sch[0]).'</div>';
-            $html .= '<div style="position:absolute;top:290px;left:170px; width:100%">'.$datapdf->recruit_district.'</div>';
-            $html .= '<div style="position:absolute;top:290px;left:510px; width:100%">'.$datapdf->recruit_province.'</div>';
-            $html .= '<div style="position:absolute;top:318px;left:160px; width:100%">'.$date_D.'</div>';
-            $html .= '<div style="position:absolute;top:318px;left:240px; width:100%">'.$TH_Month[$date_M-1].'</div>';
-            $html .= '<div style="position:absolute;top:318px;left:370px; width:100%">'.$date_Y.'</div>';
-            $html .= '<div style="position:absolute;top:318px;left:470px; width:100%">'.$this->timeago->getAge($datapdf->recruit_birthday).'</div>';
-            $html .= '<div style="position:absolute;top:318px;left:600px; width:100%">'.$datapdf->recruit_race.'</div>';
-            $html .= '<div style="position:absolute;top:345px;left:162px; width:100%">'.$datapdf->recruit_nationality.'</div>';
-            $html .= '<div style="position:absolute;top:345px;left:300px; width:100%">'.$datapdf->recruit_religion.'</div>';
-            $html .= '<div style="position:absolute;top:345px;left:540px; width:100%">'.$datapdf->recruit_idCard.'</div>';
-            $html .= '<div style="position:absolute;top:373px;left:350px; width:100%">'.$datapdf->recruit_phone.'</div>';
-            $html .= '<div style="position:absolute;top:373px;left:600px; width:100%">'.$datapdf->recruit_grade.'</div>';
-            
+
+            $html = '<div style="position:absolute;top:60px;left:635px; width:100%"><img style="width: 120px;hight:100px;" src="' . base_url('uploads/recruitstudent/m' . $datapdf->recruit_regLevel . '/img/' . $datapdf->recruit_img) . '"></div>';
+            $html .= '<div style="position:absolute;top:18px;left:100px; width:100%">รอบ ' . $datapdf->quota_explain . '</div>';
+            $html .= '<div style="position:absolute;top:18px;left:690px; width:100%">' . sprintf("%04d", $datapdf->recruit_id) . '</div>';
+            $html .= '<div style="position:absolute;top:232px;left:180px; width:100%">' . $datapdf->recruit_prefix . $datapdf->recruit_firstName . '</div>';
+            $html .= '<div style="position:absolute;top:232px;left:470px; width:100%">' . $datapdf->recruit_lastName . '</div>';
+            $html .= '<div style="position:absolute;top:262px;left:340px; width:100%">' . ($sch[0] == '' ? $sch[1] : $sch[0]) . '</div>';
+            $html .= '<div style="position:absolute;top:290px;left:170px; width:100%">' . $datapdf->recruit_district . '</div>';
+            $html .= '<div style="position:absolute;top:290px;left:510px; width:100%">' . $datapdf->recruit_province . '</div>';
+            $html .= '<div style="position:absolute;top:318px;left:160px; width:100%">' . $date_D . '</div>';
+            $html .= '<div style="position:absolute;top:318px;left:240px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
+            $html .= '<div style="position:absolute;top:318px;left:370px; width:100%">' . $date_Y . '</div>';
+            $html .= '<div style="position:absolute;top:318px;left:470px; width:100%">' . $this->timeago->getAge($datapdf->recruit_birthday) . '</div>';
+            $html .= '<div style="position:absolute;top:318px;left:600px; width:100%">' . $datapdf->recruit_race . '</div>';
+            $html .= '<div style="position:absolute;top:345px;left:162px; width:100%">' . $datapdf->recruit_nationality . '</div>';
+            $html .= '<div style="position:absolute;top:345px;left:300px; width:100%">' . $datapdf->recruit_religion . '</div>';
+            $html .= '<div style="position:absolute;top:345px;left:540px; width:100%">' . $datapdf->recruit_idCard . '</div>';
+            $html .= '<div style="position:absolute;top:373px;left:350px; width:100%">' . $datapdf->recruit_phone . '</div>';
+            $html .= '<div style="position:absolute;top:373px;left:600px; width:100%">' . $datapdf->recruit_grade . '</div>';
+
             $mpdf->WriteHTML($html);
             $mpdf->AddPage();
         }
