@@ -10,10 +10,10 @@ class AdminControlRecruit extends BaseController
     public function index()
     {
         $model = new AdmissionModel();
-        
+
         // Get distinct years
         $years = $model->select('recruit_year')->distinct()->orderBy('recruit_year', 'DESC')->findColumn('recruit_year');
-        
+
         if (empty($years)) {
             $years = [date('Y')];
         }
@@ -23,12 +23,12 @@ class AdminControlRecruit extends BaseController
 
         // Join with Quota table to get readable category names
         $data['recruits'] = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials')
-                                  ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
-                                  ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
-                                  ->where('recruit_year', $selectedYear)
-                                  ->groupBy('tb_recruitstudent.recruit_id')
-                                  ->orderBy('recruit_id', 'DESC')
-                                  ->findAll();
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
+            ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->where('recruit_year', $selectedYear)
+            ->groupBy('tb_recruitstudent.recruit_id')
+            ->orderBy('recruit_id', 'DESC')
+            ->findAll();
 
         $data['years'] = $years;
         $data['selected_year'] = $selectedYear;
@@ -40,11 +40,11 @@ class AdminControlRecruit extends BaseController
     public function view($id = null)
     {
         $model = new AdmissionModel();
-        $courseModel = new \App\Models\CourseModel(); 
-        
+        $courseModel = new \App\Models\CourseModel();
+
         $data['recruit'] = $model->select('tb_recruitstudent.*, tb_course.course_fullname as course_name_joined')
-                                 ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
-                                 ->find($id);
+            ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->find($id);
 
         if (empty($data['recruit'])) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('ไม่พบข้อมูลผู้สมัคร ID: ' . $id);
@@ -55,17 +55,17 @@ class AdminControlRecruit extends BaseController
             $courseIds = explode('|', $data['recruit']['recruit_majorOrder']);
             $majorOrderList = [];
 
-            // Fetch course initials for each ID
+            // Fetch course full names for each ID
             if (!empty($courseIds)) {
                 // Using whereIn for a single query to get all courses
-                $courses = $courseModel->select('course_id, course_initials')
-                                       ->whereIn('course_id', $courseIds)
-                                       ->findAll();
-                
-                // Map course_id to course_initials for easy lookup
+                $courses = $courseModel->select('course_id, course_fullname')
+                    ->whereIn('course_id', $courseIds)
+                    ->findAll();
+
+                // Map course_id to course_fullname for easy lookup
                 $courseMap = [];
                 foreach ($courses as $course) {
-                    $courseMap[$course['course_id']] = $course['course_initials'];
+                    $courseMap[$course['course_id']] = $course['course_fullname'];
                 }
 
                 // Reconstruct the list in the original order specified by recruit_majorOrder
@@ -91,14 +91,22 @@ class AdminControlRecruit extends BaseController
     public function edit($id = null)
     {
         $model = new AdmissionModel();
+        $courseModel = new \App\Models\CourseModel();
         $data['recruit'] = $model->find($id);
 
         if (empty($data['recruit'])) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('ไม่พบข้อมูลผู้สมัคร ID: ' . $id);
         }
 
+        // Process recruit_majorOrder to get IDs array
+        $data['major_order_ids'] = [];
+        if (!empty($data['recruit']['recruit_majorOrder'])) {
+            $data['major_order_ids'] = explode('|', $data['recruit']['recruit_majorOrder']);
+        }
+
         $data['courses'] = $model->getAllCourses();
         $data['quotas'] = $model->getAllQuotas();
+        $data['courses_json'] = json_encode($data['courses']);
         $data['remote_base_url'] = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
         $data['title'] = 'แก้ไขข้อมูลผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitEdit', $data);
@@ -109,8 +117,23 @@ class AdminControlRecruit extends BaseController
         $model = new AdmissionModel();
         $courseModel = new \App\Models\CourseModel();
 
-        // Get Course Name from ID for backward compatibility (optional but recommended)
-        $courseId = $this->request->getPost('recruit_tpyeRoom_id');
+        // Build major order from 3 dropdowns
+        $majorOrder = [];
+        $course1 = $this->request->getPost('recruit_tpyeRoom1');
+        $course2 = $this->request->getPost('recruit_tpyeRoom2');
+        $course3 = $this->request->getPost('recruit_tpyeRoom3');
+
+        if (!empty($course1))
+            $majorOrder[] = $course1;
+        if (!empty($course2))
+            $majorOrder[] = $course2;
+        if (!empty($course3))
+            $majorOrder[] = $course3;
+
+        $majorOrderStr = implode('|', $majorOrder);
+
+        // Get first course as primary for backward compatibility
+        $courseId = $course1;
         $courseName = '';
         if ($courseId) {
             $course = $courseModel->find($courseId);
@@ -130,8 +153,9 @@ class AdminControlRecruit extends BaseController
             'recruit_grade' => $this->request->getPost('recruit_grade'),
             'recruit_regLevel' => $this->request->getPost('recruit_regLevel'),
             'recruit_category' => $this->request->getPost('recruit_category'),
-            'recruit_tpyeRoom' => $courseName, // Keep text for legacy
-            'recruit_tpyeRoom_id' => $courseId, // New ID
+            'recruit_tpyeRoom' => $courseName,
+            'recruit_tpyeRoom_id' => $courseId,
+            'recruit_majorOrder' => $majorOrderStr,
             'recruit_status' => $this->request->getPost('recruit_status'),
             'recruit_homeNumber' => $this->request->getPost('recruit_homeNumber'),
             'recruit_homeGroup' => $this->request->getPost('recruit_homeGroup'),
@@ -140,31 +164,66 @@ class AdminControlRecruit extends BaseController
             'recruit_homedistrict' => $this->request->getPost('recruit_homedistrict'),
             'recruit_homeProvince' => $this->request->getPost('recruit_homeProvince'),
             'recruit_homePostcode' => $this->request->getPost('recruit_homePostcode'),
+            'recruit_race' => $this->request->getPost('recruit_race'),
+            'recruit_nationality' => $this->request->getPost('recruit_nationality'),
+            'recruit_religion' => $this->request->getPost('recruit_religion'),
+            'recruit_district' => $this->request->getPost('recruit_district'),
+            'recruit_province' => $this->request->getPost('recruit_province'),
+            'recruit_major' => $this->request->getPost('recruit_major') ?: $course['course_branch'] ?? '',
+            'recruit_address' => "เลขที่ " . $this->request->getPost('recruit_homeNumber') . " หมู่ที่ " . (!empty($this->request->getPost('recruit_homeGroup')) ? $this->request->getPost('recruit_homeGroup') : '-') . " ถนน " . (!empty($this->request->getPost('recruit_homeRoad')) ? $this->request->getPost('recruit_homeRoad') : '-') . " ตำบล" . $this->request->getPost('recruit_homeSubdistrict') . " อำเภอ" . $this->request->getPost('recruit_homedistrict') . " จังหวัด" . $this->request->getPost('recruit_homeProvince') . " " . $this->request->getPost('recruit_homePostcode'),
+            'recruit_dateUpdate' => date('Y-m-d H:i:s'),
         ];
-        
-        // Handle file upload
-        $img = $this->request->getFile('recruit_img');
-        if ($img->isValid() && !$img->hasMoved()) {
-            $currentRecruit = $model->find($id);
-            $regLevel = $currentRecruit['recruit_regLevel'];
-            
-            $remoteUpload = new \App\Libraries\RemoteUpload();
-            $subPath = 'admission/recruitstudent/m' . $regLevel . '/img';
-            
-            $result = $remoteUpload->upload($img, $subPath);
-            
-            if ($result && $result['status'] === 'success') {
-                $data['recruit_img'] = $result['filename'];
-                // Delete old image if exists
-                if (!empty($currentRecruit['recruit_img'])) {
-                    $remoteUpload->delete($currentRecruit['recruit_img'], $subPath);
+
+        $currentRecruit = $model->find($id);
+        $regLevel = $currentRecruit['recruit_regLevel'];
+        $remoteUpload = new \App\Libraries\RemoteUpload();
+
+        // Handle file uploads
+        $fileFields = [
+            'recruit_img' => 'img',
+            'recruit_certificateEdu' => 'certificate',
+            'recruit_certificateEduB' => 'certificateB',
+            'recruit_copyidCard' => 'copyidCard',
+            'recruit_copyAddress' => 'copyAddress',
+        ];
+
+        foreach ($fileFields as $field => $folder) {
+            $file = $this->request->getFile($field);
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $subPath = 'admission/recruitstudent/m' . $regLevel . '/' . $folder;
+                $result = $remoteUpload->upload($file, $subPath);
+
+                if ($result && $result['status'] === 'success') {
+                    $data[$field] = $result['filename'];
+                    // Delete old file if exists
+                    if (!empty($currentRecruit[$field])) {
+                        $remoteUpload->delete($currentRecruit[$field], $subPath);
+                    }
                 }
+            }
+        }
+
+        // Handle ability certificate (multiple files)
+        $abilityFiles = $this->request->getFileMultiple('recruit_certificateAbility');
+        if (!empty($abilityFiles) && $abilityFiles[0]->isValid()) {
+            $subPath = 'admission/recruitstudent/m' . $regLevel . '/certificateAbility';
+            $newAbilityFiles = [];
+            foreach ($abilityFiles as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $result = $remoteUpload->upload($file, $subPath);
+                    if ($result && $result['status'] === 'success') {
+                        $newAbilityFiles[] = $result['filename'];
+                    }
+                }
+            }
+            if (!empty($newAbilityFiles)) {
+                $data['recruit_certificateAbility'] = implode('|', $newAbilityFiles);
             }
         }
 
         $model->update($id, $data);
 
-        return redirect()->to(site_url('skjadmin/recruits'))->with('success', 'อัปเดตข้อมูลผู้สมัครสำเร็จ');
+        return redirect()->to(site_url('skjadmin/recruits/view/' . $id))->with('success', 'อัปเดตข้อมูลผู้สมัครสำเร็จ');
     }
 
     public function delete($id = null)
@@ -233,10 +292,10 @@ class AdminControlRecruit extends BaseController
         $draw = intval($request->getVar('draw'));
         $start = intval($request->getVar('start'));
         $length = intval($request->getVar('length'));
-        
+
         $search = $request->getVar('search');
         $searchValue = $search['value'] ?? '';
-        
+
         $year = $request->getVar('year') ?? date('Y');
         $statusFilter = $request->getVar('status_filter') ?? '';
 
@@ -246,9 +305,9 @@ class AdminControlRecruit extends BaseController
         // 2. Count Filtered Records
         $builder = $model->builder();
         $builder->select('tb_recruitstudent.recruit_id')
-                ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
-                ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
-                ->where('tb_recruitstudent.recruit_year', $year);
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
+            ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->where('tb_recruitstudent.recruit_year', $year);
 
         // Apply status filter
         if (!empty($statusFilter)) {
@@ -267,7 +326,7 @@ class AdminControlRecruit extends BaseController
                 ->orLike('tb_recruitstudent.recruit_category', $searchValue)
                 ->orLike('tb_quota.quota_key', $searchValue)
                 ->orLike('tb_quota.quota_explain', $searchValue)
-                ->orLike('tb_course.course_initials', $searchValue)
+                ->orLike('tb_course.course_branch', $searchValue)
                 ->orLike('tb_course.course_fullname', $searchValue)
                 ->groupEnd();
         }
@@ -276,10 +335,10 @@ class AdminControlRecruit extends BaseController
 
         // 3. Fetch Data
         $builder = $model->builder();
-        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_initials, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status')
-                ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
-                ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
-                ->where('tb_recruitstudent.recruit_year', $year);
+        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key')
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
+            ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->where('tb_recruitstudent.recruit_year', $year);
 
         // Apply status filter
         if (!empty($statusFilter)) {
@@ -298,7 +357,7 @@ class AdminControlRecruit extends BaseController
                 ->orLike('tb_recruitstudent.recruit_category', $searchValue)
                 ->orLike('tb_quota.quota_key', $searchValue)
                 ->orLike('tb_quota.quota_explain', $searchValue)
-                ->orLike('tb_course.course_initials', $searchValue)
+                ->orLike('tb_course.course_branch', $searchValue)
                 ->orLike('tb_course.course_fullname', $searchValue)
                 ->groupEnd();
         }
@@ -307,10 +366,10 @@ class AdminControlRecruit extends BaseController
         if ($length > 0) {
             $builder->limit($length, $start);
         }
-        
+
         $builder->groupBy('tb_recruitstudent.recruit_id');
         $builder->orderBy('tb_recruitstudent.recruit_id', 'DESC');
-        
+
         $recruits = $builder->get()->getResultArray();
 
         $data = [];
@@ -345,12 +404,53 @@ class AdminControlRecruit extends BaseController
                     </button>
                 </div>';
 
+            // Build course display with all ranks from recruit_majorOrder
+            $courseHtml = '';
+            if (!empty($recruit['recruit_majorOrder'])) {
+                $courseIds = explode('|', $recruit['recruit_majorOrder']);
+                if (count($courseIds) > 0) {
+                    // Get course model and fetch all courses at once
+                    $courseModel = new \App\Models\CourseModel();
+                    $courses = $courseModel->select('course_id, course_branch')
+                        ->whereIn('course_id', $courseIds)
+                        ->findAll();
+
+                    // Create a map for quick lookup
+                    $courseMap = [];
+                    foreach ($courses as $course) {
+                        $courseMap[$course['course_id']] = $course['course_branch'];
+                    }
+
+                    // Build HTML with order numbers
+                    $courseItems = [];
+                    foreach ($courseIds as $index => $id) {
+                        $orderNum = $index + 1;
+                        $courseName = $courseMap[$id] ?? 'ไม่พบ';
+                        $badgeColor = 'bg-label-info';
+                        if ($orderNum == 1) {
+                            $badgeColor = 'bg-label-primary';
+                        } elseif ($orderNum == 2) {
+                            $badgeColor = 'bg-label-success';
+                        } elseif ($orderNum == 3) {
+                            $badgeColor = 'bg-label-warning';
+                        }
+                        $courseItems[] = '<span class="badge ' . $badgeColor . ' me-1 mb-1" title="อันดับที่ ' . $orderNum . '">' . $orderNum . '. ' . esc($courseName) . '</span>';
+                    }
+                    $courseHtml = '<div class="d-flex flex-wrap gap-1">' . implode('', $courseItems) . '</div>';
+                }
+            }
+
+            // Fallback if no majorOrder
+            if (empty($courseHtml)) {
+                $courseHtml = '<span class="badge bg-label-info">' . esc($recruit['course_branch'] ?? $recruit['course_fullname'] ?? $recruit['recruit_tpyeRoom']) . '</span>';
+            }
+
             $data[] = [
                 'avatar' => $avatar,
                 'recruit_id' => '<span class="badge bg-label-secondary">' . esc(sprintf('%04d', $recruit['recruit_id'] ?? 0)) . '</span>',
                 'name' => '<div class="fw-semibold">' . esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '')) . '</div><small class="text-muted">' . esc($recruit['recruit_lastName'] ?? '') . '</small>',
                 'category' => '<small>' . esc($recruit['quota_explain'] ?? $recruit['recruit_category']) . '</small>',
-                'course' => '<span class="badge bg-label-info">' . esc($recruit['course_initials'] ?? $recruit['course_fullname'] ?? $recruit['recruit_tpyeRoom']) . '</span>',
+                'course' => $courseHtml,
                 'status' => '<span class="status-badge ' . $statusClass . '">' . esc($status) . '</span>',
                 'actions' => $actions
             ];
@@ -373,21 +473,21 @@ class AdminControlRecruit extends BaseController
     {
         $request = service('request');
         $model = new AdmissionModel();
-        
+
         $year = $request->getVar('year') ?? date('Y');
-        
+
         // Get counts
         $total = $model->where('recruit_year', $year)->countAllResults(false);
         $approved = $model->where('recruit_year', $year)
-                          ->where('recruit_status', 'ผ่านการตรวจสอบ')
-                          ->countAllResults(false);
+            ->where('recruit_status', 'ผ่านการตรวจสอบ')
+            ->countAllResults(false);
         $pending = $model->where('recruit_year', $year)
-                         ->where('recruit_status', 'รอตรวจสอบ')
-                         ->countAllResults(false);
+            ->where('recruit_status', 'รอตรวจสอบ')
+            ->countAllResults(false);
         $rejected = $model->where('recruit_year', $year)
-                          ->like('recruit_status', 'ไม่ผ่าน')
-                          ->countAllResults(false);
-        
+            ->like('recruit_status', 'ไม่ผ่าน')
+            ->countAllResults(false);
+
         return $this->response->setJSON([
             'total' => $total,
             'approved' => $approved,
@@ -401,9 +501,9 @@ class AdminControlRecruit extends BaseController
         $db = \Config\Database::connect();
         $model = new AdmissionModel();
         $recruit = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_quota.quota_key, tb_course.course_fullname as course_name_joined')
-                         ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
-                         ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
-                         ->find($id);
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
+            ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->find($id);
 
         if (!$recruit) {
             return "ไม่พบข้อมูลผู้สมัคร";
@@ -438,15 +538,15 @@ class AdminControlRecruit extends BaseController
         ]);
 
         // Prepare Data
-        $TH_Month = array("มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฏาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม");
-        
-        $date_Y = date('Y',strtotime($recruit['recruit_birthday']))+543;
-        $date_D = date('d',strtotime($recruit['recruit_birthday']));
-        $date_M = date('n',strtotime($recruit['recruit_birthday']));
+        $TH_Month = array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฏาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
 
-        $date_Y_regis = date('Y',strtotime($recruit['recruit_date']))+543;
-        $date_D_regis = date('d',strtotime($recruit['recruit_date']));
-        $date_M_regis = date('n',strtotime($recruit['recruit_date']));
+        $date_Y = date('Y', strtotime($recruit['recruit_birthday'])) + 543;
+        $date_D = date('d', strtotime($recruit['recruit_birthday']));
+        $date_M = date('n', strtotime($recruit['recruit_birthday']));
+
+        $date_Y_regis = date('Y', strtotime($recruit['recruit_date'])) + 543;
+        $date_D_regis = date('d', strtotime($recruit['recruit_date']));
+        $date_M_regis = date('n', strtotime($recruit['recruit_date']));
 
         // Calculate Age
         $birthDate = new \DateTime($recruit['recruit_birthday']);
@@ -456,46 +556,46 @@ class AdminControlRecruit extends BaseController
         $sch = explode("โรงเรียน", $recruit['recruit_oldSchool']);
         $oldSchool = ($sch[0] == '' && isset($sch[1])) ? $sch[1] : $sch[0];
 
-        $mpdf->SetTitle($recruit['recruit_prefix'].$recruit['recruit_firstName'].' '.$recruit['recruit_lastName']);
-        
+        $mpdf->SetTitle($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']);
+
         // Generate HTML
         $html = '';
         $baseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
         $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . $recruit['recruit_img']);
-        
+
         if (!empty($recruit['recruit_img'])) {
-             $html .= '<div style="position:absolute;top:90px;left:635px; width:100%"><img style="width: 120px;height:100px;" src="'.$imgUrl.'"></div>'; 
+            $html .= '<div style="position:absolute;top:90px;left:635px; width:100%"><img style="width: 120px;height:100px;" src="' . $imgUrl . '"></div>';
         }
-        
-        $html .= '<div style="position:absolute;top:18px;left:100px; width:100%;font-size:16px;">'.$recruit['quota_explain'].'</div>';
-        $html .= '<div style="position:absolute;top:180px;left:555px; width:100%;font-size:24px;">'.$recruit['recruit_regLevel'].'</div>';
-        $html .= '<div style="position:absolute;top:63px;left:700px; width:100%">'.sprintf("%04d",$recruit['recruit_id']).'</div>';
-        $html .= '<div style="position:absolute;top:280px;left:180px; width:100%">'.$recruit['recruit_prefix'].$recruit['recruit_firstName'].'</div>';
-        $html .= '<div style="position:absolute;top:280px;left:470px; width:100%">'.$recruit['recruit_lastName'].'</div>';
-        $html .= '<div style="position:absolute;top:307px;left:270px; width:100%">'.$oldSchool.'</div>';
-        $html .= '<div style="position:absolute;top:335px;left:170px; width:100%">'.$recruit['recruit_district'].'</div>';
-        $html .= '<div style="position:absolute;top:335px;left:510px; width:100%">'.$recruit['recruit_province'].'</div>';
-        $html .= '<div style="position:absolute;top:363px;left:160px; width:100%">'.$date_D.'</div>';
-        $html .= '<div style="position:absolute;top:363px;left:240px; width:100%">'.$TH_Month[$date_M-1].'</div>';
-        $html .= '<div style="position:absolute;top:363px;left:370px; width:100%">'.$date_Y.'</div>';
-        $html .= '<div style="position:absolute;top:363px;left:470px; width:100%">'.$age.'</div>';
-        $html .= '<div style="position:absolute;top:363px;left:600px; width:100%">'.$recruit['recruit_race'].'</div>';
-        $html .= '<div style="position:absolute;top:390px;left:162px; width:100%">'.$recruit['recruit_nationality'].'</div>';
-        $html .= '<div style="position:absolute;top:390px;left:300px; width:100%">'.$recruit['recruit_religion'].'</div>';
-        $html .= '<div style="position:absolute;top:390px;left:540px; width:100%">'.$recruit['recruit_idCard'].'</div>';
-        $html .= '<div style="position:absolute;top:418px;left:350px; width:100%">'.$recruit['recruit_phone'].'</div>';
-        $html .= '<div style="position:absolute;top:418px;left:600px; width:100%">'.$recruit['recruit_grade'].'</div>';
-        $html .= '<div style="position:absolute;top:445px;left:270px; width:100%">'.$recruit['recruit_homeNumber'].'</div>';
-        $html .= '<div style="position:absolute;top:445px;left:390px; width:100%">'.$recruit['recruit_homeGroup'].'</div>';
-        $html .= '<div style="position:absolute;top:445px;left:475px; width:100%">'.$recruit['recruit_homeRoad'].'</div>';
-        $html .= '<div style="position:absolute;top:445px;left:615px; width:100%">'.$recruit['recruit_homeSubdistrict'].'</div>';
-        $html .= '<div style="position:absolute;top:475px;left:180px; width:100%">'.$recruit['recruit_homedistrict'].'</div>';
-        $html .= '<div style="position:absolute;top:475px;left:400px; width:100%">'.$recruit['recruit_homeProvince'].'</div>';
-        $html .= '<div style="position:absolute;top:475px;left:620px; width:100%">'.$recruit['recruit_homePostcode'].'</div>';
-        $html .= '<div style="position:absolute;top:503px;left:695px; width:100%;font-size:22px;">'.$recruit['recruit_regLevel'].'</div>';
-        
-        $html .= '<div style="position:absolute;top:880px;left:340px; width:100%">'.$recruit['recruit_prefix'].$recruit['recruit_firstName'].' '.$recruit['recruit_lastName'].'</div>';
-        $html .= '<div style="position:absolute;top:905px;left:350px; width:100%">'.$date_D_regis.' '.$TH_Month[$date_M_regis-1].' '.$date_Y_regis.'</div>';
+
+        $html .= '<div style="position:absolute;top:18px;left:100px; width:100%;font-size:16px;">' . $recruit['quota_explain'] . '</div>';
+        $html .= '<div style="position:absolute;top:180px;left:555px; width:100%;font-size:24px;">' . $recruit['recruit_regLevel'] . '</div>';
+        $html .= '<div style="position:absolute;top:63px;left:700px; width:100%">' . sprintf("%04d", $recruit['recruit_id']) . '</div>';
+        $html .= '<div style="position:absolute;top:280px;left:180px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . '</div>';
+        $html .= '<div style="position:absolute;top:280px;left:470px; width:100%">' . $recruit['recruit_lastName'] . '</div>';
+        $html .= '<div style="position:absolute;top:307px;left:270px; width:100%">' . $oldSchool . '</div>';
+        $html .= '<div style="position:absolute;top:335px;left:170px; width:100%">' . $recruit['recruit_district'] . '</div>';
+        $html .= '<div style="position:absolute;top:335px;left:510px; width:100%">' . $recruit['recruit_province'] . '</div>';
+        $html .= '<div style="position:absolute;top:363px;left:160px; width:100%">' . $date_D . '</div>';
+        $html .= '<div style="position:absolute;top:363px;left:240px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
+        $html .= '<div style="position:absolute;top:363px;left:370px; width:100%">' . $date_Y . '</div>';
+        $html .= '<div style="position:absolute;top:363px;left:470px; width:100%">' . $age . '</div>';
+        $html .= '<div style="position:absolute;top:363px;left:600px; width:100%">' . $recruit['recruit_race'] . '</div>';
+        $html .= '<div style="position:absolute;top:390px;left:162px; width:100%">' . $recruit['recruit_nationality'] . '</div>';
+        $html .= '<div style="position:absolute;top:390px;left:300px; width:100%">' . $recruit['recruit_religion'] . '</div>';
+        $html .= '<div style="position:absolute;top:390px;left:540px; width:100%">' . $recruit['recruit_idCard'] . '</div>';
+        $html .= '<div style="position:absolute;top:418px;left:350px; width:100%">' . $recruit['recruit_phone'] . '</div>';
+        $html .= '<div style="position:absolute;top:418px;left:600px; width:100%">' . $recruit['recruit_grade'] . '</div>';
+        $html .= '<div style="position:absolute;top:445px;left:270px; width:100%">' . $recruit['recruit_homeNumber'] . '</div>';
+        $html .= '<div style="position:absolute;top:445px;left:390px; width:100%">' . $recruit['recruit_homeGroup'] . '</div>';
+        $html .= '<div style="position:absolute;top:445px;left:475px; width:100%">' . $recruit['recruit_homeRoad'] . '</div>';
+        $html .= '<div style="position:absolute;top:445px;left:615px; width:100%">' . $recruit['recruit_homeSubdistrict'] . '</div>';
+        $html .= '<div style="position:absolute;top:475px;left:180px; width:100%">' . $recruit['recruit_homedistrict'] . '</div>';
+        $html .= '<div style="position:absolute;top:475px;left:400px; width:100%">' . $recruit['recruit_homeProvince'] . '</div>';
+        $html .= '<div style="position:absolute;top:475px;left:620px; width:100%">' . $recruit['recruit_homePostcode'] . '</div>';
+        $html .= '<div style="position:absolute;top:503px;left:695px; width:100%;font-size:22px;">' . $recruit['recruit_regLevel'] . '</div>';
+
+        $html .= '<div style="position:absolute;top:880px;left:340px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName'] . '</div>';
+        $html .= '<div style="position:absolute;top:905px;left:350px; width:100%">' . $date_D_regis . ' ' . $TH_Month[$date_M_regis - 1] . ' ' . $date_Y_regis . '</div>';
 
         // Major Order / Course Selection
         if ($recruit['quota_key'] == "normal") {
@@ -504,7 +604,7 @@ class AdminControlRecruit extends BaseController
             foreach ($SubCourse as $key => $v_SubCourse) {
                 $CheckCourse = $db->table('tb_course')->select('course_initials')->where('course_id', $v_SubCourse)->get()->getRow();
                 if ($CheckCourse) {
-                    $html .= "ลำดับที่ ".($key+1).' '.$CheckCourse->course_initials."<br>";
+                    $html .= "ลำดับที่ " . ($key + 1) . ' ' . $CheckCourse->course_initials . "<br>";
                 }
             }
             $html .= '</div>';
@@ -512,26 +612,26 @@ class AdminControlRecruit extends BaseController
             $html .= '<div style="position:absolute;top:570px;left:200px; width:100%">';
             // Use course_name_joined if available, otherwise fallback to recruit_tpyeRoom
             $courseDisplay = !empty($recruit['course_name_joined']) ? $recruit['course_name_joined'] : $recruit['recruit_tpyeRoom'];
-            $html .= "ลำดับที่ 1 ".$courseDisplay. ' สาขา '.$recruit['recruit_major'];
+            $html .= "ลำดับที่ 1 " . $courseDisplay . ' สาขา ' . $recruit['recruit_major'];
             $html .= '</div>';
         }
 
         // Documents Checkmarks (using dejavusans font which is built-in to mPDF)
         $checkEmoji = '<span style="font-family: dejavusans; font-size: 30px; line-height: 1;">✔</span>';
         if (!empty($recruit['recruit_certificateEdu'])) {
-            $html .= '<div style="position:absolute;top:785px;left:110px; width:100%;">'.$checkEmoji.'</div>';
+            $html .= '<div style="position:absolute;top:785px;left:110px; width:100%;">' . $checkEmoji . '</div>';
         }
         if (!empty($recruit['recruit_copyidCard'])) {
-            $html .= '<div style="position:absolute;top:785px;left:328px; width:100%;">'.$checkEmoji.'</div>';
+            $html .= '<div style="position:absolute;top:785px;left:328px; width:100%;">' . $checkEmoji . '</div>';
         }
         if (!empty($recruit['recruit_img'])) {
-            $html .= '<div style="position:absolute;top:788px;left:560px; width:100%;">'.$checkEmoji.'</div>';
+            $html .= '<div style="position:absolute;top:788px;left:560px; width:100%;">' . $checkEmoji . '</div>';
         }
 
         $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ.pdf', true);
         $mpdf->WriteHTML($html);
-        
+
         $this->response->setHeader('Content-Type', 'application/pdf');
-        $mpdf->Output('Reg_'.sprintf("%04d",$recruit['recruit_id']).'.pdf', 'I');
+        $mpdf->Output('Reg_' . sprintf("%04d", $recruit['recruit_id']) . '.pdf', 'I');
     }
 }

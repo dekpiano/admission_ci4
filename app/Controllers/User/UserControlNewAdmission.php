@@ -457,6 +457,7 @@ class UserControlNewAdmission extends BaseController
                 $quotaName = $quotaInfo ? $quotaInfo->quota_explain : 'ทั่วไป';
 
                 $lineMsg = "📢 มีนักเรียนสมัครใหม่\n\n";
+                $lineMsg .= "👤 ชื่อ: {$data_insert['recruit_prefix']}{$data_insert['recruit_firstName']} {$data_insert['recruit_lastName']}\n";
                 $lineMsg .= "�️ เวลา: " . date('d/m/Y H:i') . " น.\n";
                 $lineMsg .= "📋 ปีการศึกษา: {$year}\n";
                 $lineMsg .= "🏫 ระดับชั้น: ม." . ($data_insert['recruit_regLevel'] == 1 ? "1" : "4") . "\n";

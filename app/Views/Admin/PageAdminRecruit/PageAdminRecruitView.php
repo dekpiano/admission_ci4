@@ -224,7 +224,8 @@
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">แผนการเรียนที่สมัคร (หลัก)</label>
                                     <p class="form-control-static text-primary fw-bold">
-                                        <?= esc($recruit['recruit_tpyeRoom']) ?></p>
+                                        <?= esc($recruit['recruit_tpyeRoom']) ?>
+                                    </p>
                                 </div>
                                 <?php if (!empty($recruit['recruit_major'])): ?>
                                     <div class="col-md-12 mb-3">
@@ -232,11 +233,11 @@
                                         <p class="form-control-static"><?= esc($recruit['recruit_major']) ?></p>
                                     </div>
                                 <?php endif; ?>
-                                <?php if (!empty($recruit['majorOrderList'])): ?>
+                                <?php if (!empty($recruit['major_order_list'])): ?>
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">อันดับแผนการเรียนที่เลือก</label>
                                         <ul class="list-group list-group-flush">
-                                            <?php foreach ($recruit['majorOrderList'] as $index => $major): ?>
+                                            <?php foreach ($recruit['major_order_list'] as $index => $major): ?>
                                                 <li class="list-group-item d-flex align-items-center">
                                                     <span class="badge bg-primary rounded-pill me-3"><?= $index + 1 ?></span>
                                                     <?= esc($major) ?>
