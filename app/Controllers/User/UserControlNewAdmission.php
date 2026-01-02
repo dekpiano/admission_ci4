@@ -323,6 +323,7 @@ class UserControlNewAdmission extends BaseController
         }
         $majorOrder = implode('|', $ranks);
 
+
         // Prepare Data
         $data_insert = [
             'recruit_id' => $recruit_id,
@@ -353,6 +354,14 @@ class UserControlNewAdmission extends BaseController
             'recruit_tpyeRoom_id' => $post['recruit_tpyeRoom1'],
             'recruit_major' => $course_branch,
             'recruit_majorOrder' => $majorOrder,
+            'recruit_nickname' => $post['recruit_nickname'] ?? '',
+            'recruit_weight' => !empty($post['recruit_weight']) ? $post['recruit_weight'] : null,
+            'recruit_height' => !empty($post['recruit_height']) ? $post['recruit_height'] : null,
+            'recruit_fatherName' => $post['recruit_fatherName'] ?? '',
+            'recruit_fatherJob' => $post['recruit_fatherJob'] ?? '',
+            'recruit_motherName' => $post['recruit_motherName'] ?? '',
+            'recruit_motherJob' => $post['recruit_motherJob'] ?? '',
+            'recruit_sportPosition' => $post['recruit_sportPosition'] ?? '',
             'recruit_agegroup' => isset($post['recruit_agegroup']) ? $post['recruit_agegroup'] : 0,
             'recruit_address' => "เลขที่ " . $post['recruit_homeNumber'] . " หมู่ที่ " . (!empty($post['recruit_homeGroup']) ? $post['recruit_homeGroup'] : '-') . " ถนน " . (!empty($post['recruit_homeRoad']) ? $post['recruit_homeRoad'] : '-') . " ตำบล" . $post['recruit_homeSubdistrict'] . " อำเภอ" . $post['recruit_homedistrict'] . " จังหวัด" . $post['recruit_homeProvince'] . " " . $post['recruit_homePostcode'],
             'recruit_status' => "รอการตรวจสอบ",

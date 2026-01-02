@@ -276,6 +276,17 @@
                     <?= csrf_field() ?>
                     <input type="hidden" name="recruit_regLevel" value="<?= $level ?>">
 
+                    <!-- Hidden inputs for sports fields - always submitted with form -->
+                    <input type="hidden" name="recruit_agegroup" id="recruit_agegroup_hidden" value="">
+                    <input type="hidden" name="recruit_sportPosition" id="recruit_sportPosition_hidden" value="">
+                    <input type="hidden" name="recruit_nickname" id="recruit_nickname_hidden" value="">
+                    <input type="hidden" name="recruit_weight" id="recruit_weight_hidden" value="">
+                    <input type="hidden" name="recruit_height" id="recruit_height_hidden" value="">
+                    <input type="hidden" name="recruit_fatherName" id="recruit_fatherName_hidden" value="">
+                    <input type="hidden" name="recruit_fatherJob" id="recruit_fatherJob_hidden" value="">
+                    <input type="hidden" name="recruit_motherName" id="recruit_motherName_hidden" value="">
+                    <input type="hidden" name="recruit_motherJob" id="recruit_motherJob_hidden" value="">
+
                     <!-- Step 1: Quota & Program -->
                     <div class="form-step active" id="step-1">
                         <div class="divider text-start">
@@ -325,10 +336,10 @@
 
                         <div class="row mb-3" id="course_section" style="display:none;">
                             <div class="col-sm-12">
-                                <label class="form-label">เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span
+                                <label class="form-label">เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ/ นักกีฬาเลือกได้ 1 อันดับ) <span
                                         class="text-danger">*</span></label>
 
-                                <div class="mb-2 input-group flex-nowrap">
+                                <div class="mb-2 input-group flex-nowrap" id="rank_container_1">
                                     <span class="input-group-text" style="min-width: 80px;">อันดับ 1</span>
                                     <select class="form-select course-select" name="recruit_tpyeRoom1"
                                         id="recruit_tpyeRoom1" required>
@@ -336,7 +347,7 @@
                                     </select>
                                 </div>
 
-                                <div class="mb-2 input-group flex-nowrap">
+                                <div class="mb-2 input-group flex-nowrap" id="rank_container_2">
                                     <span class="input-group-text" style="min-width: 80px;">อันดับ 2</span>
                                     <select class="form-select course-select" name="recruit_tpyeRoom2"
                                         id="recruit_tpyeRoom2">
@@ -344,12 +355,116 @@
                                     </select>
                                 </div>
 
-                                <div class="mb-2 input-group flex-nowrap">
+                                <div class="mb-2 input-group flex-nowrap" id="rank_container_3">
                                     <span class="input-group-text" style="min-width: 80px;">อันดับ 3</span>
                                     <select class="form-select course-select" name="recruit_tpyeRoom3"
                                         id="recruit_tpyeRoom3">
                                         <option value="" selected disabled>-- เลือกอันดับ 3 --</option>
                                     </select>
+                                </div>
+                                <!-- Sports Info Section (Hidden by default, shown when sports course is selected) -->
+                                <div id="sports_info_section" style="display:none;" class="mt-4">
+                                    <div class="divider text-start">
+                                        <div class="divider-text text-primary fw-bold">
+                                            <i class='bx bx-run me-1'></i> ข้อมูลเพิ่มเติมสำหรับนักกีฬา
+                                        </div>
+                                    </div>
+                                    <div id="age_radio_container" style="display:none;" class="mb-4">
+                                        <!-- Will be populated by JS -->
+                                    </div>
+
+
+                                    <div class="row mb-3">
+                                        <div class="col-sm-12">
+                                            <label for="recruit_sportPosition" class="form-label">สมัครชนิดกีฬาในตำแหน่ง
+                                                <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class='bx bx-trophy'></i></span>
+                                                <input type="text" class="form-control sport-field"
+                                                    data-field="recruit_sportPosition" id="recruit_sportPosition_input"
+                                                    placeholder="ระบุตำแหน่งที่สมัคร (เช่น กองหน้า, ผู้รักษาประตู)">
+                                            </div>
+                                            <div class="form-text text-muted small">* ระบุเฉพาะกีฬาฟุตบอล/ฟุตซอล
+                                                กีฬาชนิดอื่นใส่เครื่องหมาย -</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4">
+                                            <label for="recruit_nickname" class="form-label">ชื่อเล่น <span
+                                                    class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class='bx bx-smile'></i></span>
+                                                <input type="text" class="form-control sport-field"
+                                                    data-field="recruit_nickname" id="recruit_nickname_input"
+                                                    placeholder="ชื่อเล่น">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="recruit_weight" class="form-label">น้ำหนัก <span
+                                                    class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="number" step="0.1" class="form-control sport-field"
+                                                    data-field="recruit_weight" id="recruit_weight_input"
+                                                    placeholder="0.0">
+                                                <span class="input-group-text">กก.</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="recruit_height" class="form-label">ส่วนสูง <span
+                                                    class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="number" step="0.1" class="form-control sport-field"
+                                                    data-field="recruit_height" id="recruit_height_input"
+                                                    placeholder="0.0">
+                                                <span class="input-group-text">ซม.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-sm-6">
+                                            <label for="recruit_fatherName" class="form-label">ชื่อ-นามสกุล บิดา <span
+                                                    class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                                <input type="text" class="form-control sport-field"
+                                                    data-field="recruit_fatherName" id="recruit_fatherName_input"
+                                                    placeholder="ชื่อ-นามสกุล บิดา">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="recruit_fatherJob" class="form-label">อาชีพ บิดา <span
+                                                    class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control sport-field"
+                                                    data-field="recruit_fatherJob" id="recruit_fatherJob_input"
+                                                    placeholder="อาชีพ">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-sm-6">
+                                            <label for="recruit_motherName" class="form-label">ชื่อ-นามสกุล มารดา <span
+                                                    class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class='bx bx-user-voice'></i></span>
+                                                <input type="text" class="form-control sport-field"
+                                                    data-field="recruit_motherName" id="recruit_motherName_input"
+                                                    placeholder="ชื่อ-นามสกุล มารดา">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="recruit_motherJob" class="form-label">อาชีพ มารดา <span
+                                                    class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control sport-field"
+                                                    data-field="recruit_motherJob" id="recruit_motherJob_input"
+                                                    placeholder="อาชีพ">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -441,7 +556,7 @@
                                 <select class="form-select" name="recruit_birthdayD" id="recruit_birthdayD" required>
                                     <option value="">วัน</option>
                                     <?php for ($i = 1; $i <= 31; $i++): ?>
-                                        <option value="<?= sprintf('%02d', $i) ?>"><?= $i ?></option>
+                                            <option value="<?= sprintf('%02d', $i) ?>"><?= $i ?></option>
                                     <?php endfor; ?>
                                 </select>
                             </div>
@@ -467,11 +582,13 @@
                                     <option value="">ปี (พ.ศ.)</option>
                                     <?php $curYear = date('Y') + 543;
                                     for ($i = $curYear - 20; $i <= $curYear - 10; $i++): ?>
-                                        <option value="<?= $i ?>"><?= $i ?></option>
+                                            <option value="<?= $i ?>"><?= $i ?></option>
                                     <?php endfor; ?>
                                 </select>
                             </div>
                         </div>
+
+
 
                         <div class="row mb-3">
                             <div class="col-sm-4">
@@ -535,6 +652,9 @@
                                 </div>
                             </div>
                         </div>
+
+
+
                     </div>
 
                     <!-- Step 3: Address -->
@@ -613,14 +733,14 @@
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text"><i class='bx bxs-school'></i></span>
                                     <?php if (isset($preCheckOldSchool) && !empty($preCheckOldSchool)): ?>
-                                        <input type="text" class="form-control" value="<?= $preCheckOldSchool ?>" readonly>
-                                        <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool"
-                                            value="<?= $preCheckOldSchool ?>">
+                                            <input type="text" class="form-control" value="<?= $preCheckOldSchool ?>" readonly>
+                                            <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool"
+                                                value="<?= $preCheckOldSchool ?>">
                                     <?php else: ?>
-                                        <select class="form-select" id="recruit_oldSchool_select" required>
-                                            <option value="">-- พิมพ์เพื่อค้นหาชื่อโรงเรียน --</option>
-                                        </select>
-                                        <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool" required>
+                                            <select class="form-select" id="recruit_oldSchool_select" required>
+                                                <option value="">-- พิมพ์เพื่อค้นหาชื่อโรงเรียน --</option>
+                                            </select>
+                                            <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool" required>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -893,6 +1013,17 @@
             const $btn = $(this);
             const originalBtnText = $btn.html();
 
+            // Sync visible sport fields to hidden inputs before submit
+            document.querySelectorAll('.sport-field').forEach(input => {
+                const fieldName = input.dataset.field;
+                if (fieldName) {
+                    const hiddenInput = document.getElementById(fieldName + '_hidden');
+                    if (hiddenInput) {
+                        hiddenInput.value = input.value;
+                    }
+                }
+            });
+
             // Disable button and show loading
             $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังบันทึก...');
 
@@ -908,6 +1039,7 @@
             });
 
             var formData = new FormData($('#regisForm')[0]);
+
 
             $.ajax({
                 url: $('#regisForm').attr('action'),
@@ -1280,24 +1412,9 @@
 
         const courseLabel = courseSection.querySelector('label.form-label'); // Get the label element
 
-        // Create container for age radio buttons if it doesn't exist
+        // Get existing elements from HTML (now inside sports_info_section)
         let ageRadioContainer = document.getElementById('age_radio_container');
-        if (!ageRadioContainer) {
-            ageRadioContainer = document.createElement('div');
-            ageRadioContainer.id = 'age_radio_container';
-            ageRadioContainer.className = 'mb-3';
-            ageRadioContainer.style.display = 'none';
-            courseSection.appendChild(ageRadioContainer);
-        }
-
-        // Create hidden input for recruit_agegroup if it doesn't exist
-        let ageGroupInput = document.querySelector('input[name="recruit_agegroup"]');
-        if (!ageGroupInput) {
-            ageGroupInput = document.createElement('input');
-            ageGroupInput.type = 'hidden';
-            ageGroupInput.name = 'recruit_agegroup';
-            document.getElementById('regisForm').appendChild(ageGroupInput);
-        }
+        let ageGroupInput = document.getElementById('recruit_agegroup_hidden');
 
         // Reset all selects
         courseSelects.forEach((select, index) => {
@@ -1340,33 +1457,62 @@
             // ตรวจสอบว่าเป็นโควตานักกีฬาหรือไม่จากการเลือก recruit_category
             const selectedQuotaOption = document.getElementById('recruit_category').selectedOptions[0];
             const selectedQuotaName = selectedQuotaOption ? selectedQuotaOption.text : '';
-            const isSportsQuotaCategory = selectedQuotaName.includes('นักกีฬา');
+            // ใช้ regex หรือตรวจสอบคำว่า "กีฬา" เพื่อความครอบคลุม
+            const isSportsQuotaCategory = selectedQuotaName.includes('กีฬา') || selectedQuotaName.includes('นักกีฬา');
+
+            console.log('Is Sports Quota:', isSportsQuotaCategory);
+
+            if (isSportsQuotaCategory) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'คำแนะนำสำหรับโควตานักกีฬา',
+                    html: '<div class="text-start">' +
+                        'เมื่อเลือกประเภทโควตาความสามารถพิเศษทางกีฬา:<br>' +
+                        '1. ท่านจะเลือกได้เพียง 1 ประเภทกีฬาเท่านั้น (ไม่มีการจัดอันดับ)<br>' +
+                        '2. ท่านจะไม่สามารถเลือกแผนการเรียนปกติในอันดับอื่นได้<br>' +
+                        '<br><b>ขอให้ท่านพิจารณาอย่างถี่ถ้วนก่อนเลือกประเภทโควตานี้ครับ</b>' +
+                        '</div>',
+                    confirmButtonText: 'รับทราบ',
+                    confirmButtonColor: '#3085d6'
+                });
+            }
 
             // Set Label and Visibility based on Quota Type
+            const rank1 = document.getElementById('rank_container_1');
+            const rank2 = document.getElementById('rank_container_2');
+            const rank3 = document.getElementById('rank_container_3');
+
+            console.log('rank1 element:', rank1);
+            console.log('rank2 element:', rank2);
+            console.log('rank3 element:', rank3);
+
             if (isSportsQuotaCategory) {
-                // โควตานักกีฬา - เลือกได้ 1 อันดับ
-                courseLabel.innerHTML = 'เลือกแผนการเรียน (เลือกได้สูงสุด 1 อันดับ) <span class="text-danger">*</span>';
+                console.log('>>> Entering SPORTS quota branch - HIDING ranks');
+                // โควตานักกีฬา - ไม่ต้องเลือกแผนการเรียน (ซ่อนทั้งหมด)
+                courseLabel.style.display = 'none';
 
-                // ซ่อนอันดับ 2 และ 3
-                courseContainers[1].style.display = 'none';
-                courseContainers[2].style.display = 'none';
+                // ซ่อนทั้งอันดับ 1, 2 และ 3 แบบเจาะจง (ใช้ important เพื่อบดบัง CSS เดิม)
+                if (rank1) rank1.style.setProperty('display', 'none', 'important');
+                if (rank2) rank2.style.setProperty('display', 'none', 'important');
+                if (rank3) rank3.style.setProperty('display', 'none', 'important');
 
-                // ปิด required และเคลียร์ค่า
+                // ปิด required และเคลียร์ค่า หรือเลือกอันแรกให้อัตโนมัติถ้ามี
+                courseSelects[0].required = false;
                 courseSelects[1].required = false;
                 courseSelects[2].required = false;
-                courseSelects[1].value = '';
-                courseSelects[2].value = '';
 
-                // เคลียร์ name ของอันดับ 2-3 (ป้องกันการส่งค่าว่างไปกวนถ้า controller เช็ค)
-                // หรือคงไว้ตามเดิมถ้า controller รับค่าว่างได้
+                if (allowedCourses.length > 0 && allowedCourses[0] !== '') {
+                    courseSelects[0].value = allowedCourses[0];
+                }
             } else {
                 // โควตาปกติ - เลือกได้สูงสุด 3 อันดับ
+                courseLabel.style.display = 'block';
                 courseLabel.innerHTML = 'เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span class="text-danger">*</span>';
 
                 // แสดงทั้ง 3 อันดับ
-                courseContainers[0].style.display = 'flex';
-                courseContainers[1].style.display = 'flex';
-                courseContainers[2].style.display = 'flex';
+                if (rank1) rank1.style.setProperty('display', 'flex', 'important');
+                if (rank2) rank2.style.setProperty('display', 'flex', 'important');
+                if (rank3) rank3.style.setProperty('display', 'flex', 'important');
 
                 // เปิด required
                 courseSelects[0].required = true;
@@ -1374,15 +1520,28 @@
                 courseSelects[2].required = true;
             }
 
+            // ซ่อนข้อมูลกีฬาเมื่อเปลี่ยนโควตา (จะแสดงเมื่อเลือกแผนการเรียนกีฬาใน อันดับ 1)
+            const sportsInfoSection = document.getElementById('sports_info_section');
+            if (sportsInfoSection) sportsInfoSection.style.display = 'none';
+            ['sportPosition', 'nickname', 'weight', 'height', 'fatherName', 'motherName', 'fatherJob', 'motherJob'].forEach(field => {
+                const el = document.getElementById('recruit_' + field + '_input');
+                if (el) {
+                    el.required = false;
+                    el.value = '';
+                }
+            });
+
             // Restore names (in case they were modified elsewhere, good practice)
             courseSelects[0].setAttribute('name', 'recruit_tpyeRoom1');
             courseSelects[1].setAttribute('name', 'recruit_tpyeRoom2');
             courseSelects[2].setAttribute('name', 'recruit_tpyeRoom3');
 
-            // Restore input group text visibility (just in case)
-            courseContainers[0].querySelector('.input-group-text').style.display = 'block';
-            courseContainers[1].querySelector('.input-group-text').style.display = 'block';
-            courseContainers[2].querySelector('.input-group-text').style.display = 'block';
+            // Restore input group text visibility (just in case - for normal quota)
+            if (!isSportsQuotaCategory) {
+                if (rank1) rank1.querySelector('.input-group-text').style.display = 'block';
+                if (rank2) rank2.querySelector('.input-group-text').style.display = 'block';
+                if (rank3) rank3.querySelector('.input-group-text').style.display = 'block';
+            }
 
             ageRadioContainer.style.display = 'none';
 
@@ -1408,9 +1567,17 @@
                 });
             });
 
+            // After population, if it's Sports Quota, auto-select the first allowed course
+            if (isSportsQuotaCategory && allowedCourses.length > 0 && allowedCourses[0] !== '') {
+                courseSelects[0].value = allowedCourses[0];
+                // Trigger change to handle any side effects (like age group radios)
+                const event = new Event('change');
+                courseSelects[0].dispatchEvent(event);
+            }
+
             // Event Listeners และ Logic อื่นๆ (เหมือนเดิม)
 
-            // เพิ่ม event listener สำหรับอันดับ 1 เพื่อตรวจสอบว่าเป็นกีฬาหรือไม่ (เฉพาะ Logic รายวิชาที่อาจจะมี age)
+            // เพิ่ม event listener สำหรับอันดับ 1 เพื่อตรวจสอบว่าเป็นกีฬาหรือไม่
             courseSelects[0].addEventListener('change', function () {
                 const selectedCourseId = this.value;
                 const selectElement = this;
@@ -1419,10 +1586,62 @@
 
                 if (!selectedCourse) return;
 
-                // ... (Logic ตรวจสอบเกรดหรือ duplicate เหมือนเดิม) ...
-                // แต่ถ้าเป็นโควตานักกีฬา เราไม่จำเป็นต้องเช็ค Duplicate กับอันดับ 2-3 เพราะมันซ่อนอยู่
+                // ตรวจสอบว่าแผนการเรียนที่เลือกเป็น "กีฬา" หรือไม่
+                const courseName = selectedCourse.course_initials || selectedCourse.course_fullname || '';
+                const courseBranch = selectedCourse.course_branch || '';
+                const isSportsCourse = courseName.includes('กีฬา') || courseBranch.includes('กีฬา');
 
-                if (!isSportsQuotaCategory) {
+                console.log('=== DEBUG Course Selection ===');
+                console.log('Course Name:', courseName);
+                console.log('Course Branch:', courseBranch);
+                console.log('Is Sports Course:', isSportsCourse);
+
+                // Get rank containers and sports info section
+                const rank2 = document.getElementById('rank_container_2');
+                const rank3 = document.getElementById('rank_container_3');
+                const sportsInfoSection = document.getElementById('sports_info_section');
+
+                if (isSportsCourse) {
+                    console.log('>>> SPORTS course selected - HIDING rank 2 & 3');
+                    // ซ่อนอันดับ 2 และ 3
+                    if (rank2) rank2.style.setProperty('display', 'none', 'important');
+                    if (rank3) rank3.style.setProperty('display', 'none', 'important');
+                    courseSelects[1].required = false;
+                    courseSelects[2].required = false;
+                    courseSelects[1].value = '';
+                    courseSelects[2].value = '';
+
+                    // แสดงช่องข้อมูลกีฬา (Section ใหม่)
+                    if (sportsInfoSection) sportsInfoSection.style.display = 'block';
+
+                    // ตั้ง required สำหรับ fields ในกีฬา
+                    ['sportPosition', 'nickname', 'weight', 'height', 'fatherName', 'motherName', 'fatherJob', 'motherJob'].forEach(field => {
+                        const el = document.getElementById('recruit_' + field + '_input');
+                        if (el) el.required = true;
+                    });
+                } else {
+                    console.log('>>> Normal course selected - SHOWING rank 2 & 3');
+                    // แสดงอันดับ 2 และ 3
+                    if (rank2) rank2.style.setProperty('display', 'flex', 'important');
+                    if (rank3) rank3.style.setProperty('display', 'flex', 'important');
+                    courseSelects[1].required = true;
+                    courseSelects[2].required = true;
+
+                    // ซ่อนช่องข้อมูลกีฬา
+                    if (sportsInfoSection) sportsInfoSection.style.display = 'none';
+
+                    // ปิด required และเคลียร์ค่า
+                    ['sportPosition', 'nickname', 'weight', 'height', 'fatherName', 'motherName', 'fatherJob', 'motherJob'].forEach(field => {
+                        const el = document.getElementById('recruit_' + field + '_input');
+                        if (el) {
+                            el.required = false;
+                            el.value = '';
+                        }
+                    });
+                }
+
+                // ตรวจสอบ duplicate (เฉพาะถ้าไม่ใช่กีฬา)
+                if (!isSportsCourse) {
                     const otherSelects = [courseSelects[1], courseSelects[2]];
                     const isDuplicate = otherSelects.some(s => s.value === selectedCourseId && selectedCourseId !== '');
                     if (isDuplicate) {
@@ -1438,7 +1657,6 @@
                 }
 
                 // Logic ตรวจสอบเกรด
-                const courseName = selectedCourse.course_initials || selectedCourse.course_fullname || '';
                 let gradeRequirement = null;
                 let requiredGPA = 0;
 
@@ -1755,6 +1973,13 @@
 
         // Helper function to get field value
         function getFieldValue(key) {
+            // For sport fields, check by data-field or _input suffix
+            const sportFields = ['recruit_sportPosition', 'recruit_nickname', 'recruit_weight', 'recruit_height', 'recruit_fatherName', 'recruit_motherName', 'recruit_fatherJob', 'recruit_motherJob'];
+            if (sportFields.includes(key)) {
+                const el = document.getElementById(key + '_input');
+                return el ? el.value || '<span class="text-muted">-</span>' : '<span class="text-muted">-</span>';
+            }
+
             const element = document.querySelector(`[name="${key}"]`);
             if (key === 'recruit_birthday') {
                 return birthday;
@@ -1787,11 +2012,26 @@
 
         // Build grouped HTML
         let html = '';
+        const quotaName = getFieldValue('recruit_category');
+        const courseId1 = document.querySelector('[name="recruit_tpyeRoom1"]').value;
+        const selectedCourse1 = coursesData.find(c => c.course_id == courseId1);
+        const isSports = quotaName.includes('นักกีฬา') ||
+            (selectedCourse1 && (
+                (selectedCourse1.course_fullname && selectedCourse1.course_fullname.includes('กีฬา')) ||
+                (selectedCourse1.course_branch && selectedCourse1.course_branch.includes('กีฬา'))
+            ));
 
         // Group 1: ข้อมูลการสมัคร
         html += '<div class="data-group">';
         html += '<div class="data-group-title"><i class="bx bx-bookmark text-primary"></i>ข้อมูลการสมัคร</div>';
-        html += createDataItem('ประเภทโควตา', getFieldValue('recruit_category'));
+        html += createDataItem('ประเภทโควตา', quotaName);
+        if (isSports) {
+            const ageGroup = formData.get('recruit_agegroup');
+            if (ageGroup) {
+                html += createDataItem('รุ่นอายุ', ageGroup + ' ปี');
+            }
+            html += createDataItem('ตำแหน่งที่สมัคร', getFieldValue('recruit_sportPosition'));
+        }
         html += createDataItem('แผนการเรียน 1', getFieldValue('recruit_tpyeRoom1'));
         const plan2 = getFieldValue('recruit_tpyeRoom2');
         const plan3 = getFieldValue('recruit_tpyeRoom3');
@@ -1803,11 +2043,21 @@
         html += '<div class="data-group">';
         html += '<div class="data-group-title"><i class="bx bx-user text-success"></i>ข้อมูลส่วนตัว</div>';
         html += createDataItem('ชื่อ-นามสกุล', getFieldValue('recruit_prefix') + getFieldValue('recruit_firstName') + ' ' + getFieldValue('recruit_lastName'));
+        if (isSports) {
+            html += createDataItem('ชื่อเล่น', getFieldValue('recruit_nickname'));
+        }
         html += createDataItem('เลขบัตรประชาชน', getFieldValue('recruit_idCard'));
         html += createDataItem('วันเกิด', getFieldValue('recruit_birthday'));
+        if (isSports) {
+            html += createDataItem('น้ำหนัก / ส่วนสูง', getFieldValue('recruit_weight') + ' กก. / ' + getFieldValue('recruit_height') + ' ซม.');
+        }
         html += createDataItem('เบอร์โทรศัพท์', getFieldValue('recruit_phone'));
         html += createDataItem('เชื้อชาติ/สัญชาติ', getFieldValue('recruit_race') + '/' + getFieldValue('recruit_nationality'));
         html += createDataItem('ศาสนา', getFieldValue('recruit_religion'));
+        if (isSports) {
+            html += createDataItem('บิดา', getFieldValue('recruit_fatherName') + ' (อาชีพ: ' + getFieldValue('recruit_fatherJob') + ')');
+            html += createDataItem('มารดา', getFieldValue('recruit_motherName') + ' (อาชีพ: ' + getFieldValue('recruit_motherJob') + ')');
+        }
         html += '</div>';
 
         // Group 3: ที่อยู่
@@ -2193,6 +2443,4 @@
         text-align: right;
         word-break: break-word;
     }
-</style>
-
-<?= $this->endSection() ?>
+</style><?= $this->endSection() ?>

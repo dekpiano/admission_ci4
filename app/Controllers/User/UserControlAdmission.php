@@ -640,116 +640,263 @@ class UserControlAdmission extends BaseController
 
         // 2. Database Connections
         $db = \Config\Database::connect();
+        $model = new AdmissionModel();
 
         // 3. Fetch Student Data
-        // We use $id passed to the function, NOT session, to allow status check printing
-        $builder = $db->table('tb_recruitstudent');
-        $builder->where('recruit_id', $id);
-        $student = $builder->get()->getRow();
+        $recruit = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_quota.quota_key, tb_course.course_fullname as course_name_joined, tb_course.course_branch')
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
+            ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->find($id);
 
-        if (!$student) {
-            return "ไม่พบข้อมูลนักเรียน";
+        if (!$recruit) {
+            return "ไม่พบข้อมูลผู้สมัคร";
         }
 
+        // Check if this is a sports excellence applicant
+        $isSport = (
+            (!empty($recruit['recruit_sportPosition']) && $recruit['recruit_sportPosition'] !== '-') ||
+            (isset($recruit['course_name_joined']) && mb_strpos($recruit['course_name_joined'], 'กีฬา') !== false) ||
+            (isset($recruit['course_branch']) && mb_strpos($recruit['course_branch'], 'กีฬา') !== false) ||
+            (isset($recruit['quota_key']) && $recruit['quota_key'] === 'sport')
+        );
+
         // 4. Prepare Data
-        $date_Y = date('Y', strtotime($student->recruit_birthday)) + 543;
         $TH_Month = array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฏาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
-        $date_D = date('d', strtotime($student->recruit_birthday));
-        $date_M = date('n', strtotime($student->recruit_birthday));
 
-        $date_Y_regis = date('Y', strtotime($student->recruit_date)) + 543;
-        $date_D_regis = date('d', strtotime($student->recruit_date));
-        $date_M_regis = date('n', strtotime($student->recruit_date));
+        $date_Y = date('Y', strtotime($recruit['recruit_birthday'])) + 543;
+        $date_D = date('d', strtotime($recruit['recruit_birthday']));
+        $date_M = date('n', strtotime($recruit['recruit_birthday']));
 
-        // 5. Initialize mPDF (Card Format [210, 90])
-        // Clean output buffer
+        $date_Y_regis = date('Y', strtotime($recruit['recruit_date'])) + 543;
+        $date_D_regis = date('d', strtotime($recruit['recruit_date']));
+        $date_M_regis = date('n', strtotime($recruit['recruit_date']));
+
+        // Calculate Age
+        $birthDate = new \DateTime($recruit['recruit_birthday']);
+        $today = new \DateTime();
+        $age = $today->diff($birthDate)->y;
+
+        $sch = explode("โรงเรียน", $recruit['recruit_oldSchool']);
+        $oldSchool = ($sch[0] == '' && isset($sch[1])) ? $sch[1] : $sch[0];
+
+        // 5. Initialize mPDF
         if (ob_get_length())
             ob_clean();
 
+        $customFontDir = SHARED_LIB_PATH . '/vendor/mpdf/mpdf/ttfonts';
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
         $mpdf = new \Mpdf\Mpdf([
             'mode' => 'utf-8',
+            'format' => 'A4', // Use A4 for both sports and regular forms
+            'fontDir' => array_merge($fontDirs, [$customFontDir]),
+            'fontdata' => $fontData + [
+                'sarabun' => [
+                    'R' => 'THSarabun.ttf',
+                    'I' => 'THSarabun-Italic.ttf',
+                    'B' => 'THSarabun-Bold.ttf',
+                    'BI' => 'THSarabun-BoldItalic.ttf',
+                ]
+            ],
             'default_font_size' => 16,
             'default_font' => 'sarabun',
-            'format' => [210, 90],
-            'tempDir' => WRITEPATH . 'temp' // Added tempDir as per AdminControlReport
+            'tempDir' => WRITEPATH . 'temp'
         ]);
 
-        $mpdf->SetTitle($student->recruit_prefix . $student->recruit_firstName . ' ' . $student->recruit_lastName);
-        $mpdf->showImageErrors = true;
+        $mpdf->SetTitle($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']);
 
-        // 6. Generate HTML Content
-        // 6. Generate HTML Content
-        // Image Path
-        $img_tag = '';
-        if (!empty($student->recruit_img)) {
-            // Construct Remote URL directly to avoid localhost loopback issues with mPDF
-            $remoteBaseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
-            $fileName = 'recruitstudent/m' . $student->recruit_regLevel . '/img/' . $student->recruit_img;
-            $fullRemoteUrl = rtrim($remoteBaseUrl, '/') . '/' . ltrim($fileName, '/');
+        // 6. Generate HTML
+        $html = '';
+        $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . $recruit['recruit_img']);
 
-            try {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $fullRemoteUrl);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-                $imageData = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                curl_close($ch);
+        if ($isSport) {
+            // Layout for Sport Excellence (A4) - Synced with generate_pdf.php coordinates
+            $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ_sport.pdf', true);
+            $mpdf->AddPage();
 
-                if ($httpCode == 200 && !empty($imageData)) {
-                    // Detect MIME type from content, not extension
-                    $finfo = new \finfo(FILEINFO_MIME_TYPE);
-                    $mime = $finfo->buffer($imageData);
+            // Image (173, 10, 30, 40)
+            if (!empty($recruit['recruit_img'])) {
+                $mpdf->Image($imgUrl, 173, 10, 30, 40);
+            }
 
-                    // Allow only valid image types
-                    $allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+            // Top Content
+            $mpdf->SetXY(147, 42);
+            $mpdf->WriteHTML($recruit['recruit_year']);
 
-                    if (in_array($mime, $allowedMimes)) {
-                        $base64 = base64_encode($imageData);
-                        $img_src = 'data:' . $mime . ';base64,' . $base64;
-                        // รูปถ่ายสัดส่วน 3:4 (แนวตั้ง) กว้าง 105px สูง 140px
-                        $img_tag = '<img style="width:105px;height:140px;object-fit:cover;" src="' . $img_src . '">';
+            // Name and Gender
+            $mpdf->SetXY(40, 58);
+            $mpdf->WriteHTML($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']);
+
+            $checkMarkPath = FCPATH . 'uploads/recruitstudent/Check-Mark1.png';
+            if ($recruit['recruit_prefix'] === 'เด็กหญิง' || $recruit['recruit_prefix'] === 'นางสาว' || (isset($recruit['recruit_gender']) && $recruit['recruit_gender'] === 'หญิง')) {
+                $mpdf->Image($checkMarkPath, 120, 58, 7, 7);
+            } else {
+                $mpdf->Image($checkMarkPath, 108, 58, 7, 7);
+            }
+
+            // Age and Nickname
+            $mpdf->SetXY(146, 58);
+            $mpdf->WriteHTML($age);
+            $mpdf->SetXY(175, 58);
+            $mpdf->WriteHTML($recruit['recruit_nickname'] ?? '');
+
+            // Birth Date and Physicals
+            $mpdf->SetXY(30, 66);
+            $mpdf->WriteHTML($date_D);
+            $mpdf->SetXY(60, 66);
+            $mpdf->WriteHTML($TH_Month[$date_M - 1]);
+            $mpdf->SetXY(98, 66);
+            $mpdf->WriteHTML($date_Y);
+            $mpdf->SetXY(127, 66);
+            $mpdf->WriteHTML($recruit['recruit_height'] ?? '');
+            $mpdf->SetXY(173, 66);
+            $mpdf->WriteHTML($recruit['recruit_weight'] ?? '');
+
+            // Parents
+            $mpdf->SetXY(40, 74);
+            $mpdf->WriteHTML($recruit['recruit_fatherName'] ?? '');
+            $mpdf->SetXY(130, 74);
+            $mpdf->WriteHTML($recruit['recruit_fatherJob'] ?? '');
+            $mpdf->SetXY(40, 82);
+            $mpdf->WriteHTML($recruit['recruit_motherName'] ?? '');
+            $mpdf->SetXY(130, 82);
+            $mpdf->WriteHTML($recruit['recruit_motherJob'] ?? '');
+
+            // Address
+            $mpdf->SetXY(65, 90);
+            $mpdf->WriteHTML($recruit['recruit_homeNumber']);
+            $mpdf->SetXY(91, 90);
+            $mpdf->WriteHTML($recruit['recruit_homeGroup'] ?? '-');
+            $mpdf->SetXY(112, 90);
+            $mpdf->WriteHTML($recruit['recruit_homeRoad'] ?? '-');
+            $mpdf->SetXY(142, 90);
+            $mpdf->WriteHTML($recruit['recruit_homeSubdistrict']);
+            $mpdf->SetXY(30, 98);
+            $mpdf->WriteHTML($recruit['recruit_homedistrict']);
+            $mpdf->SetXY(75, 98);
+            $mpdf->WriteHTML($recruit['recruit_homeProvince']);
+            $mpdf->SetXY(123, 98);
+            $mpdf->WriteHTML($recruit['recruit_homePostcode']);
+            $mpdf->SetXY(165, 98);
+            $mpdf->WriteHTML($recruit['recruit_phone']);
+
+            // Education
+            $mpdf->SetXY(123, 107);
+            $mpdf->WriteHTML($date_Y_regis);
+            $mpdf->SetXY(45, 115);
+            $mpdf->WriteHTML($recruit['recruit_regLevel'] == 1 ? 'ป.6' : 'ม.3');
+            $mpdf->SetXY(107, 115);
+            $mpdf->WriteHTML($oldSchool);
+
+            // Choice
+            $mpdf->SetXY(50, 123);
+            $mpdf->WriteHTML('มัธยมศึกษาปีที่ ' . $recruit['recruit_regLevel']);
+            $mpdf->SetXY(109, 123);
+            $mpdf->WriteHTML($recruit['course_branch'] ?? '');
+            $mpdf->SetXY(162, 123);
+            $mpdf->WriteHTML($recruit['recruit_sportPosition'] ?? '');
+
+            // Signature
+            $mpdf->SetXY(140, 141);
+            $mpdf->WriteHTML($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']);
+
+            // Confirmation Part (Bottom)
+            $mpdf->SetXY(140, 188);
+            $mpdf->WriteHTML($recruit['recruit_year']);
+            $mpdf->SetXY(35, 196);
+            $mpdf->WriteHTML($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']);
+            $mpdf->SetXY(118, 196);
+            $mpdf->WriteHTML('มัธยมศึกษาปีที่ ' . $recruit['recruit_regLevel']);
+            $mpdf->SetXY(167, 196);
+            $mpdf->WriteHTML($recruit['course_branch'] ?? '');
+
+            // Top Left & Bottom Right Tags
+            $mpdf->SetXY(15, 18);
+            $mpdf->WriteHTML($recruit['course_branch'] ?? '');
+            $mpdf->SetXY(15, 26);
+            $mpdf->WriteHTML($recruit['recruit_sportPosition'] ?? '');
+            $mpdf->SetXY(164, 173);
+            $mpdf->WriteHTML($recruit['course_branch'] ?? '');
+            $mpdf->SetXY(164, 183);
+            $mpdf->WriteHTML($recruit['recruit_sportPosition'] ?? '');
+
+        } else {
+            // Layout for Regular Application (registerSKJ.pdf)
+            $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ.pdf', true);
+            $mpdf->AddPage();
+
+            if (!empty($recruit['recruit_img'])) {
+                $html .= '<div style="position:absolute;top:90px;left:640px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
+            }
+
+            $html .= '<div style="position:absolute;top:18px;left:100px; width:100%;font-size:16px;">' . ($recruit['quota_explain'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:180px;left:555px; width:100%;font-size:24px;">' . $recruit['recruit_regLevel'] . '</div>';
+            $html .= '<div style="position:absolute;top:63px;left:700px; width:100%">' . sprintf("%04d", $recruit['recruit_id']) . '</div>';
+            $html .= '<div style="position:absolute;top:280px;left:180px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . '</div>';
+            $html .= '<div style="position:absolute;top:280px;left:470px; width:100%">' . $recruit['recruit_lastName'] . '</div>';
+            $html .= '<div style="position:absolute;top:307px;left:270px; width:100%">' . $oldSchool . '</div>';
+            $html .= '<div style="position:absolute;top:335px;left:170px; width:100%">' . ($recruit['recruit_district'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:335px;left:510px; width:100%">' . ($recruit['recruit_province'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:160px; width:100%">' . $date_D . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:240px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:370px; width:100%">' . $date_Y . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:470px; width:100%">' . $age . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:600px; width:100%">' . ($recruit['recruit_race'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:390px;left:162px; width:100%">' . ($recruit['recruit_nationality'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:390px;left:300px; width:100%">' . ($recruit['recruit_religion'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:390px;left:540px; width:100%">' . ($recruit['recruit_idCard'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:418px;left:350px; width:100%">' . ($recruit['recruit_phone'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:418px;left:600px; width:100%">' . ($recruit['recruit_grade'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:445px;left:270px; width:100%">' . ($recruit['recruit_homeNumber'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:445px;left:390px; width:100%">' . ($recruit['recruit_homeGroup'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:445px;left:475px; width:100%">' . ($recruit['recruit_homeRoad'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:445px;left:615px; width:100%">' . ($recruit['recruit_homeSubdistrict'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:475px;left:180px; width:100%">' . ($recruit['recruit_homedistrict'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:475px;left:400px; width:100%">' . ($recruit['recruit_homeProvince'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:475px;left:620px; width:100%">' . ($recruit['recruit_homePostcode'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:503px;left:695px; width:100%;font-size:22px;">' . $recruit['recruit_regLevel'] . '</div>';
+
+            $html .= '<div style="position:absolute;top:880px;left:340px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName'] . '</div>';
+            $html .= '<div style="position:absolute;top:905px;left:350px; width:100%">' . $date_D_regis . ' ' . $TH_Month[$date_M_regis - 1] . ' ' . $date_Y_regis . '</div>';
+
+            // Major Order / Course Selection
+            if ($recruit['quota_key'] == "normal") {
+                $SubCourse = explode('|', $recruit['recruit_majorOrder']);
+                $html .= '<div style="position:absolute;top:570px;left:200px; width:100%">';
+                foreach ($SubCourse as $key => $v_SubCourse) {
+                    $CheckCourse = $this->db->table('tb_course')->select('course_initials')->where('course_id', $v_SubCourse)->get()->getRow();
+                    if ($CheckCourse) {
+                        $html .= "ลำดับที่ " . ($key + 1) . ' ' . $CheckCourse->course_initials . "<br>";
                     }
                 }
-            } catch (\Exception $e) {
-                // Fallback or ignore
+                $html .= '</div>';
+            } else {
+                $html .= '<div style="position:absolute;top:570px;left:200px; width:100%">';
+                $courseDisplay = $recruit['course_name_joined'] ?? $recruit['recruit_tpyeRoom'];
+                $html .= "ลำดับที่ 1 " . $courseDisplay . ' สาขา ' . ($recruit['recruit_major'] ?? '');
+                $html .= '</div>';
+            }
+
+            // Documents Checkmarks
+            $checkEmoji = '<span style="font-family: dejavusans; font-size: 30px; line-height: 1;">✔</span>';
+            if (!empty($recruit['recruit_certificateEdu'])) {
+                $html .= '<div style="position:absolute;top:785px;left:110px; width:100%;">' . $checkEmoji . '</div>';
+            }
+            if (!empty($recruit['recruit_copyidCard'])) {
+                $html .= '<div style="position:absolute;top:785px;left:328px; width:100%;">' . $checkEmoji . '</div>';
+            }
+            if (!empty($recruit['recruit_img'])) {
+                $html .= '<div style="position:absolute;top:788px;left:560px; width:100%;">' . $checkEmoji . '</div>';
             }
         }
 
-        $html = '<div style="position:absolute;top:100px;left:75px; width:100%">' . $img_tag . '</div>';
-        $html .= '<div style="position:absolute;top:57px;left:150px; width:100%">' . sprintf("%04d", $student->recruit_id) . '</div>'; // Application ID
-        $html .= '<div style="position:absolute;top:100px;left:250px; width:100%">' . $student->recruit_prefix . $student->recruit_firstName . '</div>'; // Name
-        $html .= '<div style="position:absolute;top:100px;left:480px; width:100%">' . $student->recruit_lastName . '</div>'; // Surname
-        $html .= '<div style="position:absolute;top:127px;left:400px; width:100%">' . $student->recruit_idCard . '</div>'; // ID Card
-        $html .= '<div style="position:absolute;top:155px;left:270px; width:100%"> ' . $student->recruit_tpyeRoom . '</div>'; // Program
-
-        // License Image (Signature/Stamp)
-        $license_path = FCPATH . 'public/asset/img/license.png'; // Adjusted path assuming public/asset
-        if (!file_exists($license_path)) {
-            $license_path = FCPATH . 'asset/img/license.png'; // Try alternate path
-        }
-        if (file_exists($license_path)) {
-            $html .= '<div style="position:absolute;top:200px;left:340px; width:100%"><img style="width:120px;height:100px;" src="' . $license_path . '"></div>';
-        }
-
-        $html .= '<div style="position:absolute;top:255px;left:360px; width:100%">' . $date_D_regis . ' ' . $TH_Month[$date_M_regis - 1] . ' ' . $date_Y_regis . '</div>'; // Date
-
-        // 7. Set Template
-        $templatePath = FCPATH . 'uploads/recruitstudent/pdf_registudentForStudent.pdf';
-
-        if (file_exists($templatePath)) {
-            $mpdf->SetDocTemplate($templatePath, true);
-        } else {
-            $html .= '<div style="color:red; position:absolute; top:0; left:0;">Template not found: ' . $templatePath . '</div>';
-        }
-
         $mpdf->WriteHTML($html);
-
         $this->response->setHeader('Content-Type', 'application/pdf');
-        $mpdf->Output('Reg_' . $student->recruit_idCard . '.pdf', 'I');
-        exit(); // Prevent CI4 from interfering with the output
+        $mpdf->Output('Reg_' . $recruit['recruit_idCard'] . '.pdf', 'I');
+        exit();
     }
 
     public function SchoolList()

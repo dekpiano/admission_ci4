@@ -500,7 +500,7 @@ class AdminControlRecruit extends BaseController
     {
         $db = \Config\Database::connect();
         $model = new AdmissionModel();
-        $recruit = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_quota.quota_key, tb_course.course_fullname as course_name_joined')
+        $recruit = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_quota.quota_key, tb_course.course_fullname as course_name_joined, tb_course.course_branch')
             ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
             ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
             ->find($id);
@@ -563,72 +563,162 @@ class AdminControlRecruit extends BaseController
         $baseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
         $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . $recruit['recruit_img']);
 
-        if (!empty($recruit['recruit_img'])) {
-            $html .= '<div style="position:absolute;top:90px;left:635px; width:100%"><img style="width: 120px;height:100px;" src="' . $imgUrl . '"></div>';
-        }
+        // Check if this is a sports excellence applicant
+        $isSport = (
+            (!empty($recruit['recruit_sportPosition']) && $recruit['recruit_sportPosition'] !== '-') ||
+            (isset($recruit['course_name_joined']) && mb_strpos($recruit['course_name_joined'], 'กีฬา') !== false) ||
+            (isset($recruit['course_branch']) && mb_strpos($recruit['course_branch'], 'กีฬา') !== false) ||
+            (isset($recruit['quota_key']) && $recruit['quota_key'] === 'sport')
+        );
 
-        $html .= '<div style="position:absolute;top:18px;left:100px; width:100%;font-size:16px;">' . $recruit['quota_explain'] . '</div>';
-        $html .= '<div style="position:absolute;top:180px;left:555px; width:100%;font-size:24px;">' . $recruit['recruit_regLevel'] . '</div>';
-        $html .= '<div style="position:absolute;top:63px;left:700px; width:100%">' . sprintf("%04d", $recruit['recruit_id']) . '</div>';
-        $html .= '<div style="position:absolute;top:280px;left:180px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . '</div>';
-        $html .= '<div style="position:absolute;top:280px;left:470px; width:100%">' . $recruit['recruit_lastName'] . '</div>';
-        $html .= '<div style="position:absolute;top:307px;left:270px; width:100%">' . $oldSchool . '</div>';
-        $html .= '<div style="position:absolute;top:335px;left:170px; width:100%">' . $recruit['recruit_district'] . '</div>';
-        $html .= '<div style="position:absolute;top:335px;left:510px; width:100%">' . $recruit['recruit_province'] . '</div>';
-        $html .= '<div style="position:absolute;top:363px;left:160px; width:100%">' . $date_D . '</div>';
-        $html .= '<div style="position:absolute;top:363px;left:240px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
-        $html .= '<div style="position:absolute;top:363px;left:370px; width:100%">' . $date_Y . '</div>';
-        $html .= '<div style="position:absolute;top:363px;left:470px; width:100%">' . $age . '</div>';
-        $html .= '<div style="position:absolute;top:363px;left:600px; width:100%">' . $recruit['recruit_race'] . '</div>';
-        $html .= '<div style="position:absolute;top:390px;left:162px; width:100%">' . $recruit['recruit_nationality'] . '</div>';
-        $html .= '<div style="position:absolute;top:390px;left:300px; width:100%">' . $recruit['recruit_religion'] . '</div>';
-        $html .= '<div style="position:absolute;top:390px;left:540px; width:100%">' . $recruit['recruit_idCard'] . '</div>';
-        $html .= '<div style="position:absolute;top:418px;left:350px; width:100%">' . $recruit['recruit_phone'] . '</div>';
-        $html .= '<div style="position:absolute;top:418px;left:600px; width:100%">' . $recruit['recruit_grade'] . '</div>';
-        $html .= '<div style="position:absolute;top:445px;left:270px; width:100%">' . $recruit['recruit_homeNumber'] . '</div>';
-        $html .= '<div style="position:absolute;top:445px;left:390px; width:100%">' . $recruit['recruit_homeGroup'] . '</div>';
-        $html .= '<div style="position:absolute;top:445px;left:475px; width:100%">' . $recruit['recruit_homeRoad'] . '</div>';
-        $html .= '<div style="position:absolute;top:445px;left:615px; width:100%">' . $recruit['recruit_homeSubdistrict'] . '</div>';
-        $html .= '<div style="position:absolute;top:475px;left:180px; width:100%">' . $recruit['recruit_homedistrict'] . '</div>';
-        $html .= '<div style="position:absolute;top:475px;left:400px; width:100%">' . $recruit['recruit_homeProvince'] . '</div>';
-        $html .= '<div style="position:absolute;top:475px;left:620px; width:100%">' . $recruit['recruit_homePostcode'] . '</div>';
-        $html .= '<div style="position:absolute;top:503px;left:695px; width:100%;font-size:22px;">' . $recruit['recruit_regLevel'] . '</div>';
-
-        $html .= '<div style="position:absolute;top:880px;left:340px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName'] . '</div>';
-        $html .= '<div style="position:absolute;top:905px;left:350px; width:100%">' . $date_D_regis . ' ' . $TH_Month[$date_M_regis - 1] . ' ' . $date_Y_regis . '</div>';
-
-        // Major Order / Course Selection
-        if ($recruit['quota_key'] == "normal") {
-            $SubCourse = explode('|', $recruit['recruit_majorOrder']);
-            $html .= '<div style="position:absolute;top:570px;left:200px; width:100%">';
-            foreach ($SubCourse as $key => $v_SubCourse) {
-                $CheckCourse = $db->table('tb_course')->select('course_initials')->where('course_id', $v_SubCourse)->get()->getRow();
-                if ($CheckCourse) {
-                    $html .= "ลำดับที่ " . ($key + 1) . ' ' . $CheckCourse->course_initials . "<br>";
-                }
+        if ($isSport) {
+            // Layout for Sport Excellence (registerSKJ_sport.pdf)
+            if (!empty($recruit['recruit_img'])) {
+                // Image position for sport template
+                $html .= '<div style="position:absolute;top:38px;left:655px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
             }
-            $html .= '</div>';
+
+            // Type of Sport & Age Group (Top Left)
+            $html .= '<div style="position:absolute;top:68px;left:56px; width:100%">' . ($recruit['course_branch'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:98px;left:56px; width:100%">' . ($recruit['recruit_sportPosition'] ?? '') . '</div>';
+
+            // Application ID
+            $html .= '<div style="position:absolute;top:158px;left:556px; width:100%; font-size: 20px;">' . $recruit['recruit_year'] . '</div>';
+
+            // Name
+            $html .= '<div style="position:absolute;top:219px;left:151px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName'] . '</div>';
+
+            // Gender
+            $checkMarkPath = FCPATH . 'uploads/recruitstudent/Check-Mark1.png';
+            if ($recruit['recruit_prefix'] === 'เด็กหญิง' || $recruit['recruit_prefix'] === 'นางสาว' || (isset($recruit['recruit_gender']) && $recruit['recruit_gender'] === 'หญิง')) {
+                $html .= '<div style="position:absolute;top:219px;left:453px; width:100%"><img src="' . $checkMarkPath . '" style="width:26px; height:26px;"></div>';
+            } else {
+                $html .= '<div style="position:absolute;top:219px;left:408px; width:100%"><img src="' . $checkMarkPath . '" style="width:26px; height:26px;"></div>';
+            }
+
+            // Age and Nickname
+            $html .= '<div style="position:absolute;top:219px;left:552px; width:100%">' . $age . '</div>';
+            $html .= '<div style="position:absolute;top:219px;left:661px; width:100%">' . ($recruit['recruit_nickname'] ?? '') . '</div>';
+
+            // Birth Date
+            $html .= '<div style="position:absolute;top:249px;left:113px; width:100%">' . $date_D . '</div>';
+            $html .= '<div style="position:absolute;top:249px;left:226px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
+            $html .= '<div style="position:absolute;top:249px;left:370px; width:100%">' . $date_Y . '</div>';
+
+            // Height and Weight
+            $html .= '<div style="position:absolute;top:249px;left:480px; width:100%">' . ($recruit['recruit_height'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:249px;left:654px; width:100%">' . ($recruit['recruit_weight'] ?? '') . '</div>';
+
+            // Parents
+            $html .= '<div style="position:absolute;top:279px;left:151px; width:100%">' . ($recruit['recruit_fatherName'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:279px;left:495px; width:100%">' . ($recruit['recruit_fatherJob'] ?? '') . '</div>';
+
+            $html .= '<div style="position:absolute;top:310px;left:151px; width:100%">' . ($recruit['recruit_motherName'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:310px;left:495px; width:100%">' . ($recruit['recruit_motherJob'] ?? '') . '</div>';
+
+            // Address
+            $html .= '<div style="position:absolute;top:340px;left:246px; width:100%">' . $recruit['recruit_homeNumber'] . '</div>';
+            $html .= '<div style="position:absolute;top:340px;left:344px; width:100%">' . ($recruit['recruit_homeGroup'] ?? '-') . '</div>';
+            $html .= '<div style="position:absolute;top:340px;left:423px; width:100%">' . ($recruit['recruit_homeRoad'] ?? '-') . '</div>';
+            $html .= '<div style="position:absolute;top:340px;left:536px; width:100%">' . $recruit['recruit_homeSubdistrict'] . '</div>';
+            $html .= '<div style="position:absolute;top:370px;left:113px; width:100%">' . $recruit['recruit_homedistrict'] . '</div>';
+            $html .= '<div style="position:absolute;top:370px;left:283px; width:100%">' . $recruit['recruit_homeProvince'] . '</div>';
+            $html .= '<div style="position:absolute;top:370px;left:465px; width:100%">' . $recruit['recruit_homePostcode'] . '</div>';
+            $html .= '<div style="position:absolute;top:370px;left:623px; width:100%">' . $recruit['recruit_phone'] . '</div>';
+
+            // Education Status
+            $html .= '<div style="position:absolute;top:441px;left:465px; width:100%">' . $date_Y_regis . '</div>';
+            $html .= '<div style="position:absolute;top:471px;left:170px; width:100%">' . $recruit['recruit_regLevel'] . '</div>';
+            $html .= '<div style="position:absolute;top:471px;left:404px; width:100%">' . $oldSchool . '</div>';
+            $html .= '<div style="position:absolute;top:502px;left:170px; width:100%">' . $recruit['recruit_regLevel'] . '</div>';
+            $html .= '<div style="position:absolute;top:502px;left:404px; width:100%">' . ($recruit['course_branch'] ?? '') . '</div>';
+            $html .= '<div style="position:absolute;top:502px;left:655px; width:100%">' . ($recruit['recruit_sportPosition'] ?? '') . '</div>';
+
+            // Signature
+            $html .= '<div style="position:absolute;top:572px;left:529px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName'] . '</div>';
+
+            // Second Part (Confirmation)
+            $html .= '<div style="position:absolute;top:750px;left:556px; width:100%; font-size: 20px;">' . $recruit['recruit_year'] . '</div>';
+            $html .= '<div style="position:absolute;top:790px;left:132px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName'] . '</div>';
+            $html .= '<div style="position:absolute;top:790px;left:440px; width:100%">' . $recruit['recruit_regLevel'] . '</div>';
+            $html .= '<div style="position:absolute;top:790px;left:660px; width:100%">' . ($recruit['course_branch'] ?? '') . '</div>';
+
+            // Signature 2
+            $html .= '<div style="position:absolute;top:958px;left:132px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName'] . '</div>';
+
+
+
+            $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ_sport.pdf', true);
         } else {
-            $html .= '<div style="position:absolute;top:570px;left:200px; width:100%">';
-            // Use course_name_joined if available, otherwise fallback to recruit_tpyeRoom
-            $courseDisplay = !empty($recruit['course_name_joined']) ? $recruit['course_name_joined'] : $recruit['recruit_tpyeRoom'];
-            $html .= "ลำดับที่ 1 " . $courseDisplay . ' สาขา ' . $recruit['recruit_major'];
-            $html .= '</div>';
+            // Layout for Regular Application (registerSKJ.pdf)
+            if (!empty($recruit['recruit_img'])) {
+                $html .= '<div style="position:absolute;top:90px;left:640px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
+            }
+
+            $html .= '<div style="position:absolute;top:18px;left:100px; width:100%;font-size:16px;">' . $recruit['quota_explain'] . '</div>';
+            $html .= '<div style="position:absolute;top:180px;left:555px; width:100%;font-size:24px;">' . $recruit['recruit_regLevel'] . '</div>';
+            $html .= '<div style="position:absolute;top:63px;left:700px; width:100%">' . sprintf("%04d", $recruit['recruit_id']) . '</div>';
+            $html .= '<div style="position:absolute;top:280px;left:180px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . '</div>';
+            $html .= '<div style="position:absolute;top:280px;left:470px; width:100%">' . $recruit['recruit_lastName'] . '</div>';
+            $html .= '<div style="position:absolute;top:307px;left:270px; width:100%">' . $oldSchool . '</div>';
+            $html .= '<div style="position:absolute;top:335px;left:170px; width:100%">' . $recruit['recruit_district'] . '</div>';
+            $html .= '<div style="position:absolute;top:335px;left:510px; width:100%">' . $recruit['recruit_province'] . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:160px; width:100%">' . $date_D . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:240px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:370px; width:100%">' . $date_Y . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:470px; width:100%">' . $age . '</div>';
+            $html .= '<div style="position:absolute;top:363px;left:600px; width:100%">' . $recruit['recruit_race'] . '</div>';
+            $html .= '<div style="position:absolute;top:390px;left:162px; width:100%">' . $recruit['recruit_nationality'] . '</div>';
+            $html .= '<div style="position:absolute;top:390px;left:300px; width:100%">' . $recruit['recruit_religion'] . '</div>';
+            $html .= '<div style="position:absolute;top:390px;left:540px; width:100%">' . $recruit['recruit_idCard'] . '</div>';
+            $html .= '<div style="position:absolute;top:418px;left:350px; width:100%">' . $recruit['recruit_phone'] . '</div>';
+            $html .= '<div style="position:absolute;top:418px;left:600px; width:100%">' . $recruit['recruit_grade'] . '</div>';
+            $html .= '<div style="position:absolute;top:445px;left:270px; width:100%">' . $recruit['recruit_homeNumber'] . '</div>';
+            $html .= '<div style="position:absolute;top:445px;left:390px; width:100%">' . $recruit['recruit_homeGroup'] . '</div>';
+            $html .= '<div style="position:absolute;top:445px;left:475px; width:100%">' . $recruit['recruit_homeRoad'] . '</div>';
+            $html .= '<div style="position:absolute;top:445px;left:615px; width:100%">' . $recruit['recruit_homeSubdistrict'] . '</div>';
+            $html .= '<div style="position:absolute;top:475px;left:180px; width:100%">' . $recruit['recruit_homedistrict'] . '</div>';
+            $html .= '<div style="position:absolute;top:475px;left:400px; width:100%">' . $recruit['recruit_homeProvince'] . '</div>';
+            $html .= '<div style="position:absolute;top:475px;left:620px; width:100%">' . $recruit['recruit_homePostcode'] . '</div>';
+            $html .= '<div style="position:absolute;top:503px;left:695px; width:100%;font-size:22px;">' . $recruit['recruit_regLevel'] . '</div>';
+
+            $html .= '<div style="position:absolute;top:880px;left:340px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName'] . '</div>';
+            $html .= '<div style="position:absolute;top:905px;left:350px; width:100%">' . $date_D_regis . ' ' . $TH_Month[$date_M_regis - 1] . ' ' . $date_Y_regis . '</div>';
+
+            // Major Order / Course Selection
+            if ($recruit['quota_key'] == "normal") {
+                $SubCourse = explode('|', $recruit['recruit_majorOrder']);
+                $html .= '<div style="position:absolute;top:570px;left:200px; width:100%">';
+                foreach ($SubCourse as $key => $v_SubCourse) {
+                    $CheckCourse = $db->table('tb_course')->select('course_initials')->where('course_id', $v_SubCourse)->get()->getRow();
+                    if ($CheckCourse) {
+                        $html .= "ลำดับที่ " . ($key + 1) . ' ' . $CheckCourse->course_initials . "<br>";
+                    }
+                }
+                $html .= '</div>';
+            } else {
+                $html .= '<div style="position:absolute;top:570px;left:200px; width:100%">';
+                // Use course_name_joined if available, otherwise fallback to recruit_tpyeRoom
+                $courseDisplay = !empty($recruit['course_name_joined']) ? $recruit['course_name_joined'] : $recruit['recruit_tpyeRoom'];
+                $html .= "ลำดับที่ 1 " . $courseDisplay . ' สาขา ' . $recruit['recruit_major'];
+                $html .= '</div>';
+            }
+
+            // Documents Checkmarks (using dejavusans font which is built-in to mPDF)
+            $checkEmoji = '<span style="font-family: dejavusans; font-size: 30px; line-height: 1;">✔</span>';
+            if (!empty($recruit['recruit_certificateEdu'])) {
+                $html .= '<div style="position:absolute;top:785px;left:110px; width:100%;">' . $checkEmoji . '</div>';
+            }
+            if (!empty($recruit['recruit_copyidCard'])) {
+                $html .= '<div style="position:absolute;top:785px;left:328px; width:100%;">' . $checkEmoji . '</div>';
+            }
+            if (!empty($recruit['recruit_img'])) {
+                $html .= '<div style="position:absolute;top:788px;left:560px; width:100%;">' . $checkEmoji . '</div>';
+            }
+
+            $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ.pdf', true);
         }
 
-        // Documents Checkmarks (using dejavusans font which is built-in to mPDF)
-        $checkEmoji = '<span style="font-family: dejavusans; font-size: 30px; line-height: 1;">✔</span>';
-        if (!empty($recruit['recruit_certificateEdu'])) {
-            $html .= '<div style="position:absolute;top:785px;left:110px; width:100%;">' . $checkEmoji . '</div>';
-        }
-        if (!empty($recruit['recruit_copyidCard'])) {
-            $html .= '<div style="position:absolute;top:785px;left:328px; width:100%;">' . $checkEmoji . '</div>';
-        }
-        if (!empty($recruit['recruit_img'])) {
-            $html .= '<div style="position:absolute;top:788px;left:560px; width:100%;">' . $checkEmoji . '</div>';
-        }
-
-        $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ.pdf', true);
         $mpdf->WriteHTML($html);
 
         $this->response->setHeader('Content-Type', 'application/pdf');

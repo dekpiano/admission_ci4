@@ -11,23 +11,25 @@
                 <div class="text-center mb-4">
                     <i class="bx bx-id-card display-4 text-primary"></i>
                     <h5 class="mt-2">ตรวจสอบเลขบัตรประชาชน</h5>
-                    <p class="text-muted">ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : '-' ?></p>
+                    <p class="text-muted">ปีการศึกษา
+                        <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : '-' ?></p>
                     <p class="text-muted">กรุณากรอกเลขบัตรประชาชนเพื่อตรวจสอบสิทธิ์ก่อนสมัคร</p>
                 </div>
 
                 <form action="<?= base_url('new-admission/check-id') ?>" method="post">
                     <input type="hidden" name="level" value="<?= $level ?>">
-                    
+
 
 
                     <div class="mb-3">
                         <div class="form-floating">
-                            <input type="text" class="form-control" name="recruit_idCard" id="recruit_idCard" maxlength="17" required placeholder="เลขบัตรประชาชน 13 หลัก">
+                            <input type="text" class="form-control" name="recruit_idCard" id="recruit_idCard"
+                                maxlength="17" required placeholder="เลขบัตรประชาชน 13 หลัก">
                             <label for="recruit_idCard">เลขบัตรประชาชน (13 หลัก)</label>
                         </div>
                     </div>
 
-                    <?php if(session()->getFlashdata('error')): ?>
+                    <?php if (session()->getFlashdata('error')): ?>
                         <div class="alert alert-danger" role="alert">
                             <i class="bx bx-error-circle me-1"></i> <?= session()->getFlashdata('error') ?>
                         </div>
@@ -36,7 +38,8 @@
                     <button type="submit" class="btn btn-primary w-100 btn-lg" id="checkIdBtn">
                         <i class='bx bx-search-alt me-2'></i>ตรวจสอบ
                     </button>
-                    <a href="<?= base_url('new-admission') ?>" class="btn btn-outline-secondary w-100 mt-2" id="backBtn">
+                    <a href="<?= base_url('new-admission') ?>" class="btn btn-outline-secondary w-100 mt-2"
+                        id="backBtn">
                         <i class='bx bx-arrow-back me-2'></i>ย้อนกลับ
                     </a>
                 </form>
@@ -51,19 +54,20 @@
 
 <?= $this->section('styles') ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     function checkThaiID(id) {
-        if(id.length != 13) return false;
+        if (id.length != 13) return false;
         let sum = 0;
-        for(let i = 0; i < 12; i++) {
+        for (let i = 0; i < 12; i++) {
             sum += parseFloat(id.charAt(i)) * (13 - i);
         }
-        if((11 - sum % 11) % 10 != parseFloat(id.charAt(12))) {
+        if ((11 - sum % 11) % 10 != parseFloat(id.charAt(12))) {
             return false;
         }
         return true;
@@ -72,7 +76,7 @@
     document.getElementById('recruit_idCard').addEventListener('input', function (e) {
         var x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,4})(\d{0,5})(\d{0,2})(\d{0,1})/);
         e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
-        
+
         // Real-time validation visual feedback
         const rawId = e.target.value.replace(/-/g, '');
         if (rawId.length === 13) {
@@ -88,13 +92,13 @@
         }
     });
 
-    document.querySelector('form').addEventListener('submit', function(e) {
+    document.querySelector('form').addEventListener('submit', function (e) {
         const form = this;
         const idInput = document.getElementById('recruit_idCard');
         const submitBtn = form.querySelector('button[type="submit"]');
         const backBtn = form.querySelector('a.btn-outline-secondary');
         const rawId = idInput.value.replace(/-/g, '');
-        
+
         if (!checkThaiID(rawId)) {
             e.preventDefault();
             Swal.fire({
@@ -104,19 +108,28 @@
                 confirmButtonText: 'ตกลง'
             });
             idInput.classList.add('is-invalid');
+
+            // Reset buttons if they were somehow disabled before
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bx bx-search-alt me-2"></i>ตรวจสอบ';
+
+            if (backBtn) {
+                backBtn.classList.remove('disabled');
+                backBtn.style.pointerEvents = 'auto';
+            }
             return;
         }
-        
+
         // Show loading state on button only
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังตรวจสอบ...';
-        
+
         // Disable back button too
         if (backBtn) {
             backBtn.classList.add('disabled');
             backBtn.style.pointerEvents = 'none';
         }
-        
+
         // Use readonly instead of disabled - readonly still submits the value!
         idInput.readOnly = true;
         idInput.style.backgroundColor = '#e9ecef';
