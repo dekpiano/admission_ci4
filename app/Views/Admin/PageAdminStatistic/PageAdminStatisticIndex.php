@@ -122,9 +122,12 @@
     <div class="col-md-6 col-lg-3">
         <?php
         $verified = 0;
-        foreach ($statusByLevel as $s)
-            if ($s->recruit_status == 'ตรวจสอบแล้ว' || $s->recruit_status == 'ยืนยันสิทธิ์')
+        foreach ($statusByLevel as $s) {
+            // นับเฉพาะสถานะ 'ผ่านการตรวจสอบ' ซึ่งเป็นสถานะจริงในระบบ
+            if ($s->recruit_status == 'ผ่านการตรวจสอบ') {
                 $verified += $s->total;
+            }
+        }
         ?>
         <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
@@ -243,7 +246,8 @@
                         <div class="row g-4">
                             <?php
                             $m1_rooms = array_filter($stats['total_by_room'], function ($r) {
-                                return $r->recruit_regLevel == 1; });
+                                return $r->recruit_regLevel == 1;
+                            });
                             if (empty($m1_rooms)): ?>
                                 <div class="col-12 text-center py-5">
                                     <img src="<?= base_url('public/sneat-assets/img/illustrations/man-with-laptop-light.png') ?>"
@@ -290,7 +294,8 @@
                         <div class="row g-4">
                             <?php
                             $m4_rooms = array_filter($stats['total_by_room'], function ($r) {
-                                return $r->recruit_regLevel == 4; });
+                                return $r->recruit_regLevel == 4;
+                            });
                             if (empty($m4_rooms)): ?>
                                 <div class="col-12 text-center py-5 text-muted">ไม่พบข้อมูลผู้สมัคร</div>
                             <?php else: ?>

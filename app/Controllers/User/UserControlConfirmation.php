@@ -84,15 +84,50 @@ class UserControlConfirmation extends BaseController
                 ->get()->getRow();
 
             if ($recruit) {
-                // You might want to check recruit_status here as well
-                // if ($recruit->recruit_status != 'ผ่านการตรวจสอบ') { ... }
+                // ตรวจสอบเงื่อนไขการรายงานตัว
+                // 1. ต้องผ่านการตรวจสอบการสมัคร
+                if ($recruit->recruit_status !== 'ผ่านการตรวจสอบ') {
+                    return redirect()->to('confirmation/login')->with('error', 'ยังไม่ผ่านการตรวจสอบการสมัคร กรุณารอการตรวจสอบจากเจ้าหน้าที่');
+                }
 
-                // Store the ID that was found (or the plain one, consistent with session usage)
-                // Let's store the one from DB to be sure, or just the plain one if we use that for queries
+                // 2. ตรวจสอบผลการคัดเลือก
+                // ตรวจสอบว่าเป็นนักกีฬาหรือไม่
+                $isSportApplicant = (
+                    (!empty($recruit->recruit_sportPosition) && $recruit->recruit_sportPosition !== '-') ||
+                    (isset($recruit->quota_key) && $recruit->quota_key === 'sport')
+                );
+
+                if ($isSportApplicant) {
+                    // นักกีฬา: ต้องผ่านการคัดเลือก
+                    $sportResult = $recruit->recruit_sportSelectionResult ?? 'รอคัดเลือก';
+                    if ($sportResult !== 'ผ่านการคัดเลือก') {
+                        if ($sportResult === 'ไม่ผ่านการคัดเลือก') {
+                            return redirect()->to('confirmation/login')->with('error', '❌ ไม่ผ่านการคัดเลือกความสามารถพิเศษ (กีฬา) ไม่สามารถรายงานตัวได้');
+                        } elseif ($sportResult === 'ไม่มาคัดเลือก') {
+                            return redirect()->to('confirmation/login')->with('error', '🚫 ไม่ได้เข้าร่วมการคัดเลือกความสามารถพิเศษ (กีฬา) ไม่สามารถรายงานตัวได้');
+                        } else {
+                            return redirect()->to('confirmation/login')->with('error', '⏳ รอผลการคัดเลือกความสามารถพิเศษ (กีฬา) กรุณารอประกาศผลจากทางโรงเรียน');
+                        }
+                    }
+                } else {
+                    // นักเรียนทั่วไป: ต้องสอบผ่าน
+                    $quizResult = $recruit->recruit_StatusQuiz ?? 'รอสอบ';
+                    if ($quizResult !== 'สอบผ่าน') {
+                        if ($quizResult === 'สอบไม่ผ่าน') {
+                            return redirect()->to('confirmation/login')->with('error', '❌ ไม่ผ่านการสอบข้อเขียน ไม่สามารถรายงานตัวได้');
+                        } elseif ($quizResult === 'ไม่มาสอบ') {
+                            return redirect()->to('confirmation/login')->with('error', '🚫 ไม่ได้เข้าสอบข้อเขียน ไม่สามารถรายงานตัวได้');
+                        } else {
+                            return redirect()->to('confirmation/login')->with('error', '⏳ รอผลการสอบข้อเขียน กรุณารอประกาศผลจากทางโรงเรียน');
+                        }
+                    }
+                }
+
+                // ผ่านทุกเงื่อนไข - สามารถรายงานตัวได้
                 $this->session->set('confirmation_student_id', $recruit->recruit_idCard);
                 return redirect()->to('confirmation/form');
             } else {
-                return redirect()->to('confirmation/login')->with('error', 'ไม่พบข้อมูลการสมัคร หรือยังไม่ผ่านการตรวจสอบ');
+                return redirect()->to('confirmation/login')->with('error', 'ไม่พบข้อมูลการสมัคร');
             }
         } else {
             return redirect()->to('confirmation/login')->with('error', 'กรุณากรอกเลขประจำตัวประชาชน');

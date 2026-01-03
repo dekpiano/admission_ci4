@@ -269,6 +269,48 @@
                                 </div>
                             </div>
 
+                            <?php
+                            // Check if this is a sport applicant
+                            $isSportApplicant = false;
+                            if (isset($quotas)) {
+                                foreach ($quotas as $q) {
+                                    if ($q->quota_id == $recruit['recruit_category'] && $q->quota_key === 'sport') {
+                                        $isSportApplicant = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!empty($recruit['recruit_sportPosition']) && $recruit['recruit_sportPosition'] !== '-') {
+                                $isSportApplicant = true;
+                            }
+                            ?>
+                            <div class="col-md-12" id="sportSelectionResultSection"
+                                style="<?= !$isSportApplicant ? 'display:none;' : '' ?>">
+                                <div class="alert alert-warning bg-label-warning border-0 py-3 mb-0">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class='bx bx-run fs-3 me-2'></i>
+                                        <h6 class="mb-0 fw-bold">ผลการคัดเลือกรอบนักกีฬา</h6>
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i
+                                                class='bx bx-trophy text-warning'></i></span>
+                                        <select class="form-select fw-bold" name="recruit_sportSelectionResult"
+                                            id="recruit_sportSelectionResult">
+                                            <option value="รอคัดเลือก" <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'รอคัดเลือก' || empty($recruit['recruit_sportSelectionResult']) ? 'selected' : '' ?>>⏳ รอคัดเลือก</option>
+                                            <option value="ผ่านการคัดเลือก" <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'ผ่านการคัดเลือก' ? 'selected' : '' ?>>✅ ผ่านการคัดเลือก
+                                            </option>
+                                            <option value="ไม่ผ่านการคัดเลือก"
+                                                <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'ไม่ผ่านการคัดเลือก' ? 'selected' : '' ?>>❌ ไม่ผ่านการคัดเลือก
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">
+                                        <i class='bx bx-info-circle me-1'></i>
+                                        สถานะนี้ใช้สำหรับบันทึกผลการคัดเลือกรอบความสามารถพิเศษด้านกีฬา
+                                    </small>
+                                </div>
+                            </div>
+
                             <div class="col-12">
                                 <label class="form-label">ประเภทโควตา / รอบการสมัคร <span
                                         class="text-danger">*</span></label>
@@ -807,6 +849,31 @@
                 reader.readAsDataURL(file);
             }
         });
+
+        // 4.5. Sport Selection Result - Show/Hide based on Quota
+        // Store quota_key mappings
+        const quotaData = {};
+        <?php if (isset($quotas)): ?>
+            <?php foreach ($quotas as $q): ?>
+                quotaData[<?= $q->quota_id ?>] = '<?= $q->quota_key ?>';
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        function updateSportSelectionVisibility() {
+            const selectedQuota = $('#recruit_category').val();
+            const quotaKey = quotaData[selectedQuota] || '';
+            const sportPosition = '<?= esc($recruit['recruit_sportPosition'] ?? '') ?>';
+
+            // Show if quota is 'sport' or if applicant has a sport position
+            if (quotaKey === 'sport' || (sportPosition && sportPosition !== '-')) {
+                $('#sportSelectionResultSection').slideDown();
+            } else {
+                $('#sportSelectionResultSection').slideUp();
+            }
+        }
+
+        // Bind to quota dropdown change
+        $('#recruit_category').on('change', updateSportSelectionVisibility);
 
         // 5. Submit Handling
         $('#editForm').on('submit', function (e) {

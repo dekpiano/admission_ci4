@@ -45,6 +45,7 @@ class AdmissionModel extends Model
         'recruit_motherName',
         'recruit_motherJob',
         'recruit_sportPosition',
+        'recruit_sportSelectionResult',
         'recruit_agegroup',
         'recruit_img',
         'recruit_status',

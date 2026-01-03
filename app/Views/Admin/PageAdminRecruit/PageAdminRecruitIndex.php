@@ -10,7 +10,7 @@
         --primary-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         --primary-light: rgba(40, 167, 69, 0.15);
     }
-    
+
     /* Stats Cards */
     .stat-card {
         border-radius: 12px;
@@ -18,10 +18,12 @@
         transition: all 0.3s ease;
         overflow: hidden;
     }
+
     .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
+
     .stat-card .stat-icon {
         width: 56px;
         height: 56px;
@@ -31,16 +33,18 @@
         justify-content: center;
         font-size: 1.5rem;
     }
+
     .stat-card .stat-value {
         font-size: 2rem;
         font-weight: 700;
         line-height: 1.2;
     }
+
     .stat-card .stat-label {
         color: #697a8d;
         font-size: 0.9rem;
     }
-    
+
     /* Filter Buttons */
     .filter-btn {
         border-radius: 20px;
@@ -49,18 +53,21 @@
         border: 2px solid transparent;
         transition: all 0.2s ease;
     }
+
     .filter-btn:hover {
         transform: scale(1.05);
     }
+
     .filter-btn.active {
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     }
-    
+
     /* Table Styling - Green Theme */
     #recruitsTable {
         border-collapse: separate;
         border-spacing: 0 8px;
     }
+
     #recruitsTable thead th {
         border: none;
         background: var(--primary-gradient);
@@ -68,33 +75,40 @@
         padding: 14px 16px;
         font-weight: 600;
     }
+
     #recruitsTable thead th:first-child {
         border-radius: 10px 0 0 10px;
     }
+
     #recruitsTable thead th:last-child {
         border-radius: 0 10px 10px 0;
     }
+
     #recruitsTable tbody tr {
         background: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         transition: all 0.2s ease;
     }
+
     #recruitsTable tbody tr:hover {
         transform: scale(1.01);
         box-shadow: 0 8px 25px rgba(40, 167, 69, 0.15);
     }
+
     #recruitsTable tbody td {
         border: none;
         padding: 12px 16px;
         vertical-align: middle;
     }
+
     #recruitsTable tbody td:first-child {
         border-radius: 10px 0 0 10px;
     }
+
     #recruitsTable tbody td:last-child {
         border-radius: 0 10px 10px 0;
     }
-    
+
     /* Action Buttons */
     .action-btn {
         width: 36px;
@@ -106,42 +120,51 @@
         transition: all 0.2s ease;
         border: none;
     }
+
     .action-btn:hover {
         transform: scale(1.15);
     }
+
     .action-btn.view-btn {
         background: rgba(40, 167, 69, 0.15);
         color: #28a745;
     }
+
     .action-btn.view-btn:hover {
         background: #28a745;
         color: white;
     }
+
     .action-btn.edit-btn {
         background: rgba(32, 201, 151, 0.15);
         color: #20c997;
     }
+
     .action-btn.edit-btn:hover {
         background: #20c997;
         color: white;
     }
+
     .action-btn.print-btn {
         background: rgba(3, 195, 236, 0.15);
         color: #03c3ec;
     }
+
     .action-btn.print-btn:hover {
         background: #03c3ec;
         color: white;
     }
+
     .action-btn.delete-btn {
         background: rgba(255, 62, 29, 0.15);
         color: #ff3e1d;
     }
+
     .action-btn.delete-btn:hover {
         background: #ff3e1d;
         color: white;
     }
-    
+
     /* Avatar in Table */
     .recruit-avatar {
         width: 45px;
@@ -150,7 +173,7 @@
         object-fit: cover;
         border: 2px solid #f0f0f0;
     }
-    
+
     /* Status Badge - Green for pending */
     .status-badge {
         padding: 6px 14px;
@@ -158,22 +181,35 @@
         font-size: 0.8rem;
         font-weight: 600;
     }
-    .status-pending { background: rgba(40, 167, 69, 0.15); color: #28a745; }
-    .status-approved { background: rgba(113, 221, 55, 0.15); color: #71dd37; }
-    .status-rejected { background: rgba(255, 62, 29, 0.15); color: #ff3e1d; }
-    
+
+    .status-pending {
+        background: rgba(255, 171, 0, 0.15);
+        color: #ffab00;
+    }
+
+    .status-approved {
+        background: rgba(113, 221, 55, 0.15);
+        color: #71dd37;
+    }
+
+    .status-rejected {
+        background: rgba(255, 62, 29, 0.15);
+        color: #ff3e1d;
+    }
+
     /* Card Header */
     .main-card {
         border-radius: 15px;
         border: none;
-        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
     }
+
     .main-card .card-header {
         background: white;
         border-bottom: 1px solid #f0f0f0;
         padding: 1.25rem 1.5rem;
     }
-    
+
     /* Year Selector - Green Theme */
     .year-selector-wrapper {
         display: flex;
@@ -184,6 +220,7 @@
         border-radius: 16px;
         box-shadow: 0 8px 25px rgba(40, 167, 69, 0.35);
     }
+
     .year-selector-label {
         color: white;
         font-weight: 600;
@@ -193,9 +230,11 @@
         gap: 6px;
         white-space: nowrap;
     }
+
     .year-selector-label i {
         font-size: 1.25rem;
     }
+
     .year-selector {
         border: none;
         border-radius: 10px;
@@ -206,24 +245,26 @@
         background: white;
         color: var(--primary-color);
         cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+
     .year-selector:focus {
         outline: none;
-        box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
     }
-    
+
     /* Search Box - Green Theme */
     .dataTables_filter input {
         border-radius: 10px !important;
         padding: 0.5rem 1rem !important;
         border: 2px solid #e9ecef !important;
     }
+
     .dataTables_filter input:focus {
         border-color: var(--primary-color) !important;
         box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
     }
-    
+
     /* Page Title Icon */
     .text-primary {
         color: var(--primary-color) !important;
@@ -246,7 +287,7 @@
                 ปีการศึกษา
             </label>
             <select name="year" id="year" class="form-select year-selector">
-                <?php foreach ($years as $y) : ?>
+                <?php foreach ($years as $y): ?>
                     <option value="<?= $y ?>" <?= $y == $selected_year ? 'selected' : '' ?>><?= $y ?></option>
                 <?php endforeach; ?>
             </select>
@@ -287,7 +328,7 @@
         </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card h-100 cursor-pointer" data-filter="รอตรวจสอบ">
+        <div class="card stat-card h-100 cursor-pointer" data-filter="รอการตรวจสอบ">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon" style="background: rgba(255, 171, 0, 0.15); color: #ffab00;">
@@ -295,7 +336,7 @@
                     </div>
                     <div>
                         <div class="stat-value text-warning" id="pendingCount">-</div>
-                        <div class="stat-label">รอตรวจสอบ</div>
+                        <div class="stat-label">รอการตรวจสอบ</div>
                     </div>
                 </div>
             </div>
@@ -334,7 +375,7 @@
                 <button type="button" class="btn filter-btn btn-outline-success" data-status="ผ่านการตรวจสอบ">
                     <i class="bx bx-check-circle me-1"></i> ผ่าน
                 </button>
-                <button type="button" class="btn filter-btn btn-outline-warning" data-status="รอตรวจสอบ">
+                <button type="button" class="btn filter-btn btn-outline-warning" data-status="รอการตรวจสอบ">
                     <i class="bx bx-time-five me-1"></i> รอ
                 </button>
                 <button type="button" class="btn filter-btn btn-outline-danger" data-status="ไม่ผ่าน">
@@ -348,12 +389,13 @@
             <table class="table table-hover" id="recruitsTable">
                 <thead>
                     <tr>
-                        <th style="width: 80px;">รูป</th>
-                        <th data-priority="1">ชื่อ - นามสกุล</th>
-                        <th data-priority="4">รหัส</th>
-                        <th data-priority="5">หลักสูตร</th>
-                        <th data-priority="2">สถานะ</th>
-                        <th data-priority="3" style="width: 180px;" class="text-center">จัดการ</th>
+                        <th style="width: 60px;" class="text-center">รูป</th>
+                        <th data-priority="1" style="min-width: 150px;">ชื่อ - นามสกุล</th>
+                        <th data-priority="4" style="width: 70px;" class="text-center">รหัส</th>
+                        <th data-priority="5" style="min-width: 120px;">หลักสูตร</th>
+                        <th data-priority="2" style="width: 130px;" class="text-center">สถานะการสมัคร</th>
+                        <th data-priority="3" style="width: 140px;" class="text-center">จัดการ</th>
+                        <th data-priority="6" style="width: 120px;" class="text-center">ผลการคัดเลือก</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -368,11 +410,14 @@
 
 <?= $this->section('scripts') ?>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         var currentStatusFilter = '';
-        
+
+        // Clear any saved DataTable state to prevent column mismatch errors
+        localStorage.removeItem('DataTables_recruitsTable_' + window.location.pathname);
+
         var table = $('#recruitsTable').DataTable({
-            stateSave: true,
+            stateSave: false,
             responsive: true,
             processing: true,
             serverSide: true,
@@ -380,7 +425,7 @@
             ajax: {
                 url: '<?= site_url('skjadmin/recruits/ajax') ?>',
                 type: 'POST',
-                data: function(d) {
+                data: function (d) {
                     d.year = $('#year').val();
                     d.status_filter = currentStatusFilter;
                     d.<?= csrf_token() ?> = '<?= csrf_hash() ?>';
@@ -392,48 +437,49 @@
                 { data: 'recruit_id' },
                 { data: 'course' },
                 { data: 'status' },
-                { data: 'actions', orderable: false, searchable: false }
+                { data: 'actions', orderable: false, searchable: false },
+                { data: 'selection_result', orderable: false }
             ],
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json",
                 "processing": '<div class="text-center my-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">กำลังโหลดข้อมูล...</p></div>'
             },
-            "drawCallback": function(settings) {
+            "drawCallback": function (settings) {
                 // Update stats after draw
                 updateStats();
             }
         });
 
         // Reload table when year is changed
-        $('#year').on('change', function() {
+        $('#year').on('change', function () {
             table.ajax.reload();
         });
-        
+
         // Status filter buttons
-        $('#statusFilter .filter-btn').on('click', function() {
+        $('#statusFilter .filter-btn').on('click', function () {
             $('#statusFilter .filter-btn').removeClass('active');
             $(this).addClass('active');
             currentStatusFilter = $(this).data('status');
             table.ajax.reload();
         });
-        
+
         // Stats card click filter
-        $('.stat-card[data-filter]').on('click', function() {
+        $('.stat-card[data-filter]').on('click', function () {
             var filterStatus = $(this).data('filter');
             currentStatusFilter = filterStatus;
-            
+
             // Update active button
             $('#statusFilter .filter-btn').removeClass('active');
-            $('#statusFilter .filter-btn').each(function() {
+            $('#statusFilter .filter-btn').each(function () {
                 var btnStatus = $(this).data('status');
                 if (filterStatus.includes(btnStatus) || (btnStatus === 'ไม่ผ่าน' && filterStatus.includes('ไม่ผ่าน'))) {
                     $(this).addClass('active');
                 }
             });
-            
+
             table.ajax.reload();
         });
-        
+
         // Update statistics
         function updateStats() {
             $.ajax({
@@ -443,7 +489,7 @@
                     year: $('#year').val(),
                     <?= csrf_token() ?>: '<?= csrf_hash() ?>'
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response) {
                         $('#totalCount').text(response.total || 0);
                         $('#approvedCount').text(response.approved || 0);
@@ -453,11 +499,147 @@
                 }
             });
         }
-        
+
         // Initial stats load
         updateStats();
+
+        // Sport Result Dropdown Change Handler
+        $(document).on('change', '.sport-result-select', function () {
+            var $select = $(this);
+            var recruitId = $select.data('id');
+            var newResult = $select.val();
+            var originalValue = $select.data('original') || $select.find('option:selected').val();
+
+            // Disable select during update
+            $select.prop('disabled', true);
+
+            $.ajax({
+                url: '<?= site_url('skjadmin/recruits/update-sport-result') ?>',
+                type: 'POST',
+                data: {
+                    id: recruitId,
+                    result: newResult,
+                    <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Show success toast
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'อัปเดตสถานะสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                        // Update background color based on status
+                        if (newResult === 'ผ่านการคัดเลือก') {
+                            $select.removeClass('bg-label-warning bg-label-danger').addClass('bg-label-success');
+                        } else if (newResult === 'ไม่ผ่านการคัดเลือก') {
+                            $select.removeClass('bg-label-warning bg-label-success').addClass('bg-label-danger');
+                        } else {
+                            $select.removeClass('bg-label-success bg-label-danger').addClass('bg-label-warning');
+                        }
+                    } else {
+                        // Revert on error
+                        $select.val(originalValue);
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                },
+                error: function () {
+                    $select.val(originalValue);
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                },
+                complete: function () {
+                    $select.prop('disabled', false);
+                }
+            });
+        });
+
+        // Quiz Result Dropdown Change Handler (for non-sport applicants)
+        $(document).on('change', '.quiz-result-select', function () {
+            var $select = $(this);
+            var recruitId = $select.data('id');
+            var newResult = $select.val();
+            var originalValue = $select.data('original') || $select.find('option:selected').val();
+
+            // Disable select during update
+            $select.prop('disabled', true);
+
+            $.ajax({
+                url: '<?= site_url('skjadmin/recruits/update-quiz-result') ?>',
+                type: 'POST',
+                data: {
+                    id: recruitId,
+                    result: newResult,
+                    <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Show success toast
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'อัปเดตผลสอบสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                        // Update background color based on status
+                        if (newResult === 'สอบผ่าน') {
+                            $select.removeClass('bg-label-warning bg-label-danger').addClass('bg-label-success');
+                        } else if (newResult === 'สอบไม่ผ่าน') {
+                            $select.removeClass('bg-label-warning bg-label-success').addClass('bg-label-danger');
+                        } else {
+                            $select.removeClass('bg-label-success bg-label-danger').addClass('bg-label-warning');
+                        }
+                    } else {
+                        // Revert on error
+                        $select.val(originalValue);
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                },
+                error: function () {
+                    $select.val(originalValue);
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                },
+                complete: function () {
+                    $select.prop('disabled', false);
+                }
+            });
+        });
     });
-    
+
     // Delete confirmation
     function confirmDelete(id) {
         Swal.fire({

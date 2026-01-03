@@ -130,7 +130,10 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('recruits/update/(:num)', 'AdminControlRecruit::update/$1');
     $routes->get('recruits/delete/(:num)', 'AdminControlRecruit::delete/$1');
     $routes->post('recruits/update-status', 'AdminControlRecruit::updateStatus');
+    $routes->post('recruits/update-sport-result', 'AdminControlRecruit::updateSportResult');
+    $routes->post('recruits/update-quiz-result', 'AdminControlRecruit::updateQuizResult');
     $routes->get('recruits/print/(:num)', 'AdminControlRecruit::print/$1');
+    $routes->get('recruits/print-normal/(:num)', 'AdminControlRecruit::printNormal/$1');
     $routes->post('recruits/stats', 'AdminControlRecruit::getStats');
 
     // Statistic
