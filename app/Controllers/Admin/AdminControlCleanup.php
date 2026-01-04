@@ -329,4 +329,113 @@ class AdminControlCleanup extends BaseController
 
         return $this->response->setJSON(['status' => 'error', 'message' => 'ลบไม่สำเร็จ']);
     }
+
+    /**
+     * List files in trash
+     */
+    public function list_trash()
+    {
+        if (!$this->checkAuth()) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
+        }
+
+        $result = $this->remoteUpload->listTrash();
+        
+        if ($result) {
+            // Calculate total size in MB
+            $totalSizeMB = round(($result['total_size'] ?? 0) / 1024 / 1024, 2);
+            
+            return $this->response->setJSON([
+                'status' => 'success',
+                'count' => $result['count'] ?? 0,
+                'total_size' => $result['total_size'] ?? 0,
+                'total_size_mb' => $totalSizeMB,
+                'expired_count' => $result['expired_count'] ?? 0,
+                'files' => $result['files'] ?? []
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'ไม่สามารถเชื่อมต่อ Server ปลายทางได้ (กรุณาอัพโหลด list_trash.php)'
+        ]);
+    }
+
+    /**
+     * Restore a file from trash
+     */
+    public function restore_file()
+    {
+        if (!$this->checkAuth()) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
+        }
+
+        $name = $this->request->getPost('name');
+        $path = $this->request->getPost('path');
+
+        if (empty($name)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'ข้อมูลไม่ครบ']);
+        }
+
+        $result = $this->remoteUpload->restoreFromTrash($name, $path);
+        
+        if ($result && $result['status'] === 'success') {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'กู้คืนไฟล์สำเร็จ',
+                'restored_to' => $result['restored_to'] ?? ''
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => $result['message'] ?? 'กู้คืนไม่สำเร็จ'
+        ]);
+    }
+
+    /**
+     * Empty expired files from trash
+     */
+    public function empty_expired()
+    {
+        if (!$this->checkAuth()) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
+        }
+
+        $remote_url = "https://skj.nsnpao.go.th/token/empty_expired_trash.php";
+        $token = trim(getenv('upload.secret.token') ?: "Dekpiano2025!!");
+
+        $client = \Config\Services::curlrequest();
+        try {
+            $response = $client->post($remote_url, [
+                'headers' => [
+                    'X-Auth-Token' => $token,
+                    'Authorization' => 'Bearer ' . $token
+                ],
+                'verify' => false,
+                'timeout' => 60
+            ]);
+            $body = json_decode($response->getBody(), true);
+
+            if ($body && $body['status'] === 'success') {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => $body['message'] ?? 'สำเร็จ',
+                    'deleted_count' => $body['deleted_count'] ?? 0,
+                    'deleted_files' => $body['deleted_files'] ?? []
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $body['message'] ?? 'เกิดข้อผิดพลาด'
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'ติดต่อ Server ปลายทางไม่ได้: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

@@ -68,13 +68,18 @@
                             </button>
                         </li>
                         <li class="nav-item">
+                            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-trash">
+                                <i class="bx bx-trash me-1"></i> ถังขยะ <span class="badge bg-warning ms-1" id="trashBadge">0</span>
+                            </button>
+                        </li>
+                        <li class="nav-item">
                             <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-orphans">
-                                <i class="bx bx-link-external me-1"></i> ไฟล์ไม่ตรงฐานข้อมูล (Orphans)
+                                <i class="bx bx-link-external me-1"></i> ไฟล์ไม่ตรง DB
                             </button>
                         </li>
                         <li class="nav-item">
                             <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-local">
-                                <i class="bx bx-server me-1"></i> ไฟล์ชั่วคราว (Local)
+                                <i class="bx bx-server me-1"></i> ไฟล์ชั่วคราว
                             </button>
                         </li>
                     </ul>
@@ -103,46 +108,141 @@
                             </div>
                         </div>
 
-                        <!-- Tab Orphans -->
-                        <div class="tab-pane fade" id="tab-orphans" role="tabpanel">
+                        <!-- Tab Trash (ถังขยะ) -->
+                        <div class="tab-pane fade" id="tab-trash" role="tabpanel">
                             <div class="alert alert-info border-info mt-2 mb-4">
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="bx bx-help-circle fs-4 me-2"></i>
-                                    <strong>วิธีการทำงาน:</strong>
-                                </div>
-                                <div>ระบบจะเทียบรายชื่อไฟล์บน Cloud กับใน DB หากไม่พบชื่อไฟล์ใน DB จะถือว่าเป็น "ไฟล์ขยะ"</div>
-                            </div>
-                            
-                            <div class="alert alert-warning border-warning mb-4" id="alertSetupRequired" style="display: none;">
-                                <div class="d-flex align-items-start">
-                                    <i class="bx bx-error-circle fs-4 me-2 mt-1"></i>
+                                <div class="d-flex align-items-center">
+                                    <i class="bx bx-info-circle fs-4 me-2"></i>
                                     <div>
-                                        <strong>ต้องติดตั้ง API บน Server ปลายทาง</strong>
-                                        <p class="mb-2 mt-1">กรุณาอัพโหลดไฟล์ <code>list_files.php</code> ไปที่ Server <code>skj.nsnpao.go.th</code> ตาม path:</p>
-                                        <code class="d-block bg-dark text-light p-2 rounded">/token/list_files.php</code>
-                                        <p class="mt-2 mb-0"><small>ไฟล์นี้อยู่ในโปรเจคที่ <code>public/token/list_files.php</code></small></p>
+                                        <strong>ถังขยะ:</strong> ไฟล์ที่ลบจะถูกเก็บไว้ที่นี่ 30 วัน ก่อนลบถาวร สามารถกู้คืนได้ตลอดเวลา
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="d-flex gap-3 mb-4">
-                                <button type="button" class="btn btn-primary" id="btnScanOrphans"><i class="bx bx-cloud-download me-1"></i> สแกนหาไฟล์กำพร้า</button>
-                                <button type="button" class="btn btn-danger disabled" id="btnDeleteOrphans"><i class="bx bx-trash me-1"></i> ลบไฟล์ที่เลือก (<span id="orphanCount">0</span>)</button>
+                            <div class="d-flex flex-wrap gap-3 mb-4">
+                                <button type="button" class="btn btn-primary" id="btnLoadTrash">
+                                    <i class="bx bx-refresh me-1"></i> โหลดรายการถังขยะ
+                                </button>
+                                <button type="button" class="btn btn-success disabled" id="btnRestoreSelected">
+                                    <i class="bx bx-undo me-1"></i> กู้คืนที่เลือก (<span id="restoreCount">0</span>)
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" id="btnEmptyExpired">
+                                    <i class="bx bx-trash me-1"></i> ลบไฟล์หมดอายุ
+                                </button>
                             </div>
+                            
+                            <!-- Trash Stats -->
+                            <div class="row g-3 mb-4" id="trashStats" style="display: none;">
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bx bx-file fs-3 text-primary me-2"></i>
+                                            <div>
+                                                <h5 class="mb-0" id="trashTotalCount">0</h5>
+                                                <small class="text-muted">ไฟล์ในถังขยะ</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bx bx-hdd fs-3 text-info me-2"></i>
+                                            <div>
+                                                <h5 class="mb-0" id="trashTotalSize">0 MB</h5>
+                                                <small class="text-muted">พื้นที่ใช้งาน</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bx bx-time-five fs-3 text-danger me-2"></i>
+                                            <div>
+                                                <h5 class="mb-0" id="trashExpiredCount">0</h5>
+                                                <small class="text-muted">ไฟล์หมดอายุ (พร้อมลบ)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="table-responsive rounded-3 border">
                                 <table class="table table-hover mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th style="width: 50px;"><input type="checkbox" class="form-check-input check-all" data-target=".orphan-check"></th>
-                                            <th>ชื่อไฟล์</th>
-                                            <th>ตำแหน่ง (Path)</th>
-                                            <th style="width: 100px;">ลิงก์</th>
+                                            <th style="width: 50px;"><input type="checkbox" class="form-check-input check-all" data-target=".trash-check"></th>
+                                            <th>ชื่อไฟล์เดิม</th>
+                                            <th>ตำแหน่งเดิม</th>
+                                            <th style="width: 150px;">วันที่ลบ</th>
+                                            <th style="width: 150px;">หมดอายุ</th>
+                                            <th style="width: 100px;">ขนาด</th>
+                                            <th style="width: 80px;">ดำเนินการ</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="orphanList">
-                                        <tr><td colspan="4" class="text-center py-5 text-muted">กดปุ่มสแกนหาไฟล์กำพร้า</td></tr>
+                                    <tbody id="trashList">
+                                        <tr><td colspan="7" class="text-center py-5 text-muted">กดปุ่มโหลดรายการถังขยะ</td></tr>
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+
+                        <!-- Tab Orphans -->
+                        <div class="tab-pane fade" id="tab-orphans" role="tabpanel">
+                            <!-- ⚠️ DISABLED: ระบบนี้ยังอยู่ระหว่างการพัฒนา -->
+                            <div class="alert alert-danger border-danger mt-2 mb-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bx bx-error-circle fs-3 me-3 mt-1"></i>
+                                    <div>
+                                        <strong class="fs-5">⚠️ ระบบถูกปิดการใช้งานชั่วคราว</strong>
+                                        <p class="mb-2 mt-2">ระบบสแกนไฟล์กำพร้ายังอยู่ระหว่างการพัฒนาและทดสอบ เพื่อป้องกันการลบไฟล์ที่ยังใช้งานอยู่</p>
+                                        <p class="mb-0"><small class="text-muted">หากต้องการใช้งาน กรุณาติดต่อผู้ดูแลระบบ</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- ซ่อนปุ่มและตารางไว้ก่อน -->
+                            <div style="display: none;">
+                                <div class="alert alert-info border-info mt-2 mb-4">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bx bx-help-circle fs-4 me-2"></i>
+                                        <strong>วิธีการทำงาน:</strong>
+                                    </div>
+                                    <div>ระบบจะเทียบรายชื่อไฟล์บน Cloud กับใน DB หากไม่พบชื่อไฟล์ใน DB จะถือว่าเป็น "ไฟล์ขยะ"</div>
+                                </div>
+                                
+                                <div class="alert alert-warning border-warning mb-4" id="alertSetupRequired" style="display: none;">
+                                    <div class="d-flex align-items-start">
+                                        <i class="bx bx-error-circle fs-4 me-2 mt-1"></i>
+                                        <div>
+                                            <strong>ต้องติดตั้ง API บน Server ปลายทาง</strong>
+                                            <p class="mb-2 mt-1">กรุณาอัพโหลดไฟล์ <code>list_files.php</code> ไปที่ Server <code>skj.nsnpao.go.th</code> ตาม path:</p>
+                                            <code class="d-block bg-dark text-light p-2 rounded">/token/list_files.php</code>
+                                            <p class="mt-2 mb-0"><small>ไฟล์นี้อยู่ในโปรเจคที่ <code>public/token/list_files.php</code></small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex gap-3 mb-4">
+                                    <button type="button" class="btn btn-primary" id="btnScanOrphans" disabled><i class="bx bx-cloud-download me-1"></i> สแกนหาไฟล์กำพร้า</button>
+                                    <button type="button" class="btn btn-danger disabled" id="btnDeleteOrphans"><i class="bx bx-trash me-1"></i> ลบไฟล์ที่เลือก (<span id="orphanCount">0</span>)</button>
+                                </div>
+                                <div class="table-responsive rounded-3 border">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width: 50px;"><input type="checkbox" class="form-check-input check-all" data-target=".orphan-check"></th>
+                                                <th>ชื่อไฟล์</th>
+                                                <th>ตำแหน่ง (Path)</th>
+                                                <th style="width: 100px;">ลิงก์</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="orphanList">
+                                            <tr><td colspan="4" class="text-center py-5 text-muted">ระบบถูกปิดการใช้งานชั่วคราว</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
 
@@ -390,6 +490,242 @@ $(document).ready(function() {
             location.reload();
         });
     }
+
+    // ==========================================
+    // 4. Trash Management (ถังขยะ)
+    // ==========================================
+    
+    // Load trash files
+    $('#btnLoadTrash').on('click', function() {
+        loadTrashFiles();
+    });
+    
+    function loadTrashFiles() {
+        const $btn = $('#btnLoadTrash');
+        $btn.html('<span class="spinner-border spinner-border-sm me-1"></span> กำลังโหลด...').addClass('disabled');
+        
+        $.post('<?= site_url('skjadmin/cleanup/list_trash') ?>')
+            .done(function(res) {
+                $btn.html('<i class="bx bx-refresh me-1"></i> โหลดรายการถังขยะ').removeClass('disabled');
+                
+                if(res.status === 'success') {
+                    // Show stats
+                    $('#trashStats').show();
+                    $('#trashTotalCount').text(res.count || 0);
+                    $('#trashTotalSize').text((res.total_size_mb || 0) + ' MB');
+                    $('#trashExpiredCount').text(res.expired_count || 0);
+                    $('#trashBadge').text(res.count || 0);
+                    
+                    let html = '';
+                    if(res.files && res.files.length > 0) {
+                        res.files.forEach(file => {
+                            const isExpired = new Date(file.delete_after) <= new Date();
+                            const sizeKB = Math.round(file.size / 1024);
+                            const sizeText = sizeKB > 1024 ? (sizeKB / 1024).toFixed(2) + ' MB' : sizeKB + ' KB';
+                            
+                            html += `<tr class="${isExpired ? 'table-warning' : ''}">
+                                <td><input type="checkbox" class="form-check-input trash-check" 
+                                    data-name="${file.trash_name}" 
+                                    data-path="${file.trash_path}"
+                                    ${!file.can_restore ? 'disabled' : ''}></td>
+                                <td><small class="text-primary">${file.original_name || file.trash_name}</small></td>
+                                <td><small class="text-muted">${file.original_path || '-'}</small></td>
+                                <td><small>${file.deleted_at || '-'}</small></td>
+                                <td><small class="${isExpired ? 'text-danger fw-bold' : ''}">${file.delete_after || '-'} ${isExpired ? '(หมดอายุ)' : ''}</small></td>
+                                <td><small>${sizeText}</small></td>
+                                <td>
+                                    ${file.can_restore ? `<button class="btn btn-sm btn-outline-success btn-restore" 
+                                        data-name="${file.trash_name}" 
+                                        data-path="${file.trash_path}">
+                                        <i class="bx bx-undo"></i>
+                                    </button>` : '<span class="text-muted">-</span>'}
+                                </td>
+                            </tr>`;
+                        });
+                    } else {
+                        html = '<tr><td colspan="7" class="text-center py-5 text-success"><i class="bx bx-check-circle me-1"></i> ถังขยะว่างเปล่า</td></tr>';
+                    }
+                    $('#trashList').html(html);
+                } else {
+                    Swal.fire('Error', res.message || 'เกิดข้อผิดพลาด', 'error');
+                }
+            })
+            .fail(function() {
+                $btn.html('<i class="bx bx-refresh me-1"></i> โหลดรายการถังขยะ').removeClass('disabled');
+                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อ Server ได้', 'error');
+            });
+    }
+    
+    // Count selected trash files
+    $(document).on('change', '.trash-check', function() {
+        let count = $('.trash-check:checked').length;
+        $('#restoreCount').text(count);
+        $('#btnRestoreSelected').toggleClass('disabled', count === 0);
+    });
+    
+    // Restore single file
+    $(document).on('click', '.btn-restore', function() {
+        const $btn = $(this);
+        const name = $btn.data('name');
+        const path = $btn.data('path');
+        
+        Swal.fire({
+            title: 'กู้คืนไฟล์?',
+            text: 'ไฟล์จะถูกย้ายกลับไปตำแหน่งเดิม',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'กู้คืน',
+            cancelButtonText: 'ยกเลิก'
+        }).then(result => {
+            if (result.isConfirmed) {
+                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+                
+                $.post('<?= site_url('skjadmin/cleanup/restore_file') ?>', { name: name, path: path })
+                    .done(function(res) {
+                        if (res.status === 'success') {
+                            Swal.fire({
+                                toast: true, position: 'top-end', icon: 'success',
+                                title: 'กู้คืนสำเร็จ', showConfirmButton: false, timer: 2000
+                            });
+                            loadTrashFiles();
+                        } else {
+                            $btn.prop('disabled', false).html('<i class="bx bx-undo"></i>');
+                            Swal.fire('Error', res.message || 'กู้คืนไม่สำเร็จ', 'error');
+                        }
+                    })
+                    .fail(function() {
+                        $btn.prop('disabled', false).html('<i class="bx bx-undo"></i>');
+                        Swal.fire('Error', 'เกิดข้อผิดพลาด', 'error');
+                    });
+            }
+        });
+    });
+    
+    // Restore selected files
+    $('#btnRestoreSelected').on('click', function() {
+        const files = $('.trash-check:checked').map(function() {
+            return { name: $(this).data('name'), path: $(this).data('path') };
+        }).get();
+        
+        if (files.length === 0) return;
+        
+        Swal.fire({
+            title: `กู้คืน ${files.length} ไฟล์?`,
+            text: 'ไฟล์จะถูกย้ายกลับไปตำแหน่งเดิม',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'กู้คืนทั้งหมด',
+            cancelButtonText: 'ยกเลิก'
+        }).then(result => {
+            if (result.isConfirmed) {
+                restoreWithProgress(files);
+            }
+        });
+    });
+    
+    async function restoreWithProgress(files) {
+        const total = files.length;
+        let completed = 0;
+        let success = 0;
+        let errors = 0;
+        
+        Swal.fire({
+            title: 'กำลังกู้คืนไฟล์...',
+            html: `
+                <div class="mb-3">
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                             role="progressbar" style="width: 0%" id="restoreProgress">0%</div>
+                    </div>
+                </div>
+                <div class="text-muted">
+                    <span id="restoreStatus">เตรียมกู้คืน...</span><br>
+                    <small>สำเร็จ: <span id="restoreSuccessCount">0</span> | ผิดพลาด: <span id="restoreErrorCount">0</span></small>
+                </div>
+            `,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false
+        });
+        
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            $('#restoreStatus').text(`กำลังกู้คืน: ${file.name} (${i + 1}/${total})`);
+            
+            try {
+                const res = await $.post('<?= site_url('skjadmin/cleanup/restore_file') ?>', { 
+                    name: file.name, 
+                    path: file.path 
+                });
+                
+                if (res.status === 'success') {
+                    success++;
+                    $('#restoreSuccessCount').text(success);
+                } else {
+                    errors++;
+                    $('#restoreErrorCount').text(errors);
+                }
+            } catch (e) {
+                errors++;
+                $('#restoreErrorCount').text(errors);
+            }
+            
+            completed++;
+            const percent = Math.round((completed / total) * 100);
+            $('#restoreProgress').css('width', percent + '%').text(percent + '%');
+        }
+        
+        Swal.fire({
+            icon: errors > 0 ? 'warning' : 'success',
+            title: 'เสร็จสิ้น!',
+            html: `
+                <div class="text-center">
+                    <p class="mb-2">กู้คืนสำเร็จ <strong class="text-success">${success}</strong> ไฟล์</p>
+                    ${errors > 0 ? `<p class="mb-0 text-danger">ผิดพลาด <strong>${errors}</strong> ไฟล์</p>` : ''}
+                </div>
+            `,
+            confirmButtonText: 'ตกลง'
+        }).then(() => {
+            loadTrashFiles();
+        });
+    }
+    
+    // Empty expired files
+    $('#btnEmptyExpired').on('click', function() {
+        Swal.fire({
+            title: 'ลบไฟล์หมดอายุถาวร?',
+            text: 'ไฟล์ที่อยู่ในถังขยะเกิน 30 วันจะถูกลบถาวรและไม่สามารถกู้คืนได้',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'ลบถาวร',
+            cancelButtonText: 'ยกเลิก'
+        }).then(result => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'กำลังลบ...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+                
+                $.post('<?= site_url('skjadmin/cleanup/empty_expired') ?>')
+                    .done(function(res) {
+                        if (res.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'สำเร็จ!',
+                                text: `ลบไฟล์หมดอายุ ${res.deleted_count || 0} ไฟล์`
+                            }).then(() => loadTrashFiles());
+                        } else {
+                            Swal.fire('Error', res.message || 'เกิดข้อผิดพลาด', 'error');
+                        }
+                    })
+                    .fail(function() {
+                        Swal.fire('Error', 'ไม่สามารถเชื่อมต่อ Server ได้', 'error');
+                    });
+            }
+        });
+    });
 });
 </script>
 <?= $this->endSection() ?>
