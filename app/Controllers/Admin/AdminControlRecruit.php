@@ -42,8 +42,9 @@ class AdminControlRecruit extends BaseController
         $model = new AdmissionModel();
         $courseModel = new \App\Models\CourseModel();
 
-        $data['recruit'] = $model->select('tb_recruitstudent.*, tb_course.course_fullname as course_name_joined')
+        $data['recruit'] = $model->select('tb_recruitstudent.*, tb_course.course_fullname as course_name_joined, tb_personnel.pers_prefix as verifier_prefix, tb_personnel.pers_firstname as verifier_fname, tb_personnel.pers_lastname as verifier_lname')
             ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->join('skjacth_personnel.tb_personnel', 'skjacth_personnel.tb_personnel.pers_id = tb_recruitstudent.recruit_userUpdate', 'left')
             ->find($id);
 
         if (empty($data['recruit'])) {
@@ -172,6 +173,7 @@ class AdminControlRecruit extends BaseController
             'recruit_major' => $this->request->getPost('recruit_major') ?: $course['course_branch'] ?? '',
             'recruit_address' => "เลขที่ " . $this->request->getPost('recruit_homeNumber') . " หมู่ที่ " . (!empty($this->request->getPost('recruit_homeGroup')) ? $this->request->getPost('recruit_homeGroup') : '-') . " ถนน " . (!empty($this->request->getPost('recruit_homeRoad')) ? $this->request->getPost('recruit_homeRoad') : '-') . " ตำบล" . $this->request->getPost('recruit_homeSubdistrict') . " อำเภอ" . $this->request->getPost('recruit_homedistrict') . " จังหวัด" . $this->request->getPost('recruit_homeProvince') . " " . $this->request->getPost('recruit_homePostcode'),
             'recruit_dateUpdate' => date('Y-m-d H:i:s'),
+            'recruit_userUpdate' => session()->get('pers_id'),
             'recruit_sportSelectionResult' => $this->request->getPost('recruit_sportSelectionResult'),
         ];
 
@@ -270,20 +272,38 @@ class AdminControlRecruit extends BaseController
 
     public function updateStatus()
     {
-        $request = service('request');
-        $id = $request->getPost('id');
-        $status = $request->getPost('status');
+        try {
+            $id = $this->request->getVar('id');
+            $status = $this->request->getVar('status');
 
-        if ($id && $status) {
-            $model = new AdmissionModel();
-            $updated = $model->update($id, ['recruit_status' => $status]);
+            if ($id && $status) {
+                $model = new AdmissionModel();
+                $updated = $model->update($id, [
+                    'recruit_status' => $status,
+                    'recruit_userUpdate' => session()->get('pers_id'),
+                    'recruit_dateUpdate' => date('Y-m-d H:i:s')
+                ]);
 
-            if ($updated) {
-                return $this->response->setJSON(['success' => true]);
+                if ($updated) {
+                    return $this->response->setJSON(['success' => true]);
+                }
             }
-        }
 
-        return $this->response->setJSON(['success' => false]);
+            return $this->response->setJSON([
+                'success' => false, 
+                'message' => 'Missing ID or Status',
+                'debug' => [
+                    'id' => $id,
+                    'status' => $status,
+                    'method' => $this->request->getMethod(),
+                    'post' => $this->request->getPost(),
+                    'get' => $this->request->getGet(),
+                    'all_vars' => $this->request->getVar()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -299,7 +319,11 @@ class AdminControlRecruit extends BaseController
 
         if ($id && in_array($result, $validResults)) {
             $model = new AdmissionModel();
-            $updated = $model->update($id, ['recruit_sportSelectionResult' => $result]);
+            $updated = $model->update($id, [
+            'recruit_sportSelectionResult' => $result,
+            'recruit_userUpdate' => session()->get('pers_id'),
+            'recruit_dateUpdate' => date('Y-m-d H:i:s')
+        ]);
 
             if ($updated) {
                 return $this->response->setJSON(['success' => true, 'message' => 'อัปเดตสถานะสำเร็จ']);
@@ -322,7 +346,11 @@ class AdminControlRecruit extends BaseController
 
         if ($id && in_array($result, $validResults)) {
             $model = new AdmissionModel();
-            $updated = $model->update($id, ['recruit_StatusQuiz' => $result]);
+            $updated = $model->update($id, [
+            'recruit_StatusQuiz' => $result,
+            'recruit_userUpdate' => session()->get('pers_id'),
+            'recruit_dateUpdate' => date('Y-m-d H:i:s')
+        ]);
 
             if ($updated) {
                 return $this->response->setJSON(['success' => true, 'message' => 'อัปเดตสถานะสำเร็จ']);
@@ -383,9 +411,10 @@ class AdminControlRecruit extends BaseController
 
         // 3. Fetch Data
         $builder = $model->builder();
-        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key, tb_recruitstudent.recruit_sportPosition, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz')
+        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key, tb_recruitstudent.recruit_sportPosition, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz, tb_recruitstudent.recruit_dateUpdate, skjacth_personnel.tb_personnel.pers_prefix as verifier_prefix, skjacth_personnel.tb_personnel.pers_firstname as verifier_fname, skjacth_personnel.tb_personnel.pers_lastname as verifier_lname')
             ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
             ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->join('skjacth_personnel.tb_personnel', 'skjacth_personnel.tb_personnel.pers_id = tb_recruitstudent.recruit_userUpdate', 'left')
             ->where('tb_recruitstudent.recruit_year', $year);
 
         // Apply status filter
@@ -545,6 +574,14 @@ class AdminControlRecruit extends BaseController
                     </div>';
             }
 
+            $verifierName = '-';
+            if (!empty($recruit['verifier_fname'])) {
+                $verifierName = esc($recruit['verifier_prefix'] . $recruit['verifier_fname'] . ' ' . $recruit['verifier_lname']);
+                if (!empty($recruit['recruit_dateUpdate'])) {
+                    $verifierName .= '<div class="text-muted" style="font-size: 0.65rem; line-height: 1.2;">(' . date('d/m/Y H:i', strtotime($recruit['recruit_dateUpdate'])) . ')</div>';
+                }
+            }
+
             $data[] = [
                 'avatar' => $avatar,
                 'recruit_id' => '<span class="badge bg-label-secondary">' . esc(sprintf('%04d', $recruit['recruit_id'] ?? 0)) . '</span>',
@@ -553,6 +590,7 @@ class AdminControlRecruit extends BaseController
                 'course' => $courseHtml,
                 'selection_result' => $selectionResultHtml,
                 'status' => '<span class="status-badge ' . $statusClass . '">' . esc($status) . '</span>',
+                'verifier' => $verifierName,
                 'actions' => $actions
             ];
         }

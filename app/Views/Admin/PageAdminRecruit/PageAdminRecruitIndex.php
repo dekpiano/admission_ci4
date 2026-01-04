@@ -394,6 +394,7 @@
                         <th data-priority="4" style="width: 70px;" class="text-center">รหัส</th>
                         <th data-priority="5" style="min-width: 120px;">หลักสูตร</th>
                         <th data-priority="2" style="width: 130px;" class="text-center">สถานะการสมัคร</th>
+                        <th data-priority="7" style="width: 150px;" class="text-center">ผู้ตรวจสอบ</th>
                         <th data-priority="3" style="width: 140px;" class="text-center">จัดการ</th>
                         <th data-priority="6" style="width: 120px;" class="text-center">ผลการคัดเลือก</th>
                     </tr>
@@ -437,6 +438,7 @@
                 { data: 'recruit_id' },
                 { data: 'course' },
                 { data: 'status' },
+                { data: 'verifier', className: 'text-center' },
                 { data: 'actions', orderable: false, searchable: false },
                 { data: 'selection_result', orderable: false }
             ],
@@ -541,6 +543,8 @@
                         } else {
                             $select.removeClass('bg-label-success bg-label-danger').addClass('bg-label-warning');
                         }
+                        // Reload to show verifier info
+                        table.ajax.reload(null, false);
                     } else {
                         // Revert on error
                         $select.val(originalValue);
@@ -609,6 +613,8 @@
                         } else {
                             $select.removeClass('bg-label-success bg-label-danger').addClass('bg-label-warning');
                         }
+                        // Reload to show verifier info
+                        table.ajax.reload(null, false);
                     } else {
                         // Revert on error
                         $select.val(originalValue);

@@ -72,6 +72,16 @@
                                 <span class="fw-bold me-2">เบอร์โทร:</span>
                                 <span><?= esc($recruit['recruit_phone']) ?></span>
                             </li>
+                            <?php if (!empty($recruit['verifier_fname'])): ?>
+                                <li class="mb-3">
+                                    <span class="fw-bold me-2">ผู้ตรวจสอบ:</span>
+                                    <span><?= esc($recruit['verifier_prefix'] . $recruit['verifier_fname'] . ' ' . $recruit['verifier_lname']) ?></span>
+                                </li>
+                                <li class="mb-3">
+                                    <span class="fw-bold me-2">วันที่ตรวจสอบ:</span>
+                                    <span><?= !empty($recruit['recruit_dateUpdate']) ? esc($datethai->thai_date_fullmonth(strtotime($recruit['recruit_dateUpdate']))) . ' ' . date('H:i', strtotime($recruit['recruit_dateUpdate'])) : '-' ?></span>
+                                </li>
+                            <?php endif; ?>
                         </ul>
                         <div class="d-grid gap-2 mb-3">
                             <button class="btn btn-success" onclick="updateStatus('ผ่านการตรวจสอบ')">
@@ -350,11 +360,13 @@
 
     function submitStatusUpdate(statusValue) {
         $.ajax({
-            url: '<?= site_url('skjadmin/recruits/update-status') ?>',
+            url: '<?= base_url('skjadmin/recruits/update-status') ?>',
             type: 'POST',
+            dataType: 'json',
             data: {
                 id: '<?= $recruit['recruit_id'] ?>',
-                status: statusValue
+                status: statusValue,
+                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
             },
             success: function (response) {
                 if (response.success) {
@@ -368,7 +380,7 @@
                 } else {
                     Swal.fire(
                         'ผิดพลาด!',
-                        'ไม่สามารถอัปเดตสถานะได้',
+                        response.message || 'ไม่สามารถอัปเดตสถานะได้',
                         'error'
                     );
                 }
