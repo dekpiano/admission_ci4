@@ -292,7 +292,7 @@ $pendingCount = 0;
 $approvedCount = 0;
 
 foreach ($students ?? [] as $student) {
-    if (!empty($student->stu_UpdateConfirm)) {
+    if (!empty($student->stu_UpdateConfirm) && $student->stu_UpdateConfirm == $student->recruit_year) {
         $confirmedCount++;
     } else {
         $pendingCount++;
@@ -407,7 +407,7 @@ foreach ($students ?? [] as $student) {
                     <?php if (!empty($students)): ?>
                         <?php foreach ($students as $student): ?>
                             <?php
-                            $isConfirmed = !empty($student->stu_UpdateConfirm);
+                            $isConfirmed = (!empty($student->stu_UpdateConfirm) && $student->stu_UpdateConfirm == $student->recruit_year);
                             $rStatus = $student->recruit_status ?? 'รอตรวจสอบ';
                             $rClass = ($rStatus == 'ผ่านการตรวจสอบ') ? 'status-approved' : (($rStatus == 'ไม่ผ่าน' || strpos($rStatus, 'ไม่ผ่าน') !== false) ? 'status-rejected' : 'status-pending');
 

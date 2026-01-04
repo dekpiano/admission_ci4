@@ -620,8 +620,7 @@
                         </div>
 
                         <div class="alert alert-warning" role="alert">
-                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพ (.jpg, .png) หรือ PDF ขนาดไม่เกิน
-                            2MB
+                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพเฉพาะฟอร์แมต <b>.jpg, .jpeg, .png</b> หรือ <b>.pdf</b> เท่านั้น (ไม่รองรับไฟล์ HEIC จาก iPhone) ขนาดไม่เกิน 4MB
                         </div>
 
                         <div class="row">
@@ -630,7 +629,7 @@
                                 <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า)
                                     <?= empty($student['recruit_certificateEdu']) ? '<span class="text-danger">*</span>' : '' ?></label>
                                 <input class="form-control" type="file" id="recruit_certificateEdu"
-                                    name="recruit_certificateEdu" accept="image/*,.pdf"
+                                    name="recruit_certificateEdu" accept=".jpg,.jpeg,.png,.pdf"
                                     <?= empty($student['recruit_certificateEdu']) ? 'required' : '' ?>
                                     onchange="previewImage(this, 'preview_certificate')">
                                 <div class="mt-2 text-center">
@@ -660,7 +659,7 @@
                                 <label for="recruit_certificateEduB" class="form-label">ปพ.1 (หลัง)
                                     <?= empty($student['recruit_certificateEduB']) ? '<span class="text-danger">*</span>' : '' ?></label>
                                 <input class="form-control" type="file" id="recruit_certificateEduB"
-                                    name="recruit_certificateEduB" accept="image/*,.pdf"
+                                    name="recruit_certificateEduB" accept=".jpg,.jpeg,.png,.pdf"
                                     <?= empty($student['recruit_certificateEduB']) ? 'required' : '' ?>
                                     onchange="previewImage(this, 'preview_certificateB')">
                                 <div class="mt-2 text-center">
@@ -691,7 +690,7 @@
                                 <label for="recruit_copyidCard" class="form-label">สำเนาบัตรประชาชน
                                     <?= empty($student['recruit_copyidCard']) ? '<span class="text-danger">*</span>' : '' ?></label>
                                 <input class="form-control" type="file" id="recruit_copyidCard"
-                                    name="recruit_copyidCard" accept="image/*,.pdf"
+                                    name="recruit_copyidCard" accept=".jpg,.jpeg,.png,.pdf"
                                     <?= empty($student['recruit_copyidCard']) ? 'required' : '' ?>
                                     onchange="previewImage(this, 'preview_idcard')">
                                 <div class="mt-2 text-center">
@@ -792,6 +791,7 @@
     function handleImageSelect(input) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
+
             const reader = new FileReader();
             reader.onload = function (e) {
                 imageToCrop.src = e.target.result;
@@ -825,6 +825,7 @@
         const namePreview = document.getElementById(previewId + '_name');
         if (input.files && input.files[0]) {
             const file = input.files[0];
+
             const reader = new FileReader();
             if (file.type.match('image.*')) {
                 reader.onload = function (e) {

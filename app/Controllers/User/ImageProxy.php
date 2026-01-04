@@ -40,11 +40,42 @@ class ImageProxy extends BaseController
             $contentLength = $response->getHeaderLine('Content-Length');
 
             if ($statusCode === 200) {
+                // Determine the correct Content-Type
+                $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                $mimeMap = [
+                    'heic' => 'image/heic',
+                    'heif' => 'image/heif',
+                    'jpg'  => 'image/jpeg',
+                    'jpeg' => 'image/jpeg',
+                    'png'  => 'image/png',
+                    'gif'  => 'image/gif',
+                    'webp' => 'image/webp',
+                    'pdf'  => 'application/pdf',
+                ];
+
+                // Prioritize extension-based MIME type if it's a known image/PDF type
+                // otherwise use the response header or fallback
+                if (isset($mimeMap[$extension])) {
+                    $finalContentType = $mimeMap[$extension];
+                } else {
+                    $finalContentType = $contentType ?: 'application/octet-stream';
+                    
+                    // If content type is generic, try to use fileinfo for better detection
+                    if ($finalContentType === 'application/octet-stream' || strpos($finalContentType, 'text/plain') !== false) {
+                        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                        $detectedMime = $finfo->buffer($body);
+                        if ($detectedMime && $detectedMime !== 'text/plain') {
+                            $finalContentType = $detectedMime;
+                        }
+                    }
+                }
+
                 // Set appropriate headers and output the image
                 return $this->response
                             ->setStatusCode($statusCode)
-                            ->setHeader('Content-Type', $contentType ?: 'application/octet-stream')
+                            ->setHeader('Content-Type', $finalContentType)
                             ->setHeader('Content-Length', $contentLength ?: strlen($body))
+                            ->setHeader('Cache-Control', 'public, max-age=86400') // Add caching for better performance
                             ->setBody($body);
             } else {
                 // Return a generic placeholder or an error image/message

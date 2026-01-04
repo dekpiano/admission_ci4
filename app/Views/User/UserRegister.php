@@ -783,7 +783,7 @@
                         </div>
 
                         <div class="alert alert-warning" role="alert">
-                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพ (.jpg, .png) หรือ PDF
+                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพเฉพาะฟอร์แมต <b>.jpg, .jpeg, .png</b> หรือ <b>.pdf</b> เท่านั้น (ไม่รองรับไฟล์ HEIC จาก iPhone)
                         </div>
 
                         <div class="row">
@@ -791,8 +791,8 @@
                             <div class="col-md-6 mb-3">
                                 <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า) <span
                                         class="text-danger">*</span></label>
-                                <input class="form-control" type="file" id="recruit_certificateEdu"
-                                    name="recruit_certificateEdu" accept="image/*,.pdf" required
+                                <input class="form-control" type="file"
+                                    name="recruit_certificateEdu" accept=".jpg,.jpeg,.png,.pdf" required
                                     onchange="previewImage(this, 'preview_certificate')">
                                 <div class="mt-2 text-center">
                                     <img id="preview_certificate" src="#" alt="ตัวอย่าง ปพ.1 (หน้า)"
@@ -804,7 +804,7 @@
                                 <label for="recruit_certificateEduB" class="form-label">ปพ.1 (หลัง) <span
                                         class="text-danger">*</span></label>
                                 <input class="form-control" type="file" id="recruit_certificateEduB"
-                                    name="recruit_certificateEduB" accept="image/*,.pdf" required
+                                    name="recruit_certificateEduB" accept=".jpg,.jpeg,.png,.pdf" required
                                     onchange="previewImage(this, 'preview_certificateB')">
                                 <div class="mt-2 text-center">
                                     <img id="preview_certificateB" src="#" alt="ตัวอย่าง ปพ.1 (หลัง)"
@@ -816,7 +816,7 @@
                                 <label for="recruit_copyidCard" class="form-label">สำเนาบัตรประชาชน <span
                                         class="text-danger">*</span></label>
                                 <input class="form-control" type="file" id="recruit_copyidCard"
-                                    name="recruit_copyidCard" accept="image/*,.pdf" required
+                                    name="recruit_copyidCard" accept=".jpg,.jpeg,.png,.pdf" required
                                     onchange="previewImage(this, 'preview_idcard')">
                                 <div class="mt-2 text-center">
                                     <img id="preview_idcard" src="#" alt="ตัวอย่างบัตรประชาชน"

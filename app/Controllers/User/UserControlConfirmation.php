@@ -167,7 +167,8 @@ class UserControlConfirmation extends BaseController
             ->where('stu_iden', $studentId)
             ->get()->getResult();
 
-        $isStudentSaved = !empty($studentPers);
+        // Check if student has confirmed for THE CURRENT YEAR
+        $isStudentSaved = (!empty($studentPers) && ($studentPers[0]->stu_UpdateConfirm ?? '') == $year);
 
         // Pre-fill from Recruit Data if Personnel Data is empty
         if (empty($studentPers) && !empty($recruit)) {

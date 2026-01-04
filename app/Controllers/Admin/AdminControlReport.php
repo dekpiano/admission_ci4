@@ -110,11 +110,10 @@ class AdminControlReport extends BaseController
                 $canPrint = true;
                 $statusText = $student->recruit_status ?? 'รอตรวจสอบ';
             } else {
-                // For confirmation, check if student has confirmed
-                $canPrint = !empty($student->stu_UpdateConfirm);
+                // For confirmation, check if student has confirmed FOR THIS YEAR
+                $canPrint = (!empty($student->stu_UpdateConfirm) && $student->stu_UpdateConfirm == $year);
                 $statusText = $canPrint ? 'รายงานตัวแล้ว' : 'ยังไม่รายงานตัว';
             }
-            
             $data[] = [
                 'id' => $student->recruit_id,
                 'recruit_id' => sprintf('%04d', $student->recruit_id),

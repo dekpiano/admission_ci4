@@ -38,6 +38,7 @@
         href="<?= base_url('public/sneat-assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') ?>" />
     <link rel="stylesheet" href="<?= base_url('public/sneat-assets/vendor/libs/apex-charts/apex-charts.css') ?>" />
 
+
     <!-- Page CSS -->
     <style>
         body {
@@ -1012,6 +1013,7 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <?= $this->renderSection('scripts') ?>
     <script>
