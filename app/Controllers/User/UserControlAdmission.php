@@ -679,11 +679,11 @@ class UserControlAdmission extends BaseController
         $TH_Month = array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฏาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
 
         $date_Y = date('Y', strtotime($recruit['recruit_birthday'])) + 543;
-        $date_D = date('d', strtotime($recruit['recruit_birthday']));
+        $date_D = date('j', strtotime($recruit['recruit_birthday']));
         $date_M = date('n', strtotime($recruit['recruit_birthday']));
 
         $date_Y_regis = date('Y', strtotime($recruit['recruit_date'])) + 543;
-        $date_D_regis = date('d', strtotime($recruit['recruit_date']));
+        $date_D_regis = date('j', strtotime($recruit['recruit_date']));
         $date_M_regis = date('n', strtotime($recruit['recruit_date']));
 
         // Calculate Age
@@ -739,7 +739,11 @@ class UserControlAdmission extends BaseController
 
             // Top Content
             $mpdf->SetXY(147, 42);
-            $mpdf->WriteHTML($recruit['recruit_year']);
+            $yearDisplay = $recruit['recruit_year'];
+            if ($recruit['recruit_year'] >= 2569 && !empty($recruit['recruit_round'])) {
+                $yearDisplay .= ' (รอบที่ ' . $recruit['recruit_round'] . ')';
+            }
+            $mpdf->WriteHTML($yearDisplay);
 
             // Name and Gender
             $mpdf->SetXY(40, 58);
@@ -820,7 +824,11 @@ class UserControlAdmission extends BaseController
 
             // Confirmation Part (Bottom)
             $mpdf->SetXY(140, 188);
-            $mpdf->WriteHTML($recruit['recruit_year']);
+            $yearDisplayBottom = $recruit['recruit_year'];
+            if ($recruit['recruit_year'] >= 2569 && !empty($recruit['recruit_round'])) {
+                $yearDisplayBottom .= ' (รอบที่ ' . $recruit['recruit_round'] . ')';
+            }
+            $mpdf->WriteHTML($yearDisplayBottom);
             $mpdf->SetXY(35, 196);
             $mpdf->WriteHTML($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']);
             $mpdf->SetXY(118, 196);
@@ -847,7 +855,11 @@ class UserControlAdmission extends BaseController
                 $html .= '<div style="position:absolute;top:90px;left:640px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
             }
 
-            $html .= '<div style="position:absolute;top:18px;left:100px; width:100%;font-size:16px;">' . ($recruit['quota_explain'] ?? '') . '</div>';
+            $quotaDisplay = ($recruit['quota_explain'] ?? '');
+            if ($recruit['recruit_year'] >= 2569 && !empty($recruit['recruit_round'])) {
+                $quotaDisplay .= ' (รอบที่ ' . $recruit['recruit_round'] . ')';
+            }
+            $html .= '<div style="position:absolute;top:18px;left:100px; width:100%;font-size:16px;">' . $quotaDisplay . '</div>';
             $html .= '<div style="position:absolute;top:180px;left:555px; width:100%;font-size:24px;">' . $recruit['recruit_regLevel'] . '</div>';
             $html .= '<div style="position:absolute;top:63px;left:700px; width:100%">' . sprintf("%04d", $recruit['recruit_id']) . '</div>';
             $html .= '<div style="position:absolute;top:280px;left:180px; width:100%">' . $recruit['recruit_prefix'] . $recruit['recruit_firstName'] . '</div>';

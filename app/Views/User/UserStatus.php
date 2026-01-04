@@ -28,7 +28,7 @@
                     <h5 class="mt-2">ตรวจสอบสถานะการสมัคร</h5>
                     <p class="text-muted">ปีการศึกษา <?= $checkYear->openyear_year ?? '-' ?>
                         <?php if (isset($checkYear->openyear_year) && $checkYear->openyear_year >= 2569): ?>
-                            รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>
+                            (รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>)
                         <?php endif; ?>
                     </p>
                     <p class="text-muted">กรอกเลขบัตรประชาชนและวันเดือนปีเกิด</p>

@@ -1197,8 +1197,8 @@
                         <i class='bx bx-calendar-event me-1'></i> ปีการศึกษา <?= $checkYear->openyear_year ?? '-' ?>
                     </div>
                     <?php if (isset($checkYear->openyear_year) && $checkYear->openyear_year >= 2569): ?>
-                        <div class="badge rounded-pill px-3 py-2 d-flex align-items-center border border-white border-opacity-50 shadow-sm" style="background: rgba(255,255,255,0.2);">
-                            <i class='bx bx-sync me-1'></i> รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>
+                        <div class="badge bg-warning text-dark rounded-pill px-3 py-2 d-flex align-items-center shadow-sm border-white border-2">
+                            <i class='bx bxs-star me-1'></i> รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>
                         </div>
                     <?php endif; ?>
                 </div>
