@@ -986,6 +986,7 @@ class AdminControlRecruit extends BaseController
             $html .= '</div>';
         }
 
+
         // Documents Checkmarks
         $checkEmoji = '<span style="font-family: dejavusans; font-size: 30px; line-height: 1;">✔</span>';
         if (!empty($recruit['recruit_certificateEdu'])) {
