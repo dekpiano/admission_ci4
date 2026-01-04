@@ -36,6 +36,9 @@ $routes->get('image-proxy', 'User\ImageProxy::index');
 $routes->get('admission/edit/(:num)', 'User\UserControlAdmission::edit_student/$1');
 $routes->post('admission/update', 'User\UserControlAdmission::update_student');
 
+// Contact page
+$routes->get('contact', 'User\UserControlContact::index');
+
 
 $routes->get('login', 'User\UserControlLogin::login_student');
 $routes->get('loginAdmin', 'User\UserControlLogin::login_admin');

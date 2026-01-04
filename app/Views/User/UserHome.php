@@ -1681,6 +1681,93 @@
     <?php endif; ?>
 </div>
 
+<!-- Contact Us Section -->
+<div class="row mt-5 mb-4">
+    <div class="col-12">
+        <div class="excellence-section p-4 p-md-5" style="border-radius: 30px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 158, 181, 0.2); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0 text-center text-lg-start">
+                    <div class="welcome-badge mb-3 bg-label-primary px-3 py-1 rounded-pill d-inline-block" style="background: rgba(255, 158, 181, 0.1) !important; color: #ff9eb5 !important;">
+                        <span class="small fw-bold text-uppercase"><i class="bx bx-headphone me-1"></i> Support Center</span>
+                    </div>
+                    <h2 class="fw-bold mb-3 display-6" style="color: #444;">ติดต่อสอบถามข้อมูล</h2>
+                    <p class="text-muted mb-4 fs-5">หากคุณมีข้อสงสัยหรือต้องการความช่วยเหลือเกี่ยวกับการสมัครเรียน สามารถติดต่อเราได้ผ่านช่องทางต่างๆ หรือเยี่ยมชมหน้าช่วยเหลือของเรา</p>
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                        <a href="<?= base_url('contact') ?>" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm">
+                            <i class="bx bx-help-circle me-2"></i> ดูคำถามที่พบบ่อย (FAQ)
+                        </a>
+                        <a href="https://line.me/R/ti/p/<?= esc($contact_info['line_id'] ?? '') ?>" target="_blank" class="btn btn-outline-success btn-lg rounded-pill px-4 shadow-sm" style="border-color: #00c300; color: #008f00;">
+                            <i class="bi bi-line me-2"></i> LINE Official
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-none bg-transparent">
+                        <div class="card-body p-0">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="p-3 rounded-4 bg-white border h-100 transition-hover shadow-sm" style="transition: all 0.3s ease;">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="rounded-3 bg-label-info p-2 me-3">
+                                                <i class="bx bx-phone fs-4 text-info"></i>
+                                            </div>
+                                            <h6 class="fw-bold mb-0 text-dark">เบอร์โทรศัพท์</h6>
+                                        </div>
+                                        <p class="mb-0 small text-muted">โรงเรียน: <?= esc($contact_info['phone'] ?? '') ?></p>
+                                        <p class="mb-0 small text-muted"><?= esc($contact_info['phone2'] ?? '') ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-3 rounded-4 bg-white border h-100 transition-hover shadow-sm" style="transition: all 0.3s ease;">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="rounded-3 bg-label-primary p-2 me-3">
+                                                <i class="bx bxl-facebook fs-4 text-primary"></i>
+                                            </div>
+                                            <h6 class="fw-bold mb-0 text-dark">Facebook</h6>
+                                        </div>
+                                        <p class="mb-0 small text-muted">SKJNS160</p>
+                                        <a href="<?= esc($contact_info['facebook'] ?? '') ?>" target="_blank" class="small text-primary text-decoration-none">เยี่ยมชมเพจ <i class="bx bx-right-arrow-alt"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-3 rounded-4 bg-white border h-100 transition-hover shadow-sm" style="transition: all 0.3s ease;">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="rounded-3 bg-label-warning p-2 me-3">
+                                                <i class="bx bx-time fs-4 text-warning"></i>
+                                            </div>
+                                            <h6 class="fw-bold mb-0 text-dark">เวลาทำการ</h6>
+                                        </div>
+                                        <p class="mb-0 small text-muted"><?= esc($contact_info['office_hours'] ?? '') ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-3 rounded-4 bg-white border h-100 transition-hover shadow-sm" style="transition: all 0.3s ease;">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="rounded-3 bg-label-secondary p-2 me-3">
+                                                <i class="bx bx-map fs-4 text-secondary"></i>
+                                            </div>
+                                            <h6 class="fw-bold mb-0 text-dark">สถานที่ตั้ง</h6>
+                                        </div>
+                                        <a href="https://maps.google.com/?q=โรงเรียนสวนกุหลาบวิทยาลัย(จิรประวัติ)นครสวรรค์" target="_blank" class="small text-danger text-decoration-none">เปิดแผนที่ Google Maps <i class="bx bx-navigation"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        border-color: #ff9eb5 !important;
+        box-shadow: 0 10px 20px rgba(255, 158, 181, 0.1) !important;
+    }
+</style>
+
 <!-- PDPA Modal -->
 <div class="modal fade" id="pdpaModal" tabindex="-1" aria-labelledby="pdpaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">

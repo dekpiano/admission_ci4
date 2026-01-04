@@ -37,8 +37,24 @@ class UserControlNewAdmission extends BaseController
 
         $data['schedules'] = $this->admissionModel->getAdmissionSchedule($data['checkYear']->openyear_year);
         $data['stats'] = $this->admissionModel->getAdmissionStats($data['checkYear']->openyear_year);
+        $data['contact_info'] = $this->getContactInfo();
 
         return view('User/UserHome', $data);
+    }
+
+    private function getContactInfo()
+    {
+        return [
+            'school_name' => 'โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์',
+            'address' => '160 หมู่ 1 ตำบลนครสวรรค์ออก อำเภอเมืองนครสวรรค์ จังหวัดนครสวรรค์ 60000',
+            'phone' => '056-009-667',
+            'phone2' => 'หัวหน้างานรับนักเรียน ครูณัฏฐิกานต์ แสงอุทัย 09-2189-9145',
+            'email' => 'skjschool@gmail.com',
+            'line_id' => '@514kixba',
+            'facebook' => 'https://www.facebook.com/SKJNS160',
+            'website' => 'https://skj.ac.th',
+            'office_hours' => 'จันทร์ - ศุกร์ 08:30 - 16:30 น.',
+        ];
     }
 
     public function pre_check($level = null)

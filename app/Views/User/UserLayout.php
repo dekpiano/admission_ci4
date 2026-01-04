@@ -25,6 +25,7 @@
         rel="stylesheet">
 
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- Core CSS -->
     <link rel="stylesheet" href="<?= base_url('public/sneat-assets/vendor/css/core.css') ?>"
@@ -845,6 +846,16 @@
                         </a>
                     </li>
 
+                    <!-- Support -->
+                    <li class="menu-header small text-uppercase">
+                        <span class="menu-header-text">ช่วยเหลือ</span>
+                    </li>
+                    <li class="menu-item <?= uri_string() == 'contact' ? 'active' : '' ?>">
+                        <a href="<?= base_url('contact') ?>" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-support"></i>
+                            <div data-i18n="Contact">ติดต่อสอบถาม</div>
+                        </a>
+                    </li>
 
                 </ul>
             </aside>
