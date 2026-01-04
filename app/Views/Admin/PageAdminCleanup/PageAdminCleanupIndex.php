@@ -1,4 +1,4 @@
-<?= $this->extend('admin/layout/AdminLayout') ?>
+<?= $this->extend('Admin/layout/AdminLayout') ?>
 
 <?= $this->section('content') ?>
 <div class="row">
@@ -105,10 +105,26 @@
 
                         <!-- Tab Orphans -->
                         <div class="tab-pane fade" id="tab-orphans" role="tabpanel">
-                            <div class="alert alert-info border-info mt-2 mb-4 d-flex align-items-center">
-                                <i class="bx bx-help-circle fs-4 me-2"></i>
+                            <div class="alert alert-info border-info mt-2 mb-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bx bx-help-circle fs-4 me-2"></i>
+                                    <strong>วิธีการทำงาน:</strong>
+                                </div>
                                 <div>ระบบจะเทียบรายชื่อไฟล์บน Cloud กับใน DB หากไม่พบชื่อไฟล์ใน DB จะถือว่าเป็น "ไฟล์ขยะ"</div>
                             </div>
+                            
+                            <div class="alert alert-warning border-warning mb-4" id="alertSetupRequired" style="display: none;">
+                                <div class="d-flex align-items-start">
+                                    <i class="bx bx-error-circle fs-4 me-2 mt-1"></i>
+                                    <div>
+                                        <strong>ต้องติดตั้ง API บน Server ปลายทาง</strong>
+                                        <p class="mb-2 mt-1">กรุณาอัพโหลดไฟล์ <code>list_files.php</code> ไปที่ Server <code>skj.nsnpao.go.th</code> ตาม path:</p>
+                                        <code class="d-block bg-dark text-light p-2 rounded">/token/list_files.php</code>
+                                        <p class="mt-2 mb-0"><small>ไฟล์นี้อยู่ในโปรเจคที่ <code>public/token/list_files.php</code></small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="d-flex gap-3 mb-4">
                                 <button type="button" class="btn btn-primary" id="btnScanOrphans"><i class="bx bx-cloud-download me-1"></i> สแกนหาไฟล์กำพร้า</button>
                                 <button type="button" class="btn btn-danger disabled" id="btnDeleteOrphans"><i class="bx bx-trash me-1"></i> ลบไฟล์ที่เลือก (<span id="orphanCount">0</span>)</button>
@@ -194,8 +210,18 @@ $(document).ready(function() {
 
     $('#btnDeleteBatch').on('click', function() {
         let ids = $('.junk-check:checked').map(function(){ return $(this).val(); }).get();
-        confirmAndAction('ลบข้อมูลผู้สมัครและไฟล์แนบ?', `จำนวน ${ids.length} รายการ`, () => {
-             $.post('<?= site_url('skjadmin/cleanup/delete') ?>', {ids: ids}, res => location.reload());
+        
+        Swal.fire({
+            title: 'ลบข้อมูลผู้สมัครและไฟล์แนบ?',
+            text: `จำนวน ${ids.length} รายการ`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ตกลง',
+            cancelButtonText: 'ยกเลิก'
+        }).then(result => {
+            if (result.isConfirmed) {
+                deleteWithProgress(ids, 'db');
+            }
         });
     });
 
@@ -203,23 +229,41 @@ $(document).ready(function() {
     $('#btnScanOrphans').on('click', function() {
         const $btn = $(this);
         $btn.html('<span class="spinner-border spinner-border-sm me-1"></span> กำลังเทียบ DB...').addClass('disabled');
-        $.post('<?= site_url('skjadmin/cleanup/scan_orphans') ?>', function(res) {
-            $btn.html('<i class="bx bx-cloud-download me-1"></i> สแกนหาไฟล์กำพร้า').removeClass('disabled');
-            if(res.status === 'success') {
-                let html = '';
-                if(res.orphans.length > 0) {
-                    res.orphans.forEach(file => {
-                        html += `<tr>
-                            <td><input type="checkbox" class="form-check-input orphan-check" data-name="${file.name}" data-path="${file.path}"></td>
-                            <td class="text-primary">${file.name}</td>
-                            <td><small>${file.path}</small></td>
-                            <td><a href="https://skj.nsnpao.go.th/uploads/${file.path}" target="_blank"><i class="bx bx-link-external"></i></a></td>
-                        </tr>`;
-                    });
-                } else { html = '<tr><td colspan="4" class="text-center py-5">ยอดเยี่ยม! ไม่มีไฟล์ขยะที่เกินมาจากฐานข้อมูล</td></tr>'; }
-                $('#orphanList').html(html);
-            } else { Swal.fire('Error', res.message, 'error'); }
-        });
+        
+        $.post('<?= site_url('skjadmin/cleanup/scan_orphans') ?>')
+            .done(function(res) {
+                $btn.html('<i class="bx bx-cloud-download me-1"></i> สแกนหาไฟล์กำพร้า').removeClass('disabled');
+                
+                if(res.status === 'success') {
+                    $('#alertSetupRequired').hide();
+                    let html = '';
+                    if(res.orphans.length > 0) {
+                        res.orphans.forEach(file => {
+                            html += `<tr>
+                                <td><input type="checkbox" class="form-check-input orphan-check" data-name="${file.name}" data-path="${file.path}"></td>
+                                <td class="text-primary">${file.name}</td>
+                                <td><small>${file.path}</small></td>
+                                <td><a href="https://skj.nsnpao.go.th/uploads/${file.path}" target="_blank"><i class="bx bx-link-external"></i></a></td>
+                            </tr>`;
+                        });
+                    } else { 
+                        html = '<tr><td colspan="4" class="text-center py-5 text-success"><i class="bx bx-check-circle me-1"></i> ยอดเยี่ยม! ไม่มีไฟล์ขยะที่เกินมาจากฐานข้อมูล</td></tr>'; 
+                    }
+                    $('#orphanList').html(html);
+                } else {
+                    // Check if error is 404 (API not installed)
+                    if (res.message && res.message.includes('404')) {
+                        $('#alertSetupRequired').show();
+                        $('#orphanList').html('<tr><td colspan="4" class="text-center py-5 text-warning"><i class="bx bx-error me-1"></i> ยังไม่ได้ติดตั้ง API บน Server ปลายทาง</td></tr>');
+                    } else {
+                        Swal.fire('Error', res.message, 'error');
+                    }
+                }
+            })
+            .fail(function(xhr) {
+                $btn.html('<i class="bx bx-cloud-download me-1"></i> สแกนหาไฟล์กำพร้า').removeClass('disabled');
+                Swal.fire('Error', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+            });
     });
 
     $(document).on('change', '.orphan-check', function() {
@@ -232,8 +276,18 @@ $(document).ready(function() {
         let files = $('.orphan-check:checked').map(function(){ 
             return { name: $(this).data('name'), path: $(this).data('path') }; 
         }).get();
-        confirmAndAction('ลบไฟล์ (Orphans) ข้าม Cloud?', `ไฟล์จำนวน ${files.length} รายการนี้ไม่มีชื่ออยู่ในฐานข้อมูล`, () => {
-             $.post('<?= site_url('skjadmin/cleanup/delete_orphans') ?>', {files: files}, res => location.reload());
+        
+        Swal.fire({
+            title: 'ลบไฟล์ (Orphans) ข้าม Cloud?',
+            text: `ไฟล์จำนวน ${files.length} รายการนี้ไม่มีชื่ออยู่ในฐานข้อมูล`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ตกลง',
+            cancelButtonText: 'ยกเลิก'
+        }).then(result => {
+            if (result.isConfirmed) {
+                deleteWithProgress(files, 'orphan');
+            }
         });
     });
 
@@ -248,6 +302,93 @@ $(document).ready(function() {
     function confirmAndAction(title, text, callback) {
         Swal.fire({ title, text, icon: 'warning', showCancelButton: true, confirmButtonText: 'ตกลง', cancelButtonText: 'ยกเลิก' })
             .then(result => { if(result.isConfirmed) { Swal.showLoading(); callback(); } });
+    }
+
+    /**
+     * Delete items with progress bar
+     * @param {Array} items - Array of items to delete (IDs for DB, or file objects for orphans)
+     * @param {string} type - 'db' or 'orphan'
+     */
+    async function deleteWithProgress(items, type) {
+        const total = items.length;
+        let completed = 0;
+        let success = 0;
+        let errors = 0;
+
+        // Show progress modal
+        Swal.fire({
+            title: 'กำลังลบข้อมูล...',
+            html: `
+                <div class="mb-3">
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" 
+                             role="progressbar" style="width: 0%" id="deleteProgress">0%</div>
+                    </div>
+                </div>
+                <div class="text-muted">
+                    <span id="deleteStatus">เตรียมลบ...</span><br>
+                    <small>สำเร็จ: <span id="successCount">0</span> | ผิดพลาด: <span id="errorCount">0</span></small>
+                </div>
+            `,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const url = type === 'db' 
+            ? '<?= site_url('skjadmin/cleanup/delete_single') ?>'
+            : '<?= site_url('skjadmin/cleanup/delete_orphan_single') ?>';
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            
+            // Update status
+            $('#deleteStatus').text(type === 'db' 
+                ? `กำลังลบ ID: ${item} (${i + 1}/${total})`
+                : `กำลังลบ: ${item.name} (${i + 1}/${total})`
+            );
+
+            try {
+                const postData = type === 'db' 
+                    ? { id: item }
+                    : { name: item.name, path: item.path };
+
+                const res = await $.post(url, postData);
+                
+                if (res.status === 'success') {
+                    success++;
+                    $('#successCount').text(success);
+                } else {
+                    errors++;
+                    $('#errorCount').text(errors);
+                }
+            } catch (e) {
+                errors++;
+                $('#errorCount').text(errors);
+            }
+
+            completed++;
+            const percent = Math.round((completed / total) * 100);
+            $('#deleteProgress').css('width', percent + '%').text(percent + '%');
+        }
+
+        // Complete
+        Swal.fire({
+            icon: errors > 0 ? 'warning' : 'success',
+            title: 'เสร็จสิ้น!',
+            html: `
+                <div class="text-center">
+                    <p class="mb-2">ลบข้อมูลสำเร็จ <strong class="text-success">${success}</strong> รายการ</p>
+                    ${errors > 0 ? `<p class="mb-0 text-danger">ผิดพลาด <strong>${errors}</strong> รายการ</p>` : ''}
+                </div>
+            `,
+            confirmButtonText: 'รีเฟรชหน้า'
+        }).then(() => {
+            location.reload();
+        });
     }
 });
 </script>

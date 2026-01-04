@@ -159,6 +159,56 @@ class AdminControlCleanup extends BaseController
         ]);
     }
 
+    /**
+     * Delete a single recruit record (for progress tracking)
+     */
+    public function delete_single()
+    {
+        if (!$this->checkAuth()) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
+        }
+
+        $id = $this->request->getPost('id');
+        if (empty($id)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'ไม่พบ ID']);
+        }
+
+        $student = $this->db->table('tb_recruitstudent')->where('recruit_id', $id)->get()->getRow();
+        if (!$student) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'ไม่พบข้อมูล']);
+        }
+
+        // Delete files from Remote Server
+        $regLevel = $student->recruit_regLevel;
+        $file_fields = [
+            'recruit_img' => 'img',
+            'recruit_certificateEdu' => 'certificate',
+            'recruit_certificateEduB' => 'certificateB',
+            'recruit_copyidCard' => 'copyidCard',
+            'recruit_copyAddress' => 'copyAddress'
+        ];
+
+        foreach ($file_fields as $field => $folder) {
+            if (!empty($student->$field)) {
+                $subPath = 'admission/recruitstudent/m' . $regLevel . '/' . $folder;
+                $this->remoteUpload->delete($student->$field, $subPath);
+            }
+        }
+
+        // Delete ability certificates
+        if (!empty($student->recruit_certificateAbility)) {
+            $abilityFiles = explode('|', $student->recruit_certificateAbility);
+            $this->remoteUpload->delete($abilityFiles, 'admission/recruitstudent/m' . $regLevel . '/certificateAbility');
+        }
+
+        // Delete from DB
+        if ($this->db->table('tb_recruitstudent')->where('recruit_id', $id)->delete()) {
+            return $this->response->setJSON(['status' => 'success']);
+        }
+
+        return $this->response->setJSON(['status' => 'error', 'message' => 'ลบไม่สำเร็จ']);
+    }
+
     public function scan_orphans()
     {
         if (!$this->checkAuth()) {
@@ -254,5 +304,29 @@ class AdminControlCleanup extends BaseController
             'status' => 'success',
             'message' => "กำจัดไฟล์ไม่ตรง DB สำเร็จ $success รายการ"
         ]);
+    }
+
+    /**
+     * Delete a single orphan file (for progress tracking)
+     */
+    public function delete_orphan_single()
+    {
+        if (!$this->checkAuth()) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
+        }
+
+        $name = $this->request->getPost('name');
+        $path = $this->request->getPost('path');
+
+        if (empty($name) || empty($path)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'ข้อมูลไม่ครบ']);
+        }
+
+        $subPath = dirname($path);
+        if ($this->remoteUpload->delete($name, $subPath)) {
+            return $this->response->setJSON(['status' => 'success']);
+        }
+
+        return $this->response->setJSON(['status' => 'error', 'message' => 'ลบไม่สำเร็จ']);
     }
 }

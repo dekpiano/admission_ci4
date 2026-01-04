@@ -204,9 +204,11 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->get('cleanup', 'AdminControlCleanup::index');
     $routes->post('cleanup/scan', 'AdminControlCleanup::scan');
     $routes->post('cleanup/delete', 'AdminControlCleanup::delete');
+    $routes->post('cleanup/delete_single', 'AdminControlCleanup::delete_single');
     $routes->post('cleanup/clean_local', 'AdminControlCleanup::clean_local');
     $routes->post('cleanup/scan_orphans', 'AdminControlCleanup::scan_orphans');
     $routes->post('cleanup/delete_orphans', 'AdminControlCleanup::delete_orphans');
+    $routes->post('cleanup/delete_orphan_single', 'AdminControlCleanup::delete_orphan_single');
 
 });
 
