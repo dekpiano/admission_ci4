@@ -104,4 +104,14 @@ class AdminControlSetting extends BaseController
 
         return $this->response->setJSON(['success' => true, 'msg' => 'บันทึกช่วงเวลาเรียบร้อยแล้ว']);
     }
+    public function update_round()
+    {
+        $round = $this->request->getPost('round');
+
+        $this->db->table('tb_onoffsys')->where('onoff_id', 1)->update([
+            'onoff_round' => $round
+        ]);
+
+        return $this->response->setJSON(['success' => true, 'msg' => 'เปลี่ยนรอบการรับสมัครเรียบร้อยแล้ว']);
+    }
 }

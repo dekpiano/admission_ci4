@@ -42,7 +42,8 @@ class AdmissionModel extends Model
         'recruit_copyAddress',
         'recruit_certificateAbility',
         'recruit_status',
-        'recruit_category'
+        'recruit_category',
+        'recruit_round'
     ];
 
     public function recruitstudent_insert($data)

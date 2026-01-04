@@ -117,6 +117,20 @@
                         </select>
                         <div class="form-text">การเปลี่ยนปีการศึกษาจะส่งผลต่อการแสดงผลข้อมูลในหน้าแรกและการออกเลขที่ใบสมัคร</div>
                     </div>
+
+                    <?php if (isset($yearConfig->openyear_year) && $yearConfig->openyear_year >= 2569): ?>
+                    <div class="mb-3">
+                        <label for="selectRound" class="form-label">รอบที่เปิดรับสมัคร</label>
+                        <select class="form-select" id="selectRound" onchange="updateRound(this.value)">
+                            <?php for($i=1; $i<=5; $i++): ?>
+                                <option value="<?= $i ?>" <?= (isset($settings->onoff_round) && $settings->onoff_round == $i) ? 'selected' : '' ?>>
+                                    รอบที่ <?= $i ?>
+                                </option>
+                            <?php endfor; ?>
+                        </select>
+                        <div class="form-text">ระบุรอบการรับสมัครที่ต้องการให้บันทึกในข้อมูลผู้สมัคร</div>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -227,7 +241,9 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire('สำเร็จ!', data.msg, 'success');
+                        Swal.fire('สำเร็จ!', data.msg, 'success').then(() => {
+                            location.reload();
+                        });
                     }
                 });
             } else {
@@ -252,6 +268,37 @@
             if (data.success) {
                 Swal.fire('สำเร็จ!', data.msg, 'success');
             }
+        });
+    }
+
+    function updateRound(round) {
+        fetch('<?= base_url('skjadmin/settings/update_round') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `round=${round}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: 'เปลี่ยนรอบการรับสมัครเรียบร้อยแล้ว'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
         });
     }
 </script>

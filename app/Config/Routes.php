@@ -166,6 +166,7 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('settings/update_year', 'AdminControlSetting::update_year');
     $routes->post('settings/update_comment', 'AdminControlSetting::update_comment');
     $routes->post('settings/update_dates', 'AdminControlSetting::update_dates');
+    $routes->post('settings/update_round', 'AdminControlSetting::update_round');
 
     // User Management
     $routes->get('users', 'AdminControlUser::index');

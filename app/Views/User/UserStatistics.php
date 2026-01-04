@@ -232,6 +232,9 @@
                 <i class='bx bxs-school me-1'></i> สถิติจำนวนผู้สมัครแยกตามระดับชั้นและเพศ (หญิง/ชาย)
                 <span class="mx-2 opacity-50">|</span>
                 <i class='bx bx-calendar me-1'></i> ปีการศึกษา <?= $checkYear->openyear_year ?>
+                <?php if (isset($checkYear->openyear_year) && $checkYear->openyear_year >= 2569): ?>
+                    (รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>)
+                <?php endif; ?>
             </p>
         </div>
 

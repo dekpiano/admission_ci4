@@ -12,7 +12,11 @@
                     <i class="bx bx-id-card display-4 text-primary"></i>
                     <h5 class="mt-2">ตรวจสอบเลขบัตรประชาชน</h5>
                     <p class="text-muted">ปีการศึกษา
-                        <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : '-' ?></p>
+                        <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : '-' ?>
+                        <?php if (isset($checkYear->openyear_year) && $checkYear->openyear_year >= 2569): ?>
+                            รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>
+                        <?php endif; ?>
+                    </p>
                     <p class="text-muted">กรุณากรอกเลขบัตรประชาชนเพื่อตรวจสอบสิทธิ์ก่อนสมัคร</p>
                 </div>
 

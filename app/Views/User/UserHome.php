@@ -115,10 +115,11 @@
     }
 
     .hero-title {
-        font-size: 2.2rem;
+        font-size: clamp(1.8rem, 5vw, 2.8rem);
         font-weight: 800;
-        text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.15);
+        text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
         margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
         animation: fadeInUp 0.8s ease-out 0.2s both;
     }
 
@@ -1183,16 +1184,27 @@
 
             <!-- Welcome Text Content -->
             <div class="col-lg-7 text-center text-lg-start hero-content order-lg-2 order-1 mb-4 mb-lg-0">
-                <div class="welcome-badge">
-                    <i class='bx bx-heart me-1'></i> ยินดีต้อนรับสู่ครอบครัว สกจ.
+                <div class="welcome-badge mb-3">
+                    <i class='bx bxs-smile me-1'></i> ยินดีต้อนรับสู่ครอบครัว สกจ.
                 </div>
 
-                <h1 class="hero-title">
-                    <i class='bx bx-graduation me-2'></i>ระบบรับสมัครนักเรียนออนไลน์
+                <h1 class="hero-title mb-2" style="line-height: 1.2;">
+                    ระบบรับสมัครนักเรียนออนไลน์
                 </h1>
 
-                <p class="hero-subtitle">
-                    <i class='bx bx-building-house me-2'></i>โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์
+                <div class="d-flex flex-wrap gap-2 mb-3 justify-content-center justify-content-lg-start animate__animated animate__fadeInUp animate__delay-1s">
+                    <div class="badge bg-white text-primary rounded-pill px-3 py-2 d-flex align-items-center shadow-sm">
+                        <i class='bx bx-calendar-event me-1'></i> ปีการศึกษา <?= $checkYear->openyear_year ?? '-' ?>
+                    </div>
+                    <?php if (isset($checkYear->openyear_year) && $checkYear->openyear_year >= 2569): ?>
+                        <div class="badge rounded-pill px-3 py-2 d-flex align-items-center border border-white border-opacity-50 shadow-sm" style="background: rgba(255,255,255,0.2);">
+                            <i class='bx bx-sync me-1'></i> รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <p class="hero-subtitle opacity-75 mb-4">
+                    <i class='bx bx-building-house me-1'></i> โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์
                 </p>
 
                 <?php

@@ -243,7 +243,14 @@
                 <h5 class="mb-0 text-primary"><i class='bx bx-edit me-2'></i>แบบฟอร์มสมัครเรียน ชั้นมัธยมศึกษาปีที่
                     <?= $level ?> (Registration Form)
                 </h5>
-                <small class="text-muted">กรุณากรอกข้อมูลให้ครบถ้วน</small>
+                <div class="text-end">
+                    <small class="text-muted d-block">ปีการศึกษา <?= $checkYear->openyear_year ?? '-' ?>
+                        <?php if (isset($checkYear->openyear_year) && $checkYear->openyear_year >= 2569): ?>
+                            (รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>)
+                        <?php endif; ?>
+                    </small>
+                    <small class="text-muted">กรุณากรอกข้อมูลให้ครบถ้วน</small>
+                </div>
             </div>
             <div class="card-body pt-4">
 

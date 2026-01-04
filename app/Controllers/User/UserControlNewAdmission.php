@@ -182,6 +182,7 @@ class UserControlNewAdmission extends BaseController
     public function status()
     {
         $data['title'] = "ตรวจสอบสถานะการสมัคร";
+        $data['checkYear'] = $this->admissionModel->getOpenYear();
         $data['quotas'] = $this->admissionModel->getAllQuotas(); // Add quotas for menu generation
         $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
         return view('User/UserStatus', $data);
@@ -305,6 +306,7 @@ class UserControlNewAdmission extends BaseController
             ]);
         }
 
+        $systemStatus = $this->admissionModel->getSystemStatus();
         $year = $this->admissionModel->getOpenYear()->openyear_year;
 
         // Check duplicate
@@ -386,6 +388,10 @@ class UserControlNewAdmission extends BaseController
             'recruit_statusSurrender' => '',
             'recruit_StatusQuiz' => 'รอเข้าสอบ'
         ];
+
+        if ($year >= 2569) {
+            $data_insert['recruit_round'] = $systemStatus->onoff_round ?? '1';
+        }
 
         // Handle Files
         $file_fields = ['recruit_img', 'recruit_certificateEdu', 'recruit_certificateEduB', 'recruit_copyidCard'];

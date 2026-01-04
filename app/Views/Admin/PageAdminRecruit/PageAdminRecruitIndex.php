@@ -382,6 +382,23 @@
                     <i class="bx bx-x-circle me-1"></i> ไม่ผ่าน
                 </button>
             </div>
+            <!-- Round Filter -->
+            <?php if ($selected_year >= 2569): ?>
+            <div class="d-flex align-items-center gap-2">
+                <label for="roundFilter" class="small fw-bold text-muted mb-0">รอบ:</label>
+                <select id="roundFilter" class="form-select form-select-sm" style="width: 120px;">
+                    <option value="">ทั้งหมด</option>
+                    <?php if(isset($rounds)): ?>
+                        <?php foreach($rounds as $r): ?>
+                            <option value="<?= $r ?>">รอบที่ <?= $r ?></option>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <option value="1">รอบที่ 1</option>
+                        <option value="2">รอบที่ 2</option>
+                    <?php endif; ?>
+                </select>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card-body p-4">
@@ -389,8 +406,11 @@
             <table class="table table-hover" id="recruitsTable">
                 <thead>
                     <tr>
-                        <th style="width: 60px;" class="text-center">รูป</th>
+                         <th style="width: 60px;" class="text-center">รูป</th>
                         <th data-priority="1" style="min-width: 150px;">ชื่อ - นามสกุล</th>
+                        <?php if ($selected_year >= 2569): ?>
+                        <th style="width: 80px;" class="text-center">รอบที่</th>
+                        <?php endif; ?>
                         <th data-priority="4" style="width: 70px;" class="text-center">รหัส</th>
                         <th data-priority="5" style="min-width: 120px;">หลักสูตร</th>
                         <th data-priority="2" style="width: 130px;" class="text-center">สถานะการสมัคร</th>
@@ -428,12 +448,16 @@
                 data: function (d) {
                     d.year = $('#year').val();
                     d.status_filter = currentStatusFilter;
+                    d.round_filter = $('#roundFilter').length ? $('#roundFilter').val() : '';
                     d.<?= csrf_token() ?> = '<?= csrf_hash() ?>';
                 }
             },
             columns: [
                 { data: 'avatar', orderable: false, searchable: false },
                 { data: 'name' },
+                <?php if ($selected_year >= 2569): ?>
+                { data: 'round', orderable: true },
+                <?php endif; ?>
                 { data: 'recruit_id' },
                 { data: 'course' },
                 { data: 'status' },
@@ -452,6 +476,11 @@
 
         // Reload table when year is changed
         $('#year').on('change', function () {
+            window.location.href = '<?= site_url('skjadmin/recruits?year=') ?>' + $(this).val();
+        });
+
+        // Reload table when round filter is changed
+        $('#roundFilter').on('change', function () {
             table.ajax.reload();
         });
 

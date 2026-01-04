@@ -59,7 +59,8 @@ class AdmissionModel extends Model
         'recruit_certificateEdu',
         'recruit_certificateEduB',
         'recruit_copyidCard',
-        'recruit_userUpdate'
+        'recruit_userUpdate',
+        'recruit_round'
     ];
 
     public function student_insert($data)

@@ -30,6 +30,9 @@ class AdminControlRecruit extends BaseController
             ->orderBy('recruit_id', 'DESC')
             ->findAll();
 
+        $data['rounds'] = $model->select('recruit_round')->distinct()->orderBy('recruit_round', 'ASC')->findColumn('recruit_round') ?? ['1'];
+        if(empty($data['rounds'])) $data['rounds'] = ['1'];
+
         $data['years'] = $years;
         $data['selected_year'] = $selectedYear;
         $data['title'] = 'ข้อมูลผู้สมัคร';
@@ -374,6 +377,7 @@ class AdminControlRecruit extends BaseController
 
         $year = $request->getVar('year') ?? date('Y');
         $statusFilter = $request->getVar('status_filter') ?? '';
+        $roundFilter = $request->getVar('round_filter') ?? '';
 
         // 1. Get Total Records (for this year)
         $totalRecords = $model->where('recruit_year', $year)->countAllResults();
@@ -393,6 +397,9 @@ class AdminControlRecruit extends BaseController
                 $builder->where('tb_recruitstudent.recruit_status', $statusFilter);
             }
         }
+        if (!empty($roundFilter)) {
+            $builder->where('tb_recruitstudent.recruit_round', $roundFilter);
+        }
 
         if (!empty($searchValue)) {
             $builder->groupStart()
@@ -411,7 +418,7 @@ class AdminControlRecruit extends BaseController
 
         // 3. Fetch Data
         $builder = $model->builder();
-        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key, tb_recruitstudent.recruit_sportPosition, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz, tb_recruitstudent.recruit_dateUpdate, skjacth_personnel.tb_personnel.pers_prefix as verifier_prefix, skjacth_personnel.tb_personnel.pers_firstname as verifier_fname, skjacth_personnel.tb_personnel.pers_lastname as verifier_lname')
+        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_recruitstudent.recruit_round, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key, tb_recruitstudent.recruit_sportPosition, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz, tb_recruitstudent.recruit_dateUpdate, skjacth_personnel.tb_personnel.pers_prefix as verifier_prefix, skjacth_personnel.tb_personnel.pers_firstname as verifier_fname, skjacth_personnel.tb_personnel.pers_lastname as verifier_lname')
             ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
             ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
             ->join('skjacth_personnel.tb_personnel', 'skjacth_personnel.tb_personnel.pers_id = tb_recruitstudent.recruit_userUpdate', 'left')
@@ -424,6 +431,9 @@ class AdminControlRecruit extends BaseController
             } else {
                 $builder->where('tb_recruitstudent.recruit_status', $statusFilter);
             }
+        }
+        if (!empty($roundFilter)) {
+            $builder->where('tb_recruitstudent.recruit_round', $roundFilter);
         }
 
         if (!empty($searchValue)) {
@@ -586,6 +596,7 @@ class AdminControlRecruit extends BaseController
                 'avatar' => $avatar,
                 'recruit_id' => '<span class="badge bg-label-secondary">' . esc(sprintf('%04d', $recruit['recruit_id'] ?? 0)) . '</span>',
                 'name' => '<div class="fw-semibold">' . esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '')) . '</div><small class="text-muted">' . esc($recruit['recruit_lastName'] ?? '') . '</small>',
+                'round' => '<span class="badge bg-label-dark">รอบที่ ' . esc($recruit['recruit_round'] ?? '1') . '</span>',
                 'category' => '<small>' . esc($recruit['quota_explain'] ?? $recruit['recruit_category']) . '</small>',
                 'course' => $courseHtml,
                 'selection_result' => $selectionResultHtml,

@@ -227,6 +227,12 @@
                                     <label class="form-label">ปีการศึกษา</label>
                                     <p class="form-control-static"><?= esc($recruit['recruit_year']) ?></p>
                                 </div>
+                                <?php if ($recruit['recruit_year'] >= 2569): ?>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">รอบที่</label>
+                                    <p class="form-control-static">รอบที่ <?= esc($recruit['recruit_round'] ?? '1') ?></p>
+                                </div>
+                                <?php endif; ?>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">ระดับชั้น</label>
                                     <p class="form-control-static"><?= esc($recruit['recruit_regLevel']) ?></p>
