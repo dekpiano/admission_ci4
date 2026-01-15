@@ -570,7 +570,7 @@
                 <div class="card-body p-4">
                     <div class="photo-preview-wrapper mb-3">
                         <img id="preview_img_display"
-                            src="<?= base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . ($recruit['recruit_img'] ?? 'default.png')) ?>"
+                            src="<?= get_recruit_file_url($recruit['recruit_img'] ?? '', $recruit['recruit_regLevel'], 'img') ?>"
                             alt="Student Photo"
                             onerror="this.onerror=null;this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>';">
 
@@ -672,9 +672,9 @@
                                                     <p class="small mt-1 mb-0 text-muted">คลิกเพื่อดูไฟล์ PDF</p>
                                                 </div>
                                             <?php else: ?>
-                                                <a href="<?= base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/' . $df['dir'] . '/' . $recruit[$df['id']]) ?>"
+                                                <a href="<?= get_recruit_file_url($recruit[$df['id']], $recruit['recruit_regLevel'], $df['dir']) ?>"
                                                     target="_blank" class="d-block w-100 h-100">
-                                                    <img src="<?= base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/' . $df['dir'] . '/' . $recruit[$df['id']]) ?>"
+                                                    <img src="<?= get_recruit_file_url($recruit[$df['id']], $recruit['recruit_regLevel'], $df['dir']) ?>"
                                                         class="w-100 h-100" style="object-fit: contain;" alt="<?= $df['name'] ?>"
                                                         onerror="this.src='<?= base_url('public/sneat-assets/img/illustrations/page-misc-error-light.png') ?>'">
                                                 </a>
@@ -875,6 +875,12 @@
 
         // Bind to quota dropdown change
         $('#recruit_category').on('change', updateSportSelectionVisibility);
+
+        // ID Card formatting
+        $('#recruit_idCard').on('input', function (e) {
+            var x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,4})(\d{0,5})(\d{0,2})(\d{0,1})/);
+            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+        }).trigger('input');
 
         // 5. Submit Handling
         $('#editForm').on('submit', function (e) {

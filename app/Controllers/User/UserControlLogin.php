@@ -23,7 +23,7 @@ class UserControlLogin extends BaseController
         $this->admissionModel = new AdmissionModel();
         $this->db = \Config\Database::connect();
         $this->session = \Config\Services::session();
-        helper(['url', 'cookie', 'form']);
+        helper(['url', 'cookie', 'form', 'upload']);
 
         // Google Client Setup
         // ... (rest of constructor is the same)
@@ -112,8 +112,15 @@ class UserControlLogin extends BaseController
     public function CheckLoginConfirmStudentNew()
     {
         if ($this->request->getPost('idenStu')) {
+            $idenStu = $this->request->getPost('idenStu');
+            $plainId = str_replace('-', '', $idenStu ?? '');
+            $formattedId = \format_id_card($idenStu);
+
             $builder = $this->db->table('tb_recruitstudent');
-            $builder->where('recruit_idCard', $this->request->getPost('idenStu'));
+            $builder->groupStart()
+                ->where('recruit_idCard', $plainId)
+                ->orWhere('recruit_idCard', $formattedId)
+            ->groupEnd();
             $builder->where('recruit_phone', $this->request->getPost('recruit_phone'));
             $builder->where('recruit_status', "ผ่านการตรวจสอบ");
             $count = $builder->countAllResults();

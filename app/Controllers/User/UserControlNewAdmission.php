@@ -23,7 +23,7 @@ class UserControlNewAdmission extends BaseController
         $this->session = \Config\Services::session();
         $this->timeago = new Timeago();
         $this->datethai = new Datethai();
-        helper(['url', 'form']);
+        helper(['url', 'form', 'upload']);
     }
 
     public function index()
@@ -375,12 +375,12 @@ class UserControlNewAdmission extends BaseController
             'recruit_prefix' => $post['recruit_prefix'],
             'recruit_firstName' => $post['recruit_firstName'],
             'recruit_lastName' => $post['recruit_lastName'],
-            'recruit_idCard' => str_replace('-', '', $post['recruit_idCard']),
+            'recruit_idCard' => \format_id_card($post['recruit_idCard']),
             'recruit_birthday' => $recruit_birthday,
             'recruit_race' => $post['recruit_race'],
             'recruit_nationality' => $post['recruit_nationality'],
             'recruit_religion' => $post['recruit_religion'],
-            'recruit_phone' => str_replace('-', '', $post['recruit_phone']),
+            'recruit_phone' => $post['recruit_phone'],
             'recruit_homeNumber' => $post['recruit_homeNumber'],
             'recruit_homeGroup' => $post['recruit_homeGroup'],
             'recruit_homeRoad' => $post['recruit_homeRoad'],

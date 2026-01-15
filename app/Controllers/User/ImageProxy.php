@@ -6,30 +6,92 @@ use App\Controllers\BaseController;
 
 class ImageProxy extends BaseController
 {
-    protected $primaryServer = "https://skj.nsnpao.go.th";
-    protected $fallbackServer = "http://118.172.140.151:8000";
+    // สลับลำดับ: HTTP ก่อน (เพราะ HTTPS มีปัญหา SSL)
+    protected $primaryServer = "http://118.172.140.151:8000";
+    protected $fallbackServer = "https://skj.nsnpao.go.th";
     
     public function index()
     {
         $fileName = $this->request->getVar('file'); // e.g., recruitstudent/m4/img/image.png
+        $debug = $this->request->getVar('debug') === '1'; // Add ?debug=1 for debugging
         
         if (empty($fileName)) {
             return $this->response->setStatusCode(400)->setBody('Missing file parameter');
         }
 
-        // Try primary server first, then fallback
+        $debugInfo = [];
+
+        // 1. ตรวจสอบ Local ก่อน (กรณีเซิร์ฟเวอร์ล่มและใช้ local fallback)
+        $localPath = FCPATH . 'uploads/admission/' . ltrim($fileName, '/');
+        $debugInfo['local_path'] = $localPath;
+        $debugInfo['local_exists'] = file_exists($localPath);
+        
+        $localResult = $this->fetchFromLocal($fileName);
+        if ($localResult !== null) {
+            return $localResult;
+        }
+
+        // 2. ลอง Remote servers (HTTP ก่อน, แล้ว HTTPS)
         $servers = [$this->primaryServer, $this->fallbackServer];
         
         foreach ($servers as $server) {
-            $result = $this->fetchFromServer($server, $fileName);
+            $result = $this->fetchFromServer($server, $fileName, $debugInfo);
             if ($result !== null) {
                 return $result;
             }
         }
         
-        // Both servers failed
-        log_message('error', "ImageProxy: Both servers failed for file: {$fileName}");
-        return $this->response->setStatusCode(404)->setBody('File not found on any server.');
+        // ทั้ง Local และ Remote ไม่พบ
+        log_message('error', "ImageProxy: File not found anywhere: {$fileName} | Debug: " . json_encode($debugInfo));
+        
+        // ถ้าเปิด debug mode ให้แสดงข้อมูล
+        if ($debug) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setContentType('application/json')
+                ->setBody(json_encode([
+                    'error' => 'File not found',
+                    'file' => $fileName,
+                    'debug' => $debugInfo
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
+        
+        return $this->response->setStatusCode(404)->setBody('File not found.');
+    }
+    
+    /**
+     * ตรวจสอบและส่งไฟล์จาก Local Storage
+     * 
+     * @param string $fileName The file path
+     * @return \CodeIgniter\HTTP\Response|null Returns response if found, null if not
+     */
+    protected function fetchFromLocal(string $fileName)
+    {
+        // ไฟล์ local อยู่ที่ public/uploads/admission/
+        $localPath = FCPATH . 'uploads/admission/' . ltrim($fileName, '/');
+        
+        if (file_exists($localPath) && is_file($localPath)) {
+            try {
+                $body = file_get_contents($localPath);
+                $mimeType = mime_content_type($localPath);
+                $contentLength = filesize($localPath);
+                
+                log_message('debug', "ImageProxy: Serving from local: {$localPath}");
+                
+                return $this->response
+                    ->setStatusCode(200)
+                    ->setHeader('Content-Type', $mimeType)
+                    ->setHeader('Content-Length', $contentLength)
+                    ->setHeader('Cache-Control', 'public, max-age=86400')
+                    ->setHeader('X-Source', 'local') // บอกว่ามาจาก local
+                    ->setBody($body);
+            } catch (\Exception $e) {
+                log_message('error', "ImageProxy: Error reading local file: " . $e->getMessage());
+                return null;
+            }
+        }
+        
+        return null;
     }
     
     /**
@@ -37,16 +99,18 @@ class ImageProxy extends BaseController
      * 
      * @param string $serverUrl The server URL
      * @param string $fileName The file path
+     * @param array &$debugInfo Reference to debug info array
      * @return \CodeIgniter\HTTP\Response|null Returns response if successful, null if failed
      */
-    protected function fetchFromServer(string $serverUrl, string $fileName)
+    protected function fetchFromServer(string $serverUrl, string $fileName, array &$debugInfo = [])
     {
         $fullRemoteUrl = rtrim($serverUrl, '/') . '/uploads/admission/' . ltrim($fileName, '/');
+        $debugInfo['tried_urls'][] = $fullRemoteUrl;
         
         $client = \Config\Services::curlrequest([
             'verify' => false,
-            'timeout' => 5,
-            'connect_timeout' => 3,
+            'timeout' => 10,  // เพิ่ม timeout เป็น 10 วินาที
+            'connect_timeout' => 5,  // เพิ่ม connect timeout เป็น 5 วินาที
         ]);
 
         try {
@@ -58,6 +122,7 @@ class ImageProxy extends BaseController
             ]);
 
             $statusCode = $response->getStatusCode();
+            $debugInfo['server_responses'][$serverUrl] = $statusCode;
             
             if ($statusCode === 200) {
                 $body = $response->getBody();
@@ -96,6 +161,8 @@ class ImageProxy extends BaseController
                             ->setHeader('Content-Type', $finalContentType)
                             ->setHeader('Content-Length', $contentLength ?: strlen($body))
                             ->setHeader('Cache-Control', 'public, max-age=86400')
+                            ->setHeader('X-Source', 'remote') // บอกว่ามาจาก remote
+                            ->setHeader('X-Remote-Server', $serverUrl)
                             ->setBody($body);
             }
             
@@ -104,9 +171,9 @@ class ImageProxy extends BaseController
             return null;
 
         } catch (\Exception $e) {
+            $debugInfo['errors'][$serverUrl] = $e->getMessage();
             log_message('debug', "ImageProxy: Server {$serverUrl} failed with exception: " . $e->getMessage());
             return null;
         }
     }
 }
-

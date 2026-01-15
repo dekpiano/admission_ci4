@@ -4,10 +4,12 @@ namespace App\Libraries;
 
 class RemoteUpload
 {
-    protected $primaryServer = "https://skj.nsnpao.go.th";
-    protected $fallbackServer = "http://118.172.140.151:8000";
+    // สลับลำดับ: ใช้ HTTP ก่อน (เพราะ HTTPS มีปัญหา SSL)
+    protected $primaryServer = "http://118.172.140.151:8000";
+    protected $fallbackServer = "https://skj.nsnpao.go.th";
     protected $activeServer = null;
     protected $token;
+    protected $useLocalFallback = true; // เปิดใช้ local fallback
 
     public function __construct()
     {
@@ -23,24 +25,29 @@ class RemoteUpload
     {
         $cacheFile = WRITEPATH . 'cache/active_upload_server.txt';
         
-        // Try cache first (valid for 5 minutes)
-        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 300) {
-            return trim(file_get_contents($cacheFile));
+        // Clear cache if older than 2 minutes (faster failover)
+        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 120) {
+            $cached = trim(file_get_contents($cacheFile));
+            // Verify cached server is still working
+            if ($this->isServerAvailable($cached)) {
+                return $cached;
+            }
         }
 
-        // Try primary first
+        // Try HTTP server first (primary)
         if ($this->isServerAvailable($this->primaryServer)) {
             $this->cacheActiveServer($cacheFile, $this->primaryServer);
             return $this->primaryServer;
         }
 
-        // Fall back to secondary
+        // Fall back to HTTPS
         if ($this->isServerAvailable($this->fallbackServer)) {
             $this->cacheActiveServer($cacheFile, $this->fallbackServer);
             return $this->fallbackServer;
         }
 
-        return $this->primaryServer; // Default back to primary
+        // Return primary as default, will try local fallback in upload()
+        return $this->primaryServer;
     }
 
     protected function isServerAvailable($serverUrl)
@@ -137,7 +144,7 @@ class RemoteUpload
     }
 
     /**
-     * Upload File
+     * Upload File with Local Fallback
      */
     public function upload($file, $subPath, $customName = null)
     {
@@ -161,7 +168,56 @@ class RemoteUpload
         ];
         if ($customName) $payload['desired_filename'] = $customName;
 
-        return $this->sendRequest('upload.php', $payload, true);
+        // Try remote upload first
+        $result = $this->sendRequest('upload.php', $payload, true);
+        
+        // If remote upload failed and local fallback is enabled, save locally
+        if (isset($result['status']) && $result['status'] === 'error' && $this->useLocalFallback) {
+            log_message('warning', 'RemoteUpload: Remote servers failed, using local fallback');
+            return $this->uploadLocal($filePath, $subPath, $originalName);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Local Upload Fallback
+     * Saves file to public/uploads directory when remote servers are unavailable
+     */
+    protected function uploadLocal($filePath, $subPath, $fileName)
+    {
+        try {
+            // Generate unique filename to prevent conflicts
+            $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+            $baseName = pathinfo($fileName, PATHINFO_FILENAME);
+            $uniqueName = $baseName . '_' . uniqid() . '.' . $ext;
+            
+            // Create directory if not exists
+            $uploadDir = FCPATH . 'uploads/' . $subPath;
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            $destination = $uploadDir . '/' . $uniqueName;
+            
+            // Copy file to destination
+            if (copy($filePath, $destination)) {
+                log_message('info', 'RemoteUpload: File saved locally: ' . $destination);
+                return [
+                    'status' => 'success',
+                    'filename' => $uniqueName,
+                    'path' => $subPath . '/' . $uniqueName,
+                    'url' => base_url('uploads/' . $subPath . '/' . $uniqueName),
+                    'storage' => 'local' // Flag to indicate local storage
+                ];
+            }
+            
+            return ['status' => 'error', 'message' => 'Failed to save file locally'];
+            
+        } catch (\Exception $e) {
+            log_message('error', 'RemoteUpload Local Fallback Error: ' . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Local fallback failed: ' . $e->getMessage()];
+        }
     }
 
     /**

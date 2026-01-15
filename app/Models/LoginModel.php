@@ -6,6 +6,12 @@ use CodeIgniter\Model;
 
 class LoginModel extends Model
 {
+    public function __construct()
+    {
+        parent::__construct();
+        helper('upload');
+    }
+
     public function record_count($username, $password)
     {
         $db2 = \Config\Database::connect('skjpers');
@@ -29,8 +35,14 @@ class LoginModel extends Model
 
     public function Student_Login($username, $password)
     {
+        $plainId = str_replace('-', '', $username ?? '');
+        $formattedId = \format_id_card($username);
+
         return $this->db->table('tb_recruitstudent')
-            ->where('recruit_idCard', $username)
+            ->groupStart()
+                ->where('recruit_idCard', $plainId)
+                ->orWhere('recruit_idCard', $formattedId)
+            ->groupEnd()
             ->where('recruit_birthday', $password)
             ->get()->getResult();
     }

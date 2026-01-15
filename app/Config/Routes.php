@@ -130,7 +130,7 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
 
     // Recruit Management
     $routes->get('recruits', 'AdminControlRecruit::index');
-    $routes->post('recruits/ajax', 'AdminControlRecruit::getRecruitsAjax');
+    $routes->add('recruits/ajax', 'AdminControlRecruit::getRecruitsAjax');
     $routes->get('recruits/view/(:num)', 'AdminControlRecruit::view/$1');
     $routes->get('recruits/edit/(:num)', 'AdminControlRecruit::edit/$1');
     $routes->post('recruits/update/(:num)', 'AdminControlRecruit::update/$1');
@@ -221,6 +221,12 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('cleanup/list_trash', 'AdminControlCleanup::list_trash');
     $routes->post('cleanup/restore_file', 'AdminControlCleanup::restore_file');
     $routes->post('cleanup/empty_expired', 'AdminControlCleanup::empty_expired');
+
+    // Local Sync Management
+    $routes->get('local-sync', 'AdminControlLocalSync::index');
+    $routes->post('local-sync/sync-all', 'AdminControlLocalSync::syncAll');
+    $routes->post('local-sync/sync-single', 'AdminControlLocalSync::syncSingle');
+    $routes->get('local-sync/api-check-status', 'AdminControlLocalSync::apiCheckStatus');
 
 });
 

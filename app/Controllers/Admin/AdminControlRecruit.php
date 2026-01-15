@@ -28,7 +28,6 @@ class AdminControlRecruit extends BaseController
             ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
             ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
             ->where('recruit_year', $selectedYear)
-            ->groupBy('tb_recruitstudent.recruit_id')
             ->orderBy('recruit_id', 'DESC')
             ->findAll();
 
@@ -149,7 +148,7 @@ class AdminControlRecruit extends BaseController
         }
 
         $data = [
-            'recruit_idCard' => $this->request->getPost('recruit_idCard'),
+            'recruit_idCard' => \format_id_card($this->request->getPost('recruit_idCard')),
             'recruit_prefix' => $this->request->getPost('recruit_prefix'),
             'recruit_firstName' => $this->request->getPost('recruit_firstName'),
             'recruit_lastName' => $this->request->getPost('recruit_lastName'),
@@ -456,7 +455,8 @@ class AdminControlRecruit extends BaseController
             $builder->limit($length, $start);
         }
 
-        $builder->groupBy('tb_recruitstudent.recruit_id');
+
+        // ลบ groupBy ออกเพราะ recruit_id เป็น Primary Key ไม่ต้อง GROUP BY
         $builder->orderBy('tb_recruitstudent.recruit_id', 'DESC');
 
         $recruits = $builder->get()->getResultArray();

@@ -26,7 +26,7 @@ class UserControlStudents extends BaseController
         $this->timeago = new Timeago();
         $this->db = \Config\Database::connect(); // Keep for other methods not yet refactored
         $this->session = \Config\Services::session();
-        helper(['url', 'form', 'cookie']);
+        helper(['url', 'form', 'cookie', 'upload']);
     }
 
     public function checkSession()
@@ -167,7 +167,7 @@ class UserControlStudents extends BaseController
                 'recruit_race' => $post['recruit_race'],
                 'recruit_nationality' => $post['recruit_nationality'],
                 'recruit_religion' => $post['recruit_religion'],
-                'recruit_idCard' => $post['recruit_idCard'],
+                'recruit_idCard' => \format_id_card($post['recruit_idCard']),
                 'recruit_phone' => $post['recruit_phone'],
                 'recruit_homeNumber' => $post['recruit_homeNumber'],
                 'recruit_homeGroup' => $post['recruit_homeGroup'],

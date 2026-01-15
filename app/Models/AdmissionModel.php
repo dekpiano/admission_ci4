@@ -6,8 +6,14 @@ use CodeIgniter\Model;
 
 class AdmissionModel extends Model
 {
+    public function __construct()
+    {
+        parent::__construct();
+        helper('upload');
+    }
+
     protected $table = 'tb_recruitstudent';
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'recruit_id'; // ใช้ recruit_id เป็น PK เพราะ Controller ค้นหาด้วย recruit_id
     protected $allowedFields = [
         'id',
         'recruit_id',
@@ -104,7 +110,13 @@ class AdmissionModel extends Model
 
     public function isIdCardRegistered($idcard, $year)
     {
-        return $this->where('recruit_idCard', $idcard)
+        $plainId = str_replace('-', '', $idcard ?? '');
+        $formattedId = \format_id_card($idcard);
+
+        return $this->groupStart()
+                ->where('recruit_idCard', $plainId)
+                ->orWhere('recruit_idCard', $formattedId)
+            ->groupEnd()
             ->where('recruit_year', $year)
             ->countAllResults() > 0;
     }
@@ -122,7 +134,13 @@ class AdmissionModel extends Model
 
     public function findStudentForStatusCheck($idcard, $birthday, $year)
     {
-        return $this->where('recruit_idCard', $idcard)
+        $plainId = str_replace('-', '', $idcard ?? '');
+        $formattedId = \format_id_card($idcard);
+
+        return $this->groupStart()
+                ->where('recruit_idCard', $plainId)
+                ->orWhere('recruit_idCard', $formattedId)
+            ->groupEnd()
             ->where('recruit_birthday', $birthday)
             ->where('recruit_year', $year)
             ->get()
