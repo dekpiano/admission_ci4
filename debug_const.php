@@ -1,0 +1,4 @@
+<?php
+echo "FCPATH: " . FCPATH . PHP_EOL;
+echo "ROOTPATH: " . ROOTPATH . PHP_EOL;
+echo "WRITEPATH: " . WRITEPATH . PHP_EOL;

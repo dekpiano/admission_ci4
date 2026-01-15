@@ -160,26 +160,24 @@ if (!function_exists('get_recruit_file_url')) {
             return base_url('sneat-assets/img/avatars/1.png');
         }
         
-        // พาธที่ถูกต้องในระบบคือ admission/recruitstudent/m...
-        $path = "admission/recruitstudent/m{$level}/{$folder}/{$filename}";
-        $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+        $subPath = "recruitstudent/m{$level}/{$folder}/{$filename}";
+        $fullPath = "admission/" . $subPath;
 
-        // 1. ตรวจสอบไฟล์ในเครื่องตัวเองก่อน
-        $localPath = FCPATH . 'uploads/' . $path;
+        // 1. ตรวจสอบไฟล์ในเครื่องตัวเองก่อน (รวดเร็วที่สุด)
+        $localPath = FCPATH . 'uploads/' . $fullPath;
         if (file_exists($localPath)) {
-            return base_url('uploads/' . $path);
+            return base_url('uploads/' . $fullPath);
         }
 
-        // 2. กำหนดเซิร์ฟเวอร์หลัก
-        $mainServer = "https://skj.nsnpao.go.th";
-
-        // 3. กรณีอยู่บนเซิร์ฟเวอร์อื่น (เช่น admission2.skj.ac.th) ให้ไปดึงจากเซิร์ฟเวอร์หลัก
-        if (strpos($currentHost, 'skj.nsnpao.go.th') === false) {
-            return $mainServer . '/uploads/' . $path;
+        // 2. กรณีพิเศษ: หากต้องการลิงก์ตรงจาก IP จริงๆ (ข้าม Proxy)
+        if ($forceDirect) {
+            return "http://118.172.140.151:8000/uploads/admission/" . $subPath;
         }
 
-        // 4. กรณีอยู่บนเซิร์ฟเวอร์หลักแล้วแต่หาไฟล์ไม่เจอ
-        return base_url('uploads/' . $path);
+        // 3. ใช้ Image Proxy เป็นตัวช่วยหลัก (สำรองกรณีโดเมนหลักล่ม)
+        // Proxy จะไปหาไฟล์จากทั้ง Local และ IP Server ให้เองโดยอัตโนมัติ
+        // และจะส่งกลับมาเป็น HTTPS ทำให้ไม่มีปัญหา Mixed Content ครับ
+        return base_url("image-proxy?file=" . urlencode($subPath));
     }
 }
 
