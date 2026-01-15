@@ -5,6 +5,8 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
 
+helper('upload');
+
 class AdminControlRecruit extends BaseController
 {
     public function index()
@@ -87,7 +89,7 @@ class AdminControlRecruit extends BaseController
             $data['recruit']['major_order_list'] = []; // Ensure it's always an array even if recruit_majorOrder is empty
         }
 
-        $data['remote_base_url'] = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
+        $data['remote_base_url'] = get_upload_base_url();
         $data['title'] = 'รายละเอียดผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitView', $data);
     }
@@ -111,7 +113,7 @@ class AdminControlRecruit extends BaseController
         $data['courses'] = $model->getAllCourses();
         $data['quotas'] = $model->getAllQuotas();
         $data['courses_json'] = json_encode($data['courses']);
-        $data['remote_base_url'] = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
+        $data['remote_base_url'] = get_upload_base_url();
         $data['title'] = 'แก้ไขข้อมูลผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitEdit', $data);
     }
@@ -471,7 +473,7 @@ class AdminControlRecruit extends BaseController
                 $statusClass = 'status-rejected'; // Red
             }
 
-            // Generate avatar with lazy loading
+            // Generate avatar with lazy loading - use image-proxy for fallback support
             $imgSrc = base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '1') . '/img/' . ($recruit['recruit_img'] ?? 'default.png'));
             $defaultImg = base_url('sneat-assets/img/avatars/1.png');
             $avatar = '<img src="' . $imgSrc . '" class="recruit-avatar" alt="Avatar" loading="lazy" onerror="this.onerror=null;this.src=\'' . $defaultImg . '\';">';
@@ -714,7 +716,7 @@ class AdminControlRecruit extends BaseController
 
         // Generate HTML
         $html = '';
-        $baseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
+        $baseUrl = get_upload_base_url();
         $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . $recruit['recruit_img']);
 
         // Check if this is a sports excellence applicant

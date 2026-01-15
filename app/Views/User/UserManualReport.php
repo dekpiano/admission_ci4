@@ -2,158 +2,348 @@
 
 <?= $this->section('styles') ?>
 <style>
-    /* Timeline Styles (Compact & Mobile Friendly) */
-    .timeline {
+    /* ===== Premium Hero Banner (Booking Style) ===== */
+    .manual-banner {
+        background: linear-gradient(135deg, #ff9eb5 0%, #f77062 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        color: white;
         position: relative;
-        padding: 1rem 0;
+        overflow: hidden;
+        margin-bottom: 2rem;
     }
-    .timeline::before {
+
+    .manual-banner::before {
         content: '';
         position: absolute;
-        left: 40px;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background: linear-gradient(180deg, #ff9eb5 0%, #84d2f6 100%);
-        border-radius: 10px;
+        top: -100%;
+        right: -50%;
+        width: 300%;
+        height: 300%;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+        animation: pulse 8s ease-in-out infinite;
     }
-    .timeline-item {
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .manual-banner .breadcrumb-nav {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 1rem;
+    }
+
+    .manual-banner .breadcrumb-nav a {
+        color: rgba(255,255,255,0.85);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .manual-banner .breadcrumb-nav a:hover {
+        color: #fff;
+    }
+
+    .manual-banner .breadcrumb-nav span {
+        opacity: 0.7;
+        margin: 0 0.5rem;
+    }
+
+    .manual-banner .hero-content {
         position: relative;
-        padding-left: 80px;
-        margin-bottom: 2.5rem;
+        z-index: 2;
     }
-    .timeline-icon {
-        position: absolute;
-        left: 0;
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%);
-        border-radius: 50%;
+
+    .manual-banner .hero-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 2rem;
-        color: white;
-        box-shadow: 0 4px 15px rgba(255, 158, 181, 0.3);
-        z-index: 2;
-        transition: all 0.3s ease;
-        border: 4px solid #fff;
+        margin-bottom: 1.25rem;
+        animation: float 3s ease-in-out infinite;
     }
-    .timeline-item:nth-child(even) .timeline-icon {
-        background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%);
-        box-shadow: 0 4px 15px rgba(132, 210, 246, 0.3);
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
     }
-    .timeline-item:nth-child(3) .timeline-icon {
-        background: linear-gradient(135deg, #a8e6cf 0%, #c4f5da 100%);
-        box-shadow: 0 4px 15px rgba(168, 230, 207, 0.3);
+
+    .manual-banner h2 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
     }
-    .timeline-item:nth-child(4) .timeline-icon {
-        background: linear-gradient(135deg, #ffd89b 0%, #ffe9b8 100%);
-        box-shadow: 0 4px 15px rgba(255, 216, 155, 0.3);
+
+    .manual-banner p {
+        opacity: 0.9;
+        margin-bottom: 0;
+        font-size: 1rem;
     }
-    
-    .timeline-number {
+
+    /* ===== Step Cards (Booking Style) ===== */
+    .step-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        border: 1px solid #f1f5f9;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .step-card::before {
+        content: '';
         position: absolute;
+        left: 0;
         top: 0;
-        right: 0;
-        width: 24px;
-        height: 24px;
-        background: #fff;
-        color: #ff9eb5;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(180deg, #ff9eb5 0%, #f77062 100%);
+        border-radius: 0 5px 5px 0;
+    }
+
+    .step-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .step-number-bubble {
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        background: linear-gradient(135deg, #ff9eb5 0%, #f77062 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: bold;
-        font-size: 0.8rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        border: 2px solid #ff9eb5;
-    }
-    .timeline-item:nth-child(even) .timeline-number {
-        color: #84d2f6;
-        border-color: #84d2f6;
-    }
-    .timeline-item:nth-child(3) .timeline-number {
-        color: #a8e6cf;
-        border-color: #a8e6cf;
-    }
-    .timeline-item:nth-child(4) .timeline-number {
-        color: #ffd89b;
-        border-color: #ffd89b;
+        color: white;
+        font-weight: 800;
+        font-size: 1.5rem;
+        box-shadow: 0 6px 20px rgba(255, 158, 181, 0.35);
     }
 
-    .timeline-content {
-        background: #fff;
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        border-left: 4px solid #ff9eb5;
-        transition: all 0.3s ease;
-    }
-    .timeline-item:nth-child(even) .timeline-content {
-        border-left-color: #84d2f6;
-    }
-    .timeline-item:nth-child(3) .timeline-content {
-        border-left-color: #a8e6cf;
-    }
-    .timeline-item:nth-child(4) .timeline-content {
-        border-left-color: #ffd89b;
-    }
-
-    .timeline-title {
-        color: #ff9eb5;
+    .step-header-text h4 {
         font-weight: 700;
-        font-size: 1.1rem;
+        font-size: 1.25rem;
+        color: #334155;
+        margin-bottom: 0.35rem;
+    }
+
+    .step-header-text p {
+        color: #64748b;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .step-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    .step-instructions {
+        padding-left: 0.5rem;
+    }
+
+    .step-instructions ul {
+        padding-left: 1.2rem;
+        margin: 0;
+    }
+
+    .step-instructions li {
+        color: #475569;
+        margin-bottom: 0.6rem;
+        line-height: 1.6;
+    }
+
+    .step-instructions li:last-child {
+        margin-bottom: 0;
+    }
+
+    /* ===== Mockup Wrapper (Browser Frame Style) ===== */
+    .mockup-wrapper {
+        background: #1e293b;
+        border-radius: 12px;
+        padding: 0;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    .mockup-header {
+        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .mockup-dots {
+        display: flex;
+        gap: 6px;
+    }
+
+    .mockup-dots span {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .mockup-dots span:nth-child(1) { background: #ef4444; }
+    .mockup-dots span:nth-child(2) { background: #fbbf24; }
+    .mockup-dots span:nth-child(3) { background: #22c55e; }
+
+    .mockup-url {
+        flex: 1;
+        background: #475569;
+        border-radius: 6px;
+        padding: 0.4rem 0.75rem;
+        margin-left: 0.75rem;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .mockup-url i {
+        color: #22c55e;
+    }
+
+    .mockup-body {
+        background: #f8fafc;
+        padding: 1rem;
+        min-height: 200px;
+    }
+
+    /* Mini UI Elements Inside Mockup */
+    .mini-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        margin-bottom: 0.75rem;
+    }
+
+    .mini-form-group {
         margin-bottom: 0.5rem;
     }
-    .timeline-item:nth-child(even) .timeline-title {
-        color: #84d2f6;
+
+    .mini-label {
+        font-size: 0.65rem;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+        display: block;
     }
-    .timeline-item:nth-child(3) .timeline-title {
-        color: #a8e6cf;
+
+    .mini-input {
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.7rem;
+        color: #334155;
+        width: 100%;
     }
-    .timeline-item:nth-child(4) .timeline-title {
-        color: #ffd89b;
+
+    .mini-btn {
+        background: linear-gradient(135deg, #ff9eb5 0%, #f77062 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-align: center;
     }
-    
-    /* Mobile Optimization */
-    @media (max-width: 767.98px) {
-        .timeline::before {
-            left: 20px;
+
+    .mini-photo-box {
+        width: 45px;
+        height: 55px;
+        background: #e2e8f0;
+        border: 2px dashed #cbd5e1;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ===== Preparation Section ===== */
+    .prep-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title .icon-box {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #ff9eb5 0%, #f77062 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+    }
+
+    .section-title h3 {
+        font-weight: 700;
+        font-size: 1.4rem;
+        margin: 0;
+        color: #334155;
+    }
+
+    .tips-box {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        border-left: 4px solid #f59e0b;
+        margin-bottom: 1.5rem;
+    }
+
+    .tips-box h6 {
+        color: #92400e;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .tips-box ul {
+        margin: 0;
+        padding-left: 1.1rem;
+    }
+
+    .tips-box li {
+        color: #78350f;
+        font-size: 0.875rem;
+        margin-bottom: 0.3rem;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 991.98px) {
+        .step-body {
+            grid-template-columns: 1fr;
         }
-        .timeline-item {
-            padding-left: 55px;
-            margin-bottom: 2rem;
-        }
-        .timeline-icon {
-            width: 45px;
-            height: 45px;
-            font-size: 1.2rem;
-            border-width: 3px;
-        }
-        .timeline-number {
-            width: 18px;
-            height: 18px;
-            font-size: 0.6rem;
-            right: -5px;
-            top: -5px;
-            border-width: 1px;
-        }
-        .timeline-content {
-            padding: 1rem;
-            border-radius: 10px;
-        }
-        .timeline-title {
-            font-size: 1rem;
-        }
-        .card-body {
-            padding: 1rem !important;
-        }
-        h2 {
-            font-size: 1.5rem;
-        }
-        p.fs-5 {
-            font-size: 1rem !important;
+        .manual-banner {
+            padding: 1.5rem;
         }
     }
 </style>
@@ -162,152 +352,206 @@
 <?= $this->section('content') ?>
 <div class="container-xxl flex-grow-1 container-p-y">
 
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">หน้าหลัก /</span> คู่มือการรายงานตัวและมอบตัว</h4>
-
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card text-center" style="background: linear-gradient(135deg, #84d2f6 0%, #ff9eb5 100%);">
-                <div class="card-body py-5">
-                    <h2 class="text-white fw-bold mb-2"><i class='bx bx-user-check me-2'></i>คู่มือการรายงานตัวและมอบตัวนักเรียนใหม่</h2>
-                    <p class="text-white fs-5 mb-0">ขอแสดงความยินดี! กรุณาดำเนินการตามขั้นตอนเพื่อรักษาสิทธิ์การเข้าศึกษา</p>
-                </div>
+    <!-- Premium Hero Banner -->
+    <div class="manual-banner">
+        <div class="hero-content">
+            <div class="breadcrumb-nav">
+                <a href="<?= base_url('new-admission') ?>">หน้าหลัก</a>
+                <span>/</span>
+                <a href="<?= base_url('new-admission/manual') ?>">คู่มือการใช้งาน</a>
+                <span>/</span>
+                คู่มือการรายงานตัว
             </div>
+            <div class="hero-icon">
+                <i class='bx bx-user-check'></i>
+            </div>
+            <h2>คู่มือการรายงานตัวและมอบตัว</h2>
+            <p>ขั้นตอนและวิธีการรายงานตัวออนไลน์ สำหรับนักเรียนที่ผ่านการคัดเลือก</p>
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body p-4">
-                    
-                    <div class="timeline">
-                        
-                        <!-- Step 1: Check Results -->
-                        <div class="timeline-item">
-                            <div class="timeline-icon">
-                                <i class='bx bx-search-alt'></i>
-                                <div class="timeline-number">1</div>
-                            </div>
-                            <div class="timeline-content">
-                                <h5 class="timeline-title">ตรวจสอบรายชื่อผู้ผ่านการคัดเลือก</h5>
-                                <p class="text-muted mb-3">เข้าสู่เว็บไซต์โรงเรียนเพื่อตรวจสอบประกาศผลสอบคัดเลือก</p>
-                                <ul class="mb-3 ps-3">
-                                    <li>เข้าหน้าเว็บไซต์ <a href="<?= base_url() ?>">ระบบรับสมัครนักเรียนใหม่</a></li>
-                                    <li>คลิกเมนู <a href="<?= base_url('new-admission/status') ?>"><strong>"ตรวจสอบสถานะ"</strong></a></li>
-                                    <li>กรอกเลขบัตรประชาชนและวันเกิด เพื่อดูรายละเอียด</li>
-                                    <li>ตรวจสอบว่าสถานะเป็น <span class="badge bg-success">"ผ่านการคัดเลือก"</span> ถ้าไม่ใช่ ให้กลับไป <span class="badge bg-warning">"แก้ไขข้อมูล"</span></li>
-                                </ul>
-                                <div class="alert alert-info py-2 px-3 mb-0" role="alert">
-                                    <i class='bx bx-info-circle me-1'></i> หากพบชื่อในประกาศ ให้ดำเนินการตามขั้นตอนถัดไป
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 2: Confirm Rights Online -->
-                        <div class="timeline-item">
-                            <div class="timeline-icon">
-                                <i class='bx bx-check-double'></i>
-                                <div class="timeline-number">2</div>
-                            </div>
-                            <div class="timeline-content">
-                                <h5 class="timeline-title">รายงานตัวออนไลน์</h5>
-                                <p class="text-muted mb-3">ยืนยันการรับสิทธิ์เข้าศึกษาผ่านระบบออนไลน์</p>
-                                <ul class="mb-3 ps-3">
-                                    <li>เข้าระบบรายงานตัว (ใช้เลขบัตรประชาชนและวันเดือนปีเกิด)</li>
-                                    <li>อ่านรายละเอียดเงื่อนไขการรายงานตัว</li>
-                                    <li>กดปุ่ม <a href="<?= base_url('confirmation/login') ?>"><span class="badge bg-primary">"รายงานตัวนักเรียนใหม่"</span></a></li>
-                                    <li>รอข้อความยืนยันจากระบบ</li>
-                                </ul>
-                                <div class="alert alert-warning py-2 px-3 mb-0" role="alert">
-                                    <i class='bx bx-time-five me-1'></i> <strong>สำคัญ!</strong> ต้องยืนยันสิทธิ์ภายในระยะเวลาที่กำหนด มิฉะนั้นจะถือว่าสละสิทธิ์
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 3: Print Documents -->
-                        <div class="timeline-item">
-                            <div class="timeline-icon">
-                                <i class='bx bx-printer'></i>
-                                <div class="timeline-number">3</div>
-                            </div>
-                            <div class="timeline-content">
-                                <h5 class="timeline-title">พิมพ์เอกสารมอบตัว</h5>
-                                <p class="text-muted mb-3">ดาวน์โหลดและพิมพ์เอกสารที่จำเป็นสำหรับวันมอบตัว</p>
-                                <ul class="mb-3 ps-3">
-                                    <li>ล็อกอินเข้าระบบรายงานตัวอีกครั้ง</li>
-                                    <li>คลิกปุ่ม <span class="badge bg-danger">"พิมพ์ใบมอบตัว"</span></li>
-                                    <li>ตรวจสอบข้อมูลให้ถูกต้อง</li>
-                                    <li>พิมพ์ออกมา</li>
-                                </ul>
-                                <h6 class="fw-bold mt-3 mb-2"> <i class='bx bx-folder-open me-1'></i>เอกสารประกอบที่ต้องเตรียม:</h6>
-                                <div class="row g-2">
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-start p-2 bg-light rounded">
-                                            <i class='bx bx-check text-success me-2 fs-5'></i>
-                                            <small>ใบมอบตัว (พิมพ์จากระบบ)</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-start p-2 bg-light rounded">
-                                            <i class='bx bx-check text-success me-2 fs-5'></i>
-                                            <small>ปพ.1 ฉบับจริง + สำเนา</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-start p-2 bg-light rounded">
-                                            <i class='bx bx-check text-success me-2 fs-5'></i>
-                                            <small>สำเนาทะเบียนบ้าน (นักเรียน, บิดา, มารดา)</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-start p-2 bg-light rounded">
-                                            <i class='bx bx-check text-success me-2 fs-5'></i>
-                                            <small>สำเนาบัตรประชาชน (นักเรียน, บิดา, มารดา)</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-start p-2 bg-light rounded">
-                                            <i class='bx bx-check text-success me-2 fs-5'></i>
-                                            <small>หลักฐานการเปลี่ยนชื่อ-สกุล (ถ้ามี)</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 4: Report to School -->
-                        <div class="timeline-item">
-                            <div class="timeline-icon">
-                                <i class='bx bx-home-heart'></i>
-                                <div class="timeline-number">4</div>
-                            </div>
-                            <div class="timeline-content">
-                                <h5 class="timeline-title">เดินทางมามอบตัวที่โรงเรียน</h5>
-                                <p class="text-muted mb-3">นำเอกสารทั้งหมดมายื่นในวันและเวลาที่กำหนด</p>
-                                <ul class="mb-3 ps-3">
-                                    <li>นักเรียนและผู้ปกครองเดินทางมาโรงเรียนตามวันเวลาที่ระบุในประกาศ</li>
-                                    <li>แต่งกาย <strong>ชุดนักเรียนโรงเรียนเดิม</strong> หรือชุดสุภาพ</li>
-                                    <li>นำเอกสารทั้งหมดมาส่งที่จุดลงทะเบียน</li>
-                                    <li>รับเอกสารและคำแนะนำจากเจ้าหน้าที่</li>
-                                </ul>
-                                <div class="alert alert-danger py-2 px-3 mb-0" role="alert">
-                                    <h6 class="alert-heading fw-bold mb-1 fs-6"><i class='bx bx-error-circle me-1'></i> หมายเหตุสำคัญ</h6>
-                                    <p class="mb-0 small">หากไม่มารายงานตัวและมอบตัวตามวันเวลาที่กำหนด จะถือว่า <strong>"สละสิทธิ์"</strong> การเข้าศึกษาต่อโดยอัตโนมัติ</p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
+        <div class="col-lg-12">
+            
+            <div class="section-title">
+                <div class="icon-box">
+                    <i class='bx bx-list-ol'></i>
                 </div>
-                <div class="card-footer text-center bg-light py-3">
-                    <a href="<?= base_url('new-admission') ?>" class="btn btn-primary btn-lg px-5 rounded-pill">
-                        <i class='bx bx-home-alt me-2'></i> กลับสู่หน้าหลัก
-                    </a>
+                <h3>ขั้นตอนการรายงานตัว</h3>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number-bubble">1</div>
+                    <div class="step-header-text">
+                        <h4>ตรวจสอบรายชื่อและสถานะ</h4>
+                        <p>เช็คผลการคัดเลือกผ่านระบบออนไลน์</p>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <div class="step-instructions">
+                        <ul>
+                            <li>เข้าหน้า <a href="<?= base_url('new-admission/status') ?>" class="fw-bold text-primary">ตรวจสอบสถานะ</a></li>
+                            <li>กรอกเลขบัตรประชาชน และวันเดือนปีเกิด</li>
+                            <li>หากผ่านการคัดเลือก สถานะจะแสดงเป็น <span class="badge bg-success">ผ่านการคัดเลือก</span></li>
+                            <li>หากสถานะเป็น <span class="badge bg-danger">ไม่ผ่านการคัดเลือก</span> จะไม่สามารถรายงานตัวได้</li>
+                        </ul>
+                    </div>
+                    <div class="mockup-wrapper">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><span></span><span></span><span></span></div>
+                            <div class="mockup-url"><i class='bx bx-lock-alt'></i> skj.ac.th/new-admission/status</div>
+                        </div>
+                        <div class="mockup-body">
+                            <div class="mini-card">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="mini-photo-box"><i class='bx bx-user' style="font-size: 1rem; color: #94a3b8;"></i></div>
+                                    <div style="font-size: 0.65rem;">
+                                        <strong>เด็กชาย ทดสอบ มุ่งมั่น</strong><br>
+                                        <span style="color: #166534; font-weight: 600;">ผ่านการคัดเลือก</span>
+                                    </div>
+                                </div>
+                                <div class="mini-btn w-100">รายงานตัวออนไลน์</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Step 2 -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number-bubble">2</div>
+                    <div class="step-header-text">
+                        <h4>รายงานตัวออนไลน์</h4>
+                        <p>ยืนยันสิทธิ์ทางการศึกษาผ่านระบบ</p>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <div class="step-instructions">
+                        <ul>
+                            <li>อ่านรายละเอียดและเงื่อนไขการรายงานตัวให้ครบถ้วน</li>
+                            <li>คลิกปุ่ม <strong>"รายงานตัวออนไลน์"</strong> ในหน้ารายละเอียดข้อมูล</li>
+                            <li>ตรวจสอบข้อมูลส่วนตัวและข้อมูลผู้ปกครอง</li>
+                            <li>กดปุ่มบันทึกเพื่อยืนยันการรายงานตัว</li>
+                        </ul>
+                        <div class="alert alert-warning py-2 px-3 mt-3" style="border-radius: 12px; font-size: 0.85rem;">
+                            <i class='bx bx-time-five me-1'></i> ต้องดำเนินการภายในระยะเวลาที่กำหนดเท่านั้น
+                        </div>
+                    </div>
+                    <div class="mockup-wrapper">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><span></span><span></span><span></span></div>
+                            <div class="mockup-url"><i class='bx bx-lock-alt'></i> skj.ac.th/new-admission/report</div>
+                        </div>
+                        <div class="mockup-body">
+                            <div class="mini-card">
+                                <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 0.5rem;">ยืนยันสิทธิ์การเข้าศึกษา</div>
+                                <div class="mini-form-group">
+                                    <div class="mini-label">ขอยืนยันสิทธิ์เข้าศึกษาต่อ</div>
+                                    <div class="d-flex gap-2">
+                                        <div style="font-size: 0.65rem;"><i class='bx bx-check-circle text-success'></i> ยืนยันสิทธิ์</div>
+                                    </div>
+                                </div>
+                                <div class="mini-btn w-100">บันทึกข้อมูลรายงานตัว</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number-bubble">3</div>
+                    <div class="step-header-text">
+                        <h4>พิมพ์ใบมอบตัว</h4>
+                        <p>ดาวน์โหลดเอกสารสำหรับนำมายื่นที่โรงเรียน</p>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <div class="step-instructions">
+                        <ul>
+                            <li>เมื่อรายงานตัวสำเร็จ ระบบจะแสดงปุ่มสำหรับพิมพ์เอกสาร</li>
+                            <li>คลิกปุ่ม <span class="badge bg-danger">พิมพ์ใบมอบตัว</span> (PDF)</li>
+                            <li>พิมพ์เอกสารใส่กระดาษ A4 เพื่อนำมาส่งในวันมอบตัว</li>
+                        </ul>
+                        <h6 class="fw-bold mt-3 mb-2" style="font-size: 0.9rem;">เอกสารที่ต้องเตรียมเพิ่ม:</h6>
+                        <ul class="small">
+                            <li>ปพ.1 ฉบับจริง + สำเนา</li>
+                            <li>สำเนาทะเบียนบ้าน (นักเรียน/บิดา/มารดา)</li>
+                            <li>สำเนาบัตรประชาชน (นักเรียน/บิดา/มารดา)</li>
+                        </ul>
+                    </div>
+                    <div class="mockup-wrapper">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><span></span><span></span><span></span></div>
+                            <div class="mockup-url"><i class='bx bx-lock-alt'></i> skj.ac.th/new-admission/report-success</div>
+                        </div>
+                        <div class="mockup-body">
+                            <div class="mini-card text-center">
+                                <i class='bx bx-check-circle text-success' style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 0.75rem;">รายงานตัวสำเร็จ!</div>
+                                <div class="mini-btn" style="background: #ef4444; width: 100%;">พิมพ์ใบมอบตัว (PDF)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number-bubble">4</div>
+                    <div class="step-header-text">
+                        <h4>มอบตัว ณ โรงเรียน</h4>
+                        <p>ส่งเอกสารและทำสัญญา ณ หอประชุมโรงเรียน</p>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <div class="step-instructions">
+                        <ul>
+                            <li>เดินทางมาโรงเรียนตามวันเวลาที่กำหนดในประกาศ</li>
+                            <li>แต่งกายด้วย <strong>ชุดนักเรียนเดิม</strong></li>
+                            <li>นำเอกสารทั้งหมด (ข้อ 3) มายื่น ณ จุดลงทะเบียน</li>
+                            <li>หากไม่มาตามกำหนด จะถือว่า <strong>สละสิทธิ์</strong></li>
+                        </ul>
+                    </div>
+                    <div class="mockup-wrapper">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><span></span><span></span><span></span></div>
+                            <div class="mockup-url"><i class='bx bx-map'></i> โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ)</div>
+                        </div>
+                        <div class="mockup-body">
+                            <div class="mini-card">
+                                <div class="text-center py-2">
+                                    <i class='bx bx-buildings' style="font-size: 2rem; color: #696cff;"></i>
+                                    <div style="font-size: 0.65rem; margin-top: 0.5rem; color: #64748b;">วันมอบตัว: ตรวจสอบในประกาศ</div>
+                                    <div style="font-size: 0.7rem; font-weight: 700; color: #334155;">หอประชุมอาคารเจ้าพระยา</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips-box">
+                <h6><i class='bx bx-bulb'></i> คำแนะนำเพิ่มเติม</h6>
+                <ul>
+                    <li>ควรตรวจสอบวันเวลาการรายงานตัวจากประกาศของโรงเรียนอย่างละเอียด</li>
+                    <li>หากมีข้อสงสัยหรือติดปัญหาการใช้งานระบบ ติดต่อได้ที่ <strong>056-009-667</strong></li>
+                </ul>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="<?= base_url('new-admission') ?>" class="btn btn-outline-primary btn-lg rounded-pill px-5">
+                    <i class='bx bx-home-alt me-2'></i> กลับสู่หน้าหลัก
+                </a>
+            </div>
+
         </div>
     </div>
-
 </div>
 <?= $this->endSection() ?>

@@ -24,7 +24,7 @@ class UserControlAdmission extends BaseController
         $this->session = \Config\Services::session();
         $this->timeago = new Timeago();
         $this->datethai = new Datethai();
-        helper(['url', 'form']);
+        helper(['url', 'form', 'upload']);
     }
 
     public function dataAll()
@@ -125,7 +125,7 @@ class UserControlAdmission extends BaseController
         $data['level'] = $level;
         $data['quotas'] = $this->admissionModel->getAllQuotas();
         $data['courses'] = $this->admissionModel->getCoursesByGradeLevel($gradeLevel);
-        $data['remote_base_url'] = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
+        $data['remote_base_url'] = get_upload_base_url();
 
         return view('User/UserEdit', $data);
     }

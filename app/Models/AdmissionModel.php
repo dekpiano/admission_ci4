@@ -7,8 +7,9 @@ use CodeIgniter\Model;
 class AdmissionModel extends Model
 {
     protected $table = 'tb_recruitstudent';
-    protected $primaryKey = 'recruit_id';
+    protected $primaryKey = 'id';
     protected $allowedFields = [
+        'id',
         'recruit_id',
         'recruit_year',
         'recruit_regLevel',

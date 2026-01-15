@@ -19,7 +19,7 @@ class AdminControlCleanup extends BaseController
         $this->db = \Config\Database::connect();
         $this->session = \Config\Services::session();
         $this->remoteUpload = new RemoteUpload();
-        helper(['url', 'form']);
+        helper(['url', 'form', 'upload']);
     }
 
     private function checkAuth()
@@ -216,7 +216,7 @@ class AdminControlCleanup extends BaseController
         }
 
         $db_files = $this->get_db_filenames();
-        $remote_url = "https://skj.nsnpao.go.th/token/list_files.php";
+        $remote_url = get_token_url('list_files.php');
         $token = trim(getenv('upload.secret.token') ?: "Dekpiano2025!!");
 
         $client = \Config\Services::curlrequest();
@@ -402,7 +402,7 @@ class AdminControlCleanup extends BaseController
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 
-        $remote_url = "https://skj.nsnpao.go.th/token/empty_expired_trash.php";
+        $remote_url = get_token_url('empty_expired_trash.php');
         $token = trim(getenv('upload.secret.token') ?: "Dekpiano2025!!");
 
         $client = \Config\Services::curlrequest();

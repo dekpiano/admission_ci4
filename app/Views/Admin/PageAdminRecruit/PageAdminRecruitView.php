@@ -21,6 +21,7 @@
                                 src="<?= base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '') . '/img/' . ($recruit['recruit_img'] ?? 'default.png')) ?>"
                                 height="110" width="110" alt="User avatar" loading="lazy" style="object-fit: cover;"
                                 onerror="this.onerror=null;this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>';">
+
                             <div class="user-info text-center">
                                 <h4 class="mb-2">
                                     <?= esc($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']) ?>

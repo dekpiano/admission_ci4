@@ -573,6 +573,7 @@
                             src="<?= base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . ($recruit['recruit_img'] ?? 'default.png')) ?>"
                             alt="Student Photo"
                             onerror="this.onerror=null;this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>';">
+
                         <div class="photo-edit-btn" onclick="document.getElementById('recruit_img').click()">
                             <i class='bx bx-camera me-1'></i> คลิกเพื่อเปลี่ยนรูปถ่าย
                         </div>

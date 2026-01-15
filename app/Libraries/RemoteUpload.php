@@ -4,276 +4,208 @@ namespace App\Libraries;
 
 class RemoteUpload
 {
-    protected $uploadUrl;
-    protected $deleteUrl;
-    protected $moveToTrashUrl;
-    protected $restoreFromTrashUrl;
-    protected $listTrashUrl;
-    protected $baseUrl;
+    protected $primaryServer = "https://skj.nsnpao.go.th";
+    protected $fallbackServer = "http://118.172.140.151:8000";
+    protected $activeServer = null;
     protected $token;
 
     public function __construct()
     {
-        $baseTokenUrl = "https://skj.nsnpao.go.th/token/";
-        
-        $this->uploadUrl = getenv('upload.server.url') ?: $baseTokenUrl . "upload.php";
-        $this->deleteUrl = getenv('upload.server.delete.url') ?: $baseTokenUrl . "delete.php";
-        $this->moveToTrashUrl = $baseTokenUrl . "move_to_trash.php";
-        $this->restoreFromTrashUrl = $baseTokenUrl . "restore_from_trash.php";
-        $this->listTrashUrl = $baseTokenUrl . "list_trash.php";
-        $this->baseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
+        // Determine which server to use
+        $this->activeServer = $this->getActiveServer();
         $this->token = trim(getenv('upload.secret.token') ?: "Dekpiano2025!!");
     }
 
     /**
-     * Upload a file to the remote server.
-     *
-     * @param \CodeIgniter\HTTP\Files\UploadedFile|string $file The file object or path to file.
-     * @param string $subPath The subdirectory path.
-     * @param string|null $customName Optional custom filename.
-     * @return array|false Returns array with 'status' and 'filename' on success, or false on failure.
+     * Check which server is available and return the active one
      */
+    protected function getActiveServer()
+    {
+        $cacheFile = WRITEPATH . 'cache/active_upload_server.txt';
+        
+        // Try cache first (valid for 5 minutes)
+        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 300) {
+            return trim(file_get_contents($cacheFile));
+        }
+
+        // Try primary first
+        if ($this->isServerAvailable($this->primaryServer)) {
+            $this->cacheActiveServer($cacheFile, $this->primaryServer);
+            return $this->primaryServer;
+        }
+
+        // Fall back to secondary
+        if ($this->isServerAvailable($this->fallbackServer)) {
+            $this->cacheActiveServer($cacheFile, $this->fallbackServer);
+            return $this->fallbackServer;
+        }
+
+        return $this->primaryServer; // Default back to primary
+    }
+
+    protected function isServerAvailable($serverUrl)
+    {
+        try {
+            $ch = curl_init($serverUrl . "/token/upload.php");
+            curl_setopt($ch, CURLOPT_NOBODY, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_errno($ch);
+            curl_close($ch);
+            return ($error === 0 && $httpCode > 0);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    protected function cacheActiveServer($cacheFile, $server)
+    {
+        if (!is_dir(dirname($cacheFile))) {
+            mkdir(dirname($cacheFile), 0755, true);
+        }
+        file_put_contents($cacheFile, $server);
+    }
+
     /**
-     * Upload a file to the remote server.
-     *
-     * @param \CodeIgniter\HTTP\Files\UploadedFile|string $file The file object or path to file.
-     * @param string $subPath The subdirectory path.
-     * @param string|null $customName Optional custom filename.
-     * @return array|false Returns array with 'status' and 'filename' on success, or false on failure.
+     * Unified request handler with fallback support
+     */
+    protected function sendRequest($endpoint, $payload, $isMultipart = false)
+    {
+        $servers = ($this->activeServer === $this->primaryServer) 
+                   ? [$this->primaryServer, $this->fallbackServer] 
+                   : [$this->fallbackServer, $this->primaryServer];
+
+        foreach ($servers as $server) {
+            $url = $server . "/token/" . $endpoint;
+            $result = $this->executeRequest($url, $payload, $isMultipart);
+
+            if ($result['status'] === 'success') {
+                // If we successfully used a different server than currently active, update cache
+                if ($server !== $this->activeServer) {
+                    $this->activeServer = $server;
+                    $this->cacheActiveServer(WRITEPATH . 'cache/active_upload_server.txt', $server);
+                    log_message('info', "RemoteUpload: Switched active server to {$server} due to success after fallback");
+                }
+                return $result['body'];
+            }
+
+            log_message('debug', "RemoteUpload: Request to {$server} failed: " . ($result['message'] ?? 'Unknown error'));
+        }
+
+        return ['status' => 'error', 'message' => 'Both servers failed to process request'];
+    }
+
+    protected function executeRequest($url, $payload, $isMultipart)
+    {
+        try {
+            $client = \Config\Services::curlrequest();
+            $options = [
+                'headers' => [
+                    'X-Auth-Token' => $this->token,
+                    'Authorization' => 'Bearer ' . $this->token
+                ],
+                'http_errors' => false,
+                'verify' => false,
+                'timeout' => 30,
+                'connect_timeout' => 5,
+            ];
+
+            if ($isMultipart) {
+                $options['multipart'] = $payload;
+            } else {
+                $options['headers']['Content-Type'] = 'application/json';
+                $options['body'] = json_encode($payload);
+            }
+
+            $response = $client->post($url, $options);
+            $statusCode = $response->getStatusCode();
+            $body = json_decode($response->getBody(), true);
+
+            if ($statusCode >= 200 && $statusCode < 300 && isset($body['status']) && ($body['status'] === 'success' || $body['status'] === 'partial_success')) {
+                return ['status' => 'success', 'body' => $body];
+            }
+
+            return ['status' => 'error', 'message' => $body['message'] ?? 'Server error'];
+
+        } catch (\Exception $e) {
+            return ['status' => 'error', 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Upload File
      */
     public function upload($file, $subPath, $customName = null)
     {
-        try {
-            $client = \Config\Services::curlrequest();
+        $filePath = ''; $mimeType = ''; $originalName = '';
 
-            $filePath = '';
-            $mimeType = '';
-            $originalName = '';
-
-            if ($file instanceof \CodeIgniter\HTTP\Files\UploadedFile) {
-                if (!$file->isValid()) {
-                    return false;
-                }
-                $filePath = $file->getTempName();
-                $mimeType = $file->getClientMimeType();
-                $originalName = $customName ?: $file->getName();
-            } else {
-                if (!file_exists($file)) {
-                    return false;
-                }
-                $filePath = $file;
-                $mimeType = mime_content_type($file);
-                $originalName = $customName ?: basename($file);
-            }
-
-            $postData = [
-                'path' => $subPath,
-                'file' => new \CURLFile($filePath, $mimeType, $originalName)
-            ];
-            
-            if ($customName) {
-                $postData['desired_filename'] = $customName;
-            }
-
-            $response = $client->post($this->uploadUrl, [
-                'multipart' => $postData,
-                'headers' => [
-                    'X-Auth-Token' => $this->token,
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'http_errors' => false,
-                'verify' => false
-            ]);
-
-            $statusCode = $response->getStatusCode();
-            $body = json_decode($response->getBody(), true);
-
-            if ($statusCode >= 200 && $statusCode < 300 && isset($body['status']) && $body['status'] === 'success') {
-                return $body;
-            } else {
-                log_message('error', 'RemoteUpload Error: ' . ($body['message'] ?? 'Unknown error') . ' Status: ' . $statusCode);
-                return ['status' => 'error', 'message' => $body['message'] ?? 'Upload failed'];
-            }
-
-        } catch (\Exception $e) {
-            log_message('error', 'RemoteUpload Exception: ' . $e->getMessage());
-            return ['status' => 'error', 'message' => 'Connection error'];
+        if ($file instanceof \CodeIgniter\HTTP\Files\UploadedFile) {
+            if (!$file->isValid()) return false;
+            $filePath = $file->getTempName();
+            $mimeType = $file->getClientMimeType();
+            $originalName = $customName ?: $file->getName();
+        } else {
+            if (!file_exists($file)) return false;
+            $filePath = $file;
+            $mimeType = mime_content_type($file);
+            $originalName = $customName ?: basename($file);
         }
+
+        $payload = [
+            'path' => $subPath,
+            'file' => new \CURLFile($filePath, $mimeType, $originalName)
+        ];
+        if ($customName) $payload['desired_filename'] = $customName;
+
+        return $this->sendRequest('upload.php', $payload, true);
     }
 
     /**
-     * Delete files from the remote server.
-     *
-     * @param array|string $files Single filename or array of filenames.
-     * @param string $subPath The subdirectory path.
-     * @return bool True on success, false on failure.
+     * Delete Files
      */
     public function delete($files, $subPath)
     {
-        if (!is_array($files)) {
-            $files = [$files];
-        }
-
-        try {
-            $client = \Config\Services::curlrequest();
-
-            $jsonData = json_encode([
-                'files' => $files,
-                'path' => $subPath
-            ]);
-
-            $response = $client->post($this->deleteUrl, [
-                'body' => $jsonData,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'X-Auth-Token' => $this->token,
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'http_errors' => false,
-                'verify' => false
-            ]);
-
-            $statusCode = $response->getStatusCode();
-            $body = json_decode($response->getBody(), true);
-
-            if ($statusCode >= 200 && $statusCode < 300 && isset($body['status']) && ($body['status'] === 'success' || $body['status'] === 'partial_success')) {
-                return true;
-            }
-
-            log_message('error', 'RemoteUpload Delete Error: ' . ($body['message'] ?? 'Unknown error'));
-            return false;
-
-        } catch (\Exception $e) {
-            log_message('error', 'RemoteUpload Delete Exception: ' . $e->getMessage());
-            return false;
-        }
+        $payload = [
+            'files' => is_array($files) ? $files : [$files],
+            'path' => $subPath
+        ];
+        $result = $this->sendRequest('delete.php', $payload);
+        return isset($result['status']) && ($result['status'] === 'success' || $result['status'] === 'partial_success');
     }
 
     /**
-     * Move files to trash instead of deleting permanently.
-     * Files will be automatically deleted after 30 days.
-     *
-     * @param array|string $files Single filename or array of filenames.
-     * @param string $subPath The subdirectory path.
-     * @return array|false Returns array with status and moved files on success, or false on failure.
+     * Move to Trash
      */
     public function moveToTrash($files, $subPath)
     {
-        if (!is_array($files)) {
-            $files = [$files];
-        }
-
-        try {
-            $client = \Config\Services::curlrequest();
-
-            $jsonData = json_encode([
-                'files' => $files,
-                'path' => $subPath
-            ]);
-
-            $response = $client->post($this->moveToTrashUrl, [
-                'body' => $jsonData,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'X-Auth-Token' => $this->token,
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'http_errors' => false,
-                'verify' => false
-            ]);
-
-            $statusCode = $response->getStatusCode();
-            $body = json_decode($response->getBody(), true);
-
-            if ($statusCode >= 200 && $statusCode < 300 && isset($body['status']) && ($body['status'] === 'success' || $body['status'] === 'partial_success')) {
-                return $body;
-            }
-
-            log_message('error', 'RemoteUpload MoveToTrash Error: ' . ($body['message'] ?? 'Unknown error'));
-            return false;
-
-        } catch (\Exception $e) {
-            log_message('error', 'RemoteUpload MoveToTrash Exception: ' . $e->getMessage());
-            return false;
-        }
+        $payload = [
+            'files' => is_array($files) ? $files : [$files],
+            'path' => $subPath
+        ];
+        return $this->sendRequest('move_to_trash.php', $payload);
     }
 
     /**
-     * Restore a file from trash back to its original location.
-     *
-     * @param string $trashFile The filename in trash.
-     * @param string $trashPath The path within trash directory.
-     * @return array|false Returns array with status on success, or false on failure.
+     * Restore from Trash
      */
-    public function restoreFromTrash($trashFile, $trashPath)
+    public function restoreFromTrash($files, $subPath)
     {
-        try {
-            $client = \Config\Services::curlrequest();
-
-            $jsonData = json_encode([
-                'trash_file' => $trashFile,
-                'trash_path' => $trashPath
-            ]);
-
-            $response = $client->post($this->restoreFromTrashUrl, [
-                'body' => $jsonData,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'X-Auth-Token' => $this->token,
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'http_errors' => false,
-                'verify' => false
-            ]);
-
-            $statusCode = $response->getStatusCode();
-            $body = json_decode($response->getBody(), true);
-
-            if ($statusCode >= 200 && $statusCode < 300 && isset($body['status']) && $body['status'] === 'success') {
-                return $body;
-            }
-
-            log_message('error', 'RemoteUpload RestoreFromTrash Error: ' . ($body['message'] ?? 'Unknown error'));
-            return false;
-
-        } catch (\Exception $e) {
-            log_message('error', 'RemoteUpload RestoreFromTrash Exception: ' . $e->getMessage());
-            return false;
-        }
+        $payload = [
+            'files' => is_array($files) ? $files : [$files],
+            'path' => $subPath
+        ];
+        return $this->sendRequest('restore_from_trash.php', $payload);
     }
 
     /**
-     * List all files in trash.
-     *
-     * @return array|false Returns array with files on success, or false on failure.
+     * List Trash
      */
-    public function listTrash()
+    public function listTrash($subPath = '')
     {
-        try {
-            $client = \Config\Services::curlrequest();
-
-            $response = $client->get($this->listTrashUrl, [
-                'headers' => [
-                    'X-Auth-Token' => $this->token,
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'http_errors' => false,
-                'verify' => false
-            ]);
-
-            $statusCode = $response->getStatusCode();
-            $body = json_decode($response->getBody(), true);
-
-            if ($statusCode >= 200 && $statusCode < 300 && isset($body['status']) && $body['status'] === 'success') {
-                return $body;
-            }
-
-            log_message('error', 'RemoteUpload ListTrash Error: ' . ($body['message'] ?? 'Unknown error'));
-            return false;
-
-        } catch (\Exception $e) {
-            log_message('error', 'RemoteUpload ListTrash Exception: ' . $e->getMessage());
-            return false;
-        }
+        return $this->sendRequest('list_trash.php', ['path' => $subPath]);
     }
 }

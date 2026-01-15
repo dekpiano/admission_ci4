@@ -1161,6 +1161,55 @@
 
 <?= $this->section('content') ?>
 
+<?php if (!empty($systemStatus->onoff_comment)): ?>
+<!-- Announcement Modal -->
+<div class="modal fade" id="announcementModal" tabindex="-1" aria-labelledby="announcementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 25px 50px rgba(0,0,0,0.15);">
+            <!-- Premium Header -->
+            <div class="modal-header border-0" style="background: linear-gradient(135deg, #ff9eb5 0%, #f77062 100%); padding: 1.5rem 2rem;">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                        <i class='bx bxs-megaphone text-white' style="font-size: 1.8rem;"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title text-white fw-bold mb-0" id="announcementModalLabel">
+                            <i class='bx bx-bell-ring me-1'></i> ประกาศแจ้งเตือน
+                        </h5>
+                        <small class="text-white-50">ข้อมูลสำคัญจากทางโรงเรียน</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Modal Body -->
+            <div class="modal-body" style="padding: 2rem;">
+                <div class="alert alert-warning border-0 mb-3" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 14px; padding: 1.25rem;">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class='bx bx-info-circle text-warning' style="font-size: 1.5rem; margin-top: 2px;"></i>
+                        <div class="announcement-content" style="font-size: 1rem; color: #78350f; line-height: 1.7;">
+                            <?= nl2br(esc($systemStatus->onoff_comment)) ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0" style="padding: 1rem 2rem 1.5rem;">
+                <button type="button" class="btn btn-lg w-100" data-bs-dismiss="modal" style="background: linear-gradient(135deg, #ff9eb5 0%, #f77062 100%); color: white; border-radius: 12px; font-weight: 600; padding: 0.8rem;">
+                    <i class='bx bx-check me-1'></i> รับทราบ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
+        announcementModal.show();
+    });
+</script>
+<?php endif; ?>
+
 <!-- Hero Section -->
 <div class="hero-section">
     <!-- Decorative Elements -->

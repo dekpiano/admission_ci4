@@ -1,4 +1,5 @@
 <?= $this->extend('Admin/layout/AdminLayout') ?>
+<?php helper('upload'); ?>
 
 <?= $this->section('content') ?>
 <div class="row">
@@ -217,7 +218,7 @@
                                         <i class="bx bx-error-circle fs-4 me-2 mt-1"></i>
                                         <div>
                                             <strong>ต้องติดตั้ง API บน Server ปลายทาง</strong>
-                                            <p class="mb-2 mt-1">กรุณาอัพโหลดไฟล์ <code>list_files.php</code> ไปที่ Server <code>skj.nsnpao.go.th</code> ตาม path:</p>
+                                            <p class="mb-2 mt-1">กรุณาอัพโหลดไฟล์ <code>list_files.php</code> ไปที่ Server <code><?= get_active_upload_server() ?></code> ตาม path:</p>
                                             <code class="d-block bg-dark text-light p-2 rounded">/token/list_files.php</code>
                                             <p class="mt-2 mb-0"><small>ไฟล์นี้อยู่ในโปรเจคที่ <code>public/token/list_files.php</code></small></p>
                                         </div>
@@ -343,7 +344,7 @@ $(document).ready(function() {
                                 <td><input type="checkbox" class="form-check-input orphan-check" data-name="${file.name}" data-path="${file.path}"></td>
                                 <td class="text-primary">${file.name}</td>
                                 <td><small>${file.path}</small></td>
-                                <td><a href="https://skj.nsnpao.go.th/uploads/${file.path}" target="_blank"><i class="bx bx-link-external"></i></a></td>
+                                <td><a href="<?= get_upload_base_url() ?>${file.path}" target="_blank"><i class="bx bx-link-external"></i></a></td>
                             </tr>`;
                         });
                     } else { 

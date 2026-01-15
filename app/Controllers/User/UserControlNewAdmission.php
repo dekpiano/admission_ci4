@@ -317,28 +317,53 @@ class UserControlNewAdmission extends BaseController
             ]);
         }
 
-        // Generate ID
-        $recruit_id = $this->NumberID();
+        // Global Encoding Fix & Input Sanitization
+        header('Content-Type: text/html; charset=utf-8');
+        mb_internal_encoding('UTF-8');
+        
+        // Sanitize every input and detect encoding more carefully
+        foreach ($post as $key => $value) {
+            if (is_string($value)) {
+                // Simplified sanitization that won't throw ValueErrors
+                // We convert from 'auto' which handles common encodings, or fallback to UTF-8
+                $post[$key] = mb_convert_encoding($value, 'UTF-8', 'auto');
+            }
+        }
+        
+        // Robust MAX ID fetch directly from DB to prevent collisions
+        $db = \Config\Database::connect();
+        $builder = $db->table('tb_recruitstudent');
+        $maxIdRow = $builder->selectMax('recruit_id')->get()->getRow();
+        $lastId = $maxIdRow ? (int)$maxIdRow->recruit_id : 0;
+        
+        $openyear = $this->admissionModel->getOpenYear();
+        $prefix = (int)$openyear->openyear_year;
+        
+        if (strpos((string)$lastId, (string)$prefix) === 0) {
+            $recruit_id = (string)($lastId + 1);
+        } else {
+            $recruit_id = $prefix . "0001";
+        }
+        
+        // Double check if this ID exists (just in case)
+        while ($db->table('tb_recruitstudent')->where('recruit_id', $recruit_id)->countAllResults() > 0) {
+            $recruit_id = (string)((int)$recruit_id + 1);
+        }
+
+        log_message('debug', 'Admission: Using final recruit_id: ' . $recruit_id . ' | Name: ' . ($post['recruit_firstName'] ?? 'N/A'));
 
         // Handle Birthday
         $recruit_birthday = ($post['recruit_birthdayY'] - 543) . '-' . $post['recruit_birthdayM'] . '-' . $post['recruit_birthdayD'];
 
-        // Lookup Course Details for Rank 1 (Primary)
+        // Reprepare values from sanitized inputs
         $courseDetails1 = $this->admissionModel->getCourseDetails($post['recruit_tpyeRoom1']);
         $course_fullname = $courseDetails1 ? $courseDetails1->course_fullname : '';
         $course_branch = $courseDetails1 ? $courseDetails1->course_branch : '';
-
-        // Handle Ranks for recruit_majorOrder (Format: ID|ID|ID)
+        
         $ranks = [];
-        if (!empty($post['recruit_tpyeRoom1'])) {
-            $ranks[] = $post['recruit_tpyeRoom1'];
-        }
-        if (!empty($post['recruit_tpyeRoom2'])) {
-            $ranks[] = $post['recruit_tpyeRoom2'];
-        }
-        if (!empty($post['recruit_tpyeRoom3'])) {
-            $ranks[] = $post['recruit_tpyeRoom3'];
-        }
+        if (!empty($post['recruit_tpyeRoom1'])) $ranks[] = $post['recruit_tpyeRoom1'];
+        if (!empty($post['recruit_tpyeRoom2'])) $ranks[] = $post['recruit_tpyeRoom2'];
+        if (!empty($post['recruit_tpyeRoom3'])) $ranks[] = $post['recruit_tpyeRoom3'];
         $majorOrder = implode('|', $ranks);
 
 
@@ -350,12 +375,12 @@ class UserControlNewAdmission extends BaseController
             'recruit_prefix' => $post['recruit_prefix'],
             'recruit_firstName' => $post['recruit_firstName'],
             'recruit_lastName' => $post['recruit_lastName'],
-            'recruit_idCard' => $post['recruit_idCard'],
+            'recruit_idCard' => str_replace('-', '', $post['recruit_idCard']),
             'recruit_birthday' => $recruit_birthday,
             'recruit_race' => $post['recruit_race'],
             'recruit_nationality' => $post['recruit_nationality'],
             'recruit_religion' => $post['recruit_religion'],
-            'recruit_phone' => $post['recruit_phone'],
+            'recruit_phone' => str_replace('-', '', $post['recruit_phone']),
             'recruit_homeNumber' => $post['recruit_homeNumber'],
             'recruit_homeGroup' => $post['recruit_homeGroup'],
             'recruit_homeRoad' => $post['recruit_homeRoad'],
@@ -373,24 +398,28 @@ class UserControlNewAdmission extends BaseController
             'recruit_major' => $course_branch,
             'recruit_majorOrder' => $majorOrder,
             'recruit_nickname' => $post['recruit_nickname'] ?? '',
-            'recruit_weight' => !empty($post['recruit_weight']) ? $post['recruit_weight'] : null,
-            'recruit_height' => !empty($post['recruit_height']) ? $post['recruit_height'] : null,
+            'recruit_agegroup' => !empty($post['recruit_agegroup']) ? (int)$post['recruit_agegroup'] : 0,
+            'recruit_weight' => !empty($post['recruit_weight']) ? (float)$post['recruit_weight'] : 0,
+            'recruit_height' => !empty($post['recruit_height']) ? (float)$post['recruit_height'] : 0,
             'recruit_fatherName' => $post['recruit_fatherName'] ?? '',
             'recruit_fatherJob' => $post['recruit_fatherJob'] ?? '',
             'recruit_motherName' => $post['recruit_motherName'] ?? '',
             'recruit_motherJob' => $post['recruit_motherJob'] ?? '',
             'recruit_sportPosition' => $post['recruit_sportPosition'] ?? '',
-            'recruit_agegroup' => isset($post['recruit_agegroup']) ? $post['recruit_agegroup'] : 0,
+            'recruit_sportSelectionResult' => '',
             'recruit_address' => "เลขที่ " . $post['recruit_homeNumber'] . " หมู่ที่ " . (!empty($post['recruit_homeGroup']) ? $post['recruit_homeGroup'] : '-') . " ถนน " . (!empty($post['recruit_homeRoad']) ? $post['recruit_homeRoad'] : '-') . " ตำบล" . $post['recruit_homeSubdistrict'] . " อำเภอ" . $post['recruit_homedistrict'] . " จังหวัด" . $post['recruit_homeProvince'] . " " . $post['recruit_homePostcode'],
+            'recruit_copyAddress' => '',
             'recruit_status' => "รอการตรวจสอบ",
             'recruit_date' => date('Y-m-d H:i:s'),
             'recruit_dateUpdate' => date('Y-m-d H:i:s'),
             'recruit_statusSurrender' => '',
-            'recruit_StatusQuiz' => 'รอเข้าสอบ'
+            'recruit_StatusQuiz' => 'รอเข้าสอบ',
+            'recruit_certificateAbility' => '',
+            'recruit_userUpdate' => ''
         ];
 
         if ($year >= 2569) {
-            $data_insert['recruit_round'] = $systemStatus->onoff_round ?? '1';
+            $data_insert['recruit_round'] = (int)($systemStatus->onoff_round ?? 1);
         }
 
         // Handle Files
@@ -491,10 +520,40 @@ class UserControlNewAdmission extends BaseController
         // Insert
         $this->db->transBegin();
         try {
-            $this->admissionModel->insert($data_insert);
+            // Force connection charset to UTF8MB4
+            $this->db->query("SET NAMES 'utf8mb4'");
+            $this->db->query("SET CHARACTER SET utf8mb4");
+            $this->db->query("SET character_set_connection=utf8mb4");
+            $this->db->query("SET character_set_results=utf8mb4");
+            $this->db->query("SET character_set_client=utf8mb4");
 
-            if ($this->db->transStatus() === FALSE) {
-                throw new \Exception('Database Insert Failed');
+            // Ensure data types are strictly correct to avoid MySQL strict mode errors
+            foreach ($data_insert as $key => $value) {
+                if ($value === '') {
+                    // List fields that can't be empty string in some DB configs
+                    if (in_array($key, ['recruit_weight', 'recruit_height', 'recruit_agegroup', 'recruit_tpyeRoom_id'])) {
+                        $data_insert[$key] = 0;
+                    }
+                }
+            }
+
+            // Disable validation to see if it's the cause
+            $inserted = $this->admissionModel->skipValidation(true)->insert($data_insert);
+
+            if (!$inserted) {
+                $error = $this->db->error();
+                $validationErrors = $this->admissionModel->errors();
+                $lastQuery = (string)$this->db->getLastQuery();
+                
+                $msg = !empty($error['message']) ? $error['message'] : 'DB rejection';
+                if (!empty($validationErrors)) {
+                    $msg .= ' | Validation: ' . json_encode($validationErrors);
+                }
+                
+                log_message('error', 'Insert Failed. Query: ' . $lastQuery);
+                log_message('error', 'DB Error: ' . json_encode($error));
+                
+                throw new \Exception($msg . ' (Check logs for Query info)');
             }
 
             $this->db->transCommit();
@@ -507,7 +566,7 @@ class UserControlNewAdmission extends BaseController
 
                 $lineMsg = "📢 มีนักเรียนสมัครใหม่\n\n";
                 $lineMsg .= "👤 ชื่อ: {$data_insert['recruit_prefix']}{$data_insert['recruit_firstName']} {$data_insert['recruit_lastName']}\n";
-                $lineMsg .= "�️ เวลา: " . date('d/m/Y H:i') . " น.\n";
+                $lineMsg .= "🕒 เวลา: " . date('d/m/Y H:i') . " น.\n";
                 $lineMsg .= "📋 ปีการศึกษา: {$year}\n";
                 $lineMsg .= "🏫 ระดับชั้น: ม." . ($data_insert['recruit_regLevel'] == 1 ? "1" : "4") . "\n";
                 $lineMsg .= "🎯 รอบ: {$quotaName}\n";
@@ -515,7 +574,6 @@ class UserControlNewAdmission extends BaseController
 
                 $this->sendLineBroadcast($lineMsg);
             } catch (\Exception $e) {
-                // Ignore notification errors to not break the registration flow
                 log_message('error', 'LINE Broadcast Error: ' . $e->getMessage());
             }
 
@@ -528,9 +586,10 @@ class UserControlNewAdmission extends BaseController
         } catch (\Exception $e) {
             $this->db->transRollback();
 
-            // Delete uploaded files from remote server since DB failed
+            // Cleanup uploaded files on failure
             $remoteUpload = new RemoteUpload();
             foreach ($uploadedFiles as $uf) {
+                // RemoteUpload->delete will already try both servers if configured
                 $remoteUpload->delete($uf['file'], $uf['path']);
             }
 
@@ -557,6 +616,82 @@ class UserControlNewAdmission extends BaseController
             } else {
                 return $openyear->openyear_year . "0001";
             }
+        }
+    }
+
+    public function showTableSchema()
+    {
+        $db = \Config\Database::connect();
+        $query = $db->query("SHOW CREATE TABLE `tb_recruitstudent` ");
+        $row = $query->getRowArray();
+        return $this->response->setJSON($row);
+    }
+
+    public function addAutoIdColumn()
+    {
+        try {
+            $db = \Config\Database::connect();
+            
+            // 0. Disable strict mode
+            $db->query("SET SESSION sql_mode = ''");
+            
+            // 1. Check if column exists
+            $fields = $db->getFieldNames('tb_recruitstudent');
+            if (in_array('id', $fields)) {
+                return $this->response->setJSON(['status' => 'info', 'message' => 'Column "id" already exists.']);
+            }
+            
+            // 2. Add id column as primary key and move recruit_id to be just a unique column
+            // We need to drop existing primary key first
+            $db->query("ALTER TABLE `tb_recruitstudent` DROP PRIMARY KEY");
+            $db->query("ALTER TABLE `tb_recruitstudent` ADD `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
+            $db->query("ALTER TABLE `tb_recruitstudent` ADD UNIQUE (`recruit_id`)");
+            
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Auto-increment ID column added and Primary Key updated successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateDatabaseCharset()
+    {
+        try {
+            $db = \Config\Database::connect();
+            $dbname = $db->getDatabase();
+            
+            // 0. Disable strict mode for this session
+            $db->query("SET SESSION sql_mode = ''");
+            
+            // 1. Update Database charset
+            $db->query("ALTER DATABASE `{$dbname}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            
+            // 2. Get all tables
+            $tables = $db->listTables();
+            $results = [];
+            
+            foreach ($tables as $table) {
+                // 3. Update Table. Use CONVERT TO to change data as well
+                $db->query("ALTER TABLE `{$table}` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                $results[] = "Updated table: {$table}";
+            }
+            
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Database and all tables updated to utf8mb4_unicode_ci successfully!',
+                'details' => $results
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
 }

@@ -28,6 +28,9 @@ $routes->get('new-admission/statistics', 'User\UserControlNewAdmission::statisti
 $routes->get('new-admission/school-search', 'User\UserControlNewAdmission::ajax_school_search'); // Route for Select2 school search
 $routes->post('new-admission/save', 'User\UserControlNewAdmission::save_register');
 $routes->post('new-admission/refresh-captcha', 'User\UserControlNewAdmission::refresh_captcha');
+$routes->get('new-admission/update-db-charset', 'User\UserControlNewAdmission::updateDatabaseCharset');
+$routes->get('new-admission/show-schema', 'User\UserControlNewAdmission::showTableSchema');
+$routes->get('new-admission/add-auto-id', 'User\UserControlNewAdmission::addAutoIdColumn');
 
 // Image Proxy for remote images
 $routes->get('image-proxy', 'User\ImageProxy::index');
