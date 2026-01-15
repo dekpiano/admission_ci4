@@ -412,7 +412,7 @@ foreach ($students ?? [] as $student) {
                             $rClass = ($rStatus == 'ผ่านการตรวจสอบ') ? 'status-approved' : (($rStatus == 'ไม่ผ่าน' || strpos($rStatus, 'ไม่ผ่าน') !== false) ? 'status-rejected' : 'status-pending');
 
                             // Generate avatar
-                            $imgSrc = base_url('image-proxy?file=recruitstudent/m' . ($student->recruit_regLevel ?? '1') . '/img/' . ($student->recruit_img ?? 'default.png'));
+                            $imgSrc = get_recruit_file_url($student->recruit_img ?? 'default.png', $student->recruit_regLevel ?? '1', 'img');
                             $defaultImg = base_url('public/sneat-assets/img/avatars/1.png');
                             ?>
                             <tr data-status="<?= $isConfirmed ? 'confirmed' : 'pending' ?>">

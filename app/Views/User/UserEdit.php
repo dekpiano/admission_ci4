@@ -322,7 +322,7 @@
                                     <div class="card-body text-center p-3">
                                         <div class="mb-3">
                                             <?php
-                                            $student_img_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/img/' . $student['recruit_img']);
+                                            $student_img_path = recruit_image_url($student['recruit_img'], $level, 'img');
                                             $default_img = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
                                             ?>
                                             <img id="preview_img_display"
@@ -635,7 +635,7 @@
                                 <div class="mt-2 text-center">
                                     <?php if (!empty($student['recruit_certificateEdu'])): ?>
                                         <?php
-                                        $file_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/certificate/' . $student['recruit_certificateEdu']);
+                                        $file_path = recruit_document_url($student['recruit_certificateEdu'], $level, 'certificateEdu');
                                         $file_extension = pathinfo($student['recruit_certificateEdu'], PATHINFO_EXTENSION);
                                         ?>
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
@@ -665,7 +665,7 @@
                                 <div class="mt-2 text-center">
                                     <?php if (!empty($student['recruit_certificateEduB'])): ?>
                                         <?php
-                                        $file_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/certificateB/' . $student['recruit_certificateEduB']);
+                                        $file_path = recruit_document_url($student['recruit_certificateEduB'], $level, 'certificateEduB');
                                         $file_extension = pathinfo($student['recruit_certificateEduB'], PATHINFO_EXTENSION);
                                         ?>
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
@@ -696,7 +696,7 @@
                                 <div class="mt-2 text-center">
                                     <?php if (!empty($student['recruit_copyidCard'])): ?>
                                         <?php
-                                        $file_path = base_url('image-proxy?file=recruitstudent/m' . $level . '/copyidCard/' . $student['recruit_copyidCard']);
+                                        $file_path = recruit_document_url($student['recruit_copyidCard'], $level, 'copyidCard');
                                         $file_extension = pathinfo($student['recruit_copyidCard'], PATHINFO_EXTENSION);
                                         ?>
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>

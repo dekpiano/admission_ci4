@@ -18,7 +18,7 @@
                     <div class="user-avatar-section">
                         <div class="d-flex align-items-center flex-column">
                             <img class="img-fluid rounded my-4"
-                                src="<?= base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '') . '/img/' . ($recruit['recruit_img'] ?? 'default.png')) ?>"
+                                src="<?= get_recruit_file_url(($recruit['recruit_img'] ?? 'default.png'), ($recruit['recruit_regLevel'] ?? ''), 'img', true) ?>"
                                 height="110" width="110" alt="User avatar" loading="lazy" style="object-fit: cover;"
                                 onerror="this.onerror=null;this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>';">
 
@@ -288,7 +288,7 @@
                                                 <i class="bx <?= $doc['icon'] ?> bx-lg mb-3 text-secondary"></i>
                                                 <h6 class="card-title"><?= $doc['name'] ?></h6>
                                                 <?php if (!empty($doc['file'])): ?>
-                                                    <a href="<?= base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/' . $doc['folder'] . '/' . $doc['file']) ?>"
+                                                    <a href="<?= get_recruit_file_url($doc['file'], $recruit['recruit_regLevel'], $doc['folder'], true) ?>"
                                                         target="_blank" class="btn btn-sm btn-outline-primary">
                                                         <i class="bx bx-show me-1"></i> ดูเอกสาร
                                                     </a>

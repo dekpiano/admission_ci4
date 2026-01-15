@@ -154,42 +154,32 @@ if (!function_exists('get_recruit_file_url')) {
      * @param string $folder The folder name (img, certificate, certificateB, copyidCard)
      * @return string The full URL to the file
      */
-    function get_recruit_file_url(?string $filename, $level = 1, string $folder = 'img'): string
+    function get_recruit_file_url(?string $filename, $level = 1, string $folder = 'img', bool $forceDirect = false): string
     {
         if (empty($filename)) {
             return base_url('sneat-assets/img/avatars/1.png');
         }
         
         $path = "recruitstudent/m{$level}/{$folder}/{$filename}";
-        
-        // 1. ตรวจสอบว่ามีไฟล์ Local หรือไม่
-        $localPath = FCPATH . 'uploads/admission/' . $path;
+        $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+
+        // 1. ตรวจสอบไฟล์ในเครื่องตัวเองก่อน (ทุกโดเมน)
+        $localPath = FCPATH . 'uploads/' . $path;
         if (file_exists($localPath)) {
-            return base_url('uploads/admission/' . $path);
+            return base_url('uploads/' . $path);
         }
-        
-        // 2. อ่าน Cache ว่า server ไหนใช้งานได้
-        $cacheFile = WRITEPATH . 'cache/active_upload_server.txt';
-        $httpsServer = "https://skj.nsnpao.go.th";
-        $httpServer = "http://118.172.140.151:8000";
-        
-        // ใช้ server จาก cache (ถ้ามีและยังไม่หมดอายุ)
-        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 300) {
-            $cachedServer = trim(file_get_contents($cacheFile));
-            if (!empty($cachedServer)) {
-                return rtrim($cachedServer, '/') . '/uploads/admission/' . $path;
-            }
+
+        // 2. กำหนดเซิร์ฟเวอร์หลักเพียงแห่งเดียว
+        $mainServer = "https://skj.nsnpao.go.th";
+
+        // 3. กรณีอยู่บนเซิร์ฟเวอร์อื่น ให้ไปดึงจากเซิร์ฟเวอร์หลัก
+        if (strpos($currentHost, 'skj.nsnpao.go.th') === false) {
+            return $mainServer . '/uploads/' . $path;
         }
-        
-        // 3. ถ้าไม่มี cache ให้ใช้ HTTPS เป็น default (browser จะโหลดได้)
-        // แต่ถ้า .env มีกำหนดไว้ก็ใช้ .env
-        $envUrl = getenv('upload.server.baseurl');
-        if ($envUrl) {
-            return rtrim($envUrl, '/') . '/' . $path;
-        }
-        
-        // Default: ใช้ HTTPS Server ก่อน
-        return $httpsServer . '/uploads/admission/' . $path;
+
+        // 4. กรณีอยู่บนเซิร์ฟเวอร์หลักแล้วแต่หาไฟล์ไม่เจอ (อาจจะยังไม่ได้ Sync)
+        // ให้ส่งคืน URL ในเครื่องตัวเองไปก่อน (หรือจะใส่ Default Image ก็ได้ครับ)
+        return base_url('uploads/' . $path);
     }
 }
 
@@ -203,7 +193,7 @@ if (!function_exists('recruit_image_url')) {
      * @param string $type The image type: 'img', 'certificate', 'certificateB', 'copyidCard'
      * @return string The full URL to the image
      */
-    function recruit_image_url(?string $filename, $level = 1, string $type = 'img'): string
+    function recruit_image_url(?string $filename, $level = 1, string $type = 'img', bool $forceDirect = false): string
     {
         if (empty($filename)) {
             return base_url('public/assets/img/default-user.png');
@@ -217,9 +207,8 @@ if (!function_exists('recruit_image_url')) {
         ];
         
         $folder = $folderMap[$type] ?? 'img';
-        $path = "recruitstudent/m{$level}/{$folder}/{$filename}";
         
-        return base_url("image-proxy?file=" . urlencode($path));
+        return get_recruit_file_url($filename, $level, $folder, $forceDirect);
     }
 }
 
@@ -232,7 +221,7 @@ if (!function_exists('recruit_document_url')) {
      * @param string $type The document type: 'certificateEdu', 'certificateEduB', 'copyidCard'
      * @return string The full URL to the document
      */
-    function recruit_document_url(?string $filename, $level = 1, string $type = 'certificateEdu'): string
+    function recruit_document_url(?string $filename, $level = 1, string $type = 'certificateEdu', bool $forceDirect = false): string
     {
         if (empty($filename)) {
             return '';
@@ -245,9 +234,8 @@ if (!function_exists('recruit_document_url')) {
         ];
         
         $folder = $folderMap[$type] ?? 'certificate';
-        $path = "recruitstudent/m{$level}/{$folder}/{$filename}";
         
-        return base_url("image-proxy?file=" . urlencode($path));
+        return get_recruit_file_url($filename, $level, $folder, $forceDirect);
     }
 }
 

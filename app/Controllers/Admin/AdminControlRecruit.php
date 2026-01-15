@@ -473,8 +473,8 @@ class AdminControlRecruit extends BaseController
                 $statusClass = 'status-rejected'; // Red
             }
 
-            // Generate avatar with lazy loading - use image-proxy for fallback support
-            $imgSrc = base_url('image-proxy?file=recruitstudent/m' . ($recruit['recruit_regLevel'] ?? '1') . '/img/' . ($recruit['recruit_img'] ?? 'default.png'));
+            // Generate avatar with lazy loading - use direct URL for better browser accessibility
+            $imgSrc = get_recruit_file_url(($recruit['recruit_img'] ?? 'default.png'), ($recruit['recruit_regLevel'] ?? '1'), 'img', true);
             $defaultImg = base_url('sneat-assets/img/avatars/1.png');
             $avatar = '<img src="' . $imgSrc . '" class="recruit-avatar" alt="Avatar" loading="lazy" onerror="this.onerror=null;this.src=\'' . $defaultImg . '\';">';
 
@@ -717,7 +717,7 @@ class AdminControlRecruit extends BaseController
         // Generate HTML
         $html = '';
         $baseUrl = get_upload_base_url();
-        $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . $recruit['recruit_img']);
+        $imgUrl = get_recruit_file_url($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
 
         // Check if this is a sports excellence applicant
         $isSport = (
@@ -994,7 +994,7 @@ class AdminControlRecruit extends BaseController
 
         // Generate HTML - Always use Regular Application Layout
         $html = '';
-        $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . $recruit['recruit_img']);
+        $imgUrl = get_recruit_file_url($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
 
         if (!empty($recruit['recruit_img'])) {
             $html .= '<div style="position:absolute;top:110px;left:680px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';

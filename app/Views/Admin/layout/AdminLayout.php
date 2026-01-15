@@ -157,6 +157,13 @@
               <div data-i18n="Cleanup">จัดการไฟล์ขยะ</div>
             </a>
           </li>
+          
+          <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/local-sync') !== false) ? 'active' : '' ?>">
+            <a href="<?= site_url('skjadmin/local-sync') ?>" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-sync"></i>
+              <div data-i18n="LocalSync">จัดการไฟล์ Local</div>
+            </a>
+          </li>
 
           <li
             class="menu-item <?= (strpos(uri_string(), 'skjadmin/service-area-schools') !== false) ? 'active' : '' ?>">

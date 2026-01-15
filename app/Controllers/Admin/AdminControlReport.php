@@ -99,7 +99,7 @@ class AdminControlReport extends BaseController
 
         $data = [];
         foreach ($students as $student) {
-            $imgSrc = base_url('image-proxy?file=recruitstudent/m' . ($student->recruit_regLevel ?? '1') . '/img/' . ($student->recruit_img ?? 'default.png'));
+            $imgSrc = get_recruit_file_url($student->recruit_img ?? 'default.png', $student->recruit_regLevel ?? '1', 'img');
             
             // Determine if can print based on type
             $canPrint = true;
@@ -596,7 +596,7 @@ class AdminControlReport extends BaseController
         $date_D_birt = (int)date('d', strtotime($confrim->stu_birthDay));
         $date_M_birt = date('n', strtotime($confrim->stu_birthDay));
 
-        $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit->recruit_regLevel . '/img/' . $recruit->recruit_img);
+        $imgUrl = get_recruit_file_url($recruit->recruit_img, $recruit->recruit_regLevel, 'img');
 
         $html = '<div style="position:absolute;top:577px;left:263px; width:100%; font-size:1.5rem">' . $idstu[0] . '</div>';
         $html .= '<div style="position:absolute;top:577px;left:305px; width:100%; font-size:1.5rem">' . $idstu[1] . '</div>';
@@ -962,7 +962,7 @@ class AdminControlReport extends BaseController
         $oldSchool = ($sch[0] == '' && isset($sch[1])) ? $sch[1] : $sch[0];
 
         $html = '';
-        $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit->recruit_regLevel . '/img/' . $recruit->recruit_img);
+        $imgUrl = get_recruit_file_url($recruit->recruit_img, $recruit->recruit_regLevel, 'img');
         
         if (!empty($recruit->recruit_img)) {
             $html .= '<div style="position:absolute;top:90px;left:635px; width:100%"><img style="width: 120px;height:100px;" src="'.$imgUrl.'"></div>';
@@ -1063,7 +1063,7 @@ class AdminControlReport extends BaseController
         $date_D_birt = (int)date('d', strtotime($confrim->stu_birthDay));
         $date_M_birt = date('n', strtotime($confrim->stu_birthDay));
 
-        $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit->recruit_regLevel . '/img/' . $recruit->recruit_img);
+        $imgUrl = get_recruit_file_url($recruit->recruit_img, $recruit->recruit_regLevel, 'img');
 
         // Build HTML (simplified version - similar structure to AdminControlSurrender::print)
         $html = '';

@@ -5,7 +5,7 @@ namespace App\Libraries;
 class RemoteUpload
 {
     // สลับลำดับ: ใช้ HTTP ก่อน (เพราะ HTTPS มีปัญหา SSL)
-    protected $primaryServer = "http://118.172.140.151:8000";
+    protected $primaryServer = "https://skj.nsnpao.go.th";
     protected $fallbackServer = "https://skj.nsnpao.go.th";
     protected $activeServer = null;
     protected $token;
@@ -53,7 +53,7 @@ class RemoteUpload
     protected function isServerAvailable($serverUrl)
     {
         try {
-            $ch = curl_init($serverUrl . "/token/upload.php");
+            $ch = curl_init($serverUrl . "/public/index.php"); // ตรวจสอบผ่านหน้าเว็บปกติ
             curl_setopt($ch, CURLOPT_NOBODY, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 2);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
@@ -144,7 +144,7 @@ class RemoteUpload
     }
 
     /**
-     * Upload File with Local Fallback
+     * Upload File - Intelligent Path Selection
      */
     public function upload($file, $subPath, $customName = null)
     {
@@ -162,22 +162,28 @@ class RemoteUpload
             $originalName = $customName ?: basename($file);
         }
 
-        $payload = [
-            'path' => $subPath,
-            'file' => new \CURLFile($filePath, $mimeType, $originalName)
-        ];
-        if ($customName) $payload['desired_filename'] = $customName;
+        // ตรวจสอบโดเมนที่ใช้งาน
+        $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+        
+        // ถ้าเป็น skj.nsnpao.go.th ให้ส่งไป Remote Server ตามปกติ
+        if (strpos($currentHost, 'skj.nsnpao.go.th') !== false) {
+            $payload = [
+                'path' => $subPath,
+                'file' => new \CURLFile($filePath, $mimeType, $originalName)
+            ];
+            if ($customName) $payload['desired_filename'] = $customName;
 
-        // Try remote upload first
-        $result = $this->sendRequest('upload.php', $payload, true);
-        
-        // If remote upload failed and local fallback is enabled, save locally
-        if (isset($result['status']) && $result['status'] === 'error' && $this->useLocalFallback) {
-            log_message('warning', 'RemoteUpload: Remote servers failed, using local fallback');
-            return $this->uploadLocal($filePath, $subPath, $originalName);
+            $result = $this->sendRequest('upload.php', $payload, true);
+            
+            // หาก Remote ล้มเหลว ให้บันทึกลงเครื่องตัวเองเป็นสำรอง
+            if (isset($result['status']) && $result['status'] === 'error' && $this->useLocalFallback) {
+                return $this->uploadLocal($filePath, $subPath, $originalName);
+            }
+            return $result;
         }
-        
-        return $result;
+
+        // หากเป็นโดเมนอื่น (เช่น admission2.skj.ac.th) ให้บันทึกลงเครื่องตัวเองทันที
+        return $this->uploadLocal($filePath, $subPath, $originalName);
     }
     
     /**
@@ -221,12 +227,24 @@ class RemoteUpload
     }
 
     /**
-     * Delete Files
+     * Delete Files - Handlers both Local and Remote
      */
     public function delete($files, $subPath)
     {
+        $fileList = is_array($files) ? $files : [$files];
+        
+        // 1. ลบจาก Local ก่อน (ถ้ามี)
+        foreach ($fileList as $file) {
+            $localPath = FCPATH . 'uploads/' . $subPath . '/' . $file;
+            if (file_exists($localPath)) {
+                @unlink($localPath);
+                log_message('info', "RemoteUpload: Local file deleted: {$localPath}");
+            }
+        }
+
+        // 2. ส่งคำสั่งไปลบที่ Remote Server ตามปกติ
         $payload = [
-            'files' => is_array($files) ? $files : [$files],
+            'files' => $fileList,
             'path' => $subPath
         ];
         $result = $this->sendRequest('delete.php', $payload);

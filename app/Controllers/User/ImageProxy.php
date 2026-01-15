@@ -8,7 +8,7 @@ class ImageProxy extends BaseController
 {
     // สลับลำดับ: HTTP ก่อน (เพราะ HTTPS มีปัญหา SSL)
     protected $primaryServer = "http://118.172.140.151:8000";
-    protected $fallbackServer = "https://skj.nsnpao.go.th";
+    protected $fallbackServer = "http://118.172.140.151:8000";
     
     public function index()
     {
@@ -116,7 +116,8 @@ class ImageProxy extends BaseController
         try {
             $response = $client->get($fullRemoteUrl, [
                 'headers' => [
-                    'Referer' => '',
+                    'Referer' => base_url(),
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 ],
                 'http_errors' => false,
             ]);
@@ -167,7 +168,7 @@ class ImageProxy extends BaseController
             }
             
             // Not 200, try next server
-            log_message('debug', "ImageProxy: Server {$serverUrl} returned status {$statusCode} for {$fileName}");
+            log_message('error', "ImageProxy: Server {$serverUrl} returned status {$statusCode} for url: {$fullRemoteUrl}");
             return null;
 
         } catch (\Exception $e) {

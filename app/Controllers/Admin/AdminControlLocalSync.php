@@ -40,8 +40,7 @@ class AdminControlLocalSync extends BaseController
     public function checkServerStatus()
     {
         $servers = [
-            'http://118.172.140.151:8000' => 'HTTP Server',
-            'https://skj.nsnpao.go.th' => 'HTTPS Server'
+            'https://skj.nsnpao.go.th' => 'Main Server (skj.nsnpao.go.th)'
         ];
 
         $status = [];
@@ -62,7 +61,7 @@ class AdminControlLocalSync extends BaseController
     protected function isServerAvailable($serverUrl)
     {
         try {
-            $ch = curl_init($serverUrl . "/token/upload.php");
+            $ch = curl_init($serverUrl . "/public/index.php");
             curl_setopt($ch, CURLOPT_NOBODY, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 3);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
@@ -83,7 +82,7 @@ class AdminControlLocalSync extends BaseController
      */
     public function getPendingLocalFiles()
     {
-        $localUploadPath = FCPATH . 'uploads/admission/';
+        $localUploadPath = FCPATH . 'uploads/recruitstudent/';
         $pendingFiles = [];
 
         if (!is_dir($localUploadPath)) {
@@ -283,7 +282,7 @@ class AdminControlLocalSync extends BaseController
     protected function uploadToRemote($filePath, $subPath, $filename, $serverUrl)
     {
         $token = trim(getenv('upload.secret.token') ?: "Dekpiano2025!!");
-        $url = $serverUrl . "/token/upload.php";
+        $url = $serverUrl . "/token/upload.php"; // ยังคงใช้ endpoint เดิมใน server ปลายทาง
 
         try {
             $mimeType = mime_content_type($filePath);

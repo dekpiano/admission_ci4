@@ -140,7 +140,7 @@ class AdminControlSurrender extends BaseController
         $html .= '<div style="position:absolute;top:463px;left:475px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
         $html .= '<div style="position:absolute;top:463px;left:550px; width:100%">' . $date_Y . '</div>';
 
-        $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . base_url('image-proxy?file=recruitstudent/m' . $recruit[0]->recruit_regLevel . '/img/' . $recruit[0]->recruit_img) . '"></div>';
+        $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . get_recruit_file_url($recruit[0]->recruit_img, $recruit[0]->recruit_regLevel, 'img') . '"></div>';
 
         $regLevel = $confrim[0]->stu_regLevel ?? $recruit[0]->recruit_regLevel;
 

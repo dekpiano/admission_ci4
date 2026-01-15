@@ -725,7 +725,7 @@ class UserControlAdmission extends BaseController
 
         // 6. Generate HTML
         $html = '';
-        $imgUrl = base_url('image-proxy?file=recruitstudent/m' . $recruit['recruit_regLevel'] . '/img/' . $recruit['recruit_img']);
+        $imgUrl = get_recruit_file_url($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
 
         if ($isSport) {
             // Layout for Sport Excellence (A4) - Synced with generate_pdf.php coordinates
