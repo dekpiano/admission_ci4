@@ -160,25 +160,25 @@ if (!function_exists('get_recruit_file_url')) {
             return base_url('sneat-assets/img/avatars/1.png');
         }
         
-        $path = "recruitstudent/m{$level}/{$folder}/{$filename}";
+        // พาธที่ถูกต้องในระบบคือ admission/recruitstudent/m...
+        $path = "admission/recruitstudent/m{$level}/{$folder}/{$filename}";
         $currentHost = $_SERVER['HTTP_HOST'] ?? '';
 
-        // 1. ตรวจสอบไฟล์ในเครื่องตัวเองก่อน (ทุกโดเมน)
+        // 1. ตรวจสอบไฟล์ในเครื่องตัวเองก่อน
         $localPath = FCPATH . 'uploads/' . $path;
         if (file_exists($localPath)) {
             return base_url('uploads/' . $path);
         }
 
-        // 2. กำหนดเซิร์ฟเวอร์หลักเพียงแห่งเดียว
+        // 2. กำหนดเซิร์ฟเวอร์หลัก
         $mainServer = "https://skj.nsnpao.go.th";
 
-        // 3. กรณีอยู่บนเซิร์ฟเวอร์อื่น ให้ไปดึงจากเซิร์ฟเวอร์หลัก
+        // 3. กรณีอยู่บนเซิร์ฟเวอร์อื่น (เช่น admission2.skj.ac.th) ให้ไปดึงจากเซิร์ฟเวอร์หลัก
         if (strpos($currentHost, 'skj.nsnpao.go.th') === false) {
             return $mainServer . '/uploads/' . $path;
         }
 
-        // 4. กรณีอยู่บนเซิร์ฟเวอร์หลักแล้วแต่หาไฟล์ไม่เจอ (อาจจะยังไม่ได้ Sync)
-        // ให้ส่งคืน URL ในเครื่องตัวเองไปก่อน (หรือจะใส่ Default Image ก็ได้ครับ)
+        // 4. กรณีอยู่บนเซิร์ฟเวอร์หลักแล้วแต่หาไฟล์ไม่เจอ
         return base_url('uploads/' . $path);
     }
 }

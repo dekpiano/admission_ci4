@@ -11,6 +11,7 @@ class AdminControlReport extends BaseController
     public function __construct()
     {
         $this->db = \Config\Database::connect();
+        helper('upload');
     }
 
     public function index()

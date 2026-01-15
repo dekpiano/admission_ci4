@@ -15,6 +15,7 @@ class AdminControlDashboard extends BaseController
         $this->db = \Config\Database::connect();
         $this->session = \Config\Services::session();
         $this->admissionModel = new \App\Models\AdmissionModel();
+        helper(['url', 'upload']);
     }
 
     public function index($year = null)

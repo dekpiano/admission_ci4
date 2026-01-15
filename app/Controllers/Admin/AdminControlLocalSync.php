@@ -82,7 +82,7 @@ class AdminControlLocalSync extends BaseController
      */
     public function getPendingLocalFiles()
     {
-        $localUploadPath = FCPATH . 'uploads/recruitstudent/';
+        $localUploadPath = FCPATH . 'uploads/admission/recruitstudent/';
         $pendingFiles = [];
 
         if (!is_dir($localUploadPath)) {

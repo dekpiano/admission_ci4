@@ -14,7 +14,7 @@ class AdminControlSurrender extends BaseController
     {
         $this->db = \Config\Database::connect();
         $this->session = \Config\Services::session();
-        helper(['url']);
+        helper(['url', 'upload']);
     }
 
     private function checkAuth()
