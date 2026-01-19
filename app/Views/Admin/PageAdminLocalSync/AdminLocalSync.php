@@ -187,7 +187,39 @@
     </div>
 </div>
 
-<!-- Loading Modal -->
+<!-- Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-cloud-upload me-2"></i>กำลัง Sync ไฟล์</h5>
+            </div>
+            <div class="modal-body py-4">
+                <div class="text-center mb-3">
+                    <div class="display-4 fw-bold text-primary" id="progressPercent">0%</div>
+                    <p class="text-muted mb-0" id="progressText">กำลังเตรียมข้อมูล...</p>
+                </div>
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                         role="progressbar" id="progressBar" 
+                         style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between mt-2 small text-muted">
+                    <span id="progressCurrent">0</span>
+                    <span id="progressTotal">/ 0 ไฟล์</span>
+                </div>
+                <!-- Current file info -->
+                <div class="mt-3 p-2 bg-light rounded" id="currentFileInfo" style="display:none;">
+                    <small class="text-muted"><i class="bi bi-file-earmark me-1"></i>กำลัง sync:</small>
+                    <code class="d-block text-truncate" id="currentFileName"></code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Loading Modal -->
 <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
@@ -240,51 +272,192 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Get all file paths from the table
+function getAllFilePaths() {
+    const paths = [];
+    document.querySelectorAll('#filesTable tbody tr').forEach(row => {
+        const path = row.dataset.path;
+        if (path) paths.push(path);
+    });
+    return paths;
+}
+
 function syncAllFiles() {
+    const filePaths = getAllFilePaths();
+    
+    if (filePaths.length === 0) {
+        Swal.fire('ไม่มีไฟล์', 'ไม่มีไฟล์ที่รอ Sync', 'info');
+        return;
+    }
+    
     Swal.fire({
         title: 'ยืนยันการ Sync',
-        text: 'ต้องการ Sync ไฟล์ทั้งหมดไปยัง Remote Server หรือไม่?',
+        html: `<p>ต้องการ Sync ไฟล์ทั้งหมด <strong>${filePaths.length}</strong> ไฟล์ไปยัง Remote Server หรือไม่?</p>`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#198754',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sync ทั้งหมด',
+        confirmButtonText: '<i class="bi bi-cloud-upload me-1"></i>Sync ทั้งหมด',
         cancelButtonText: 'ยกเลิก'
     }).then((result) => {
         if (result.isConfirmed) {
-            showLoading('กำลัง Sync ไฟล์ทั้งหมด...');
-            
-            fetch('<?= base_url('skjadmin/local-sync/sync-all') ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading();
-                
-                if (data.status === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Sync สำเร็จ!',
-                        text: data.message,
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire('เกิดข้อผิดพลาด', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
-            });
+            syncFilesWithProgress(filePaths);
         }
     });
+}
+
+async function syncFilesWithProgress(filePaths) {
+    const total = filePaths.length;
+    let success = 0;
+    let failed = 0;
+    const failedDetails = [];
+    
+    // Show progress modal
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+    progressModal.show();
+    
+    document.getElementById('progressPercent').textContent = '0%';
+    document.getElementById('progressBar').style.width = '0%';
+    document.getElementById('progressCurrent').textContent = '0';
+    document.getElementById('progressTotal').textContent = `/ ${total} ไฟล์`;
+    document.getElementById('currentFileInfo').style.display = 'block';
+    
+    for (let i = 0; i < total; i++) {
+        const filePath = filePaths[i];
+        const fileName = filePath.split('/').pop();
+        
+        // Update progress text
+        document.getElementById('progressText').textContent = `กำลัง Sync ไฟล์ที่ ${i + 1} จาก ${total}...`;
+        document.getElementById('currentFileName').textContent = fileName;
+        document.getElementById('progressCurrent').textContent = i + 1;
+        
+        try {
+            const formData = new FormData();
+            formData.append('file_path', filePath);
+            
+            const response = await fetch('<?= base_url('skjadmin/local-sync/sync-single') ?>', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                success++;
+                // Remove row from table
+                const row = document.querySelector(`tr[data-path="${filePath}"]`);
+                if (row) row.remove();
+            } else {
+                failed++;
+                failedDetails.push({
+                    filename: fileName,
+                    path: filePath,
+                    error: data.message || 'ไม่ทราบสาเหตุ'
+                });
+            }
+        } catch (error) {
+            failed++;
+            failedDetails.push({
+                filename: fileName,
+                path: filePath,
+                error: error.message || 'Network error'
+            });
+        }
+        
+        // Update progress
+        const percent = Math.round(((i + 1) / total) * 100);
+        document.getElementById('progressPercent').textContent = percent + '%';
+        document.getElementById('progressBar').style.width = percent + '%';
+        
+        // Change progress bar color based on errors
+        if (failed > 0) {
+            document.getElementById('progressBar').classList.remove('bg-success');
+            document.getElementById('progressBar').classList.add('bg-warning');
+        }
+    }
+    
+    // Hide progress modal
+    progressModal.hide();
+    
+    // Update pending count
+    const countBadge = document.getElementById('pendingCount');
+    const currentCount = parseInt(countBadge.textContent);
+    countBadge.textContent = currentCount - success;
+    
+    // Show results
+    showSyncResults(total, success, failed, failedDetails);
+}
+
+function showSyncResults(total, success, failed, failedDetails) {
+    if (failed === 0) {
+        // All success
+        Swal.fire({
+            icon: 'success',
+            title: 'Sync สำเร็จทั้งหมด!',
+            html: `<p class="mb-0">Sync สำเร็จ <strong class="text-success">${success}</strong> ไฟล์</p>`,
+            timer: 2500,
+            showConfirmButton: false
+        }).then(() => {
+            if (success > 0) location.reload();
+        });
+    } else if (success === 0) {
+        // All failed
+        let errorHtml = buildErrorList(failedDetails);
+        Swal.fire({
+            icon: 'error',
+            title: 'Sync ล้มเหลวทั้งหมด!',
+            html: `<p>ไม่สามารถ Sync ได้ <strong class="text-danger">${failed}</strong> ไฟล์</p>${errorHtml}`,
+            width: 600,
+            confirmButtonText: 'ตกลง'
+        });
+    } else {
+        // Partial success
+        let errorHtml = buildErrorList(failedDetails);
+        Swal.fire({
+            icon: 'warning',
+            title: 'Sync บางส่วน',
+            html: `
+                <div class="d-flex justify-content-center gap-4 mb-3">
+                    <div class="text-center">
+                        <div class="display-6 text-success">${success}</div>
+                        <small class="text-muted">สำเร็จ</small>
+                    </div>
+                    <div class="text-center">
+                        <div class="display-6 text-danger">${failed}</div>
+                        <small class="text-muted">ล้มเหลว</small>
+                    </div>
+                </div>
+                ${errorHtml}
+            `,
+            width: 600,
+            confirmButtonText: 'ตกลง'
+        }).then(() => {
+            if (success > 0) location.reload();
+        });
+    }
+}
+
+function buildErrorList(failedDetails) {
+    if (failedDetails.length === 0) return '';
+    
+    let html = `<div class="text-start mt-3" style="max-height: 200px; overflow-y: auto;">
+        <p class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-triangle me-1"></i>รายละเอียดข้อผิดพลาด:</p>
+        <ul class="list-unstyled small">`;
+    
+    failedDetails.forEach((item, index) => {
+        html += `
+            <li class="mb-2 p-2 bg-light rounded">
+                <strong>${index + 1}. ${item.filename}</strong>
+                <br><span class="text-danger"><i class="bi bi-x-circle me-1"></i>${item.error}</span>
+                <br><code class="small text-muted">${item.path}</code>
+            </li>`;
+    });
+    
+    html += '</ul></div>';
+    return html;
 }
 
 function syncSingleFile(filePath) {

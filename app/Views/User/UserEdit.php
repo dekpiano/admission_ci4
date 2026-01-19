@@ -620,7 +620,7 @@
                         </div>
 
                         <div class="alert alert-warning" role="alert">
-                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพเฉพาะฟอร์แมต <b>.jpg, .jpeg, .png</b> หรือ <b>.pdf</b> เท่านั้น (ไม่รองรับไฟล์ HEIC จาก iPhone) ขนาดไม่เกิน 4MB
+                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพเฉพาะฟอร์แมต <b>.jpg, .jpeg, .png</b> เท่านั้น (ไม่รองรับไฟล์ HEIC จาก iPhone)
                         </div>
 
                         <div class="row">
@@ -629,7 +629,7 @@
                                 <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า)
                                     <?= empty($student['recruit_certificateEdu']) ? '<span class="text-danger">*</span>' : '' ?></label>
                                 <input class="form-control" type="file" id="recruit_certificateEdu"
-                                    name="recruit_certificateEdu" accept=".jpg,.jpeg,.png,.pdf"
+                                    name="recruit_certificateEdu" accept=".jpg,.jpeg,.png"
                                     <?= empty($student['recruit_certificateEdu']) ? 'required' : '' ?>
                                     onchange="previewImage(this, 'preview_certificate')">
                                 <div class="mt-2 text-center">
@@ -641,10 +641,6 @@
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
                                             <img id="preview_certificate" src="<?= $file_path ?>" alt="ตัวอย่าง ปพ.1 (หน้า)"
                                                 class="img-thumbnail" style="max-height: 200px;">
-                                        <?php else: ?>
-                                            <i class='bx bxs-file-pdf display-4 text-danger'></i>
-                                            <p class="text-muted small">ไฟล์ปัจจุบัน: <a href="<?= $file_path ?>"
-                                                    target="_blank"><?= esc($student['recruit_certificateEdu']) ?></a></p>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <img id="preview_certificate" src="#" alt="ตัวอย่าง ปพ.1 (หน้า)"
@@ -659,7 +655,7 @@
                                 <label for="recruit_certificateEduB" class="form-label">ปพ.1 (หลัง)
                                     <?= empty($student['recruit_certificateEduB']) ? '<span class="text-danger">*</span>' : '' ?></label>
                                 <input class="form-control" type="file" id="recruit_certificateEduB"
-                                    name="recruit_certificateEduB" accept=".jpg,.jpeg,.png,.pdf"
+                                    name="recruit_certificateEduB" accept=".jpg,.jpeg,.png"
                                     <?= empty($student['recruit_certificateEduB']) ? 'required' : '' ?>
                                     onchange="previewImage(this, 'preview_certificateB')">
                                 <div class="mt-2 text-center">
@@ -671,10 +667,6 @@
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
                                             <img id="preview_certificateB" src="<?= $file_path ?>" alt="ตัวอย่าง ปพ.1 (หลัง)"
                                                 class="img-thumbnail" style="max-height: 200px;">
-                                        <?php else: ?>
-                                            <i class='bx bxs-file-pdf display-4 text-danger'></i>
-                                            <p class="text-muted small">ไฟล์ปัจจุบัน: <a href="<?= $file_path ?>"
-                                                    target="_blank"><?= esc($student['recruit_certificateEduB']) ?></a></p>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <img id="preview_certificateB" src="#" alt="ตัวอย่าง ปพ.1 (หลัง)"
@@ -690,7 +682,7 @@
                                 <label for="recruit_copyidCard" class="form-label">สำเนาบัตรประชาชน
                                     <?= empty($student['recruit_copyidCard']) ? '<span class="text-danger">*</span>' : '' ?></label>
                                 <input class="form-control" type="file" id="recruit_copyidCard"
-                                    name="recruit_copyidCard" accept=".jpg,.jpeg,.png,.pdf"
+                                    name="recruit_copyidCard" accept=".jpg,.jpeg,.png"
                                     <?= empty($student['recruit_copyidCard']) ? 'required' : '' ?>
                                     onchange="previewImage(this, 'preview_idcard')">
                                 <div class="mt-2 text-center">
@@ -702,10 +694,6 @@
                                         <?php if (in_array(strtolower($file_extension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
                                             <img id="preview_idcard" src="<?= $file_path ?>" alt="ตัวอย่างบัตรประชาชน"
                                                 class="img-thumbnail" style="max-height: 200px;">
-                                        <?php else: ?>
-                                            <i class='bx bxs-file-pdf display-4 text-danger'></i>
-                                            <p class="text-muted small">ไฟล์ปัจจุบัน: <a href="<?= $file_path ?>"
-                                                    target="_blank"><?= esc($student['recruit_copyidCard']) ?></a></p>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <img id="preview_idcard" src="#" alt="ตัวอย่างบัตรประชาชน"

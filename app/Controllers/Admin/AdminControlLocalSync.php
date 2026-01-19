@@ -237,16 +237,57 @@ class AdminControlLocalSync extends BaseController
         $subPath = implode('/', $pathParts);
 
         try {
+            log_message('info', "LocalSync: เริ่ม sync ไฟล์ {$filename} ไปยัง {$serverUrl}");
+            log_message('debug', "LocalSync: Full path: {$fullPath}, SubPath: {$subPath}");
+            
+            // ตรวจสอบและ compress รูปภาพที่ใหญ่เกินไป (> 0.9MB เพื่อมุดผ่าน Nginx 1MB)
+            $maxSizeMB = 0.9;
+            $currentSize = filesize($fullPath);
+            $mimeType = mime_content_type($fullPath);
+            $imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            
+            if ($currentSize > ($maxSizeMB * 1024 * 1024) && in_array($mimeType, $imageTypes)) {
+                log_message('info', "LocalSync: ไฟล์ใหญ่เกิน {$maxSizeMB}MB (" . $this->formatFileSize($currentSize) . "), กำลัง compress...");
+                
+                try {
+                    $compressor = new \App\Libraries\ImageCompressor();
+                    $compressor->setMaxFileSize($maxSizeMB)
+                               ->setMaxDimensions(1600, 2000)
+                               ->setJpegQuality(85);
+                    
+                    $compressResult = $compressor->compress($fullPath);
+                    
+                    if ($compressResult['success'] && isset($compressResult['compressed']) && $compressResult['compressed']) {
+                        log_message('info', "LocalSync: Compress สำเร็จ - " . $compressResult['message']);
+                        
+                        // ถ้าแปลงเป็น JPG ให้เปลี่ยนชื่อไฟล์
+                        if (isset($compressResult['output_path']) && $compressResult['output_path'] !== $fullPath) {
+                            // ลบไฟล์เดิม
+                            @unlink($fullPath);
+                            $fullPath = $compressResult['output_path'];
+                            $filename = basename($fullPath);
+                            log_message('info', "LocalSync: เปลี่ยนชื่อไฟล์เป็น {$filename}");
+                        }
+                    }
+                } catch (\Exception $e) {
+                    log_message('warning', "LocalSync: ไม่สามารถ compress ได้: " . $e->getMessage());
+                }
+            }
+            
             // อัปโหลดไป Remote Server
             $result = $this->uploadToRemote($fullPath, $subPath, $filename, $serverUrl);
 
             if ($result && isset($result['status']) && $result['status'] === 'success') {
+                log_message('info', "LocalSync: อัปโหลดสำเร็จ {$filename}");
+                
                 // อัปเดตฐานข้อมูล
                 $dbUpdated = $this->updateDatabaseReferences($filename, $result['filename'] ?? $filename);
+                log_message('debug', "LocalSync: อัปเดต DB {$dbUpdated} records สำหรับ {$filename}");
 
                 // ลบไฟล์ Local
                 if (file_exists($fullPath)) {
                     unlink($fullPath);
+                    log_message('info', "LocalSync: ลบไฟล์ local สำเร็จ {$fullPath}");
                     
                     // ลบ folder ถ้าว่างเปล่า
                     $this->removeEmptyDirectories(dirname($fullPath));
@@ -261,13 +302,23 @@ class AdminControlLocalSync extends BaseController
                 ];
             }
 
+            // Log error details
+            $errorMessage = $result['message'] ?? 'ไม่ทราบสาเหตุ';
+            log_message('error', "LocalSync: อัปโหลดล้มเหลว {$filename}");
+            log_message('error', "LocalSync: Error message: {$errorMessage}");
+            log_message('error', "LocalSync: Full result: " . json_encode($result, JSON_UNESCAPED_UNICODE));
+            
             return [
                 'status' => 'error',
-                'message' => "อัปโหลดล้มเหลว: " . ($result['message'] ?? 'ไม่ทราบสาเหตุ'),
-                'filename' => $filename
+                'message' => "อัปโหลดล้มเหลว: " . $errorMessage,
+                'filename' => $filename,
+                'debug' => $result // เพิ่ม debug info
             ];
 
         } catch (\Exception $e) {
+            log_message('error', "LocalSync: Exception สำหรับ {$filename}: " . $e->getMessage());
+            log_message('error', "LocalSync: Stack trace: " . $e->getTraceAsString());
+            
             return [
                 'status' => 'error',
                 'message' => "Error: " . $e->getMessage(),
@@ -286,13 +337,16 @@ class AdminControlLocalSync extends BaseController
 
         try {
             $mimeType = mime_content_type($filePath);
+            $fileSize = filesize($filePath);
+            
+            log_message('debug', "LocalSync Upload: URL={$url}, File={$filename}, Size=" . $this->formatFileSize($fileSize) . ", MimeType={$mimeType}");
             
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 120); // เพิ่ม timeout สำหรับไฟล์ใหญ่
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'X-Auth-Token: ' . $token,
@@ -307,25 +361,53 @@ class AdminControlLocalSync extends BaseController
             
             curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
             
+            $startTime = microtime(true);
             $response = curl_exec($ch);
+            $endTime = microtime(true);
+            $duration = round($endTime - $startTime, 2);
+            
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlInfo = curl_getinfo($ch);
             $error = curl_error($ch);
+            $errorCode = curl_errno($ch);
             curl_close($ch);
+            
+            log_message('debug', "LocalSync Upload: HTTP={$httpCode}, Duration={$duration}s, Response length=" . strlen($response));
 
             if ($error) {
-                return ['status' => 'error', 'message' => $error];
+                log_message('error', "LocalSync cURL Error [{$errorCode}]: {$error}");
+                log_message('error', "LocalSync cURL Info: " . json_encode([
+                    'url' => $curlInfo['url'],
+                    'http_code' => $httpCode,
+                    'connect_time' => $curlInfo['connect_time'],
+                    'total_time' => $curlInfo['total_time'],
+                    'namelookup_time' => $curlInfo['namelookup_time'],
+                    'primary_ip' => $curlInfo['primary_ip'] ?? 'N/A'
+                ]));
+                
+                // แปลง error code เป็นข้อความที่เข้าใจง่าย
+                $friendlyError = $this->getCurlErrorMessage($errorCode, $error);
+                return ['status' => 'error', 'message' => $friendlyError, 'curl_error' => $error, 'curl_code' => $errorCode];
             }
 
             $result = json_decode($response, true);
             
             if ($httpCode >= 200 && $httpCode < 300 && isset($result['status']) && $result['status'] === 'success') {
+                log_message('info', "LocalSync Upload Success: {$filename} -> Remote in {$duration}s");
                 return $result;
             }
 
-            return ['status' => 'error', 'message' => $result['message'] ?? "HTTP {$httpCode}"];
+            // Log error response
+            log_message('error', "LocalSync Upload Failed: HTTP {$httpCode}");
+            log_message('error', "LocalSync Response: " . substr($response, 0, 500)); // จำกัด log
+            
+            // แปลง HTTP code เป็นข้อความที่เข้าใจง่าย
+            $friendlyMessage = $this->getHttpErrorMessage($httpCode, $result['message'] ?? null);
+            return ['status' => 'error', 'message' => $friendlyMessage, 'http_code' => $httpCode, 'response' => $result];
 
         } catch (\Exception $e) {
-            return ['status' => 'error', 'message' => $e->getMessage()];
+            log_message('error', "LocalSync Upload Exception: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Exception: ' . $e->getMessage()];
         }
     }
 
@@ -423,5 +505,60 @@ class AdminControlLocalSync extends BaseController
         if (in_array($ext, $imageExts)) return 'image';
         if (in_array($ext, $docExts)) return 'document';
         return 'file';
+    }
+
+    /**
+     * แปลง cURL error code เป็นข้อความที่เข้าใจง่าย
+     */
+    protected function getCurlErrorMessage($errorCode, $errorMessage)
+    {
+        $errorMessages = [
+            6  => 'ไม่สามารถเชื่อมต่อ Server ได้ (DNS Resolution Failed)',
+            7  => 'Server ปฏิเสธการเชื่อมต่อ (Connection Refused)',
+            28 => 'หมดเวลาเชื่อมต่อ (Connection Timeout) - Server ตอบสนองช้าหรือไม่พร้อมใช้งาน',
+            35 => 'ปัญหา SSL/TLS Certificate',
+            52 => 'Server ไม่ตอบกลับข้อมูล (Empty Reply)',
+            55 => 'การส่งข้อมูลล้มเหลว (Send Failure) - อาจเป็นปัญหา Network',
+            56 => 'การรับข้อมูลล้มเหลว (Receive Failure)',
+            60 => 'ปัญหา SSL Certificate - ใบรับรองไม่ถูกต้อง',
+        ];
+
+        if (isset($errorMessages[$errorCode])) {
+            return $errorMessages[$errorCode];
+        }
+
+        return "cURL Error [{$errorCode}]: {$errorMessage}";
+    }
+
+    /**
+     * แปลง HTTP status code เป็นข้อความที่เข้าใจง่าย
+     */
+    protected function getHttpErrorMessage($httpCode, $serverMessage = null)
+    {
+        $httpMessages = [
+            400 => 'คำขอไม่ถูกต้อง (Bad Request)',
+            401 => 'ไม่ได้รับอนุญาต - Token ไม่ถูกต้อง',
+            403 => 'ไม่มีสิทธิ์เข้าถึง (Forbidden)',
+            404 => 'ไม่พบ endpoint บน Remote Server (upload.php Not Found)',
+            408 => 'หมดเวลาคำขอ (Request Timeout)',
+            413 => 'ไฟล์ใหญ่เกินไป (Payload Too Large)',
+            429 => 'คำขอมากเกินไป (Too Many Requests)',
+            500 => 'Server ปลายทางมีปัญหา (Internal Server Error)',
+            502 => 'Bad Gateway - Server กลางมีปัญหา',
+            503 => 'Server ไม่พร้อมให้บริการ (Service Unavailable)',
+            504 => 'Gateway Timeout - Server ตอบสนองช้าเกินไป',
+        ];
+
+        // ถ้ามี message จาก server ให้ใช้
+        if (!empty($serverMessage)) {
+            $base = $httpMessages[$httpCode] ?? "HTTP {$httpCode}";
+            return "{$base}: {$serverMessage}";
+        }
+
+        if (isset($httpMessages[$httpCode])) {
+            return $httpMessages[$httpCode];
+        }
+
+        return "HTTP Error {$httpCode}";
     }
 }

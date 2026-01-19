@@ -149,8 +149,9 @@ class RemoteUpload
 
     /**
      * Upload File - Intelligent Path Selection
+     * รองรับการ compress รูปภาพอัตโนมัติเมื่อไฟล์ใหญ่เกินไป
      */
-    public function upload($file, $subPath, $customName = null)
+    public function upload($file, $subPath, $customName = null, $autoCompress = true)
     {
         $filePath = ''; $mimeType = ''; $originalName = '';
 
@@ -166,11 +167,47 @@ class RemoteUpload
             $originalName = $customName ?: basename($file);
         }
 
-        // ตรวจสอบโดเมนที่ใช้งาน
-        $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+        // Auto compress รูปภาพที่ใหญ่เกินไป (> 0.9MB เพื่อให้ผ่านด่าน Nginx 1MB)
+        $maxSizeMB = 0.9;
+        $currentSize = filesize($filePath);
+        $imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         
-        // ถ้าเป็น skj.nsnpao.go.th ให้ส่งไป Remote Server ตามปกติ
-        if (strpos($currentHost, 'skj.nsnpao.go.th') !== false) {
+        if ($autoCompress && $currentSize > ($maxSizeMB * 1024 * 1024) && in_array($mimeType, $imageTypes)) {
+            log_message('info', "RemoteUpload: ไฟล์ใหญ่เกิน {$maxSizeMB}MB (" . $this->formatFileSize($currentSize) . "), กำลัง compress...");
+            
+            try {
+                $compressor = new ImageCompressor();
+                $compressor->setMaxFileSize($maxSizeMB)
+                           ->setMaxDimensions(1600, 2000)  // ขนาดพอดี A4 สำหรับเอกสาร
+                           ->setJpegQuality(85);
+                
+                $result = $compressor->compress($filePath);
+                
+                if ($result['success'] && isset($result['compressed']) && $result['compressed']) {
+                    log_message('info', "RemoteUpload: Compress สำเร็จ - " . $result['message']);
+                    
+                    // ถ้าแปลงเป็น JPG ให้เปลี่ยนชื่อไฟล์ด้วย
+                    if (isset($result['output_path']) && $result['output_path'] !== $filePath) {
+                        $filePath = $result['output_path'];
+                        $mimeType = 'image/jpeg';
+                        // เปลี่ยนนามสกุลไฟล์ใน originalName ด้วย
+                        $originalName = preg_replace('/\.(png|gif|webp)$/i', '.jpg', $originalName);
+                    }
+                }
+            } catch (\Exception $e) {
+                log_message('warning', "RemoteUpload: ไม่สามารถ compress ได้: " . $e->getMessage());
+                // ดำเนินการต่อโดยไม่ compress
+            }
+        }
+
+        // ตรวจสอบว่า Remote Server (skj.nsnpao.go.th) ใช้งานได้หรือไม่
+        // ถ้าใช้ได้ ให้ส่งไป Remote เป็นหลัก
+        // ถ้าไม่ได้ ให้เก็บไฟล์ที่ server ตัวเอง (local fallback)
+        
+        $remoteServerAvailable = $this->isServerAvailable($this->primaryServer);
+        
+        if ($remoteServerAvailable) {
+            // Remote server ใช้งานได้ - ส่งไป Remote
             $payload = [
                 'path' => $subPath,
                 'file' => new \CURLFile($filePath, $mimeType, $originalName)
@@ -179,14 +216,23 @@ class RemoteUpload
 
             $result = $this->sendRequest('upload.php', $payload, true);
             
-            // หาก Remote ล้มเหลว ให้บันทึกลงเครื่องตัวเองเป็นสำรอง
-            if (isset($result['status']) && $result['status'] === 'error' && $this->useLocalFallback) {
+            // หาก Remote ส่งสำเร็จ ให้ return ผลลัพธ์
+            if (isset($result['status']) && $result['status'] === 'success') {
+                log_message('info', 'RemoteUpload: File uploaded to remote server: ' . $this->primaryServer);
+                return $result;
+            }
+            
+            // หาก Remote ล้มเหลว และเปิดใช้ local fallback
+            if ($this->useLocalFallback) {
+                log_message('warning', 'RemoteUpload: Remote upload failed, falling back to local storage');
                 return $this->uploadLocal($filePath, $subPath, $originalName);
             }
+            
             return $result;
         }
-
-        // หากเป็นโดเมนอื่น (เช่น admission2.skj.ac.th) ให้บันทึกลงเครื่องตัวเองทันที
+        
+        // Remote server ใช้งานไม่ได้ - เก็บไฟล์ที่ server ตัวเอง
+        log_message('warning', 'RemoteUpload: Remote server unavailable (' . $this->primaryServer . '), saving locally');
         return $this->uploadLocal($filePath, $subPath, $originalName);
     }
     
@@ -285,5 +331,18 @@ class RemoteUpload
     public function listTrash($subPath = '')
     {
         return $this->sendRequest('list_trash.php', ['path' => $subPath]);
+    }
+
+    /**
+     * Format file size for logging
+     */
+    protected function formatFileSize($bytes)
+    {
+        if ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        }
+        return $bytes . ' B';
     }
 }

@@ -790,7 +790,7 @@
                         </div>
 
                         <div class="alert alert-warning" role="alert">
-                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพเฉพาะฟอร์แมต <b>.jpg, .jpeg, .png</b> หรือ <b>.pdf</b> เท่านั้น (ไม่รองรับไฟล์ HEIC จาก iPhone)
+                            <i class='bx bx-info-circle me-1'></i> กรุณาอัปโหลดไฟล์ภาพเฉพาะฟอร์แมต <b>.jpg, .jpeg, .png</b> เท่านั้น (ไม่รองรับไฟล์ HEIC จาก iPhone)
                         </div>
 
                         <div class="row">
@@ -799,7 +799,7 @@
                                 <label for="recruit_certificateEdu" class="form-label">ปพ.1 (หน้า) <span
                                         class="text-danger">*</span></label>
                                 <input class="form-control" type="file"
-                                    name="recruit_certificateEdu" accept=".jpg,.jpeg,.png,.pdf" required
+                                    name="recruit_certificateEdu" accept=".jpg,.jpeg,.png" required
                                     onchange="previewImage(this, 'preview_certificate')">
                                 <div class="mt-2 text-center">
                                     <img id="preview_certificate" src="#" alt="ตัวอย่าง ปพ.1 (หน้า)"
@@ -811,7 +811,7 @@
                                 <label for="recruit_certificateEduB" class="form-label">ปพ.1 (หลัง) <span
                                         class="text-danger">*</span></label>
                                 <input class="form-control" type="file" id="recruit_certificateEduB"
-                                    name="recruit_certificateEduB" accept=".jpg,.jpeg,.png,.pdf" required
+                                    name="recruit_certificateEduB" accept=".jpg,.jpeg,.png" required
                                     onchange="previewImage(this, 'preview_certificateB')">
                                 <div class="mt-2 text-center">
                                     <img id="preview_certificateB" src="#" alt="ตัวอย่าง ปพ.1 (หลัง)"
@@ -823,7 +823,7 @@
                                 <label for="recruit_copyidCard" class="form-label">สำเนาบัตรประชาชน <span
                                         class="text-danger">*</span></label>
                                 <input class="form-control" type="file" id="recruit_copyidCard"
-                                    name="recruit_copyidCard" accept=".jpg,.jpeg,.png,.pdf" required
+                                    name="recruit_copyidCard" accept=".jpg,.jpeg,.png" required
                                     onchange="previewImage(this, 'preview_idcard')">
                                 <div class="mt-2 text-center">
                                     <img id="preview_idcard" src="#" alt="ตัวอย่างบัตรประชาชน"
@@ -1141,7 +1141,7 @@
         if (input.files && input.files[0]) {
             const file = input.files[0];
             // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            const allowedTypes = ['image/jpeg', 'image/png'];
             if (!allowedTypes.includes(file.type)) {
                 console.error('Invalid file type selected:', file.type);
                 Swal.fire({

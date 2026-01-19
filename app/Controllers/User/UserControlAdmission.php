@@ -175,10 +175,10 @@ class UserControlAdmission extends BaseController
                 'recruit_grade' => 'required|decimal|greater_than_equal_to[0]|less_than_equal_to[4.00]',
                 // File fields are optional for update if a new one isn't uploaded
                 'recruit_img_cropped' => 'permit_empty',
-                'recruit_certificateEdu' => 'if_exist|max_size[recruit_certificateEdu,4096]|ext_in[recruit_certificateEdu,jpg,jpeg,png,pdf]',
-                'recruit_copyidCard' => 'if_exist|max_size[recruit_copyidCard,4096]|ext_in[recruit_copyidCard,jpg,jpeg,png,pdf]',
-                'recruit_certificateEduB' => 'if_exist|max_size[recruit_certificateEduB,4096]|ext_in[recruit_certificateEduB,jpg,jpeg,png,pdf]',
-                'recruit_copyAddress' => 'if_exist|max_size[recruit_copyAddress,4096]|ext_in[recruit_copyAddress,jpg,jpeg,png,pdf]',
+                'recruit_certificateEdu' => 'if_exist|ext_in[recruit_certificateEdu,jpg,jpeg,png]',
+                'recruit_copyidCard' => 'if_exist|ext_in[recruit_copyidCard,jpg,jpeg,png]',
+                'recruit_certificateEduB' => 'if_exist|ext_in[recruit_certificateEduB,jpg,jpeg,png]',
+                'recruit_copyAddress' => 'if_exist|ext_in[recruit_copyAddress,jpg,jpeg,png]',
             ];
 
             if (!$this->validate($rules)) {
@@ -450,10 +450,10 @@ class UserControlAdmission extends BaseController
 
                 // Added server-side validation for files during initial registration
                 $fileRules = [
-                    'recruit_certificateEdu' => 'uploaded[recruit_certificateEdu]|max_size[recruit_certificateEdu,4096]|ext_in[recruit_certificateEdu,jpg,jpeg,png,pdf]',
-                    'recruit_copyidCard' => 'uploaded[recruit_copyidCard]|max_size[recruit_copyidCard,4096]|ext_in[recruit_copyidCard,jpg,jpeg,png,pdf]',
-                    'recruit_certificateEduB' => 'uploaded[recruit_certificateEduB]|max_size[recruit_certificateEduB,4096]|ext_in[recruit_certificateEduB,jpg,jpeg,png,pdf]',
-                    'recruit_copyAddress' => 'uploaded[recruit_copyAddress]|max_size[recruit_copyAddress,4096]|ext_in[recruit_copyAddress,jpg,jpeg,png,pdf]',
+                    'recruit_certificateEdu' => 'uploaded[recruit_certificateEdu]|ext_in[recruit_certificateEdu,jpg,jpeg,png]',
+                    'recruit_copyidCard' => 'uploaded[recruit_copyidCard]|ext_in[recruit_copyidCard,jpg,jpeg,png]',
+                    'recruit_certificateEduB' => 'uploaded[recruit_certificateEduB]|ext_in[recruit_certificateEduB,jpg,jpeg,png]',
+                    'recruit_copyAddress' => 'uploaded[recruit_copyAddress]|ext_in[recruit_copyAddress,jpg,jpeg,png]',
                 ];
 
                 if (!$this->validate($fileRules)) {
