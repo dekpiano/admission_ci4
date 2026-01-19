@@ -120,7 +120,7 @@ class AdminControlLocalSync extends BaseController
     public function syncAll()
     {
         if (!$this->request->isAJAX()) {
-            return redirect()->to('admin/local-sync');
+            return redirect()->to('skjadmin/local-sync');
         }
 
         // ตรวจสอบว่ามี server พร้อมใช้งานหรือไม่
@@ -171,7 +171,7 @@ class AdminControlLocalSync extends BaseController
     public function syncSingle()
     {
         if (!$this->request->isAJAX()) {
-            return redirect()->to('admin/local-sync');
+            return redirect()->to('skjadmin/local-sync');
         }
 
         $filePath = $this->request->getPost('file_path');

@@ -729,7 +729,11 @@ class AdminControlRecruit extends BaseController
 
         if ($isSport) {
             // Layout for Sport Excellence (A4) - Synced with UserControlAdmission coordinates
-            $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ_sport.pdf', true);
+            $sportPdfTemplate = FCPATH . 'uploads/recruitstudent/registerSKJ_sport.pdf';
+            if (!file_exists($sportPdfTemplate)) {
+                return "ไม่พบไฟล์ Template PDF กีฬา: " . $sportPdfTemplate;
+            }
+            $mpdf->SetDocTemplate($sportPdfTemplate, true);
             $mpdf->AddPage();
 
             // Image (173, 10, 30, 40)
@@ -917,7 +921,11 @@ class AdminControlRecruit extends BaseController
                 $html .= '<div style="position:absolute;top:788px;left:560px; width:100%;">' . $checkEmoji . '</div>';
             }
 
-            $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ.pdf', true);
+            $regularPdfTemplate = FCPATH . 'uploads/recruitstudent/registerSKJ.pdf';
+            if (!file_exists($regularPdfTemplate)) {
+                return "ไม่พบไฟล์ Template PDF ปกติ: " . $regularPdfTemplate;
+            }
+            $mpdf->SetDocTemplate($regularPdfTemplate, true);
         }
 
         $mpdf->WriteHTML($html);
@@ -1066,7 +1074,11 @@ class AdminControlRecruit extends BaseController
             $html .= '<div style="position:absolute;top:788px;left:560px; width:100%;">' . $checkEmoji . '</div>';
         }
 
-        $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ.pdf', true);
+        $regularPdfTemplate = FCPATH . 'uploads/recruitstudent/registerSKJ.pdf';
+        if (!file_exists($regularPdfTemplate)) {
+            return "ไม่พบไฟล์ Template PDF ปกติ: " . $regularPdfTemplate;
+        }
+        $mpdf->SetDocTemplate($regularPdfTemplate, true);
         $mpdf->WriteHTML($html);
 
         $this->response->setHeader('Content-Type', 'application/pdf');

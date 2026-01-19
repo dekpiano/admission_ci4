@@ -37,8 +37,8 @@ if (!function_exists('get_active_upload_server')) {
      */
     function get_active_upload_server(): string
     {
-        // สลับลำดับ: HTTP ก่อน
-        $primaryServer = "http://118.172.140.151:8000";
+        // อ่านค่า server จาก .env
+        $primaryServer = getenv('upload.server.host') ?: "https://skj.nsnpao.go.th";
         
         // Check cache first (same cache as RemoteUpload library)
         $cacheFile = WRITEPATH . 'cache/active_upload_server.txt';
@@ -169,9 +169,10 @@ if (!function_exists('get_recruit_file_url')) {
             return base_url('uploads/' . $fullPath);
         }
 
-        // 2. กรณีพิเศษ: หากต้องการลิงก์ตรงจาก IP จริงๆ (ข้าม Proxy)
+        // 2. กรณีพิเศษ: หากต้องการลิงก์ตรง (ข้าม Proxy)
         if ($forceDirect) {
-            return "http://118.172.140.151:8000/uploads/admission/" . $subPath;
+            $baseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
+            return rtrim($baseUrl, '/') . '/' . $subPath;
         }
 
         // 3. ใช้ Image Proxy เป็นตัวช่วยหลัก (สำรองกรณีโดเมนหลักล่ม)

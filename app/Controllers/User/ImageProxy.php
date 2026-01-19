@@ -6,9 +6,15 @@ use App\Controllers\BaseController;
 
 class ImageProxy extends BaseController
 {
-    // ใช้ IP เป็นตัวหลัก (สำหรับช่วงที่โดเมนหลักล่ม) และใช้โดเมนหลักเป็นตัวสำรอง
-    protected $primaryServer = "http://118.172.140.151:8000";
-    protected $fallbackServer = "https://skj.nsnpao.go.th";
+    // อ่านค่า server จาก .env
+    protected $primaryServer;
+    protected $fallbackServer;
+    
+    public function __construct()
+    {
+        $this->primaryServer = getenv('upload.server.host') ?: "https://skj.nsnpao.go.th";
+        $this->fallbackServer = $this->primaryServer; // ใช้ server เดียวกัน
+    }
     
     public function index()
     {

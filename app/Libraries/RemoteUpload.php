@@ -4,15 +4,19 @@ namespace App\Libraries;
 
 class RemoteUpload
 {
-    // สลับลำดับ: ใช้ HTTP ก่อน (เพราะ HTTPS มีปัญหา SSL)
-    protected $primaryServer = "https://skj.nsnpao.go.th";
-    protected $fallbackServer = "https://skj.nsnpao.go.th";
+    // อ่านค่า server จาก .env
+    protected $primaryServer;
+    protected $fallbackServer;
     protected $activeServer = null;
     protected $token;
     protected $useLocalFallback = true; // เปิดใช้ local fallback
 
     public function __construct()
     {
+        // อ่านค่า server จาก .env
+        $this->primaryServer = getenv('upload.server.host') ?: "https://skj.nsnpao.go.th";
+        $this->fallbackServer = $this->primaryServer; // ใช้ server เดียวกัน
+        
         // Determine which server to use
         $this->activeServer = $this->getActiveServer();
         $this->token = trim(getenv('upload.secret.token') ?: "Dekpiano2025!!");

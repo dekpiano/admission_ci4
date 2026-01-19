@@ -729,7 +729,11 @@ class UserControlAdmission extends BaseController
 
         if ($isSport) {
             // Layout for Sport Excellence (A4) - Synced with generate_pdf.php coordinates
-            $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ_sport.pdf', true);
+            $sportPdfTemplate = FCPATH . 'uploads/recruitstudent/registerSKJ_sport.pdf';
+            if (!file_exists($sportPdfTemplate)) {
+                return "ไม่พบไฟล์ Template PDF กีฬา: " . $sportPdfTemplate;
+            }
+            $mpdf->SetDocTemplate($sportPdfTemplate, true);
             $mpdf->AddPage();
 
             // Image (173, 10, 30, 40)
@@ -848,7 +852,11 @@ class UserControlAdmission extends BaseController
 
         } else {
             // Layout for Regular Application (registerSKJ.pdf)
-            $mpdf->SetDocTemplate('uploads/recruitstudent/registerSKJ.pdf', true);
+            $regularPdfTemplate = FCPATH . 'uploads/recruitstudent/registerSKJ.pdf';
+            if (!file_exists($regularPdfTemplate)) {
+                return "ไม่พบไฟล์ Template PDF ปกติ: " . $regularPdfTemplate;
+            }
+            $mpdf->SetDocTemplate($regularPdfTemplate, true);
             $mpdf->AddPage();
 
             if (!empty($recruit['recruit_img'])) {

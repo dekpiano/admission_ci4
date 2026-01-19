@@ -254,7 +254,7 @@ function syncAllFiles() {
         if (result.isConfirmed) {
             showLoading('กำลัง Sync ไฟล์ทั้งหมด...');
             
-            fetch('<?= base_url('admin/local-sync/sync-all') ?>', {
+            fetch('<?= base_url('skjadmin/local-sync/sync-all') ?>', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -293,7 +293,7 @@ function syncSingleFile(filePath) {
     const formData = new FormData();
     formData.append('file_path', filePath);
     
-    fetch('<?= base_url('admin/local-sync/sync-single') ?>', {
+    fetch('<?= base_url('skjadmin/local-sync/sync-single') ?>', {
         method: 'POST',
         body: formData,
         headers: {
@@ -348,7 +348,7 @@ function stopAutoSync() {
 }
 
 function checkAndSync() {
-    fetch('<?= base_url('admin/local-sync/api-check-status') ?>')
+    fetch('<?= base_url('skjadmin/local-sync/api-check-status') ?>')
         .then(response => response.json())
         .then(data => {
             document.getElementById('lastCheck').textContent = data.checked_at;
@@ -358,7 +358,7 @@ function checkAndSync() {
                 console.log('Auto sync triggered: ' + data.pending_files + ' files pending');
                 
                 // Perform sync
-                fetch('<?= base_url('admin/local-sync/sync-all') ?>', {
+                fetch('<?= base_url('skjadmin/local-sync/sync-all') ?>', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

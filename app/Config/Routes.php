@@ -119,6 +119,12 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($rou
     $routes->get('news', 'AdminControlNews::index');
     $routes->get('news/add', 'AdminControlNews::add');
 
+    // Local Sync (Compatibility)
+    $routes->get('local-sync', 'AdminControlLocalSync::index');
+    $routes->post('local-sync/sync-all', 'AdminControlLocalSync::syncAll');
+    $routes->post('local-sync/sync-single', 'AdminControlLocalSync::syncSingle');
+    $routes->get('local-sync/api-check-status', 'AdminControlLocalSync::apiCheckStatus');
+
     $routes->get('logout', 'AdminControlAdmission::logout');
 });
 
