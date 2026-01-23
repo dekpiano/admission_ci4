@@ -137,6 +137,19 @@ class AdminControlRecruit extends BaseController
 
         $majorOrderStr = implode('|', $majorOrder);
 
+        // Combine birthday split fields (Match User side UI split)
+        // Handle birthday: can be from single field (Admin Flatpickr) or split fields (User select)
+        $birthday = $this->request->getPost('recruit_birthday');
+        
+        if (empty($birthday)) {
+            $birthD = $this->request->getPost('recruit_birthdayD');
+            $birthM = $this->request->getPost('recruit_birthdayM');
+            $birthY = (int)$this->request->getPost('recruit_birthdayY');
+            if ($birthD && $birthM && $birthY) {
+                $birthday = ($birthY - 543) . '-' . $birthM . '-' . $birthD;
+            }
+        }
+
         // Get first course as primary for backward compatibility
         $courseId = $course1;
         $courseName = '';
@@ -152,7 +165,7 @@ class AdminControlRecruit extends BaseController
             'recruit_prefix' => $this->request->getPost('recruit_prefix'),
             'recruit_firstName' => $this->request->getPost('recruit_firstName'),
             'recruit_lastName' => $this->request->getPost('recruit_lastName'),
-            'recruit_birthday' => $this->request->getPost('recruit_birthday'),
+            'recruit_birthday' => $birthday,
             'recruit_phone' => $this->request->getPost('recruit_phone'),
             'recruit_oldSchool' => $this->request->getPost('recruit_oldSchool'),
             'recruit_grade' => $this->request->getPost('recruit_grade'),
@@ -194,7 +207,25 @@ class AdminControlRecruit extends BaseController
             'recruit_copyAddress' => 'copyAddress',
         ];
 
+        // Handle direct cropped image (Base64 from Cropper.js)
+        $croppedImg = $this->request->getPost('recruit_img_cropped');
+        if (!empty($croppedImg)) {
+            $subPath = 'admission/recruitstudent/m' . $regLevel . '/img';
+            $remoteUpload = new \App\Libraries\RemoteUpload();
+            $result = $remoteUpload->uploadBase64($croppedImg, $subPath, 'student_photo_' . $id);
+            if ($result && $result['status'] === 'success') {
+                $data['recruit_img'] = $result['filename'];
+                // Delete old file if exists
+                if (!empty($currentRecruit['recruit_img'])) {
+                    $remoteUpload->delete($currentRecruit['recruit_img'], $subPath);
+                }
+            }
+        }
+
         foreach ($fileFields as $field => $folder) {
+            // Skip recruit_img if already handled by cropper
+            if ($field === 'recruit_img' && !empty($croppedImg)) continue;
+            
             $file = $this->request->getFile($field);
             if ($file && $file->isValid() && !$file->hasMoved()) {
                 $subPath = 'admission/recruitstudent/m' . $regLevel . '/' . $folder;
@@ -736,7 +767,7 @@ class AdminControlRecruit extends BaseController
             $mpdf->SetDocTemplate($sportPdfTemplate, true);
             $mpdf->AddPage();
 
-            // Image (173, 10, 30, 40)
+            // Image (168, 10, 30, 40) - Adjusted to be further right but still safe
             if (!empty($recruit['recruit_img'])) {
                 $mpdf->Image($imgUrl, 173, 10, 30, 40);
             }
@@ -853,7 +884,7 @@ class AdminControlRecruit extends BaseController
         } else {
             // Layout for Regular Application (registerSKJ.pdf)
             if (!empty($recruit['recruit_img'])) {
-                $html .= '<div style="position:absolute;top:110px;left:680px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
+                $html .= '<div style="position:absolute;top:110px;left:620px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
             }
 
             $quotaDisplay = $recruit['quota_explain'];
@@ -1005,7 +1036,7 @@ class AdminControlRecruit extends BaseController
         $imgUrl = get_recruit_file_url($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
 
         if (!empty($recruit['recruit_img'])) {
-            $html .= '<div style="position:absolute;top:110px;left:680px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
+            $html .= '<div style="position:absolute;top:110px;left:620px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
         }
 
         $quotaDisplay = $recruit['quota_explain'];

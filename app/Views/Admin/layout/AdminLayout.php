@@ -25,9 +25,41 @@
       font-family: 'K2D', sans-serif !important;
     }
 
+    :root {
+      --bs-primary: #28a745;
+      --bs-primary-rgb: 40, 167, 69;
+    }
+
+    .btn-primary {
+      background-color: #28a745 !important;
+      border-color: #28a745 !important;
+    }
+
+    .btn-primary:hover {
+      background-color: #218838 !important;
+      border-color: #1e7e34 !important;
+    }
+
+    .text-primary {
+      color: #28a745 !important;
+    }
+
+    .bg-primary {
+      background-color: #28a745 !important;
+    }
+
+    .bg-label-primary {
+        background-color: rgba(40, 167, 69, 0.1) !important;
+        color: #28a745 !important;
+    }
+
     /* SweetAlert2 Highest Priority */
     .swal2-container {
       z-index: 100000 !important;
+    }
+
+    .swal2-styled.swal2-confirm {
+        background-color: #28a745 !important;
     }
   </style>
 
