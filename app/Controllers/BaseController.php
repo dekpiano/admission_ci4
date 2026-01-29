@@ -127,4 +127,228 @@ abstract class BaseController extends Controller
     {
         return $this->sendLineBroadcast($message, $token);
     }
+
+
+
+    /**
+     * ส่งทั้ง LINE Broadcast และ LINE Push ไปยัง Admin ที่ลงทะเบียน
+     * @param string $message ข้อความที่จะส่ง
+     * @param string $eventType ประเภท event เช่น 'new_applicant'
+     * @return array ผลลัพธ์การส่ง
+     */
+    protected function sendLineAll($message, $eventType = 'new_applicant')
+    {
+        $results = [
+            'broadcast' => false,
+            'push' => []
+        ];
+
+        // Don't send if running on localhost
+        if (isset($_SERVER['HTTP_HOST']) && in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
+            log_message('debug', 'LINE All skipped (localhost)');
+            return $results;
+        }
+
+        // ส่ง LINE Push ไปยัง Admin ที่ลงทะเบียน
+        try {
+            $results['push'] = $this->sendLinePushToAdmins($message, $eventType);
+        } catch (\Exception $e) {
+            log_message('error', 'LINE Push Error: ' . $e->getMessage());
+        }
+
+        // ถ้าไม่มี Admin ลงทะเบียน ให้ fallback ไป Broadcast
+        if (empty($results['push']) || (isset($results['push']['status']) && $results['push']['status'] === 'no_admins')) {
+            try {
+                $results['broadcast'] = $this->sendLineBroadcast($message);
+            } catch (\Exception $e) {
+                log_message('error', 'LINE Broadcast Error: ' . $e->getMessage());
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * ส่ง LINE Push Message ไปยัง Admin ที่ลงทะเบียนไว้
+     * @param string $message ข้อความที่จะส่ง
+     * @param string $eventType ประเภท event
+     * @return array ผลลัพธ์การส่ง
+     */
+    protected function sendLinePushToAdmins($message, $eventType = 'new_applicant')
+    {
+        // ดึงรายการ Admin ที่ลงทะเบียนและเปิดรับแจ้งเตือน
+        $adminUserIds = $this->getLineAdminUserIds($eventType);
+
+        if (empty($adminUserIds)) {
+            log_message('info', 'LINE Push: No admins registered for event: ' . $eventType);
+            return ['status' => 'no_admins', 'message' => 'ไม่มี Admin ลงทะเบียนรับแจ้งเตือน'];
+        }
+
+        // ส่ง Multicast (ส่งครั้งเดียวไปหลายคน)
+        return $this->sendLineMulticast($adminUserIds, $message);
+    }
+
+    /**
+     * ส่ง LINE Multicast Message (ส่งถึงหลายคนพร้อมกัน)
+     * @param array $userIds รายการ LINE User ID
+     * @param string $message ข้อความ
+     * @return array ผลลัพธ์
+     */
+    protected function sendLineMulticast($userIds, $message)
+    {
+        $token = getenv('LINE_CHANNEL_ACCESS_TOKEN') ?: 'J5jOTH9S0h8Kye0s6SIoPWv+fLT0J4+K7ozXYM7xV7yZRjGt/ggNhJPck/fddEIj0S5D/P5FJvWYD8cFP4wPPoi3DpvGwbxVeecGrRQpx4dbE/VBaIqXAPnR7Ix7/qDYhO006+qD9qpWu64Y31FN+gdB04t89/1O/w1cDnyilFU=';
+
+        if (empty($token)) {
+            return ['status' => 'error', 'message' => 'No channel access token'];
+        }
+
+        // Multicast รองรับสูงสุด 500 คนต่อครั้ง
+        $chunks = array_chunk($userIds, 500);
+        $results = [];
+
+        foreach ($chunks as $chunk) {
+            $data = [
+                'to' => $chunk,
+                'messages' => [
+                    [
+                        'type' => 'text',
+                        'text' => $message
+                    ]
+                ]
+            ];
+
+            $ch = curl_init('https://api.line.me/v2/bot/message/multicast');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token
+            ]);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
+            $result = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($error) {
+                $results[] = ['status' => 'error', 'message' => $error];
+            } elseif ($httpCode !== 200) {
+                $results[] = ['status' => 'error', 'http_code' => $httpCode, 'response' => $result];
+            } else {
+                $results[] = ['status' => 'success', 'count' => count($chunk)];
+            }
+        }
+
+        $successCount = array_sum(array_map(function ($r) {
+            return isset($r['count']) ? $r['count'] : 0;
+        }, $results));
+
+        log_message('info', 'LINE Multicast sent to ' . $successCount . ' admins');
+
+        return [
+            'status' => 'success',
+            'total_sent' => $successCount,
+            'details' => $results
+        ];
+    }
+
+    /**
+     * ดึงรายการ LINE User ID ของ Admin ที่ลงทะเบียน
+     * @param string $eventType ประเภท event
+     * @return array รายการ User ID
+     */
+    protected function getLineAdminUserIds($eventType = null)
+    {
+        try {
+            $db = \Config\Database::connect();
+
+            // ตรวจสอบว่ามีตารางหรือไม่
+            if (!$db->tableExists('tb_line_admins')) {
+                return [];
+            }
+
+            $builder = $db->table('tb_line_admins')
+                ->where('line_status', 1)
+                ->select('line_user_id, line_events');
+
+            $admins = $builder->get()->getResult();
+
+            $userIds = [];
+            foreach ($admins as $admin) {
+                // ถ้าระบุ eventType ให้ตรวจสอบว่า Admin นี้รับ event นี้หรือไม่
+                if ($eventType && !empty($admin->line_events)) {
+                    $events = json_decode($admin->line_events, true);
+                    if (is_array($events) && !in_array($eventType, $events)) {
+                        continue;
+                    }
+                }
+                $userIds[] = $admin->line_user_id;
+            }
+
+            return $userIds;
+        } catch (\Exception $e) {
+            log_message('error', 'Error getting LINE admin user IDs: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * ส่ง LINE Push Message ถึงคนเดียว
+     * @param string $userId LINE User ID
+     * @param string $message ข้อความ
+     * @return array ผลลัพธ์
+     */
+    protected function sendLinePush($userId, $message)
+    {
+        $token = getenv('LINE_CHANNEL_ACCESS_TOKEN') ?: 'J5jOTH9S0h8Kye0s6SIoPWv+fLT0J4+K7ozXYM7xV7yZRjGt/ggNhJPck/fddEIj0S5D/P5FJvWYD8cFP4wPPoi3DpvGwbxVeecGrRQpx4dbE/VBaIqXAPnR7Ix7/qDYhO006+qD9qpWu64Y31FN+gdB04t89/1O/w1cDnyilFU=';
+
+        if (empty($token)) {
+            return ['status' => 'error', 'message' => 'No channel access token'];
+        }
+
+        $data = [
+            'to' => $userId,
+            'messages' => [
+                [
+                    'type' => 'text',
+                    'text' => $message
+                ]
+            ]
+        ];
+
+        $ch = curl_init('https://api.line.me/v2/bot/message/push');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
+        $result = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            log_message('error', 'LINE Push CURL Error: ' . $error);
+            return ['status' => 'error', 'message' => 'CURL Error: ' . $error];
+        }
+
+        if ($httpCode !== 200) {
+            $responseData = json_decode($result, true);
+            $errorMsg = $responseData['message'] ?? $result;
+            log_message('error', 'LINE Push Error: HTTP ' . $httpCode . ' - ' . $result);
+            return ['status' => 'error', 'message' => 'HTTP ' . $httpCode . ': ' . $errorMsg];
+        }
+
+        log_message('info', 'LINE Push sent successfully to: ' . $userId);
+        return ['status' => 'success', 'message' => 'ส่งสำเร็จ'];
+    }
 }
+

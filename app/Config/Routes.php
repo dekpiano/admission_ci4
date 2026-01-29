@@ -234,7 +234,25 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('local-sync/sync-single', 'AdminControlLocalSync::syncSingle');
     $routes->get('local-sync/api-check-status', 'AdminControlLocalSync::apiCheckStatus');
 
+    // Notifications
+    $routes->get('notifications/get', 'AdminControlNotification::getNotifications');
+    $routes->get('notifications/count', 'AdminControlNotification::getUnreadCount');
+    $routes->post('notifications/read/(:num)', 'AdminControlNotification::markAsRead/$1');
+    $routes->post('notifications/read-all', 'AdminControlNotification::markAllAsRead');
+    $routes->get('notifications/cleanup', 'AdminControlNotification::cleanup');
+
+    // LINE Notify Management
+    $routes->get('line-notify', 'AdminControlLineNotify::index');
+    $routes->post('line-notify/add-manual', 'AdminControlLineNotify::addManual');
+    $routes->post('line-notify/delete/(:num)', 'AdminControlLineNotify::delete/$1');
+    $routes->post('line-notify/toggle-status', 'AdminControlLineNotify::toggleStatus');
+    $routes->post('line-notify/test/(:num)', 'AdminControlLineNotify::test/$1');
+    $routes->post('line-notify/create-table', 'AdminControlLineNotify::createTable');
+
 });
+
+// LINE Webhook (Public - ไม่ต้อง login)
+$routes->post('api/line/webhook', 'Api\LineWebhook::webhook');
 
 // Compatibility / Legacy Routes (Mapping old CI3 controller names to new CI4 controllers)
 $routes->post('admin/Control_admin_admission/DataRecruitment', 'Admin\AdminControlAdmission::DataRecruitment');

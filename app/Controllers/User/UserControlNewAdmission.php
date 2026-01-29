@@ -558,13 +558,13 @@ class UserControlNewAdmission extends BaseController
 
             $this->db->transCommit();
 
-            // --- LINE OA Broadcast Notification ---
+            // --- LINE Notifications (OA Broadcast + LINE Notify) ---
             try {
                 // Get quota name
                 $quotaInfo = $this->admissionModel->getQuotaByKey($data_insert['recruit_category']);
                 $quotaName = $quotaInfo ? $quotaInfo->quota_explain : 'ทั่วไป';
 
-                $lineMsg = "📢 มีนักเรียนสมัครใหม่\n\n";
+                $lineMsg = "\n📢 มีนักเรียนสมัครใหม่\n\n";
                 $lineMsg .= "👤 ชื่อ: {$data_insert['recruit_prefix']}{$data_insert['recruit_firstName']} {$data_insert['recruit_lastName']}\n";
                 $lineMsg .= "🕒 เวลา: " . date('d/m/Y H:i') . " น.\n";
                 $lineMsg .= "📋 ปีการศึกษา: {$year}\n";
@@ -572,9 +572,18 @@ class UserControlNewAdmission extends BaseController
                 $lineMsg .= "🎯 รอบ: {$quotaName}\n";
                 $lineMsg .= "📚 แผนการเรียน: {$data_insert['recruit_tpyeRoom']}";
 
-                $this->sendLineBroadcast($lineMsg);
+                // ส่งทั้ง LINE OA Broadcast และ LINE Notify
+                $this->sendLineAll($lineMsg);
             } catch (\Exception $e) {
-                log_message('error', 'LINE Broadcast Error: ' . $e->getMessage());
+                log_message('error', 'LINE Notification Error: ' . $e->getMessage());
+            }
+
+            // --- Create Admin Notification ---
+            try {
+                $notificationModel = new \App\Models\Admin\NotificationModel();
+                $notificationModel->createApplicantNotification($data_insert);
+            } catch (\Exception $e) {
+                log_message('error', 'Notification Error: ' . $e->getMessage());
             }
 
             return $this->response->setJSON([

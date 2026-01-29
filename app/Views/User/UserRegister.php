@@ -380,21 +380,20 @@
                                         <!-- Will be populated by JS -->
                                     </div>
 
-
                                     <div class="row mb-3">
-                                        <div class="col-sm-12">
-                                            <label for="recruit_sportPosition" class="form-label">สมัครชนิดกีฬาในตำแหน่ง
-                                                <span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class='bx bx-trophy'></i></span>
-                                                <input type="text" class="form-control sport-field"
-                                                    data-field="recruit_sportPosition" id="recruit_sportPosition_input"
-                                                    placeholder="ระบุตำแหน่งที่สมัคร (เช่น กองหน้า, ผู้รักษาประตู)">
-                                            </div>
-                                            <div class="form-text text-muted small">* ระบุเฉพาะกีฬาฟุตบอล/ฟุตซอล
-                                                กีฬาชนิดอื่นใส่เครื่องหมาย -</div>
-                                        </div>
-                                    </div>
+                                         <div class="col-sm-12">
+                                             <label for="recruit_sportPosition" class="form-label">สมัครชนิดกีฬาในตำแหน่ง
+                                                 <span class="text-danger">*</span></label>
+                                             <div class="input-group">
+                                                 <span class="input-group-text"><i class='bx bx-trophy'></i></span>
+                                                 <input type="text" class="form-control sport-field"
+                                                     data-field="recruit_sportPosition" id="recruit_sportPosition_input"
+                                                     placeholder="ระบุตำแหน่งที่สมัคร (เช่น กองหน้า, ผู้รักษาประตู)">
+                                             </div>
+                                             <div class="form-text text-muted small">* ระบุเฉพาะกีฬาฟุตบอล/ฟุตซอล
+                                                 กีฬาชนิดอื่นใส่เครื่องหมาย -</div>
+                                         </div>
+                                     </div>
 
                                     <div class="row mb-3">
                                         <div class="col-sm-4">

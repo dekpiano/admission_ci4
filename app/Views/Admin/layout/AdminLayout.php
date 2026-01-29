@@ -207,6 +207,12 @@
 
 
           <?php if (session()->get('status') === 'superadmin'): ?>
+            <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/line-notify') !== false) ? 'active' : '' ?>">
+              <a href="<?= site_url('skjadmin/line-notify') ?>" class="menu-link">
+                <i class="menu-icon tf-icons bx bxl-line" style="color: #00c300;"></i>
+                <div data-i18n="LineNotify">LINE Notify</div>
+              </a>
+            </li>
             <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/users') !== false) ? 'active' : '' ?>">
               <a href="<?= site_url('skjadmin/users') ?>" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-user-check"></i>
@@ -245,6 +251,10 @@
               $posRow = $builderPos->get()->getRow();
               $userPosition = $posRow ? $posRow->admin_rloes_academic_position : '';
               ?>
+              
+              <!-- Notification Bell -->
+              <?= $this->include('Admin/layout/_navbar_notifications') ?>
+              
               <li class="nav-item navbar-dropdown dropdown-user dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                   <div class="avatar avatar-online">
