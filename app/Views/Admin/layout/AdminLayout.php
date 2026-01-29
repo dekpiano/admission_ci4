@@ -122,8 +122,9 @@
             </a>
           </li>
 
+          <!-- ========== ข้อมูลการรับสมัคร ========== -->
           <li class="menu-header small text-uppercase">
-            <span class="menu-header-text">Apps</span>
+            <span class="menu-header-text">ข้อมูลการรับสมัคร</span>
           </li>
 
           <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/recruits') !== false) ? 'active' : '' ?>">
@@ -149,30 +150,27 @@
 
           <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/reports') !== false) ? 'active' : '' ?>">
             <a href="<?= site_url('skjadmin/reports') ?>" class="menu-link">
-              <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
+              <i class="menu-icon tf-icons bx bx-printer"></i>
               <div data-i18n="Reports">รายงาน/พิมพ์</div>
             </a>
           </li>
+
+          <!-- ========== จัดการข้อมูลหลัก ========== -->
           <li class="menu-header small text-uppercase">
-            <span class="menu-header-text">System</span>
+            <span class="menu-header-text">จัดการข้อมูลหลัก</span>
           </li>
 
-          <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/settings') !== false) ? 'active' : '' ?>">
-            <a href="<?= site_url('skjadmin/settings') ?>" class="menu-link">
-              <i class="menu-icon tf-icons bx bx-cog"></i>
-              <div data-i18n="Settings">ตั้งค่าเปิดปิดรับสมัคร</div>
-            </a>
-          </li>
           <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/quotas') !== false) ? 'active' : '' ?>">
             <a href="<?= site_url('skjadmin/quotas') ?>" class="menu-link">
               <i class="menu-icon tf-icons bx bx-collection"></i>
-              <div data-i18n="Quotas">การจัดการโควต้า</div>
+              <div data-i18n="Quotas">จัดการโควต้า</div>
             </a>
           </li>
+
           <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/courses') !== false) ? 'active' : '' ?>">
             <a href="<?= site_url('skjadmin/courses') ?>" class="menu-link">
               <i class="menu-icon tf-icons bx bx-book"></i>
-              <div data-i18n="Courses">การจัดการหลักสูตร</div>
+              <div data-i18n="Courses">จัดการหลักสูตร</div>
             </a>
           </li>
 
@@ -180,6 +178,34 @@
             <a href="<?= site_url('skjadmin/schedules') ?>" class="menu-link">
               <i class="menu-icon tf-icons bx bx-calendar-event"></i>
               <div data-i18n="Schedules">จัดการกำหนดการ</div>
+            </a>
+          </li>
+
+          <li
+            class="menu-item <?= (strpos(uri_string(), 'skjadmin/service-area-schools') !== false) ? 'active' : '' ?>">
+            <a href="<?= site_url('skjadmin/service-area-schools') ?>" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-map-pin"></i>
+              <div data-i18n="ServiceArea">โรงเรียนในเขตพื้นที่</div>
+            </a>
+          </li>
+
+          <li
+            class="menu-item <?= (strpos(uri_string(), 'skjadmin/schools') !== false && strpos(uri_string(), 'service-area-schools') === false) ? 'active' : '' ?>">
+            <a href="<?= site_url('skjadmin/schools') ?>" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-building"></i>
+              <div data-i18n="Schools">จัดการข้อมูลโรงเรียน</div>
+            </a>
+          </li>
+
+          <!-- ========== ตั้งค่าระบบ ========== -->
+          <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">ตั้งค่าระบบ</span>
+          </li>
+
+          <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/settings') !== false) ? 'active' : '' ?>">
+            <a href="<?= site_url('skjadmin/settings') ?>" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-cog"></i>
+              <div data-i18n="Settings">เปิด/ปิดรับสมัคร</div>
             </a>
           </li>
 
@@ -197,22 +223,19 @@
             </a>
           </li>
 
-          <li
-            class="menu-item <?= (strpos(uri_string(), 'skjadmin/service-area-schools') !== false) ? 'active' : '' ?>">
-            <a href="<?= site_url('skjadmin/service-area-schools') ?>" class="menu-link">
-              <i class="menu-icon tf-icons bx bx-map-pin"></i>
-              <div data-i18n="ServiceArea">โรงเรียนในเขตพื้นที่</div>
-            </a>
-          </li>
-
-
+          <!-- ========== ผู้ดูแลระบบ (Superadmin Only) ========== -->
           <?php if (session()->get('status') === 'superadmin'): ?>
+            <li class="menu-header small text-uppercase">
+              <span class="menu-header-text">ผู้ดูแลระบบ</span>
+            </li>
+
             <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/line-notify') !== false) ? 'active' : '' ?>">
               <a href="<?= site_url('skjadmin/line-notify') ?>" class="menu-link">
                 <i class="menu-icon tf-icons bx bxl-line" style="color: #00c300;"></i>
                 <div data-i18n="LineNotify">LINE Notify</div>
               </a>
             </li>
+
             <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/users') !== false) ? 'active' : '' ?>">
               <a href="<?= site_url('skjadmin/users') ?>" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-user-check"></i>
@@ -367,7 +390,8 @@
 
   <script>
     $(document).ready(function () {
-      $('form').on('submit', function () {
+      // Skip forms with 'ajax-form' class or 'data-ajax' attribute - they handle their own button states
+      $('form:not(.ajax-form):not([data-ajax])').on('submit', function () {
         var $form = $(this);
         // Check HTML5 validation
         if ($form[0].checkValidity()) {

@@ -205,6 +205,17 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('service-area-schools/add', 'AdminServiceAreaSchools::add');
     $routes->post('service-area-schools/delete/(:num)', 'AdminServiceAreaSchools::delete/$1');
 
+    // School Management (All Schools Database)
+    $routes->get('schools', 'AdminControlSchool::index');
+    $routes->add('schools/ajax', 'AdminControlSchool::getSchoolsAjax');
+    $routes->get('schools/get/(:num)', 'AdminControlSchool::getSchool/$1');
+    $routes->post('schools/add', 'AdminControlSchool::add');
+    $routes->post('schools/update/(:num)', 'AdminControlSchool::update/$1');
+    $routes->post('schools/delete/(:num)', 'AdminControlSchool::delete/$1');
+    $routes->get('schools/provinces', 'AdminControlSchool::getProvinces');
+    $routes->get('schools/amphurs', 'AdminControlSchool::getAmphurs');
+    $routes->get('schools/districts', 'AdminControlSchool::getDistricts');
+
     // Schedule Management
     $routes->get('schedules', 'AdminControlSchedule::index');
     $routes->post('schedules/get', 'AdminControlSchedule::getSchedules');
