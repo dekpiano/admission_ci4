@@ -192,6 +192,16 @@ class AdminControlRecruit extends BaseController
             'recruit_dateUpdate' => date('Y-m-d H:i:s'),
             'recruit_userUpdate' => session()->get('pers_id'),
             'recruit_sportSelectionResult' => $this->request->getPost('recruit_sportSelectionResult'),
+            // Sport fields (for athlete applicants)
+            'recruit_agegroup' => $this->request->getPost('recruit_agegroup') ?: null,
+            'recruit_sportPosition' => $this->request->getPost('recruit_sportPosition') ?: null,
+            'recruit_nickname' => $this->request->getPost('recruit_nickname') ?: null,
+            'recruit_weight' => $this->request->getPost('recruit_weight') ?: null,
+            'recruit_height' => $this->request->getPost('recruit_height') ?: null,
+            'recruit_fatherName' => $this->request->getPost('recruit_fatherName') ?: null,
+            'recruit_motherName' => $this->request->getPost('recruit_motherName') ?: null,
+            'recruit_fatherJob' => $this->request->getPost('recruit_fatherJob') ?: null,
+            'recruit_motherJob' => $this->request->getPost('recruit_motherJob') ?: null,
         ];
 
         $currentRecruit = $model->find($id);

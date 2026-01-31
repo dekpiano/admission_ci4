@@ -223,8 +223,10 @@ class UserControlAdmission extends BaseController
                 'recruit_grade' => $post['recruit_grade'],
                 'recruit_category' => $post['recruit_category'],
                 'recruit_tpyeRoom' => $courseDetails1 ? $courseDetails1->course_fullname : '',
+                'recruit_tpyeRoom_id' => !empty($post['recruit_tpyeRoom1']) ? $post['recruit_tpyeRoom1'] : null, // เพิ่ม field นี้ที่ขาดหายไป
                 'recruit_major' => $courseDetails1 ? $courseDetails1->course_branch : '',
                 'recruit_majorOrder' => $majorOrder,
+                'recruit_address' => "เลขที่ " . $post['recruit_homeNumber'] . " หมู่ที่ " . (!empty($post['recruit_homeGroup']) ? $post['recruit_homeGroup'] : '-') . " ถนน " . (!empty($post['recruit_homeRoad']) ? $post['recruit_homeRoad'] : '-') . " ตำบล" . $post['recruit_homeSubdistrict'] . " อำเภอ" . $post['recruit_homedistrict'] . " จังหวัด" . $post['recruit_homeProvince'] . " " . $post['recruit_homePostcode'],
                 'recruit_status' => 'รอการตรวจสอบ', // Set status back to pending
                 'recruit_dateUpdate' => date('Y-m-d H:i:s'),
             ];
@@ -259,7 +261,7 @@ class UserControlAdmission extends BaseController
             $file_fields_upload = ['recruit_certificateEdu', 'recruit_certificateEduB', 'recruit_copyidCard'];
             $folder_map = [
                 'recruit_certificateEdu' => 'certificate',
-                'recruit_certificateEduB' => 'certificate',
+                'recruit_certificateEduB' => 'certificateB',
                 'recruit_copyidCard' => 'copyidCard',
             ];
 
