@@ -34,6 +34,15 @@ class AdminControlRecruit extends BaseController
         $data['rounds'] = $model->select('recruit_round')->distinct()->orderBy('recruit_round', 'ASC')->findColumn('recruit_round') ?? ['1'];
         if(empty($data['rounds'])) $data['rounds'] = ['1'];
 
+        // Get quotas for filter dropdown
+        $data['quotas'] = $model->getAllQuotas();
+        
+        // Get courses for filter dropdown
+        $data['courses'] = $model->getAllCourses();
+        
+        // Get distinct regLevels for filter dropdown
+        $data['regLevels'] = $model->select('recruit_regLevel')->distinct()->orderBy('recruit_regLevel', 'ASC')->findColumn('recruit_regLevel') ?? ['1', '4'];
+
         $data['years'] = $years;
         $data['selected_year'] = $selectedYear;
         $data['title'] = 'ข้อมูลผู้สมัคร';
@@ -420,6 +429,11 @@ class AdminControlRecruit extends BaseController
         $year = $request->getVar('year') ?? date('Y');
         $statusFilter = $request->getVar('status_filter') ?? '';
         $roundFilter = $request->getVar('round_filter') ?? '';
+        $quotaFilter = $request->getVar('quota_filter') ?? '';
+        $courseFilter = $request->getVar('course_filter') ?? '';
+        $regLevelFilter = $request->getVar('reg_level_filter') ?? '';
+        $excellenceFilter = $request->getVar('excellence_filter') ?? '';
+        $advancedSearch = $request->getVar('advanced_search') ?? '';
 
         // 1. Get Total Records (for this year)
         $totalRecords = $model->where('recruit_year', $year)->countAllResults();
@@ -442,17 +456,61 @@ class AdminControlRecruit extends BaseController
         if (!empty($roundFilter)) {
             $builder->where('tb_recruitstudent.recruit_round', $roundFilter);
         }
+        // Apply quota filter
+        if (!empty($quotaFilter)) {
+            $builder->where('tb_recruitstudent.recruit_category', $quotaFilter);
+        }
+        // Apply course filter
+        if (!empty($courseFilter)) {
+            $builder->where('tb_recruitstudent.recruit_tpyeRoom_id', $courseFilter);
+        }
+        // Apply regLevel filter
+        if (!empty($regLevelFilter)) {
+            $builder->where('tb_recruitstudent.recruit_regLevel', $regLevelFilter);
+        }
+        // Apply excellence filter (sport/normal) based on course_initials
+        if (!empty($excellenceFilter)) {
+            if ($excellenceFilter === 'sport') {
+                // Excellence/Sport courses have specific initials (not empty)
+                $builder->where('tb_course.course_initials IS NOT NULL');
+                $builder->where('tb_course.course_initials !=', '');
+            } elseif ($excellenceFilter === 'normal') {
+                // Normal courses have NULL or empty initials
+                $builder->groupStart()
+                    ->where('tb_course.course_initials IS NULL')
+                    ->orWhere('tb_course.course_initials', '')
+                    ->groupEnd();
+            }
+        }
 
+        // Apply DataTables search (from search box in DataTable)
         if (!empty($searchValue)) {
             $builder->groupStart()
-                ->like('tb_recruitstudent.recruit_id', $searchValue)
+                ->like('tb_course.course_fullname', $searchValue)
+                ->orLike('tb_course.course_branch', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_regLevel', $searchValue)
                 ->orLike('tb_recruitstudent.recruit_firstName', $searchValue)
                 ->orLike('tb_recruitstudent.recruit_lastName', $searchValue)
-                ->orLike('tb_recruitstudent.recruit_category', $searchValue)
-                ->orLike('tb_quota.quota_key', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_id', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_idCard', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_phone', $searchValue)
                 ->orLike('tb_quota.quota_explain', $searchValue)
-                ->orLike('tb_course.course_branch', $searchValue)
-                ->orLike('tb_course.course_fullname', $searchValue)
+                ->groupEnd();
+        }
+
+        // Apply advanced search (searches more fields including ID card, phone, old school)
+        if (!empty($advancedSearch)) {
+            $builder->groupStart()
+                ->like('tb_recruitstudent.recruit_id', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_firstName', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_lastName', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_idCard', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_phone', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_oldSchool', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_address', $advancedSearch)
+                ->orLike('tb_quota.quota_explain', $advancedSearch)
+                ->orLike('tb_course.course_branch', $advancedSearch)
+                ->orLike('tb_course.course_fullname', $advancedSearch)
                 ->groupEnd();
         }
 
@@ -460,7 +518,7 @@ class AdminControlRecruit extends BaseController
 
         // 3. Fetch Data
         $builder = $model->builder();
-        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_recruitstudent.recruit_round, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key, tb_recruitstudent.recruit_sportPosition, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz, tb_recruitstudent.recruit_dateUpdate, skjacth_personnel.tb_personnel.pers_prefix as verifier_prefix, skjacth_personnel.tb_personnel.pers_firstname as verifier_fname, skjacth_personnel.tb_personnel.pers_lastname as verifier_lname')
+        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_recruitstudent.recruit_round, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_course.course_initials, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key, tb_recruitstudent.recruit_sportPosition, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz, tb_recruitstudent.recruit_dateUpdate, tb_recruitstudent.recruit_certificateEdu, tb_recruitstudent.recruit_certificateEduB, tb_recruitstudent.recruit_copyidCard, skjacth_personnel.tb_personnel.pers_prefix as verifier_prefix, skjacth_personnel.tb_personnel.pers_firstname as verifier_fname, skjacth_personnel.tb_personnel.pers_lastname as verifier_lname')
             ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
             ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
             ->join('skjacth_personnel.tb_personnel', 'skjacth_personnel.tb_personnel.pers_id = tb_recruitstudent.recruit_userUpdate', 'left')
@@ -477,17 +535,58 @@ class AdminControlRecruit extends BaseController
         if (!empty($roundFilter)) {
             $builder->where('tb_recruitstudent.recruit_round', $roundFilter);
         }
-
+        // Apply quota filter
+        if (!empty($quotaFilter)) {
+            $builder->where('tb_recruitstudent.recruit_category', $quotaFilter);
+        }
+        // Apply course filter
+        if (!empty($courseFilter)) {
+            $builder->where('tb_recruitstudent.recruit_tpyeRoom_id', $courseFilter);
+        }
+        // Apply regLevel filter
+        if (!empty($regLevelFilter)) {
+            $builder->where('tb_recruitstudent.recruit_regLevel', $regLevelFilter);
+        }
+        // Apply excellence filter (sport/normal) based on course_initials
+        if (!empty($excellenceFilter)) {
+            if ($excellenceFilter === 'sport') {
+                $builder->where('tb_course.course_initials IS NOT NULL');
+                $builder->where('tb_course.course_initials !=', '');
+            } elseif ($excellenceFilter === 'normal') {
+                $builder->groupStart()
+                    ->where('tb_course.course_initials IS NULL')
+                    ->orWhere('tb_course.course_initials', '')
+                    ->groupEnd();
+            }
+        }
+        // Apply DataTables search
         if (!empty($searchValue)) {
             $builder->groupStart()
-                ->like('tb_recruitstudent.recruit_id', $searchValue)
+                ->like('tb_course.course_fullname', $searchValue)
+                ->orLike('tb_course.course_branch', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_regLevel', $searchValue)
                 ->orLike('tb_recruitstudent.recruit_firstName', $searchValue)
                 ->orLike('tb_recruitstudent.recruit_lastName', $searchValue)
-                ->orLike('tb_recruitstudent.recruit_category', $searchValue)
-                ->orLike('tb_quota.quota_key', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_id', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_idCard', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_phone', $searchValue)
                 ->orLike('tb_quota.quota_explain', $searchValue)
-                ->orLike('tb_course.course_branch', $searchValue)
-                ->orLike('tb_course.course_fullname', $searchValue)
+                ->groupEnd();
+        }
+
+        // Apply advanced search
+        if (!empty($advancedSearch)) {
+            $builder->groupStart()
+                ->like('tb_recruitstudent.recruit_id', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_firstName', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_lastName', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_idCard', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_phone', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_oldSchool', $advancedSearch)
+                ->orLike('tb_recruitstudent.recruit_address', $advancedSearch)
+                ->orLike('tb_quota.quota_explain', $advancedSearch)
+                ->orLike('tb_course.course_branch', $advancedSearch)
+                ->orLike('tb_course.course_fullname', $advancedSearch)
                 ->groupEnd();
         }
 
@@ -540,20 +639,48 @@ class AdminControlRecruit extends BaseController
                     <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-2 text-info"></i>พิมพ์ใบสมัคร</a></li>';
             }
 
+            // Build download menu items based on available files
+            $regLevel = $recruit['recruit_regLevel'] ?? '1';
+            $downloadMenuItems = '';
+            
+            // Check and add download links for each file type
+            if (!empty($recruit['recruit_certificateEdu'])) {
+                $certEduUrl = get_recruit_file_url($recruit['recruit_certificateEdu'], $regLevel, 'certificate');
+                $downloadMenuItems .= '<li><a class="dropdown-item" href="' . $certEduUrl . '" target="_blank" download><i class="bx bx-download me-2 text-success"></i>ปพ.1 ด้านหน้า</a></li>';
+            }
+            if (!empty($recruit['recruit_certificateEduB'])) {
+                $certEduBUrl = get_recruit_file_url($recruit['recruit_certificateEduB'], $regLevel, 'certificateB');
+                $downloadMenuItems .= '<li><a class="dropdown-item" href="' . $certEduBUrl . '" target="_blank" download><i class="bx bx-download me-2 text-success"></i>ปพ.1 ด้านหลัง</a></li>';
+            }
+            if (!empty($recruit['recruit_copyidCard'])) {
+                $copyIdUrl = get_recruit_file_url($recruit['recruit_copyidCard'], $regLevel, 'copyidCard');
+                $downloadMenuItems .= '<li><a class="dropdown-item" href="' . $copyIdUrl . '" target="_blank" download><i class="bx bx-download me-2 text-success"></i>สำเนาบัตรประชาชน</a></li>';
+            }
+            
+            // Add divider and download section only if there are files
+            $downloadSection = '';
+            if (!empty($downloadMenuItems)) {
+                $downloadSection = '
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="dropdown-header px-3 py-1 text-muted small"><i class="bx bx-folder-open me-1"></i>ดาวน์โหลดเอกสาร</li>
+                    ' . $downloadMenuItems;
+            }
+
             $actions = '
                 <div class="dropdown">
                     <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bx bx-show me-1"></i>ดูรายละเอียด
+                        <i class="bx bx-cog"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) . '"><i class="bx bx-show me-2 text-primary"></i>ดูข้อมูลทั้งหมด</a></li>
                         <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/edit/' . $recruit['recruit_id']) . '"><i class="bx bx-edit me-2 text-warning"></i>แก้ไขข้อมูล</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        ' . $printMenuItems . '
+                        ' . $printMenuItems . $downloadSection . '
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="confirmDelete(' . $recruit['recruit_id'] . ')"><i class="bx bx-trash me-2"></i>ลบข้อมูล</a></li>
                     </ul>
                 </div>';
+
 
             // Build course display with all ranks from recruit_majorOrder
             $courseHtml = '';
@@ -635,12 +762,25 @@ class AdminControlRecruit extends BaseController
                 }
             }
 
+            // Build excellence type display based on course_initials
+            $excellenceTypeHtml = '';
+            $courseInitials = $recruit['course_initials'] ?? '';
+            if (!empty($courseInitials)) {
+                // Has course_initials = Excellence/Special program
+                $excellenceTypeHtml = '<span class="text-purple fw-semibold">' . esc($courseInitials) . '</span>';
+            } else {
+                // No course_initials = Normal program
+                $excellenceTypeHtml = '<span class="text-muted">ทั่วไป</span>';
+            }
+
             $data[] = [
                 'avatar' => $avatar,
                 'recruit_id' => '<span class="badge bg-label-secondary">' . esc(sprintf('%04d', $recruit['recruit_id'] ?? 0)) . '</span>',
                 'name' => '<div class="fw-semibold">' . esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '')) . '</div><small class="text-muted">' . esc($recruit['recruit_lastName'] ?? '') . '</small>',
                 'round' => '<span class="badge bg-label-dark">รอบที่ ' . esc($recruit['recruit_round'] ?? '1') . '</span>',
+                'reg_level' => '<span class="badge bg-label-primary">ม.' . esc($recruit['recruit_regLevel'] ?? '') . '</span>',
                 'category' => '<small>' . esc($recruit['quota_explain'] ?? $recruit['recruit_category']) . '</small>',
+                'excellence_type' => $excellenceTypeHtml,
                 'course' => $courseHtml,
                 'selection_result' => $selectionResultHtml,
                 'status' => '<span class="status-badge ' . $statusClass . '">' . esc($status) . '</span>',
@@ -657,6 +797,137 @@ class AdminControlRecruit extends BaseController
         ];
 
         return $this->response->setJSON($output);
+    }
+
+    /**
+     * Get all recruits for client-side DataTable (no pagination)
+     */
+    public function getRecruitsAll()
+    {
+        $request = service('request');
+        $model = new AdmissionModel();
+
+        $year = $request->getVar('year') ?? date('Y');
+        $statusFilter = $request->getVar('status_filter') ?? '';
+        $roundFilter = $request->getVar('round_filter') ?? '';
+
+        // Build query
+        $builder = $model->builder();
+        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_recruitstudent.recruit_round, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_course.course_initials, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key, tb_recruitstudent.recruit_sportPosition, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz, tb_recruitstudent.recruit_dateUpdate, tb_recruitstudent.recruit_certificateEdu, tb_recruitstudent.recruit_certificateEduB, tb_recruitstudent.recruit_copyidCard, skjacth_personnel.tb_personnel.pers_prefix as verifier_prefix, skjacth_personnel.tb_personnel.pers_firstname as verifier_fname, skjacth_personnel.tb_personnel.pers_lastname as verifier_lname')
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
+            ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->join('skjacth_personnel.tb_personnel', 'skjacth_personnel.tb_personnel.pers_id = tb_recruitstudent.recruit_userUpdate', 'left')
+            ->where('tb_recruitstudent.recruit_year', $year);
+
+        // Apply status filter
+        if (!empty($statusFilter)) {
+            if ($statusFilter === 'ไม่ผ่าน') {
+                $builder->like('tb_recruitstudent.recruit_status', 'ไม่ผ่าน');
+            } else {
+                $builder->where('tb_recruitstudent.recruit_status', $statusFilter);
+            }
+        }
+
+        // Apply round filter
+        if (!empty($roundFilter)) {
+            $builder->where('tb_recruitstudent.recruit_round', $roundFilter);
+        }
+
+        $builder->orderBy('tb_recruitstudent.recruit_id', 'DESC');
+        $recruits = $builder->get()->getResultArray();
+
+        // Build data array
+        $data = [];
+        foreach ($recruits as $recruit) {
+            // Avatar - use same method as getRecruitsAjax
+            $imgSrc = get_recruit_file_url(($recruit['recruit_img'] ?? 'default.png'), ($recruit['recruit_regLevel'] ?? '1'), 'img', true);
+            $defaultImg = base_url('sneat-assets/img/avatars/1.png');
+            $avatar = '<img src="' . $imgSrc . '" class="recruit-avatar" alt="Avatar" loading="lazy" onerror="this.onerror=null;this.src=\'' . $defaultImg . '\';">';
+
+            // Status
+            $status = $recruit['recruit_status'] ?? 'รอการตรวจสอบ';
+            $statusClass = 'status-pending';
+            if ($status === 'ผ่านการตรวจสอบ') {
+                $statusClass = 'status-approved';
+            } elseif (strpos($status, 'ไม่ผ่าน') !== false) {
+                $statusClass = 'status-rejected';
+            }
+
+            // Check if sport candidate
+            $quotaKey = $recruit['quota_key'] ?? '';
+            $isSport = !empty($quotaKey) && strpos($quotaKey, 'A') === 0;
+
+            // Print menu items
+            if ($isSport) {
+                $printMenuItems = '
+                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-run me-2 text-purple"></i>พิมพ์ใบสมัครกีฬา</a></li>
+                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print-normal/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-2 text-info"></i>พิมพ์ใบสมัครธรรมดา</a></li>';
+            } else {
+                $printMenuItems = '
+                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-2 text-info"></i>พิมพ์ใบสมัคร</a></li>';
+            }
+
+            // Actions dropdown
+            $actions = '
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bx bx-cog"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) . '"><i class="bx bx-show me-2 text-primary"></i>ดูข้อมูล</a></li>
+                        <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/edit/' . $recruit['recruit_id']) . '"><i class="bx bx-edit me-2 text-warning"></i>แก้ไข</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        ' . $printMenuItems . '
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="confirmDelete(' . $recruit['recruit_id'] . ')"><i class="bx bx-trash me-2"></i>ลบ</a></li>
+                    </ul>
+                </div>';
+
+            // Course display
+            $courseHtml = '<span class="badge bg-label-info">' . esc($recruit['course_branch'] ?? $recruit['course_fullname'] ?? $recruit['recruit_tpyeRoom']) . '</span>';
+
+            // Selection result
+            if ($isSport) {
+                $sportResult = $recruit['recruit_sportSelectionResult'] ?? 'รอคัดเลือก';
+                $selectionResultHtml = '
+                    <select class="form-select form-select-sm sport-result-select" data-id="' . $recruit['recruit_id'] . '" style="width: auto; font-size: 0.75rem;">
+                        <option value="รอคัดเลือก"' . ($sportResult === 'รอคัดเลือก' || empty($sportResult) ? ' selected' : '') . '>⏳ รอ</option>
+                        <option value="ผ่านการคัดเลือก"' . ($sportResult === 'ผ่านการคัดเลือก' ? ' selected' : '') . '>✅ ผ่าน</option>
+                        <option value="ไม่ผ่านการคัดเลือก"' . ($sportResult === 'ไม่ผ่านการคัดเลือก' ? ' selected' : '') . '>❌ ไม่ผ่าน</option>
+                    </select>';
+            } else {
+                $quizResult = $recruit['recruit_StatusQuiz'] ?? 'รอสอบ';
+                $selectionResultHtml = '
+                    <select class="form-select form-select-sm quiz-result-select" data-id="' . $recruit['recruit_id'] . '" style="width: auto; font-size: 0.75rem;">
+                        <option value="รอสอบ"' . ($quizResult === 'รอสอบ' || empty($quizResult) ? ' selected' : '') . '>⏳ รอ</option>
+                        <option value="สอบผ่าน"' . ($quizResult === 'สอบผ่าน' ? ' selected' : '') . '>✅ ผ่าน</option>
+                        <option value="สอบไม่ผ่าน"' . ($quizResult === 'สอบไม่ผ่าน' ? ' selected' : '') . '>❌ ไม่ผ่าน</option>
+                    </select>';
+            }
+
+            // Excellence type
+            $courseInitials = $recruit['course_initials'] ?? '';
+            if (!empty($courseInitials)) {
+                $excellenceTypeHtml = '<span class="text-purple fw-semibold">' . esc($courseInitials) . '</span>';
+            } else {
+                $excellenceTypeHtml = '<span class="text-muted">ทั่วไป</span>';
+            }
+
+            $data[] = [
+                'avatar' => $avatar,
+                'recruit_id' => '<span class="badge bg-label-secondary">' . esc(sprintf('%04d', $recruit['recruit_id'] ?? 0)) . '</span>',
+                'name' => '<div class="fw-semibold">' . esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '')) . '</div><small class="text-muted">' . esc($recruit['recruit_lastName'] ?? '') . '</small>',
+                'round' => '<span class="badge bg-label-dark">รอบที่ ' . esc($recruit['recruit_round'] ?? '1') . '</span>',
+                'reg_level' => '<span class="badge bg-label-primary">ม.' . esc($recruit['recruit_regLevel'] ?? '') . '</span>',
+                'excellence_type' => $excellenceTypeHtml,
+                'course' => $courseHtml,
+                'selection_result' => $selectionResultHtml,
+                'status' => '<span class="status-badge ' . $statusClass . '">' . esc($status) . '</span>',
+                'actions' => $actions
+            ];
+        }
+
+        return $this->response->setJSON(['data' => $data]);
     }
 
     /**
@@ -691,6 +962,172 @@ class AdminControlRecruit extends BaseController
             'pending' => $pending,
             'rejected' => $rejected
         ]);
+    }
+
+    /**
+     * Export recruits data to CSV/Excel
+     */
+    public function export()
+    {
+        $request = service('request');
+        $year = $request->getVar('year') ?? date('Y');
+        $statusFilter = $request->getVar('status_filter') ?? '';
+        $roundFilter = $request->getVar('round_filter') ?? '';
+        $quotaFilter = $request->getVar('quota_filter') ?? '';
+        $courseFilter = $request->getVar('course_filter') ?? '';
+        $regLevelFilter = $request->getVar('reg_level_filter') ?? '';
+        $excellenceFilter = $request->getVar('excellence_filter') ?? '';
+        $searchValue = $request->getVar('search') ?? '';
+        $format = $request->getVar('format') ?? 'csv';
+
+        $model = new AdmissionModel();
+        $builder = $model->builder();
+        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_idCard, tb_recruitstudent.recruit_phone, tb_recruitstudent.recruit_birthday, tb_recruitstudent.recruit_oldSchool, tb_recruitstudent.recruit_grade, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_round, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_address, tb_recruitstudent.recruit_province, tb_recruitstudent.recruit_district, tb_recruitstudent.recruit_date, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz, tb_quota.quota_explain, tb_course.course_fullname, tb_course.course_branch, tb_course.course_initials')
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
+            ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->where('tb_recruitstudent.recruit_year', $year);
+
+        // Apply status filter
+        if (!empty($statusFilter)) {
+            if ($statusFilter === 'ไม่ผ่าน') {
+                $builder->like('tb_recruitstudent.recruit_status', 'ไม่ผ่าน');
+            } else {
+                $builder->where('tb_recruitstudent.recruit_status', $statusFilter);
+            }
+        }
+
+        // Apply round filter
+        if (!empty($roundFilter)) {
+            $builder->where('tb_recruitstudent.recruit_round', $roundFilter);
+        }
+
+        // Apply quota filter
+        if (!empty($quotaFilter)) {
+            $builder->where('tb_recruitstudent.recruit_category', $quotaFilter);
+        }
+
+        // Apply course filter
+        if (!empty($courseFilter)) {
+            $builder->where('tb_recruitstudent.recruit_tpyeRoom_id', $courseFilter);
+        }
+
+        // Apply regLevel filter
+        if (!empty($regLevelFilter)) {
+            $builder->where('tb_recruitstudent.recruit_regLevel', $regLevelFilter);
+        }
+
+        // Apply excellence filter based on course_initials
+        if (!empty($excellenceFilter)) {
+            if ($excellenceFilter === 'sport') {
+                $builder->where('tb_course.course_initials IS NOT NULL');
+                $builder->where('tb_course.course_initials !=', '');
+            } elseif ($excellenceFilter === 'normal') {
+                $builder->groupStart()
+                    ->where('tb_course.course_initials IS NULL')
+                    ->orWhere('tb_course.course_initials', '')
+                    ->groupEnd();
+            }
+        }
+
+        // Apply search filter
+        if (!empty($searchValue)) {
+            $builder->groupStart()
+                ->like('tb_recruitstudent.recruit_id', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_firstName', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_lastName', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_idCard', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_phone', $searchValue)
+                ->orLike('tb_recruitstudent.recruit_oldSchool', $searchValue)
+                ->orLike('tb_quota.quota_explain', $searchValue)
+                ->orLike('tb_course.course_branch', $searchValue)
+                ->orLike('tb_course.course_fullname', $searchValue)
+                ->groupEnd();
+        }
+
+        $builder->orderBy('tb_recruitstudent.recruit_id', 'ASC');
+        $recruits = $builder->get()->getResultArray();
+
+        // Prepare CSV headers
+        $headers = [
+            'ลำดับ',
+            'รหัสผู้สมัคร',
+            'คำนำหน้า',
+            'ชื่อ',
+            'นามสกุล',
+            'เลขบัตรประชาชน',
+            'เบอร์โทร',
+            'วันเกิด',
+            'โรงเรียนเดิม',
+            'เกรดเฉลี่ย',
+            'ระดับชั้นที่สมัคร',
+            'รอบที่',
+            'ประเภทโควตา',
+            'หลักสูตร',
+            'สาขา',
+            'ประเภท',
+            'สถานะเอกสาร',
+            'ผลคัดเลือกกีฬา',
+            'ผลสอบข้อเขียน',
+            'ที่อยู่',
+            'อำเภอ',
+            'จังหวัด',
+            'วันที่สมัคร'
+        ];
+
+        // Create filename
+        $ext = ($format === 'excel') ? 'csv' : 'csv';
+        $filename = 'recruits_' . $year . '_' . date('Y-m-d_His') . '.' . $ext;
+
+        // Set headers for CSV download
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        // Open output stream
+        $output = fopen('php://output', 'w');
+
+        // Add BOM for UTF-8 Excel compatibility
+        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+        // Write headers
+        fputcsv($output, $headers);
+
+        // Write data
+        $i = 1;
+        foreach ($recruits as $recruit) {
+            $excellenceType = (!empty($recruit['course_initials'])) ? $recruit['course_initials'] : 'ทั่วไป';
+            
+            $row = [
+                $i++,
+                sprintf('%04d', $recruit['recruit_id']),
+                $recruit['recruit_prefix'] ?? '',
+                $recruit['recruit_firstName'] ?? '',
+                $recruit['recruit_lastName'] ?? '',
+                $recruit['recruit_idCard'] ?? '',
+                $recruit['recruit_phone'] ?? '',
+                $recruit['recruit_birthday'] ?? '',
+                $recruit['recruit_oldSchool'] ?? '',
+                $recruit['recruit_grade'] ?? '',
+                'ม.' . ($recruit['recruit_regLevel'] ?? ''),
+                $recruit['recruit_round'] ?? '1',
+                $recruit['quota_explain'] ?? '',
+                $recruit['course_fullname'] ?? '',
+                $recruit['course_branch'] ?? '',
+                $excellenceType,
+                $recruit['recruit_status'] ?? 'รอการตรวจสอบ',
+                $recruit['recruit_sportSelectionResult'] ?? '-',
+                $recruit['recruit_StatusQuiz'] ?? '-',
+                $recruit['recruit_address'] ?? '',
+                $recruit['recruit_district'] ?? '',
+                $recruit['recruit_province'] ?? '',
+                $recruit['recruit_date'] ?? ''
+            ];
+            fputcsv($output, $row);
+        }
+
+        fclose($output);
+        exit;
     }
 
     public function print($id)

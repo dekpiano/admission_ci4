@@ -66,6 +66,66 @@
     #recruitsTable {
         border-collapse: separate;
         border-spacing: 0 8px;
+        width: 100% !important;
+    }
+
+    /* Responsive table container */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+    }
+
+    /* DataTables responsive adjustments */
+    .dataTables_wrapper {
+        overflow: hidden;
+    }
+
+    .dataTables_wrapper .row {
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .dataTables_wrapper .row > div {
+        padding: 0.5rem;
+    }
+
+    /* Responsive buttons and search */
+    @media (max-width: 768px) {
+        .dataTables_wrapper .dataTables_filter {
+            float: none;
+            text-align: left;
+            margin-bottom: 0.5rem;
+        }
+
+        .dataTables_wrapper .dataTables_length {
+            float: none;
+            text-align: left;
+        }
+
+        .dataTables_wrapper .dt-buttons {
+            margin-top: 0.5rem;
+        }
+
+        #recruitsTable thead th {
+            padding: 10px 8px;
+            font-size: 0.75rem;
+        }
+
+        #recruitsTable tbody td {
+            padding: 8px 6px;
+            font-size: 0.8rem;
+        }
+
+        .recruit-avatar {
+            width: 32px !important;
+            height: 32px !important;
+        }
+
+        .action-btn {
+            width: 28px;
+            height: 28px;
+        }
     }
 
     #recruitsTable thead th {
@@ -406,16 +466,18 @@
             <table class="table table-hover" id="recruitsTable">
                 <thead>
                     <tr>
-                         <th style="width: 60px;" class="text-center">รูป</th>
-                        <th data-priority="1" style="min-width: 150px;">ชื่อ - นามสกุล</th>
+                         <th data-priority="10" style="width: 50px;" class="text-center">รูป</th>
+                        <th data-priority="1" class="text-nowrap">ชื่อ - นามสกุล</th>
                         <?php if ($selected_year >= 2569): ?>
-                        <th style="width: 80px;" class="text-center">รอบที่</th>
+                        <th data-priority="8" style="width: 70px;" class="text-center">รอบที่</th>
                         <?php endif; ?>
-                        <th data-priority="4" style="width: 70px;" class="text-center">รหัส</th>
-                        <th data-priority="5" style="min-width: 120px;">หลักสูตร</th>
-                        <th data-priority="2" style="width: 130px;" class="text-center">สถานะการสมัคร</th>
-                        <th data-priority="3" style="width: 140px;" class="text-center">จัดการ</th>
-                        <th data-priority="6" style="width: 120px;" class="text-center">ผลการคัดเลือก</th>
+                        <th data-priority="9" style="width: 60px;" class="text-center">รหัส</th>
+                        <th data-priority="4" style="width: 60px;" class="text-center">ระดับ</th>
+                        <th data-priority="7" style="width: 80px;" class="text-center">ประเภท</th>
+                        <th data-priority="5" class="text-nowrap">หลักสูตร</th>
+                        <th data-priority="2" style="width: 110px;" class="text-center">สถานะ</th>
+                        <th data-priority="3" style="width: 100px;" class="text-center">จัดการ</th>
+                        <th data-priority="6" style="width: 100px;" class="text-center">ผลคัดเลือก</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -440,36 +502,70 @@
             stateSave: false,
             responsive: true,
             processing: true,
-            serverSide: true,
+            serverSide: false,
             pageLength: 15,
+            deferRender: true,
+            dom: '<"row align-items-center mb-3"<"col-auto"l><"col"f><"col-auto"B>>rtip',
+            buttons: [
+                {
+                    text: '<i class="bx bx-download me-1"></i> Excel',
+                    className: 'btn btn-success btn-sm',
+                    action: function (e, dt, node, config) {
+                        var params = new URLSearchParams({
+                            year: $('#year').val(),
+                            status_filter: currentStatusFilter || '',
+                            round_filter: $('#roundFilter').val() || '',
+                            search: dt.search() || '',
+                            format: 'excel'
+                        });
+                        window.location.href = '<?= site_url('skjadmin/recruits/export') ?>?' + params.toString();
+                    }
+                },
+                {
+                    text: '<i class="bx bx-file me-1"></i> CSV',
+                    className: 'btn btn-outline-success btn-sm',
+                    action: function (e, dt, node, config) {
+                        var params = new URLSearchParams({
+                            year: $('#year').val(),
+                            status_filter: currentStatusFilter || '',
+                            round_filter: $('#roundFilter').val() || '',
+                            search: dt.search() || '',
+                            format: 'csv'
+                        });
+                        window.location.href = '<?= site_url('skjadmin/recruits/export') ?>?' + params.toString();
+                    }
+                }
+            ],
             ajax: {
-                url: '<?= site_url('skjadmin/recruits/ajax') ?>',
+                url: '<?= site_url('skjadmin/recruits/ajax-all') ?>',
                 type: 'POST',
                 data: function (d) {
                     d.year = $('#year').val();
                     d.status_filter = currentStatusFilter;
                     d.round_filter = $('#roundFilter').length ? $('#roundFilter').val() : '';
                     d.<?= csrf_token() ?> = '<?= csrf_hash() ?>';
-                }
+                },
+                dataSrc: 'data'
             },
             columns: [
                 { data: 'avatar', orderable: false, searchable: false },
-                { data: 'name' },
+                { data: 'name', searchable: true },
                 <?php if ($selected_year >= 2569): ?>
-                { data: 'round', orderable: true },
+                { data: 'round', orderable: true, searchable: true },
                 <?php endif; ?>
-                { data: 'recruit_id' },
-                { data: 'course' },
-                { data: 'status' },
+                { data: 'recruit_id', searchable: true },
+                { data: 'reg_level', orderable: false, searchable: true },
+                { data: 'excellence_type', orderable: false, searchable: true },
+                { data: 'course', searchable: true },
+                { data: 'status', searchable: true },
                 { data: 'actions', orderable: false, searchable: false },
-                { data: 'selection_result', orderable: false }
+                { data: 'selection_result', orderable: false, searchable: false }
             ],
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json",
                 "processing": '<div class="text-center my-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">กำลังโหลดข้อมูล...</p></div>'
             },
             "drawCallback": function (settings) {
-                // Update stats after draw
                 updateStats();
             }
         });

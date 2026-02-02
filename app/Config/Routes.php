@@ -137,6 +137,7 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     // Recruit Management
     $routes->get('recruits', 'AdminControlRecruit::index');
     $routes->add('recruits/ajax', 'AdminControlRecruit::getRecruitsAjax');
+    $routes->add('recruits/ajax-all', 'AdminControlRecruit::getRecruitsAll');
     $routes->get('recruits/view/(:num)', 'AdminControlRecruit::view/$1');
     $routes->get('recruits/edit/(:num)', 'AdminControlRecruit::edit/$1');
     $routes->post('recruits/update/(:num)', 'AdminControlRecruit::update/$1');
@@ -147,6 +148,7 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->get('recruits/print/(:num)', 'AdminControlRecruit::print/$1');
     $routes->get('recruits/print-normal/(:num)', 'AdminControlRecruit::printNormal/$1');
     $routes->post('recruits/stats', 'AdminControlRecruit::getStats');
+    $routes->get('recruits/export', 'AdminControlRecruit::export');
 
     // Statistic
     $routes->get('statistics', 'AdminControlStatistic::index');
