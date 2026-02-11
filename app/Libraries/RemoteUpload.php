@@ -209,10 +209,23 @@ class RemoteUpload
         if ($remoteServerAvailable) {
             // Remote server ใช้งานได้ - ส่งไป Remote
             $payload = [
-                'path' => $subPath,
-                'file' => new \CURLFile($filePath, $mimeType, $originalName)
+                [
+                    'name'     => 'path',
+                    'contents' => $subPath
+                ],
+                [
+                    'name'     => 'file',
+                    'contents' => fopen($filePath, 'r'),
+                    'filename' => $originalName,
+                    'type'     => $mimeType
+                ]
             ];
-            if ($customName) $payload['desired_filename'] = $customName;
+            if ($customName) {
+                $payload[] = [
+                    'name'     => 'desired_filename',
+                    'contents' => $customName
+                ];
+            }
 
             $result = $this->sendRequest('upload.php', $payload, true);
             

@@ -32,6 +32,9 @@ $routes->get('new-admission/update-db-charset', 'User\UserControlNewAdmission::u
 $routes->get('new-admission/show-schema', 'User\UserControlNewAdmission::showTableSchema');
 $routes->get('new-admission/add-auto-id', 'User\UserControlNewAdmission::addAutoIdColumn');
 
+// Announcements (User)
+$routes->get('new-admission/announcements', 'User\UserControlAnnouncement::index');
+
 // Image Proxy for remote images
 $routes->get('image-proxy', 'User\ImageProxy::index');
 
@@ -178,6 +181,7 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('settings/update_comment', 'AdminControlSetting::update_comment');
     $routes->post('settings/update_dates', 'AdminControlSetting::update_dates');
     $routes->post('settings/update_round', 'AdminControlSetting::update_round');
+    $routes->post('settings/update_system_text', 'AdminControlSetting::update_system_text');
 
     // User Management
     $routes->get('users', 'AdminControlUser::index');
@@ -261,6 +265,13 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('line-notify/toggle-status', 'AdminControlLineNotify::toggleStatus');
     $routes->post('line-notify/test/(:num)', 'AdminControlLineNotify::test/$1');
     $routes->post('line-notify/create-table', 'AdminControlLineNotify::createTable');
+
+    // Announcement Management
+    $routes->get('announcements', 'AdminControlAnnouncement::index');
+    $routes->add('announcements/store', 'AdminControlAnnouncement::store');
+    $routes->add('announcements/update/(:any)', 'AdminControlAnnouncement::update/$1');
+    $routes->post('announcements/toggle-status', 'AdminControlAnnouncement::toggleStatus');
+    $routes->post('announcements/delete/(:num)', 'AdminControlAnnouncement::delete/$1');
 
 });
 

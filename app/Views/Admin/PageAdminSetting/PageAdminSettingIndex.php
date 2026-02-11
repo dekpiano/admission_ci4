@@ -71,6 +71,31 @@
                                 onchange="updateStatus('onoff_system', this.checked)">
                         </div>
                     </div>
+                    <div class="mt-3 bg-label-primary p-3 rounded" id="announceTextContainer" style="<?= ($settings->onoff_system == 'on') ? '' : 'display:none;' ?>">
+                        <label for="selectAnnounceText" class="form-label fw-bold"><i class='bx bx-edit'></i> หัวข้อที่ต้องการประกาศ (หน้าแรก)</label>
+                        <div class="input-group">
+                            <select class="form-select" id="selectAnnounceText" onchange="checkCustomAnnounce(this.value)">
+                                <?php 
+                                $options = [
+                                    "ประกาศรายชื่อนักเรียนมีสิทธิ์สอบ",
+                                    "ประกาศผลการคัดเลือก"
+                                ];
+                                $currentText = $settings->onoff_system_text ?? 'ประกาศผลการคัดเลือก';
+                                $isCustom = !in_array($currentText, $options);
+                                ?>
+                                <?php foreach($options as $opt): ?>
+                                    <option value="<?= $opt ?>" <?= ($currentText == $opt) ? 'selected' : '' ?>><?= $opt ?></option>
+                                <?php endforeach; ?>
+                                <option value="custom" <?= $isCustom ? 'selected' : '' ?>>กำหนดเอง...</option>
+                            </select>
+                            <input type="text" class="form-control" id="customAnnounceText" 
+                                placeholder="ระบุหัวข้อเอง..." 
+                                value="<?= $isCustom ? $currentText : '' ?>"
+                                style="<?= $isCustom ? '' : 'display:none;' ?>">
+                            <button class="btn btn-primary" type="button" onclick="updateSystemText()">บันทึก</button>
+                        </div>
+                        <small class="text-muted mt-1 d-block">ข้อความนี้จะไปแสดงในกล่องสีม่วงที่หน้าแรกของระะบบ</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -300,6 +325,59 @@
             console.error('Error:', error);
             Swal.fire('Error', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
         });
+    }
+
+    function checkCustomAnnounce(val) {
+        const customInput = document.getElementById('customAnnounceText');
+        if (val === 'custom') {
+            customInput.style.display = 'block';
+            customInput.focus();
+        } else {
+            customInput.style.display = 'none';
+        }
+    }
+
+    function updateSystemText() {
+        const select = document.getElementById('selectAnnounceText');
+        let text = select.value;
+        if (text === 'custom') {
+            text = document.getElementById('customAnnounceText').value;
+        }
+
+        if (!text) {
+            Swal.fire('คำเตือน', 'กรุณาระบุข้อความประกาศ', 'warning');
+            return;
+        }
+
+        fetch('<?= base_url('skjadmin/settings/update_system_text') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `text=${text}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'สำเร็จ',
+                    text: data.msg,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        });
+    }
+
+    // Update updateStatus to show/hide announce text container
+    const originalUpdateStatus = updateStatus;
+    updateStatus = function(field, mode) {
+        originalUpdateStatus(field, mode);
+        if (field === 'onoff_system') {
+            document.getElementById('announceTextContainer').style.display = mode ? 'block' : 'none';
+        }
     }
 </script>
 <?= $this->endSection() ?>

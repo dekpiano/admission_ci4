@@ -817,6 +817,12 @@
                             <div data-i18n="Status">ตรวจสอบสถานะ</div>
                         </a>
                     </li>
+                    <li class="menu-item <?= uri_string() == 'new-admission/announcements' || strpos(uri_string(), 'new-admission/announcements') !== false ? 'active' : '' ?>">
+                        <a href="<?= base_url('new-admission/announcements') ?>" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-news"></i>
+                            <div data-i18n="Announcements">ประกาศผลคัดเลือก</div>
+                        </a>
+                    </li>
                     <li class="menu-item <?= uri_string() == 'new-admission/statistics' ? 'active' : '' ?>">
                         <a href="<?= base_url('new-admission/statistics') ?>" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>

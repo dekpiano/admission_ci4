@@ -156,6 +156,13 @@
             </a>
           </li>
 
+          <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/announcements') !== false) ? 'active' : '' ?>">
+            <a href="<?= site_url('skjadmin/announcements') ?>" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-megaphone"></i>
+              <div data-i18n="Announcements">ประกาศผลคัดเลือก</div>
+            </a>
+          </li>
+
           <!-- ========== จัดการข้อมูลหลัก ========== -->
           <li class="menu-header small text-uppercase">
             <span class="menu-header-text">จัดการข้อมูลหลัก</span>

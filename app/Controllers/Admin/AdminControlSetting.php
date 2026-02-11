@@ -20,6 +20,8 @@ class AdminControlSetting extends BaseController
         $data['title'] = 'ตั้งค่าระบบ';
         $data['menu'] = 'settings';
 
+        $this->ensureColumnExists();
+
         // Fetch System Status
         $data['settings'] = $this->db->table('tb_onoffsys')->where('onoff_id', 1)->get()->getRow();
 
@@ -113,5 +115,25 @@ class AdminControlSetting extends BaseController
         ]);
 
         return $this->response->setJSON(['success' => true, 'msg' => 'เปลี่ยนรอบการรับสมัครเรียบร้อยแล้ว']);
+    }
+
+    public function update_system_text()
+    {
+        $this->ensureColumnExists();
+        $text = $this->request->getPost('text');
+
+        $this->db->table('tb_onoffsys')->where('onoff_id', 1)->update([
+            'onoff_system_text' => $text
+        ]);
+
+        return $this->response->setJSON(['success' => true, 'msg' => 'อัปเดตหัวข้อประกาศเรียบร้อยแล้ว']);
+    }
+
+    private function ensureColumnExists()
+    {
+        $fields = $this->db->getFieldNames('tb_onoffsys');
+        if (!in_array('onoff_system_text', $fields)) {
+            $this->db->query("ALTER TABLE tb_onoffsys ADD onoff_system_text VARCHAR(255) DEFAULT 'ประกาศผลการคัดเลือก' AFTER onoff_system");
+        }
     }
 }

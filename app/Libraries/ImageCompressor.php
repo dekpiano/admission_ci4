@@ -52,6 +52,11 @@ class ImageCompressor
      */
     public function compress($sourcePath, $destPath = null)
     {
+        // Check for GD library
+        if (!extension_loaded('gd')) {
+            return ['success' => false, 'message' => 'เครื่องเซิร์ฟเวอร์ไม่ได้ติดตั้ง GD Library (จำเป็นสำหรับการปรับขนาดรูปภาพ)'];
+        }
+
         if (!file_exists($sourcePath)) {
             return ['success' => false, 'message' => 'ไม่พบไฟล์ต้นทาง'];
         }
