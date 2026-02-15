@@ -843,6 +843,104 @@
         }
     }
 
+    /* Report Alert Box - Golden/Green Success Design */
+    .report-alert-box {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.35);
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        animation: fadeInUp 0.8s ease-out 0.7s both, reportPulse 2s infinite alternate;
+        position: relative;
+        overflow: hidden;
+        border: none;
+    }
+
+    .report-alert-box::after {
+        content: '';
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    @keyframes reportPulse {
+        from { transform: scale(1); }
+        to { transform: scale(1.02); }
+    }
+
+    .report-icon-pulse {
+        width: 65px;
+        height: 65px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        color: white;
+        position: relative;
+        flex-shrink: 0;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+    
+    .report-text h4 {
+        color: white;
+        font-weight: 800;
+        margin-bottom: 0.3rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .report-text p {
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0;
+        font-size: 1.05rem;
+    }
+
+    .report-action .btn-white {
+        background: white;
+        color: #059669;
+        font-weight: 700;
+        border-radius: 50px;
+        padding: 0.8rem 2rem;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+
+    .report-action .btn-white:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        background: #f8f9fa;
+        color: #047857;
+    }
+
+    @media (max-width: 991px) {
+        .report-alert-box {
+            flex-direction: column;
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .report-action {
+            width: 100%;
+        }
+
+        .report-action .btn-white {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
     /* Excellence Section - Mobile First */
     .excellence-section {
         background: white;
@@ -1473,6 +1571,24 @@
         <div class="result-action">
             <a href="<?= site_url('new-admission/announcements') ?>" class="btn btn-white shadow-sm">
                 <i class="bx bx-show-alt me-1"></i> ดูรายละเอียดประกาศผล
+            </a>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- Report Alert Box -->
+<?php if (isset($systemStatus) && isset($systemStatus->onoff_report) && $systemStatus->onoff_report == 'on'): ?>
+    <div class="report-alert-box">
+        <div class="report-icon-pulse">
+            <i class="bx bxs-user-check"></i>
+        </div>
+        <div class="report-text flex-grow-1">
+            <h4 class="mb-1">✨ เปิดรายงานตัวนักเรียนแล้ว (รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>)</h4>
+            <p>ยินดีกับนักเรียนทุกคนที่ผ่านการคัดเลือกในรอบนี้ สามารถรายงานตัวและมอบตัวออนไลน์ได้ที่นี่ครับ</p>
+        </div>
+        <div class="report-action">
+            <a href="<?= site_url('confirmation') ?>" class="btn btn-white shadow-sm">
+                <i class="bx bx-check-double me-1"></i> เข้าสู่ระบบรายงานตัว
             </a>
         </div>
     </div>

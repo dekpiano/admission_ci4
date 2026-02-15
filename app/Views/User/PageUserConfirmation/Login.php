@@ -8,7 +8,10 @@
             <div class="card-body">
                 <div class="text-center mb-4">
                     <i class="bx bxs-user-check display-4 text-primary"></i>
-                    <h4 class="mt-2">รายงานตัวนักเรียนใหม่</h4>
+                    <h4 class="mt-2 text-primary fw-bold">รายงานตัวนักเรียนใหม่</h4>
+                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2 mb-2">
+                        <i class='bx bxs-star me-1'></i> รอบที่ <?= $systemStatus->onoff_round ?? '1' ?> ปีการศึกษา <?= $checkYear->openyear_year ?? '-' ?>
+                    </span>
                     <p class="text-muted">สำหรับผู้ที่ผ่านการคัดเลือกและต้องการยืนยันสิทธิ์</p>
                 </div>
 

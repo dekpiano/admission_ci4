@@ -96,40 +96,40 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-12">
-                    <label for="par_relationO" class="form-label">ความสัมพันธ์กับนักเรียน</label>
+                    <label for="par_relationO" class="form-label">ความสัมพันธ์กับนักเรียน <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="par_relationO" name="par_relationO"
                         placeholder="" value="<?=$guardian->par_relation ?? ''?>" required>
                     <small class="text-muted mt-1 d-block"><i class="bx bx-info-circle me-1"></i>กรณีที่ไม่ใช่ บิดา หรือ มารดา ให้ระบุ เช่น ตา, ยาย, ลุง, ป้า, พี่สาว เป็นต้น</small>
                 </div>
                 <div class="col-md-3">
-                    <label for="par_prefixO" class="form-label">คำนำหน้า</label>
+                    <label for="par_prefixO" class="form-label">คำนำหน้า <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_prefixO"
                         name="par_prefixO" value="<?=$guardian->par_prefix ?? ''?>" required>
                 </div>
                 <div class="col-md-3">
-                    <label for="par_firstNameO" class="form-label">ชื่อจริง</label>
+                    <label for="par_firstNameO" class="form-label">ชื่อจริง <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_firstNameO"
                         name="par_firstNameO" required value="<?=$guardian->par_firstName ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_lastNameO" class="form-label">นามสกุล</label>
+                    <label for="par_lastNameO" class="form-label">นามสกุล <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_lastNameO"
                         name="par_lastNameO" required value="<?=$guardian->par_lastName ?? ''?>">
                 </div>
                 
                 <div class="col-md-2">
-                    <label for="par_agoO" class="form-label">อายุ (ปี)</label>
+                    <label for="par_agoO" class="form-label">อายุ (ปี) <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="par_agoO" name="par_agoO" placeholder=""
                         value="<?=$guardian->par_ago ?? ''?>" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="par_IdNumberO" class="form-label">รหัสประจำตัวประชาชน</label>
+                    <label for="par_IdNumberO" class="form-label">รหัสประจำตัวประชาชน <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="par_IdNumberO" placeholder=""
                         name="par_IdNumberO" data-inputmask="'mask': '9-9999-99999-99-9'" required
                         value="<?=$guardian->par_IdNumber ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_phoneO" class="form-label">เบอร์โทรศัพท์</label>
+                    <label for="par_phoneO" class="form-label">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="par_phoneO" name="par_phoneO"
                         placeholder="" data-inputmask="'mask': '999-999-9999'" required
                         value="<?=$guardian->par_phone ?? ''?>">
@@ -145,7 +145,7 @@
                     $religion_options = ["พุทธ", "อิสลาม", "คริสต์", "ฮินดู", "ซิกข์", "ไม่นับถือศาสนา", "อื่นๆ"];
                 ?>
                 <div class="col-md-4">
-                    <label for="par_raceO" class="form-label">เชื้อชาติ</label>
+                    <label for="par_raceO" class="form-label">เชื้อชาติ <span class="text-danger">*</span></label>
                     <select class="form-select" id="par_raceO" name="par_raceO" required>
                         <option value="">เลือกเชื้อชาติ</option>
                         <?php foreach($nation_options as $op): ?>
@@ -154,7 +154,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="par_nationalO" class="form-label">สัญชาติ</label>
+                    <label for="par_nationalO" class="form-label">สัญชาติ <span class="text-danger">*</span></label>
                     <select class="form-select" id="par_nationalO" name="par_nationalO" required>
                         <option value="">เลือกสัญชาติ</option>
                         <?php foreach($nation_options as $op): ?>
@@ -163,7 +163,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="par_religionO" class="form-label">ศาสนา</label>
+                    <label for="par_religionO" class="form-label">ศาสนา <span class="text-danger">*</span></label>
                     <select class="form-select" id="par_religionO" name="par_religionO" required>
                         <option value="">เลือกศาสนา</option>
                         <?php foreach($religion_options as $op): ?>
@@ -183,22 +183,22 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="par_careerO" class="form-label">อาชีพ</label>
+                    <label for="par_careerO" class="form-label">อาชีพ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="par_careerO" name="par_careerO" placeholder=""
                         required value="<?=$guardian->par_career ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_educationO" class="form-label">วุฒิการศึกษา</label>
+                    <label for="par_educationO" class="form-label">วุฒิการศึกษา <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="par_educationO" name="par_educationO"
                         placeholder="" required value="<?=$guardian->par_education ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_salaryO" class="form-label">รายได้ต่อเดือน (บาท)</label>
+                    <label for="par_salaryO" class="form-label">รายได้ต่อเดือน (บาท) <span class="text-danger">*</span></label>
                     <input type="number" class="form-control" id="par_salaryO" name="par_salaryO" placeholder=""
                         required value="<?=$guardian->par_salary ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_positionJobO" class="form-label">ตำแหน่งงาน</label>
+                    <label for="par_positionJobO" class="form-label">ตำแหน่งงาน <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="par_positionJobO" name="par_positionJobO"
                         placeholder="" required value="<?=$guardian->par_positionJob ?? ''?>">
                 </div>
@@ -262,32 +262,32 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="par_hNumberO" class="form-label">บ้านเลขที่</label>
+                    <label for="par_hNumberO" class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_hNumberO"
                         name="par_hNumberO" required value="<?=$guardian->par_hNumber ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_hMooO" class="form-label">หมู่ที่</label>
+                    <label for="par_hMooO" class="form-label">หมู่ที่ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_hMooO"
                         name="par_hMooO" required value="<?=$guardian->par_hMoo ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_hTambonO" class="form-label">ตำบล</label>
+                    <label for="par_hTambonO" class="form-label">ตำบล <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_hTambonO"
                         name="par_hTambonO" required value="<?=$guardian->par_hTambon ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_hDistrictO" class="form-label">อำเภอ</label>
+                    <label for="par_hDistrictO" class="form-label">อำเภอ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_hDistrictO"
                         name="par_hDistrictO" required value="<?=$guardian->par_hDistrict ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_hProvinceO" class="form-label">จังหวัด</label>
+                    <label for="par_hProvinceO" class="form-label">จังหวัด <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_hProvinceO"
                         name="par_hProvinceO" required value="<?=$guardian->par_hProvince ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_hPostcodeO" class="form-label">รหัสไปรษณีย์</label>
+                    <label for="par_hPostcodeO" class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_hPostcodeO"
                         name="par_hPostcodeO" required value="<?=$guardian->par_hPostcode ?? ''?>">
                 </div>
@@ -307,38 +307,38 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="par_cNumberO" class="form-label">บ้านเลขที่</label>
+                    <label for="par_cNumberO" class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_cNumberO"
                         name="par_cNumberO" required value="<?=$guardian->par_cNumber ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_cMooO" class="form-label">หมู่ที่</label>
+                    <label for="par_cMooO" class="form-label">หมู่ที่ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_cMooO"
                         name="par_cMooO" required value="<?=$guardian->par_cMoo ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_cTambonO" class="form-label">ตำบล</label>
+                    <label for="par_cTambonO" class="form-label">ตำบล <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_cTambonO"
                         name="par_cTambonO" required value="<?=$guardian->par_cTambon ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_cDistrictO" class="form-label">อำเภอ</label>
+                    <label for="par_cDistrictO" class="form-label">อำเภอ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_cDistrictO"
                         name="par_cDistrictO" required value="<?=$guardian->par_cDistrict ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_cProvinceO" class="form-label">จังหวัด</label>
+                    <label for="par_cProvinceO" class="form-label">จังหวัด <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_cProvinceO"
                         name="par_cProvinceO" required value="<?=$guardian->par_cProvince ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="par_cPostcodeO" class="form-label">รหัสไปรษณีย์</label>
+                    <label for="par_cPostcodeO" class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="par_cPostcodeO"
                         name="par_cPostcodeO" required value="<?=$guardian->par_cPostcode ?? ''?>">
                 </div>
 
                 <div class="col-12 mt-3">
-                    <label class="form-label fw-bold text-muted mb-2">ลักษณะที่พัก</label>
+                    <label class="form-label fw-bold text-muted mb-2">ลักษณะที่พัก <span class="text-danger">*</span></label>
                     <div class="row row-cols-auto g-2 align-items-center">
                         <?php $Name = array('บ้านตนเอง','เช่าบ้าน','อาศัยผู้อื่นอยู่','บ้านพักสวัสดิการ');
                         foreach ($Name as $key => $v_Name) : ?>

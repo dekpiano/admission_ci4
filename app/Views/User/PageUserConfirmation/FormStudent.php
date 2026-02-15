@@ -24,7 +24,7 @@
                         value="<?=$stuConf[0]->stu_iden ?? $stu[0]->recruit_idCard?>" readonly style="background-color: #e9ecef;">
                 </div>
                 <div class="col-md-2">
-                    <label for="stu_prefix" class="form-label">คำนำหน้า</label>
+                    <label for="stu_prefix" class="form-label">คำนำหน้า <span class="text-danger">*</span></label>
                     <select name="stu_prefix" id="stu_prefix" class="form-select" required>
                         <option value="">เลือกคำนำหน้า</option>
                         <?php 
@@ -38,21 +38,21 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_fristName" class="form-label">ชื่อจริง</label>
+                    <label for="stu_fristName" class="form-label">ชื่อจริง <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_fristName"
                         name="stu_fristName" required
                         value="<?=$stuConf[0]->stu_fristName ?? $stu[0]->recruit_firstName ?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_lastName" class="form-label">นามสกุลจริง</label>
+                    <label for="stu_lastName" class="form-label">นามสกุลจริง <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_lastName"
                         name="stu_lastName" required
                         value="<?=$stuConf[0]->stu_lastName ?? $stu[0]->recruit_lastName?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_nickName" class="form-label">ชื่อเล่น</label>
+                    <label for="stu_nickName" class="form-label">ชื่อเล่น <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="stu_nickName" name="stu_nickName"
-                        placeholder="" required value="<?=$stuConf[0]->stu_nickName ?? ''?>">
+                        placeholder="ชื่อเล่นของนักเรียน" required value="<?=$stuConf[0]->stu_nickName ?? ''?>">
                 </div>
                 
                 <?php 
@@ -78,7 +78,7 @@
                 ?>
                 
                 <div class="col-md-3">
-                    <label for="stu_day" class="form-label">วันเกิด</label>
+                    <label for="stu_day" class="form-label">วันเกิด <span class="text-danger">*</span></label>
                     <select class="form-select" id="stu_day" name="stu_day" required>
                         <option value="">วัน</option>
                         <?php for ($i=1; $i <= 31 ; $i++) : ?>
@@ -87,7 +87,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_month" class="form-label">เดือนเกิด</label>
+                    <label for="stu_month" class="form-label">เดือนเกิด <span class="text-danger">*</span></label>
                     <select class="form-select" id="stu_month" name="stu_month" required>
                         <option value="">เดือน</option>
                         <?php 
@@ -101,7 +101,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_year" class="form-label">ปีเกิด</label>
+                    <label for="stu_year" class="form-label">ปีเกิด <span class="text-danger">*</span></label>
                     <select class="form-select" id="stu_year" name="stu_year" required>
                         <option value="">ปี พ.ศ.</option>
                         <?php 
@@ -125,7 +125,7 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="stu_phone" class="form-label">เบอร์โทรศัพท์มือถือ</label>
+                    <label for="stu_phone" class="form-label">เบอร์โทรศัพท์มือถือ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="stu_phone" name="stu_phone" placeholder=""
                         required data-inputmask="'mask': '999-999-9999'"
                         value="<?=$stuConf[0]->stu_phone ?? $stu[0]->recruit_phone?>">
@@ -136,7 +136,7 @@
                             value="<?=$stuConf[0]->stu_email ?? ''?>">
                 </div>
                     <div class="col-md-4">
-                    <label for="stu_bloodType" class="form-label">กรุ๊ปเลือด</label>
+                    <label for="stu_bloodType" class="form-label">กรุ๊ปเลือด <span class="text-danger">*</span></label>
                     <select class="form-select" id="stu_bloodType" name="stu_bloodType" required>
                         <option value="">เลือกกรุ๊ปเลือด</option>
                         <?php 
@@ -151,28 +151,28 @@
                 </div>
                 
                 <div class="col-md-6">
-                    <label for="stu_diseaes" class="form-label">โรคประจำตัว (ถ้าไม่มีให้ระบุว่า "ไม่มี")</label>
+                    <label for="stu_diseaes" class="form-label">โรคประจำตัว <span class="text-danger">*</span> (ถ้าไม่มีระบุ "ไม่มี")</label>
                     <input type="text" class="form-control" id="stu_diseaes" name="stu_diseaes" placeholder=""
                         required value="<?=$stuConf[0]->stu_diseaes ?? 'ไม่มี'?>">
                 </div>
                 <div class="col-md-6">
-                    <label for="stu_disablde" class="form-label">ความพิการ (ถ้าไม่มีให้ระบุว่า "ไม่มี")</label>
+                    <label for="stu_disablde" class="form-label">ความพิการ <span class="text-danger">*</span> (ถ้าไม่มีระบุ "ไม่มี")</label>
                     <input type="text" class="form-control" id="stu_disablde" name="stu_disablde"
                         placeholder="" required value="<?=$stuConf[0]->stu_disablde ?? 'ไม่มี'?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_wieght" class="form-label">น้ำหนัก (กก.)</label>
-                    <input type="number" class="form-control" id="stu_wieght" name="stu_wieght" placeholder=""
+                    <label for="stu_wieght" class="form-label">น้ำหนัก <span class="text-danger">*</span> (กก.)</label>
+                    <input type="number" class="form-control" id="stu_wieght" name="stu_wieght" placeholder="เช่น 55"
                         required value="<?=$stuConf[0]->stu_wieght ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_hieght" class="form-label">ส่วนสูง (ซม.)</label>
-                    <input type="number" class="form-control" id="stu_hieght" name="stu_hieght" placeholder=""
+                    <label for="stu_hieght" class="form-label">ส่วนสูง <span class="text-danger">*</span> (ซม.)</label>
+                    <input type="number" class="form-control" id="stu_hieght" name="stu_hieght" placeholder="เช่น 165"
                         required value="<?=$stuConf[0]->stu_hieght ?? ''?>">
                 </div>
                     <div class="col-md-6">
-                    <label for="stu_talent" class="form-label">ความสามารถพิเศษ</label>
-                    <input type="text" class="form-control" id="stu_talent" name="stu_talent" placeholder=""
+                    <label for="stu_talent" class="form-label">ความสามารถพิเศษ <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="stu_talent" name="stu_talent" placeholder="เช่น ดนตรี, กีฬา (ถ้าไม่มีระบุ ไม่มี)"
                         required value="<?=$stuConf[0]->stu_talent ?? 'ไม่มี'?>">
                 </div>
             </div>
@@ -187,22 +187,22 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="stu_birthHospital" class="form-label">โรงพยาบาลที่เกิด</label>
-                    <input type="text" class="form-control" placeholder="" id="stu_birthHospital"
+                    <label for="stu_birthHospital" class="form-label">โรงพยาบาลที่เกิด <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" placeholder="ระบุชื่อโรงพยาบาล" id="stu_birthHospital"
                         name="stu_birthHospital" required value="<?=$stuConf[0]->stu_birthHospital ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_birthTambon" class="form-label">ตำบลที่เกิด</label>
+                    <label for="stu_birthTambon" class="form-label">ตำบลที่เกิด <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_birthTambon"
                         name="stu_birthTambon" required value="<?=$stuConf[0]->stu_birthTambon ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_birthDistrict" class="form-label">อำเภอที่เกิด</label>
+                    <label for="stu_birthDistrict" class="form-label">อำเภอที่เกิด <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_birthDistrict"
                         name="stu_birthDistrict" required value="<?=$stuConf[0]->stu_birthDistrict ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_birthProvirce" class="form-label">จังหวัดที่เกิด</label>
+                    <label for="stu_birthProvirce" class="form-label">จังหวัดที่เกิด <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_birthProvirce"
                         name="stu_birthProvirce" required value="<?=$stuConf[0]->stu_birthProvirce ?? ''?>">
                 </div>
@@ -211,7 +211,7 @@
                     $religion_options = ["พุทธ", "อิสลาม", "คริสต์", "ฮินดู", "ซิกข์", "ไม่นับถือศาสนา", "อื่นๆ"];
                 ?>
                 <div class="col-md-4">
-                    <label for="stu_nationality" class="form-label">เชื้อชาติ</label>
+                    <label for="stu_nationality" class="form-label">เชื้อชาติ <span class="text-danger">*</span></label>
                     <select class="form-select" id="stu_nationality" name="stu_nationality" required>
                         <option value="">เลือกเชื้อชาติ</option>
                         <?php foreach($nation_options as $op): ?>
@@ -220,7 +220,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="stu_race" class="form-label">สัญชาติ</label>
+                    <label for="stu_race" class="form-label">สัญชาติ <span class="text-danger">*</span></label>
                     <select class="form-select" id="stu_race" name="stu_race" required>
                         <option value="">เลือกสัญชาติ</option>
                         <?php foreach($nation_options as $op): ?>
@@ -229,7 +229,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="stu_religion" class="form-label">ศาสนา</label>
+                    <label for="stu_religion" class="form-label">ศาสนา <span class="text-danger">*</span></label>
                     <select class="form-select" id="stu_religion" name="stu_religion" required>
                         <option value="">เลือกศาสนา</option>
                         <?php foreach($religion_options as $op): ?>
@@ -249,24 +249,24 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="stu_numberSibling" class="form-label">จำนวนพี่น้องทั้งหมด (รวมนักเรียน)</label>
+                    <label for="stu_numberSibling" class="form-label">จำนวนพี่น้องทั้งหมด <span class="text-danger">*</span></label>
                     <input type="number" class="form-control" id="stu_numberSibling" name="stu_numberSibling"
-                        placeholder="" required value="<?=$stuConf[0]->stu_numberSibling ?? ''?>">
+                        placeholder="รวมนักเรียน" required value="<?=$stuConf[0]->stu_numberSibling ?? ''?>">
                 </div>
                 <div class="col-md-4">
-                    <label for="stu_firstChild" class="form-label">นักเรียนเป็นลูกคนที่</label>
+                    <label for="stu_firstChild" class="form-label">นักเรียนเป็นลูกคนที่ <span class="text-danger">*</span></label>
                     <input type="number" class="form-control" id="stu_firstChild" name="stu_firstChild"
-                        placeholder="" required value="<?=$stuConf[0]->stu_firstChild ?? ''?>">
+                        placeholder="เช่น 1" required value="<?=$stuConf[0]->stu_firstChild ?? ''?>">
                 </div>
                 <div class="col-md-4">
-                    <label for="stu_numberSiblingSkj" class="form-label">พี่น้องที่เรียน รร.สกจ. (รวมนักเรียน)</label>
+                    <label for="stu_numberSiblingSkj" class="form-label">พี่น้องที่เรียน สกจ. <span class="text-danger">*</span></label>
                     <input type="number" class="form-control" id="stu_numberSiblingSkj"
-                        name="stu_numberSiblingSkj" placeholder="" required
+                        name="stu_numberSiblingSkj" placeholder="รวมนักเรียน (ถ้าไม่มีระบุ 0)" required
                         value="<?=$stuConf[0]->stu_numberSiblingSkj ?? ''?>">
                 </div>
                 
                 <div class="col-12">
-                    <label class="form-label fw-bold text-muted mb-2">สถานภาพบิดา-มารดา</label>
+                    <label class="form-label fw-bold text-muted mb-2">สถานภาพบิดา-มารดา <span class="text-danger">*</span></label>
                     <div class="row row-cols-auto g-2">
                         <?php $parstu = array("อยู่ด้วยกัน","แยกกันอยู่","หย่าร้าง","บิดาถึงแก่กรรม","มารดาถึงแก่กรรม","บิดาและมารดาถึงแก่กรรม","บิดาหรือมารดาแต่งงานใหม่"); 
                         foreach ($parstu as $key => $v_parstu) : ?>
@@ -282,7 +282,7 @@
                 </div>
 
                 <div class="col-12">
-                    <label class="form-label fw-bold text-muted mb-2">สภาพความเป็นอยู่ปัจจุบัน</label>
+                    <label class="form-label fw-bold text-muted mb-2">สภาพความเป็นอยู่ปัจจุบัน <span class="text-danger">*</span></label>
                     <div class="row row-cols-auto g-2 align-items-center">
                         <?php $pars = array("อยู่กับบิดาและมารดา","อยู่กับบิดาหรือมารดา","บุคคลอื่น"); 
                         foreach ($pars as $key => $v_pars) : ?>
@@ -315,45 +315,45 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="stu_hCode" class="form-label">รหัสประจำบ้าน</label>
-                    <input type="text" class="form-control" placeholder="" id="stu_hCode" name="stu_hCode"
-                        required value="<?=$stuConf[0]->stu_hCode ?? ''?>">
+                    <label for="stu_hCode" class="form-label">รหัสประจำบ้าน (ถ้ามี)</label>
+                    <input type="text" class="form-control" placeholder="11 หลัก" id="stu_hCode" name="stu_hCode"
+                        value="<?=$stuConf[0]->stu_hCode ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_hNumber" class="form-label">บ้านเลขที่</label>
+                    <label for="stu_hNumber" class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_hNumber" name="stu_hNumber"
                         required value="<?=$stuConf[0]->stu_hNumber ?? $stu[0]->recruit_homeNumber?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_hMoo" class="form-label">หมู่ที่</label>
+                    <label for="stu_hMoo" class="form-label">หมู่ที่ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_hMoo" name="stu_hMoo"
                         required value="<?=$stuConf[0]->stu_hMoo ?? $stu[0]->recruit_homeGroup?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_hRoad" class="form-label">ถนน</label>
-                    <input type="text" class="form-control" id="stu_hRoad" name="stu_hRoad" placeholder=""
+                    <label for="stu_hRoad" class="form-label">ถนน <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="stu_hRoad" name="stu_hRoad" placeholder="(ถ้าไม่มีระบุ -)"
                         required value="<?=$stuConf[0]->stu_hRoad ?? $stu[0]->recruit_homeRoad?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_hTambon" class="form-label">ตำบล</label>
+                    <label for="stu_hTambon" class="form-label">ตำบล <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_hTambon"
                         name="stu_hTambon" required
                         value="<?=$stuConf[0]->stu_hTambon ?? $stu[0]->recruit_homeSubdistrict?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_hDistrict" class="form-label">อำเภอ</label>
+                    <label for="stu_hDistrict" class="form-label">อำเภอ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_hDistrict"
                         name="stu_hDistrict" required
                         value="<?=$stuConf[0]->stu_hDistrict ?? $stu[0]->recruit_homedistrict?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_hProvince" class="form-label">จังหวัด</label>
+                    <label for="stu_hProvince" class="form-label">จังหวัด <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_hProvince"
                         name="stu_hProvince" required
                         value="<?=$stuConf[0]->stu_hProvince ?? $stu[0]->recruit_homeProvince?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_hPostCode" class="form-label">รหัสไปรษณีย์</label>
+                    <label for="stu_hPostCode" class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_hPostCode"
                         name="stu_hPostCode" required
                         value="<?=$stuConf[0]->stu_hPostCode ?? $stu[0]->recruit_homePostcode?>">
@@ -374,43 +374,43 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="stu_cNumber" class="form-label">บ้านเลขที่</label>
+                    <label for="stu_cNumber" class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_cNumber" name="stu_cNumber"
                         required value="<?=$stuConf[0]->stu_cNumber ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_cMoo" class="form-label">หมู่ที่</label>
+                    <label for="stu_cMoo" class="form-label">หมู่ที่ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_cMoo" name="stu_cMoo"
                         required value="<?=$stuConf[0]->stu_cMoo ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_cRoad" class="form-label">ถนน</label>
-                    <input type="text" class="form-control" id="stu_cRoad" name="stu_cRoad" placeholder=""
+                    <label for="stu_cRoad" class="form-label">ถนน <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="stu_cRoad" name="stu_cRoad" placeholder="(ถ้าไม่มีระบุ -)"
                         required value="<?=$stuConf[0]->stu_cRoad ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_cTumbao" class="form-label">ตำบล</label>
+                    <label for="stu_cTumbao" class="form-label">ตำบล <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_cTumbao"
                         name="stu_cTumbao" required value="<?=$stuConf[0]->stu_cTumbao ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_cDistrict" class="form-label">อำเภอ</label>
+                    <label for="stu_cDistrict" class="form-label">อำเภอ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_cDistrict"
                         name="stu_cDistrict" required value="<?=$stuConf[0]->stu_cDistrict ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_cProvince" class="form-label">จังหวัด</label>
+                    <label for="stu_cProvince" class="form-label">จังหวัด <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_cProvince"
                         name="stu_cProvince" required value="<?=$stuConf[0]->stu_cProvince ?? ''?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="stu_cPostcode" class="form-label">รหัสไปรษณีย์</label>
+                    <label for="stu_cPostcode" class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="stu_cPostcode" name="stu_cPostcode"
                         placeholder="" required value="<?=$stuConf[0]->stu_cPostcode ?? ''?>">
                 </div>
                 
                 <div class="col-12 mt-3">
-                    <label class="form-label fw-bold text-muted mb-2">ลักษณะที่อยู่อาศัย</label>
+                    <label class="form-label fw-bold text-muted mb-2">ลักษณะที่อยู่อาศัย <span class="text-danger">*</span></label>
                         <div class="row row-cols-auto g-2">
                             <?php $addr = array("บ้านตนเอง","เช่าอยู่","อาศัยผู้อื่นอยู่","บ้านพักราชการ","วัด","หอพัก"); 
                             foreach ($addr as $key => $v_addr) : 
@@ -438,29 +438,35 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="stu_farSchool" class="form-label">ระยะทางจากบ้านถึง รร. (กม.)</label>
+                    <label for="stu_farSchool" class="form-label">ระยะทางจากบ้าน (กม.) <span class="text-danger">*</span></label>
                     <input type="number" class="form-control" id="stu_farSchool" name="stu_farSchool"
-                        placeholder="" required value="<?=$stuConf[0]->stu_farSchool ?? ''?>">
+                        placeholder="กิโลเมตร" required value="<?=$stuConf[0]->stu_farSchool ?? ''?>">
                 </div>
                 <div class="col-md-8">
-                    <label for="stu_travel" class="form-label">เดินทางโดยพาหนะ</label>
-                    <input type="text" class="form-control" id="stu_travel" name="stu_travel" placeholder=""
+                    <label for="stu_travel" class="form-label">เดินทางโดยพาหนะ <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="stu_travel" name="stu_travel" placeholder="เช่น รถจักรยานยนต์, รถรับ-ส่ง"
                         required value="<?=$stuConf[0]->stu_travel ?? ''?>">
                 </div>
                 
                 <div class="col-md-3">
-                    <label for="stu_gradLevel" class="form-label">จบการศึกษาชั้น</label>
+                    <label for="stu_gradLevel" class="form-label">จบการศึกษาชั้น <span class="text-danger">*</span></label>
                     <select class="form-select" id="stu_gradLevel" name="stu_gradLevel" required>
                         <option value="">เลือกระดับชั้น</option>
-                        <?php $gradLevel = array('ป.6','ม.1','ม.2','ม.3','ม.4','ม.5'); 
+                        <?php 
+                        $gradLevel = array('ป.6','ม.1','ม.2','ม.3','ม.4','ม.5'); 
+                        // Fallback logic for graduation level
+                        $defaultGrad = '';
+                        if (empty($stuConf[0]->stu_gradLevel) && !empty($stu[0]->recruit_regLevel)) {
+                            $defaultGrad = ($stu[0]->recruit_regLevel == '1') ? 'ป.6' : (($stu[0]->recruit_regLevel == '4') ? 'ม.3' : '');
+                        }
                         foreach ($gradLevel as $key => $v_gradLevel): ?>
-                        <option <?=($stuConf[0]->stu_gradLevel ?? '') == $v_gradLevel ?"selected":""?>
+                        <option <?=($stuConf[0]->stu_gradLevel ?? $defaultGrad) == $v_gradLevel ?"selected":""?>
                             value="<?=$v_gradLevel;?>"><?=$v_gradLevel;?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="col-md-9">
-                    <label for="stu_schoolfrom" class="form-label">จากโรงเรียน</label>
+                    <label for="stu_schoolfrom" class="form-label">จากโรงเรียน <span class="text-danger">*</span></label>
                     <select class="form-select" id="stu_schoolfrom" name="stu_schoolfrom" required>
                         <?php if(!empty($stuConf[0]->stu_schoolfrom) || !empty($stu[0]->recruit_oldSchool)): ?>
                             <option value="<?=$stuConf[0]->stu_schoolfrom ?? $stu[0]->recruit_oldSchool?>" selected>
@@ -470,18 +476,18 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="stu_schoolTambao" class="form-label">ตำบล</label>
+                    <label for="stu_schoolTambao" class="form-label">ตำบล <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_schoolTambao"
-                        name="stu_schoolTambao" required value="<?php echo $stuConf[0]->stu_schoolTambao ?? '';?>">
+                        name="stu_schoolTambao" required value="<?php echo $stuConf[0]->stu_schoolTambao ?? $stu[0]->recruit_homeSubdistrict ?? '';?>">
                 </div>
                 <div class="col-md-4">
-                    <label for="stu_schoolDistrict" class="form-label">อำเภอ</label>
+                    <label for="stu_schoolDistrict" class="form-label">อำเภอ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_schoolDistrict"
                         name="stu_schoolDistrict" required
                         value="<?php echo $stuConf[0]->stu_schoolDistrict ?? $stu[0]->recruit_district ;?>">
                 </div>
                 <div class="col-md-4">
-                        <label for="stu_schoolProvince" class="form-label">จังหวัด</label>
+                    <label for="stu_schoolProvince" class="form-label">จังหวัด <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="" id="stu_schoolProvince"
                         name="stu_schoolProvince" required
                         value="<?php echo $stuConf[0]->stu_schoolProvince ?? $stu[0]->recruit_province;?>">
@@ -500,21 +506,21 @@
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <label class="form-label mb-2">เคยเป็นนักเรียนโรงเรียนสวนกุหลาบวิทยาลัย(จิรประวัติ) นครสวรรค์ หรือไม่?</label>
+                    <label class="form-label mb-2">เคยเป็นนักเรียนโรงเรียนสวนกุหลาบวิทยาลัย(จิรประวัติ) นครสวรรค์ หรือไม่? <span class="text-danger">*</span></label>
                     <div class="d-flex align-items-center gap-3">
                         <div class="d-flex gap-4">
                             <div class="form-check">
                                 <input type="radio" class="form-check-input" name="stu_usedStudent" id="stu_usedStudent1" value="ไม่เคย" <?php if(isset($stuConf[0]->stu_usedStudent) && $stuConf[0]->stu_usedStudent == "ไม่เคย") echo "checked"; ?> required>
                                 <label class="form-check-label" for="stu_usedStudent1">ไม่เคย</label>
                             </div>
-
+ 
                             <div class="form-check">
                                 <input type="radio" class="form-check-input" name="stu_usedStudent" id="stu_usedStudent2" value="เคย" <?php if(isset($stuConf[0]->stu_usedStudent) && $stuConf[0]->stu_usedStudent == "เคย") echo "checked"; ?> required>
                                 <label class="form-check-label" for="stu_usedStudent2">เคย</label>
                             </div>
                         </div>
                         
-                        <div class="d-flex align-items-center ms-2">
+                        <div class="d-flex align-items-center ms-2" id="usedStudentLevelSection" style="display:none;">
                             <label class="form-label me-2 mb-0" for="stu_inputLevel">ระบุระดับชั้น:</label>
                             <select class="form-select w-auto" id="stu_inputLevel" name="stu_inputLevel">
                                 <option value="">เลือก</option>
@@ -536,13 +542,13 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="stu_phoneUrgent" class="form-label">เบอร์โทรศัพท์ติดต่อฉุกเฉิน</label>
+                    <label for="stu_phoneUrgent" class="form-label">เบอร์โทรศัพท์ติดต่อฉุกเฉิน <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="stu_phoneUrgent" name="stu_phoneUrgent"
                         value="<?php echo $stuConf[0]->stu_phoneUrgent ?? '';?>" placeholder="" required
                         data-inputmask="'mask': '999-999-9999'">
                 </div>
                 <div class="col-md-6">
-                    <label for="stu_phoneFriend" class="form-label">เบอร์โทรศัพท์เพื่อนบ้านใกล้เคียง</label>
+                    <label for="stu_phoneFriend" class="form-label">เบอร์โทรศัพท์เพื่อนบ้านใกล้เคียง <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="stu_phoneFriend" name="stu_phoneFriend"
                         value="<?php echo $stuConf[0]->stu_phoneFriend ?? '';?>" placeholder="" required
                         data-inputmask="'mask': '999-999-9999'">

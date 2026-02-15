@@ -17,6 +17,7 @@ class UserControlConfirmation extends BaseController
     {
         $this->admissionModel = new AdmissionModel();
         $this->db = \Config\Database::connect();
+        $this->dbPers = \Config\Database::connect('skjpers');
         $this->session = \Config\Services::session();
         $this->datethai = new Datethai();
         helper(['url', 'form', 'upload']);
@@ -163,7 +164,7 @@ class UserControlConfirmation extends BaseController
         }
 
         // Fetch Personnel Data (tb_students)
-        $studentPers = $this->db->table('skjacth_personnel.tb_students')
+        $studentPers = $this->dbPers->table('tb_students')
             ->where('stu_iden', $studentId)
             ->get()->getResult();
 
@@ -191,6 +192,7 @@ class UserControlConfirmation extends BaseController
             $newStu->stu_hProvince = $r->recruit_homeProvince;
             $newStu->stu_hPostCode = $r->recruit_homePostcode; // Check casing
             $newStu->stu_schoolfrom = $r->recruit_oldSchool;
+            $newStu->stu_schoolTambao = $r->recruit_homeSubdistrict ?? ''; 
             $newStu->stu_schoolDistrict = $r->recruit_district;
             $newStu->stu_schoolProvince = $r->recruit_province;
             // Initialize other fields as empty or default to avoid undefined property notices in view
@@ -222,7 +224,13 @@ class UserControlConfirmation extends BaseController
             $newStu->stu_natureRoom = '';
             $newStu->stu_farSchool = '';
             $newStu->stu_travel = '';
-            $newStu->stu_gradLevel = '';
+            if ($r->recruit_regLevel == '1') {
+                $newStu->stu_gradLevel = 'ป.6';
+            } elseif ($r->recruit_regLevel == '4') {
+                $newStu->stu_gradLevel = 'ม.3';
+            } else {
+                $newStu->stu_gradLevel = '';
+            }
             $newStu->stu_schoolTambao = '';
             $newStu->stu_usedStudent = '';
             $newStu->stu_inputLevel = '';
@@ -234,7 +242,7 @@ class UserControlConfirmation extends BaseController
         }
 
         // Fetch Parent Data
-        $parents = $this->db->table('skjacth_personnel.tb_parent')
+        $parents = $this->dbPers->table('tb_parent')
             ->where('par_stuID', $studentId)
             ->get()->getResult();
 
@@ -274,70 +282,148 @@ class UserControlConfirmation extends BaseController
      */
     public function save()
     {
-        if (!$this->session->has('confirmation_student_id')) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Session expired. Please login again.']);
+        try {
+            if (!$this->session->has('confirmation_student_id')) {
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Session expired. Please login again.']);
+            }
+
+            $studentId = $this->session->get('confirmation_student_id');
+            $post = $this->request->getPost();
+
+            // Check which form is submitted
+            if (isset($post['stu_iden'])) {
+                // Student Form
+                return $this->saveStudent($post, $studentId);
+            } elseif (isset($post['par_relationKey']) && $post['par_relationKey'] == 'พ่อ') {
+                // Father Form
+                return $this->saveParent($post, $studentId, 'พ่อ');
+            } elseif (isset($post['par_relationKeyM']) && $post['par_relationKeyM'] == 'แม่') {
+                // Mother Form
+                return $this->saveParent($post, $studentId, 'แม่');
+            } elseif (isset($post['par_relationKeyO']) && $post['par_relationKeyO'] == 'ผู้ปกครอง') {
+                // Guardian Form
+                return $this->saveParent($post, $studentId, 'ผู้ปกครอง');
+            }
+
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid form data.']);
+        } catch (\Throwable $th) {
+            // Log the error for internal tracking
+            log_message('error', '[Confirmation Save Error] ' . $th->getMessage() . "\n" . $th->getTraceAsString());
+            return $this->response->setJSON(['status' => 'error', 'message' => 'System Error: ' . $th->getMessage()]);
         }
-
-        $studentId = $this->session->get('confirmation_student_id');
-        $post = $this->request->getPost();
-
-        // Check which form is submitted
-        if (isset($post['stu_iden'])) {
-            // Student Form
-            return $this->saveStudent($post, $studentId);
-        } elseif (isset($post['par_relationKey']) && $post['par_relationKey'] == 'พ่อ') {
-            // Father Form
-            return $this->saveParent($post, $studentId, 'พ่อ');
-        } elseif (isset($post['par_relationKeyM']) && $post['par_relationKeyM'] == 'แม่') {
-            // Mother Form
-            return $this->saveParent($post, $studentId, 'แม่');
-        } elseif (isset($post['par_relationKeyO']) && $post['par_relationKeyO'] == 'ผู้ปกครอง') {
-            // Guardian Form
-            return $this->saveParent($post, $studentId, 'ผู้ปกครอง');
-        }
-
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid form data.']);
     }
 
     private function saveStudent($data, $studentId)
     {
-        // Keep original data for saving
-        $saveData = $data;
+        try {
+            // Keep original data for saving
+            $saveData = $data;
 
-        // Clean data for validation
-        $data['stu_iden'] = str_replace('-', '', $data['stu_iden']);
-        $data['stu_phone'] = str_replace('-', '', $data['stu_phone']);
-        $data['stu_phoneUrgent'] = str_replace('-', '', $data['stu_phoneUrgent']);
-        $data['stu_phoneFriend'] = str_replace('-', '', $data['stu_phoneFriend']);
+            // Clean data for validation
+            $data['stu_iden'] = str_replace('-', '', $data['stu_iden']);
+            $data['stu_phone'] = str_replace('-', '', $data['stu_phone']);
+            $data['stu_phoneUrgent'] = str_replace('-', '', $data['stu_phoneUrgent']);
+            $data['stu_phoneFriend'] = str_replace('-', '', $data['stu_phoneFriend']);
 
-        // Construct birthdate for validation
-        $birthDate = ($data['stu_year'] - 543) . '-' . sprintf('%02d', $data['stu_month']) . '-' . sprintf('%02d', $data['stu_day']);
-        $data['stu_birthDay'] = $birthDate;
+            // Construct birthdate for validation
+            $birthDate = ($data['stu_year'] - 543) . '-' . sprintf('%02d', $data['stu_month']) . '-' . sprintf('%02d', $data['stu_day']);
+            $data['stu_birthDay'] = $birthDate;
 
-        // Validation Rules
+        // Validation Rules with Thai Labels for better error messages
         $rules = [
-            'stu_iden' => 'required|numeric|exact_length[13]',
-            'stu_prefix' => 'required',
-            'stu_fristName' => 'required',
-            'stu_lastName' => 'required',
-            'stu_phone' => 'required',
-            'stu_birthDay' => 'valid_date',
-            'stu_year' => 'required|numeric',
-            'stu_month' => 'required|numeric',
-            'stu_day' => 'required|numeric',
+            'stu_iden' => ['label' => 'เลขประจำตัวประชาชน', 'rules' => 'required|numeric|exact_length[13]'],
+            'stu_prefix' => ['label' => 'คำนำหน้า', 'rules' => 'required'],
+            'stu_fristName' => ['label' => 'ชื่อจริง', 'rules' => 'required'],
+            'stu_lastName' => ['label' => 'นามสกุลจริง', 'rules' => 'required'],
+            'stu_nickName' => ['label' => 'ชื่อเล่น', 'rules' => 'required'],
+            'stu_phone' => ['label' => 'เบอร์โทรศัพท์มือถือ', 'rules' => 'required'],
+            'stu_birthDay' => ['label' => 'วันเกิด', 'rules' => 'valid_date'],
+            'stu_year' => ['label' => 'ปีที่เกิด', 'rules' => 'required|numeric'],
+            'stu_month' => ['label' => 'เดือนที่เกิด', 'rules' => 'required|numeric'],
+            'stu_day' => ['label' => 'วันที่เกิด', 'rules' => 'required|numeric'],
+            'stu_bloodType' => ['label' => 'กรุ๊ปเลือด', 'rules' => 'required'],
+            'stu_diseaes' => ['label' => 'โรคประจำตัว', 'rules' => 'required'],
+            'stu_disablde' => ['label' => 'ความพิการ', 'rules' => 'required'],
+            'stu_wieght' => ['label' => 'น้ำหนัก', 'rules' => 'required|numeric'],
+            'stu_hieght' => ['label' => 'ส่วนสูง', 'rules' => 'required|numeric'],
+            'stu_talent' => ['label' => 'ความสามารถพิเศษ', 'rules' => 'required'],
+            'stu_birthHospital' => ['label' => 'โรงพยาบาลที่เกิด', 'rules' => 'required'],
+            'stu_birthTambon' => ['label' => 'ตำบลที่เกิด', 'rules' => 'required'],
+            'stu_birthDistrict' => ['label' => 'อำเภอที่เกิด', 'rules' => 'required'],
+            'stu_birthProvirce' => ['label' => 'จังหวัดที่เกิด', 'rules' => 'required'],
+            'stu_nationality' => ['label' => 'เชื้อชาติ', 'rules' => 'required'],
+            'stu_race' => ['label' => 'สัญชาติ', 'rules' => 'required'],
+            'stu_religion' => ['label' => 'ศาสนา', 'rules' => 'required'],
+            'stu_numberSibling' => ['label' => 'จำนวนพี่น้องทั้งหมด', 'rules' => 'required|numeric'],
+            'stu_firstChild' => ['label' => 'นักเรียนเป็นลูกคนที่', 'rules' => 'required|numeric'],
+            'stu_numberSiblingSkj' => ['label' => 'พี่น้องที่เรียน สกจ.', 'rules' => 'required|numeric'],
+            'stu_parenalStatus' => ['label' => 'สถานภาพบิดา-มารดา', 'rules' => 'required'],
+            'stu_presentLife' => ['label' => 'สภาพความเป็นอยู่ปัจจุบัน', 'rules' => 'required'],
+            'stu_hNumber' => ['label' => 'บ้านเลขที่ (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+            'stu_hTambon' => ['label' => 'ตำบล (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+            'stu_hDistrict' => ['label' => 'อำเภอ (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+            'stu_hProvince' => ['label' => 'จังหวัด (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+            'stu_hPostCode' => ['label' => 'รหัสไปรษณีย์ (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+            'stu_cNumber' => ['label' => 'บ้านเลขที่ (ปัจจุบัน)', 'rules' => 'required'],
+            'stu_cMoo' => ['label' => 'หมู่ที่ (ปัจจุบัน)', 'rules' => 'required'],
+            'stu_cTumbao' => ['label' => 'ตำบล (ปัจจุบัน)', 'rules' => 'required'],
+            'stu_cDistrict' => ['label' => 'อำเภอ (ปัจจุบัน)', 'rules' => 'required'],
+            'stu_cProvince' => ['label' => 'จังหวัด (ปัจจุบัน)', 'rules' => 'required'],
+            'stu_cPostcode' => ['label' => 'รหัสไปรษณีย์ (ปัจจุบัน)', 'rules' => 'required'],
+            'stu_natureRoom' => ['label' => 'ลักษณะที่อยู่อาศัย', 'rules' => 'required'],
+            'stu_farSchool' => ['label' => 'ระยะทางจากบ้าน $(\text{กม.})', 'rules' => 'required|numeric'],
+            'stu_travel' => ['label' => 'เดินทางโดยพาหนะ', 'rules' => 'required'],
+            'stu_gradLevel' => ['label' => 'จบการศึกษาชั้น', 'rules' => 'required'],
+            'stu_schoolfrom' => ['label' => 'จากโรงเรียน', 'rules' => 'required'],
+            'stu_schoolTambao' => ['label' => 'ตำบลที่ตั้งโรงเรียน', 'rules' => 'required'],
+            'stu_schoolDistrict' => ['label' => 'อำเภอที่ตั้งโรงเรียน', 'rules' => 'required'],
+            'stu_schoolProvince' => ['label' => 'จังหวัดที่ตั้งโรงเรียน', 'rules' => 'required'],
+            'stu_usedStudent' => ['label' => 'เคยเป็นนักเรียนที่นี่', 'rules' => 'required'],
+            'stu_phoneUrgent' => ['label' => 'เบอร์โทรศัพท์ติดต่อฉุกเฉิน', 'rules' => 'required'],
+            'stu_phoneFriend' => ['label' => 'เบอร์โทรศัพท์เพื่อนบ้าน', 'rules' => 'required'],
+        ];
+
+        $messages = [
+            'required' => 'กรุณากรอกข้อมูล {field} ให้ครบถ้วน',
+            'numeric' => 'ข้อมูล {field} ต้องเป็นตัวเลขเท่านั้น',
+            'exact_length' => 'ข้อมูล {field} ต้องมีความยาว {param} ตัวอักษร',
+            'valid_date' => 'รูปแบบวันที่ไม่ถูกต้อง',
         ];
 
         $validation = \Config\Services::validation();
-        $validation->setRules($rules);
+        $validation->setRules($rules, $messages);
 
         if (!$validation->run($data)) {
-            return $this->response->setJSON(['status' => 'error', 'message' => implode(', ', $validation->getErrors())]);
+            $errors = array_values($validation->getErrors());
+            return $this->response->setJSON(['status' => 'error', 'message' => $errors[0]]);
+        }
+
+        // Additional Check for Thai ID Checksum
+        if (!$this->validateThaiID($data['stu_iden'])) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'เลขประจำตัวประชาชนของนักเรียนไม่ถูกต้อง']);
+        }
+
+        // Check for duplicate Student ID in database (excluding current session student)
+        $formattedNewId = substr($data['stu_iden'], 0, 1) . '-' . substr($data['stu_iden'], 1, 4) . '-' . substr($data['stu_iden'], 5, 5) . '-' . substr($data['stu_iden'], 10, 2) . '-' . substr($data['stu_iden'], 12, 1);
+        $dupStudent = $this->dbPers->table('tb_students')
+            ->where('stu_iden !=', $studentId)
+            ->groupStart()
+                ->where('stu_iden', $data['stu_iden'])
+                ->orWhere('stu_iden', $formattedNewId)
+            ->groupEnd()
+            ->get()->getRow();
+        
+        if ($dupStudent) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'เลขประจำตัวประชาชนนี้ถูกใช้งานโดยนักเรียนคนอื่นแล้ว']);
         }
 
         // Prepare data for tb_students using ORIGINAL formatted data ($saveData) where appropriate
         // But use constructed birthDate
+        $openYear = $this->admissionModel->getOpenYear();
+        $currentYear = $openYear ? $openYear->openyear_year : date('Y') + 543;
+
         $studentData = [
-            'stu_UpdateConfirm' => $this->admissionModel->getOpenYear()->openyear_year,
+            'stu_UpdateConfirm' => $currentYear,
             'stu_iden' => $saveData['stu_iden'], // Save with dashes
             'stu_prefix' => $saveData['stu_prefix'],
             'stu_fristName' => $saveData['stu_fristName'],
@@ -345,7 +431,7 @@ class UserControlConfirmation extends BaseController
             'stu_nickName' => $saveData['stu_nickName'],
             'stu_birthDay' => $birthDate,
             'stu_phone' => $saveData['stu_phone'], // Save with dashes
-            'stu_email' => $saveData['stu_email'],
+            'stu_email' => $saveData['stu_email'] ?? '',
             'stu_birthHospital' => $saveData['stu_birthHospital'],
             'stu_birthTambon' => $saveData['stu_birthTambon'],
             'stu_birthDistrict' => $saveData['stu_birthDistrict'],
@@ -359,29 +445,29 @@ class UserControlConfirmation extends BaseController
             'stu_wieght' => $saveData['stu_wieght'],
             'stu_hieght' => $saveData['stu_hieght'],
             'stu_talent' => $saveData['stu_talent'],
-            'stu_numberSibling' => $saveData['stu_numberSibling'],
-            'stu_firstChild' => $saveData['stu_firstChild'],
-            'stu_numberSiblingSkj' => $saveData['stu_numberSiblingSkj'],
+            'stu_numberSibling' => $saveData['stu_numberSibling'] ?? 0,
+            'stu_firstChild' => $saveData['stu_firstChild'] ?? 1,
+            'stu_numberSiblingSkj' => $saveData['stu_numberSiblingSkj'] ?? 0,
             'stu_parenalStatus' => $saveData['stu_parenalStatus'],
             'stu_presentLife' => $saveData['stu_presentLife'],
             'stu_personOther' => $saveData['stu_personOther'] ?? '',
-            'stu_hCode' => $saveData['stu_hCode'],
+            'stu_hCode' => $saveData['stu_hCode'] ?? '',
             'stu_hNumber' => $saveData['stu_hNumber'],
             'stu_hMoo' => $saveData['stu_hMoo'],
-            'stu_hRoad' => $saveData['stu_hRoad'],
+            'stu_hRoad' => $saveData['stu_hRoad'] ?? '-',
             'stu_hTambon' => $saveData['stu_hTambon'],
             'stu_hDistrict' => $saveData['stu_hDistrict'],
             'stu_hProvince' => $saveData['stu_hProvince'],
             'stu_hPostCode' => $saveData['stu_hPostCode'],
             'stu_cNumber' => $saveData['stu_cNumber'],
             'stu_cMoo' => $saveData['stu_cMoo'],
-            'stu_cRoad' => $saveData['stu_cRoad'],
+            'stu_cRoad' => $saveData['stu_cRoad'] ?? '-',
             'stu_cTumbao' => $saveData['stu_cTumbao'],
             'stu_cDistrict' => $saveData['stu_cDistrict'],
             'stu_cProvince' => $saveData['stu_cProvince'],
             'stu_cPostcode' => $saveData['stu_cPostcode'],
             'stu_natureRoom' => $saveData['stu_natureRoom'],
-            'stu_farSchool' => $saveData['stu_farSchool'],
+            'stu_farSchool' => $saveData['stu_farSchool'] ?? 0,
             'stu_travel' => $saveData['stu_travel'],
             'stu_gradLevel' => $saveData['stu_gradLevel'],
             'stu_schoolfrom' => $saveData['stu_schoolfrom'],
@@ -395,109 +481,159 @@ class UserControlConfirmation extends BaseController
         ];
 
         // Check if student exists (using ID with dashes as per session/DB convention)
-        $existing = $this->db->table('skjacth_personnel.tb_students')->where('stu_iden', $studentId)->get()->getRow();
+        $existing = $this->dbPers->table('tb_students')->where('stu_iden', $studentId)->get()->getRow();
 
         if ($existing) {
-            $this->db->table('skjacth_personnel.tb_students')->where('stu_iden', $studentId)->update($studentData);
+            $this->dbPers->table('tb_students')->where('stu_iden', $studentId)->update($studentData);
         } else {
-            $this->db->table('skjacth_personnel.tb_students')->insert($studentData);
+            $this->dbPers->table('tb_students')->insert($studentData);
         }
 
         return $this->response->setJSON(['status' => 'success', 'message' => 'บันทึกข้อมูลนักเรียนเรียบร้อยแล้ว']);
+        } catch (\Throwable $th) {
+            log_message('error', '[saveStudent Error] ' . $th->getMessage() . "\n" . $th->getTraceAsString());
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Database Error (Student): ' . $th->getMessage()]);
+        }
     }
 
     private function saveParent($data, $studentId, $relationKey)
     {
-        // Keep original data
-        $saveData = $data;
-
-        // Map fields based on relation key
-        $suffix = '';
-        if ($relationKey == 'แม่')
-            $suffix = 'M';
-        if ($relationKey == 'ผู้ปกครอง')
-            $suffix = 'O';
-
-        // Clean data for validation
-        $data['par_IdNumber' . $suffix] = str_replace('-', '', $data['par_IdNumber' . $suffix] ?? '');
-        $data['par_phone' . $suffix] = str_replace('-', '', $data['par_phone' . $suffix] ?? '');
-
-        // Validation Rules
-        $rules = [
-            'par_prefix' . $suffix => 'required',
-            'par_firstName' . $suffix => 'required',
-            'par_lastName' . $suffix => 'required',
-            'par_IdNumber' . $suffix => 'required|numeric|exact_length[13]',
-            'par_phone' . $suffix => 'required',
-            'par_hNumber' . $suffix => 'required',
-            'par_hTambon' . $suffix => 'required',
-            'par_hDistrict' . $suffix => 'required',
-            'par_hProvince' . $suffix => 'required',
-            'par_hPostcode' . $suffix => 'required',
-        ];
-
-        $validation = \Config\Services::validation();
-        $validation->setRules($rules);
-
-        if (!$validation->run($data)) {
-            return $this->response->setJSON(['status' => 'error', 'message' => implode(', ', $validation->getErrors())]);
-        }
-
-        $parentData = [
-            'par_stuID' => $studentId,
-            'par_relationKey' => $relationKey,
-            'par_relation' => $saveData['par_relation' . $suffix] ?? $relationKey,
-            'par_prefix' => $saveData['par_prefix' . $suffix],
-            'par_firstName' => $saveData['par_firstName' . $suffix],
-            'par_lastName' => $saveData['par_lastName' . $suffix],
-            'par_ago' => $saveData['par_ago' . $suffix],
-            'par_IdNumber' => $saveData['par_IdNumber' . $suffix], // Save with dashes
-            'par_phone' => $saveData['par_phone' . $suffix],       // Save with dashes
-            'par_race' => $saveData['par_race' . $suffix],
-            'par_national' => $saveData['par_national' . $suffix],
-            'par_religion' => $saveData['par_religion' . $suffix],
-            'par_career' => $saveData['par_career' . $suffix],
-            'par_education' => $saveData['par_education' . $suffix],
-            'par_salary' => $saveData['par_salary' . $suffix],
-            'par_positionJob' => $saveData['par_positionJob' . $suffix],
-            'par_decease' => $saveData['par_decease' . $suffix] ?? null,
-            'par_hNumber' => $saveData['par_hNumber' . $suffix],
-            'par_hMoo' => $saveData['par_hMoo' . $suffix],
-            'par_hTambon' => $saveData['par_hTambon' . $suffix],
-            'par_hDistrict' => $saveData['par_hDistrict' . $suffix],
-            'par_hProvince' => $saveData['par_hProvince' . $suffix],
-            'par_hPostcode' => $saveData['par_hPostcode' . $suffix],
-            'par_cNumber' => $saveData['par_cNumber' . $suffix],
-            'par_cMoo' => $saveData['par_cMoo' . $suffix],
-            'par_cTambon' => $saveData['par_cTambon' . $suffix],
-            'par_cDistrict' => $saveData['par_cDistrict' . $suffix],
-            'par_cProvince' => $saveData['par_cProvince' . $suffix],
-            'par_cPostcode' => $saveData['par_cPostcode' . $suffix],
-            'par_rest' => $saveData['par_rest' . $suffix] ?? '',
-            'par_restOrthor' => $saveData['par_restOrthor' . $suffix] ?? '',
-            'par_service' => $saveData['par_service' . $suffix] ?? '',
-            'par_serviceName' => $this->extractServiceName($saveData['par_serviceName' . $suffix] ?? ''),
-            'par_claim' => $saveData['par_claim' . $suffix] ?? '',
-        ];
-
+        // Ensure par_decease can be NULL to avoid "cannot be null" and "Incorrect date value" errors
         try {
+            $this->dbPers->query("ALTER TABLE tb_parent MODIFY COLUMN par_decease DATE NULL");
+        } catch (\Throwable $e) {
+            // Silently fail if ALTER is not allowed or already NULL
+        }
+        
+        try {
+            // Keep original data
+            $saveData = $data;
+
+            // Map fields based on relation key
+            $suffix = '';
+            if ($relationKey == 'แม่')
+                $suffix = 'M';
+            if ($relationKey == 'ผู้ปกครอง')
+                $suffix = 'O';
+
+            // Clean data for validation
+            $data['par_IdNumber' . $suffix] = str_replace('-', '', $data['par_IdNumber' . $suffix] ?? '');
+            $data['par_phone' . $suffix] = str_replace('-', '', $data['par_phone' . $suffix] ?? '');
+
+            // Validation Rules with Thai Labels
+            $rules = [
+                'par_prefix' . $suffix => ['label' => 'คำนำหน้า', 'rules' => 'required'],
+                'par_firstName' . $suffix => ['label' => 'ชื่อจริง', 'rules' => 'required'],
+                'par_lastName' . $suffix => ['label' => 'นามสกุลจริง', 'rules' => 'required'],
+                'par_ago' . $suffix => ['label' => 'อายุ', 'rules' => 'required|numeric'],
+                'par_IdNumber' . $suffix => ['label' => 'เลขประจำตัวประชาชน', 'rules' => 'required|numeric|exact_length[13]'],
+                'par_phone' . $suffix => ['label' => 'เบอร์โทรศัพท์', 'rules' => 'required'],
+                'par_race' . $suffix => ['label' => 'เชื้อชาติ', 'rules' => 'required'],
+                'par_national' . $suffix => ['label' => 'สัญชาติ', 'rules' => 'required'],
+                'par_religion' . $suffix => ['label' => 'ศาสนา', 'rules' => 'required'],
+                'par_career' . $suffix => ['label' => 'อาชีพ', 'rules' => 'required'],
+                'par_education' . $suffix => ['label' => 'วุฒิการศึกษา', 'rules' => 'required'],
+                'par_salary' . $suffix => ['label' => 'รายได้ต่อเดือน', 'rules' => 'required|numeric'],
+                'par_positionJob' . $suffix => ['label' => 'ตำแหน่งงาน', 'rules' => 'required'],
+                'par_hNumber' . $suffix => ['label' => 'บ้านเลขที่ (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+                'par_hMoo' . $suffix => ['label' => 'หมู่ที่ (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+                'par_hTambon' . $suffix => ['label' => 'ตำบล (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+                'par_hDistrict' . $suffix => ['label' => 'อำเภอ (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+                'par_hProvince' . $suffix => ['label' => 'จังหวัด (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+                'par_hPostcode' . $suffix => ['label' => 'รหัสไปรษณีย์ (ตามทะเบียนบ้าน)', 'rules' => 'required'],
+                'par_cNumber' . $suffix => ['label' => 'บ้านเลขที่ (ปัจจุบัน)', 'rules' => 'required'],
+                'par_cMoo' . $suffix => ['label' => 'หมู่ที่ (ปัจจุบัน)', 'rules' => 'required'],
+                'par_cTambon' . $suffix => ['label' => 'ตำบล (ปัจจุบัน)', 'rules' => 'required'],
+                'par_cDistrict' . $suffix => ['label' => 'อำเภอ (ปัจจุบัน)', 'rules' => 'required'],
+                'par_cProvince' . $suffix => ['label' => 'จังหวัด (ปัจจุบัน)', 'rules' => 'required'],
+                'par_cPostcode' . $suffix => ['label' => 'รหัสไปรษณีย์ (ปัจจุบัน)', 'rules' => 'required'],
+                'par_rest' . $suffix => ['label' => 'ลักษณะที่อยู่อาศัย', 'rules' => 'required'],
+            ];
+
+            if ($relationKey == 'ผู้ปกครอง') {
+                $rules['par_relation' . $suffix] = ['label' => 'ความสัมพันธ์กับนักเรียน', 'rules' => 'required'];
+            }
+
+            $messages = [
+                'required' => 'กรุณากรอกข้อมูล {field} ของ' . $relationKey . ' ให้ครบถ้วน',
+                'numeric' => 'ข้อมูล {field} ของ' . $relationKey . ' ต้องเป็นตัวเลขเท่านั้น',
+                'exact_length' => 'ข้อมูล {field} ของ' . $relationKey . ' ต้องมีความยาว {param} ตัวอักษร',
+            ];
+
+            $validation = \Config\Services::validation();
+            $validation->setRules($rules, $messages);
+
+            if (!$validation->run($data)) {
+                $errors = array_values($validation->getErrors());
+                return $this->response->setJSON(['status' => 'error', 'message' => $errors[0]]);
+            }
+
+            // Additional Check for Thai ID Checksum
+            if (!$this->validateThaiID($data['par_IdNumber' . $suffix])) {
+                return $this->response->setJSON(['status' => 'error', 'message' => 'เลขประจำตัวประชาชนของ' . $relationKey . 'ไม่ถูกต้อง']);
+            }
+
+            // Check if Parent ID is same as Student ID (Intra-form check)
+            $cleanStudentId = str_replace('-', '', $studentId);
+            if ($data['par_IdNumber' . $suffix] == $cleanStudentId) {
+                return $this->response->setJSON(['status' => 'error', 'message' => 'เลขประจำตัวประชาชนของ' . $relationKey . 'ต้องไม่ซ้ำกับของนักเรียน']);
+            }
+
+            $parentData = [
+                'par_stuID' => $studentId,
+                'par_relationKey' => $relationKey,
+                'par_relation' => $saveData['par_relation' . $suffix] ?? $relationKey,
+                'par_prefix' => $saveData['par_prefix' . $suffix],
+                'par_firstName' => $saveData['par_firstName' . $suffix],
+                'par_lastName' => $saveData['par_lastName' . $suffix],
+                'par_ago' => $saveData['par_ago' . $suffix] ?? 0,
+                'par_IdNumber' => $saveData['par_IdNumber' . $suffix], // Save with dashes
+                'par_phone' => $saveData['par_phone' . $suffix],       // Save with dashes
+                'par_race' => $saveData['par_race' . $suffix] ?? '',
+                'par_national' => $saveData['par_national' . $suffix] ?? '',
+                'par_religion' => $saveData['par_religion' . $suffix] ?? '',
+                'par_career' => $saveData['par_career' . $suffix] ?? '',
+                'par_education' => $saveData['par_education' . $suffix] ?? '',
+                'par_salary' => $saveData['par_salary' . $suffix] ?? '',
+                'par_positionJob' => $saveData['par_positionJob' . $suffix] ?? '',
+                'par_decease' => (isset($saveData['par_decease' . $suffix]) && !empty($saveData['par_decease' . $suffix])) ? $saveData['par_decease' . $suffix] : null,
+                'par_hNumber' => $saveData['par_hNumber' . $suffix],
+                'par_hMoo' => $saveData['par_hMoo' . $suffix] ?? '',
+                'par_hTambon' => $saveData['par_hTambon' . $suffix],
+                'par_hDistrict' => $saveData['par_hDistrict' . $suffix],
+                'par_hProvince' => $saveData['par_hProvince' . $suffix],
+                'par_hPostcode' => $saveData['par_hPostcode' . $suffix],
+                'par_cNumber' => $saveData['par_cNumber' . $suffix] ?? '',
+                'par_cMoo' => $saveData['par_cMoo' . $suffix] ?? '',
+                'par_cTambon' => $saveData['par_cTambon' . $suffix] ?? '',
+                'par_cDistrict' => $saveData['par_cDistrict' . $suffix] ?? '',
+                'par_cProvince' => $saveData['par_cProvince' . $suffix] ?? '',
+                'par_cPostcode' => $saveData['par_cPostcode' . $suffix] ?? '',
+                'par_rest' => $saveData['par_rest' . $suffix] ?? '',
+                'par_restOrthor' => $saveData['par_restOrthor' . $suffix] ?? '',
+                'par_service' => $saveData['par_service' . $suffix] ?? '',
+                'par_serviceName' => $this->extractServiceName($saveData['par_serviceName' . $suffix] ?? ''),
+                'par_claim' => $saveData['par_claim' . $suffix] ?? '',
+            ];
+
             // Check if parent record exists for this student and relation
-            $existing = $this->db->table('skjacth_personnel.tb_parent')
+            $existing = $this->dbPers->table('tb_parent')
                 ->where('par_stuID', $studentId)
                 ->where('par_relationKey', $relationKey)
                 ->get()->getRow();
 
             if ($existing) {
-                $this->db->table('skjacth_personnel.tb_parent')
+                $this->dbPers->table('tb_parent')
                     ->where('par_id', $existing->par_id)
                     ->update($parentData);
             } else {
-                $this->db->table('skjacth_personnel.tb_parent')->insert($parentData);
+                $this->dbPers->table('tb_parent')->insert($parentData);
             }
 
             return $this->response->setJSON(['status' => 'success', 'message' => 'บันทึกข้อมูล' . $relationKey . 'เรียบร้อยแล้ว']);
         } catch (\Throwable $e) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Database Error: ' . $e->getMessage()]);
+            log_message('error', '[saveParent Error] ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Database Error (' . $relationKey . '): ' . $e->getMessage()]);
         }
     }
 
@@ -512,6 +648,18 @@ class UserControlConfirmation extends BaseController
             return '';
         }
         return trim($input);
+    }
+
+    private function validateThaiID($id)
+    {
+        if (strlen($id) != 13) return false;
+        if (!is_numeric($id)) return false;
+        $sum = 0;
+        for ($i = 0; $i < 12; $i++) {
+            $sum += intval($id[$i]) * (13 - $i);
+        }
+        $check = (11 - ($sum % 11)) % 10;
+        return $check == intval($id[12]);
     }
 
     /**
@@ -543,9 +691,24 @@ class UserControlConfirmation extends BaseController
             ->where('recruit_year', $Year)
             ->get()->getResult();
 
-        $confrim = $this->db->table('skjacth_personnel.tb_students')
+        $confrim = $this->dbPers->table('tb_students')
             ->where('stu_iden', $studentId)
             ->get()->getResult();
+
+        $mother = $this->dbPers->table('tb_parent')
+            ->where('par_stuID', $studentId)
+            ->where('par_relationKey', 'แม่')
+            ->get()->getRow();
+
+        $father = $this->dbPers->table('tb_parent')
+            ->where('par_stuID', $studentId)
+            ->where('par_relationKey', 'พ่อ')
+            ->get()->getRow();
+
+        $guardian = $this->dbPers->table('tb_parent')
+            ->where('par_stuID', $studentId)
+            ->where('par_relationKey', 'ผู้ปกครอง')
+            ->get()->getRow();
 
         if (empty($recruit) || empty($confrim)) {
             return "Data not found";
@@ -717,9 +880,6 @@ class UserControlConfirmation extends BaseController
         $mpdf->AddPage();
 
         // Father Data
-        $confrimFa = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "พ่อ")->get()->getResult();
-        $father = $confrimFa[0] ?? null;
-
         $par_decease = ($father->par_decease ?? '0000-00-00') == '0000-00-00' ? "" : $father->par_decease;
 
         $html2 = '<div style="position:absolute;top:129px;left:195px; width:100%">' . ($father->par_prefix ?? '') . ($father->par_firstName ?? '') . ' ' . ($father->par_lastName ?? '') . '</div>';
@@ -782,8 +942,6 @@ class UserControlConfirmation extends BaseController
             $html2 .= sprintf($checkMark, 875, 270);
 
         // Mother Data
-        $confrimMa = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "แม่")->get()->getResult();
-        $mother = $confrimMa[0] ?? null;
         $par_decease_Ma = ($mother->par_decease ?? '0000-00-00') == '0000-00-00' ? "" : $mother->par_decease;
 
         $html2 .= '<div style="position:absolute;top:129px;left:400px; width:100%">' . ($mother->par_prefix ?? '') . ($mother->par_firstName ?? '') . ' ' . ($mother->par_lastName ?? '') . '</div>';
@@ -846,8 +1004,6 @@ class UserControlConfirmation extends BaseController
             $html2 .= sprintf($checkMark, 875, 470);
 
         // Guardian Data
-        $confrimPu = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "ผู้ปกครอง")->get()->getResult();
-        $guardian = $confrimPu[0] ?? null;
         $par_decease_Pu = ($guardian->par_decease ?? '0000-00-00') == '0000-00-00' ? "" : $guardian->par_decease;
 
         $html2 .= '<div style="position:absolute;top:115px;left:600px; width:100%">' . ($guardian->par_prefix ?? '') . ($guardian->par_firstName ?? '') . ' ' . ($guardian->par_lastName ?? '') . '</div>';

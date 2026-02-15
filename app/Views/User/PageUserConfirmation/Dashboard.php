@@ -37,16 +37,89 @@
 
 <style>
     .hover-card {
-        transition: all 0.3s ease;
-        border: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 1.25rem;
     }
     .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12)!important;
         border-color: var(--bs-primary);
     }
+    
+    /* Icon Design Refinement */
+    .icon-box {
+        width: 80px;
+        height: 80px;
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .icon-box i {
+        font-size: 2.5rem;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+    
+    .icon-box::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0.15;
+        z-index: 1;
+    }
+
+    /* Floating Animation for icons on hover */
+    .hover-card:hover .icon-box i {
+        transform: scale(1.1) rotate(5deg);
+    }
+
     .cursor-pointer {
         cursor: pointer;
+    }
+
+    /* Category Specific Visuals */
+    .bg-soft-primary { background-color: #e7e7ff; color: #696cff; }
+    .bg-soft-info { background-color: #d7f5fc; color: #03c3ec; }
+    .bg-soft-danger { background-color: #ffe0db; color: #ff3e1d; }
+    .bg-soft-warning { background-color: #fff2d6; color: #ffab00; }
+
+    @media (max-width: 576px) {
+        .icon-box {
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 12px !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .icon-box i {
+            font-size: 1.5rem !important;
+        }
+        .card-body {
+            padding: 1rem 0.5rem !important;
+        }
+        .card-body h5 {
+            font-size: 1rem !important;
+        }
+        .card-body p {
+            font-size: 0.7rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .card-body .badge {
+            font-size: 0.65rem !important;
+            padding: 0.4rem 0.6rem !important;
+        }
+        .card-body button {
+            font-size: 0.75rem !important;
+        }
     }
 </style>
 
@@ -64,96 +137,229 @@
             </div>
         <?php endif; ?>
 
-        <!-- Instruction Alert -->
-        <div class="alert alert-warning border-start border-5 border-warning shadow-sm mb-4" role="alert">
-            <h5 class="alert-heading fw-bold text-dark"><i class='bx bxs-bell-ring bx-tada me-2 text-warning'></i>คำชี้แจงก่อนกรอกข้อมูล</h5>
-            <hr>
-            <ul class="list-unstyled mb-0 mt-2">
-                <li class="mb-2"><i class='bx bxs-circle text-danger me-2' style="font-size: 8px; vertical-align: middle;"></i><strong>ข้อมูลนักเรียน:</strong> <span class="text-danger fw-bold">** จำเป็นต้องกรอก **</span></li>
-                <li class="mb-2"><i class='bx bxs-circle text-secondary me-2' style="font-size: 8px; vertical-align: middle;"></i><strong>ข้อมูลบิดา:</strong> ถ้าไม่มีข้อมูลบิดา ให้ไปกรอกเมนูของมารดาได้</li>
-                <li class="mb-2"><i class='bx bxs-circle text-secondary me-2' style="font-size: 8px; vertical-align: middle;"></i><strong>ข้อมูลมารดา:</strong> ถ้าไม่มีข้อมูลมารดา ให้ไปกรอกเมนูของบิดาได้</li>
-                <li class="mb-0"><i class='bx bxs-circle text-danger me-2' style="font-size: 8px; vertical-align: middle;"></i><strong>ข้อมูลผู้ปกครอง:</strong> <span class="text-danger fw-bold">** จำเป็นต้องกรอก **</span> (คนที่นักเรียนอาศัยอยู่ด้วยในปัจจุบัน)</li>
-            </ul>
+        <!-- News Ticker Announcement -->
+        <div class="news-ticker shadow-sm mb-4">
+            <div class="ticker-header">
+                <i class='bx bxs-megaphone me-1'></i> ประกาศล่าสุด
+            </div>
+            <div class="ticker-content">
+                <div class="ticker-text">
+                    <span>📢 ยินดีต้อนรับสู่ระบบรายงานตัวนักเรียนใหม่ ปีการศึกษา <?= $checkYear[0]->openyear_year ?? '' ?></span>
+                    <span>✨ กรุณาตรวจสอบข้อมูลให้ถูกต้องครบถ้วนก่อนพิมพ์เอกสาร</span>
+                    <span>⚠️ หากพบปัญหาในการใช้งาน ติดต่อสอบถามได้ที่ฝ่ายรับสมัครของโรงเรียน</span>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .news-ticker {
+                display: flex;
+                background: white;
+                border-radius: 50px;
+                overflow: hidden;
+                border: 1px solid rgba(255, 158, 181, 0.2);
+            }
+            .ticker-header {
+                background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+                color: white;
+                padding: 10px 20px;
+                font-weight: 700;
+                font-size: 0.9rem;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                z-index: 2;
+                box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            }
+            .ticker-content {
+                flex-grow: 1;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                background: #fff;
+                position: relative;
+            }
+            .ticker-text {
+                display: flex;
+                white-space: nowrap;
+                animation: ticker 30s linear infinite;
+                padding-left: 100%;
+            }
+            .ticker-text span {
+                padding: 0 40px;
+                color: #566a7f;
+                font-weight: 500;
+                font-size: 0.9rem;
+            }
+            @keyframes ticker {
+                0% { transform: translate3d(0, 0, 0); }
+                100% { transform: translate3d(-100%, 0, 0); }
+            }
+            .news-ticker:hover .ticker-text {
+                animation-play-state: paused;
+            }
+            @media (max-width: 576px) {
+                .ticker-header {
+                    padding: 8px 12px;
+                    font-size: 0.75rem;
+                }
+                .ticker-text span {
+                    font-size: 0.8rem;
+                    padding: 0 20px;
+                }
+            }
+        </style>
+
+        <!-- Instruction & Announcement Alert -->
+        <div class="alert alert-primary border-0 shadow-sm mb-4 overflow-hidden position-relative" role="alert" style="border-radius: 15px; background: linear-gradient(135deg, #fff5f7 0%, #f0f7ff 100%); border-left: 5px solid #ff9eb5 !important;">
+            <div class="d-flex align-items-center mb-2">
+                <div class="flex-shrink-0 bg-white shadow-sm rounded-circle p-2 me-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                    <i class='bx bxs-bell-ring bx-tada text-primary fs-4'></i>
+                </div>
+                <div>
+                    <h5 class="alert-heading fw-bold text-dark mb-0">ประกาศแจ้งเตือนและคำชี้แจง</h5>
+                    <small class="text-muted">โปรดอ่านคำชี้แจงก่อนดำเนินการกรอกข้อมูล</small>
+                </div>
+            </div>
+            <hr class="my-3 opacity-10">
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class='bx bxs-check-circle text-primary me-2'></i>
+                            <span><strong>ข้อมูลนักเรียน:</strong> <span class="text-danger fw-bold">จำเป็นต้องกรอก</span></span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class='bx bxs-check-circle text-info me-2'></i>
+                            <span><strong>ข้อมูลผู้ปกครอง:</strong> <span class="text-danger fw-bold">จำเป็นต้องกรอก</span></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class='bx bxs-help-circle text-secondary me-2'></i>
+                            <span><strong>บิดา/มารดา:</strong> ถ้าไม่มีข้อมูลคนใดคนหนึ่ง ให้กรอกข้อมูลอีกคนแทนได้</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <!-- Menu Selection -->
-        <div id="menu-selection" class="row g-4 mb-4">
+        <div id="menu-selection" class="row g-3 g-md-4 mb-4">
             <!-- Student Info Button -->
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 cursor-pointer shadow-sm hover-card" onclick="showForm('student-info')">
-                    <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center gap-3">
-                        <div class="avatar avatar-xl bg-label-primary rounded-circle mb-2">
-                            <i class="bx bx-user fs-1"></i>
+            <div class="col-6 col-md-6 col-lg-3">
+                <div class="card h-100 cursor-pointer shadow-sm hover-card border-0" onclick="showForm('student-info')">
+                    <div class="card-body text-center p-4 d-flex flex-column align-items-center">
+                        <div class="icon-box bg-soft-primary shadow-sm">
+                            <i class="bx bx-user"></i>
                         </div>
-                        <h5 class="card-title mb-0">ข้อมูลนักเรียน</h5>
-                        <small class="text-danger fw-bold">(** จำเป็นต้องกรอก **)</small>
-                        <div class="status-icon">
+                        <h5 class="fw-bold mb-1">ข้อมูลนักเรียน</h5>
+                        <p class="text-danger fw-bold small mb-3">** จำเป็นต้องกรอก **</p>
+                        
+                        <div class="mb-3">
                             <?php if ($isStudentSaved): ?>
-                                <span class="badge bg-label-success rounded-pill"><i class="bx bxs-check-circle me-1"></i> กรอกครบแล้ว</span>
+                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                    <i class="bx bxs-check-circle me-1"></i> กรอกครบแล้ว
+                                </span>
                             <?php else: ?>
-                                <span class="badge bg-label-danger rounded-pill"><i class="bx bxs-x-circle me-1"></i> ยังไม่กรอก</span>
+                                <span class="badge bg-danger rounded-pill px-3 py-2">
+                                    <i class="bx bxs-x-circle me-1"></i> รอดำเนินการ
+                                </span>
                             <?php endif; ?>
                         </div>
+
+                        <button class="btn btn-outline-primary rounded-pill btn-sm w-100 mt-auto">
+                            <i class='bx bx-edit-alt me-1'></i> <?= $isStudentSaved ? 'แก้ไขข้อมูล' : 'คลิกเพื่อกรอกข้อมูล' ?>
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Father Info Button -->
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 cursor-pointer shadow-sm hover-card" onclick="showForm('father-info')">
-                    <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center gap-3">
-                        <div class="avatar avatar-xl bg-label-info rounded-circle mb-2">
-                            <i class="bx bx-male fs-1"></i>
+            <div class="col-6 col-md-6 col-lg-3">
+                <div class="card h-100 cursor-pointer shadow-sm hover-card border-0" onclick="showForm('father-info')">
+                    <div class="card-body text-center p-4 d-flex flex-column align-items-center">
+                        <div class="icon-box bg-soft-info shadow-sm">
+                            <i class="bx bx-male"></i>
                         </div>
-                        <h5 class="card-title mb-0">ข้อมูลบิดา</h5>
-                        <small class="text-muted" style="font-size: 0.8rem;">(** ถ้าไม่มีข้อมูลบิดา ให้ไปกรอกเมนูของมารดาได้ **)</small>
-                        <div class="status-icon">
+                        <h5 class="fw-bold mb-1">ข้อมูลบิดา</h5>
+                        <p class="text-muted small mb-3">(** ถ้าไม่มีไม่ต้องกรอก **)</p>
+                        
+                        <div class="mb-3">
                             <?php if ($FatherCkeck): ?>
-                                <span class="badge bg-label-success rounded-pill"><i class="bx bxs-check-circle me-1"></i> กรอกครบแล้ว</span>
+                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                    <i class="bx bxs-check-circle me-1"></i> กรอกครบแล้ว
+                                </span>
                             <?php else: ?>
-                                <span class="badge bg-label-danger rounded-pill"><i class="bx bxs-x-circle me-1"></i> ยังไม่กรอก</span>
+                                <span class="badge bg-label-secondary border rounded-pill px-3 py-2">
+                                    <i class="bx bx-circle me-1"></i> ยังไม่ระบุ
+                                </span>
                             <?php endif; ?>
                         </div>
+
+                        <button class="btn btn-outline-info rounded-pill btn-sm w-100 mt-auto">
+                            <i class='bx bx-edit-alt me-1'></i> <?= $FatherCkeck ? 'แก้ไขข้อมูล' : 'คลิกเพื่อระบุข้อมูล' ?>
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Mother Info Button -->
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 cursor-pointer shadow-sm hover-card" onclick="showForm('mother-info')">
-                    <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center gap-3">
-                        <div class="avatar avatar-xl bg-label-danger rounded-circle mb-2">
-                            <i class="bx bx-female fs-1"></i>
+            <div class="col-6 col-md-6 col-lg-3">
+                <div class="card h-100 cursor-pointer shadow-sm hover-card border-0" onclick="showForm('mother-info')">
+                    <div class="card-body text-center p-4 d-flex flex-column align-items-center">
+                        <div class="icon-box bg-soft-danger shadow-sm">
+                            <i class="bx bx-female"></i>
                         </div>
-                        <h5 class="card-title mb-0">ข้อมูลมารดา</h5>
-                        <small class="text-muted" style="font-size: 0.8rem;">(** ถ้าไม่มีข้อมูลมารดา ให้ไปกรอกเมนูของบิดาได้ **)</small>
-                        <div class="status-icon">
+                        <h5 class="fw-bold mb-1">ข้อมูลมารดา</h5>
+                        <p class="text-muted small mb-3">(** ถ้าไม่มีไม่ต้องกรอก **)</p>
+                        
+                        <div class="mb-3">
                             <?php if ($MatherCkeck): ?>
-                                <span class="badge bg-label-success rounded-pill"><i class="bx bxs-check-circle me-1"></i> กรอกครบแล้ว</span>
+                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                    <i class="bx bxs-check-circle me-1"></i> กรอกครบแล้ว
+                                </span>
                             <?php else: ?>
-                                <span class="badge bg-label-danger rounded-pill"><i class="bx bxs-x-circle me-1"></i> ยังไม่กรอก</span>
+                                <span class="badge bg-label-secondary border rounded-pill px-3 py-2">
+                                    <i class="bx bx-circle me-1"></i> ยังไม่ระบุ
+                                </span>
                             <?php endif; ?>
                         </div>
+
+                        <button class="btn btn-outline-danger rounded-pill btn-sm w-100 mt-auto">
+                            <i class='bx bx-edit-alt me-1'></i> <?= $MatherCkeck ? 'แก้ไขข้อมูล' : 'คลิกเพื่อระบุข้อมูล' ?>
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Guardian Info Button -->
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 cursor-pointer shadow-sm hover-card" onclick="showForm('guardian-info')">
-                    <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center gap-3">
-                        <div class="avatar avatar-xl bg-label-warning rounded-circle mb-2">
-                            <i class="bx bx-body fs-1"></i>
+            <div class="col-6 col-md-6 col-lg-3">
+                <div class="card h-100 cursor-pointer shadow-sm hover-card border-0" onclick="showForm('guardian-info')">
+                    <div class="card-body text-center p-4 d-flex flex-column align-items-center">
+                        <div class="icon-box bg-soft-warning shadow-sm">
+                            <i class="bx bx-body"></i>
                         </div>
-                        <h5 class="card-title mb-0">ข้อมูลผู้ปกครอง</h5>
-                        <small class="text-danger fw-bold" style="font-size: 0.8rem;">(** จำเป็นต้องกรอก คนที่นักเรียนอาศัยอยู่ด้วย **)</small>
-                        <div class="status-icon">
+                        <h5 class="fw-bold mb-1">ข้อมูลผู้ปกครอง</h5>
+                        <p class="text-danger fw-bold small mb-3">** จำเป็นต้องกรอก **</p>
+                        
+                        <div class="mb-3">
                             <?php if ($OtherCkeck): ?>
-                                <span class="badge bg-label-success rounded-pill"><i class="bx bxs-check-circle me-1"></i> กรอกครบแล้ว</span>
+                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                    <i class="bx bxs-check-circle me-1"></i> กรอกครบแล้ว
+                                </span>
                             <?php else: ?>
-                                <span class="badge bg-label-danger rounded-pill"><i class="bx bxs-x-circle me-1"></i> ยังไม่กรอก</span>
+                                <span class="badge bg-danger rounded-pill px-3 py-2">
+                                    <i class="bx bxs-x-circle me-1"></i> รอดำเนินการ
+                                </span>
                             <?php endif; ?>
                         </div>
+
+                        <button class="btn btn-outline-warning rounded-pill btn-sm w-100 mt-auto">
+                            <i class='bx bx-edit-alt me-1'></i> <?= $OtherCkeck ? 'แก้ไขข้อมูล' : 'คลิกเพื่อกรอกข้อมูล' ?>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -163,7 +369,19 @@
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
                          <h5 class="card-title mb-3">พิมพ์เอกสารมอบตัว</h5>
-                         <p class="card-text text-muted mb-3">เมื่อกรอกข้อมูลครบถ้วนแล้ว สามารถพิมพ์เอกสารมอบตัวได้ที่นี่</p>
+                         <p class="card-text text-muted mb-1">เมื่อกรอกข้อมูลครบถ้วนแล้ว สามารถพิมพ์เอกสารมอบตัวได้ที่นี่</p>
+                         <div class="mb-4">
+                             <span class="badge bg-label-secondary px-3 py-2 w-100 text-wrap" style="line-height: 1.6;">
+                                 <i class="bx bx-info-circle me-1"></i> <span class="fw-bold text-dark">หมายเหตุ:</span> 
+                                 <?php if ($stu[0]->recruit_regLevel == '1'): ?>
+                                    สำหรับการมอบตัว <span class="text-primary fw-bold">ม.1 (ม.ต้น)</span> กรุณาใช้<span class="badge bg-pastel-pink ms-1">กระดาษสีชมพู</span> ในการพิมพ์
+                                 <?php elseif ($stu[0]->recruit_regLevel == '4'): ?>
+                                    สำหรับการมอบตัว <span class="text-info fw-bold">ม.4 (ม.ปลาย)</span> กรุณาใช้<span class="badge bg-pastel-blue ms-1">กระดาษสีฟ้า</span> ในการพิมพ์
+                                 <?php else: ?>
+                                    ม.ต้น ใช้<span class="text-primary fw-bold">กระดาษสีชมพู</span> | ม.ปลาย ใช้<span class="text-info fw-bold">กระดาษสีฟ้า</span>
+                                 <?php endif; ?>
+                             </span>
+                         </div>
                          
                          <?php if($isStudentSaved && $OtherCkeck): ?>
                             <a href="<?= base_url('confirmation/pdf') ?>" target="_blank" class="btn btn-primary btn-lg px-5 rounded-pill"><i class="bx bx-printer me-2"></i> พิมพ์ใบมอบตัว</a>
@@ -426,6 +644,13 @@
             $province: $('#stu_birthProvirce'),
         });
 
+        // Student School Address
+        $.Thailand({
+            $district: $('#stu_schoolTambao'),
+            $amphoe: $('#stu_schoolDistrict'),
+            $province: $('#stu_schoolProvince'),
+        });
+
         // Father Home Address
         $.Thailand({
             $district: $('#par_hTambon'),
@@ -594,6 +819,16 @@
             }
         });
 
+        // Student - Used to be student here
+        $('input[name="stu_usedStudent"]').change(function(){
+            if($(this).val() == 'เคย'){
+                $('#usedStudentLevelSection').show();
+            }else{
+                $('#usedStudentLevelSection').hide();
+                $('#stu_inputLevel').val('');
+            }
+        });
+
         // Trigger change events on load to set initial state
         $('input[name="par_rest"]:checked').trigger('change');
         $('input[name="par_service"]:checked').trigger('change', [true]);
@@ -602,6 +837,7 @@
         $('input[name="par_restO"]:checked').trigger('change');
         $('input[name="par_serviceO"]:checked').trigger('change', [true]);
         $('input[name="stu_presentLife"]:checked').trigger('change');
+        $('input[name="stu_usedStudent"]:checked').trigger('change');
 
         // Checkbox "Same as Home Address"
         $('#clickLike').change(function(){
@@ -648,6 +884,59 @@
                 $('#par_cDistrictO').val($('#par_hDistrictO').val());
                 $('#par_cProvinceO').val($('#par_hProvinceO').val());
                 $('#par_cPostcodeO').val($('#par_hPostcodeO').val());
+            }
+        });
+
+        // Thai National ID Checksum Validation
+        function script_check_id(id) {
+            if (id.length != 13) return false;
+            for (i = 0, sum = 0; i < 12; i++)
+                sum += parseFloat(id.charAt(i)) * (13 - i);
+            if ((11 - sum % 11) % 10 != parseFloat(id.charAt(12))) return false;
+            return true;
+        }
+
+        $('#stu_iden, #par_IdNumber, #par_IdNumberM, #par_IdNumberO').on('blur', function() {
+            var id = $(this).val().replace(/-/g, '');
+            if (id !== '' && id.length === 13) {
+                if (!script_check_id(id)) {
+                    $(this).addClass('is-invalid');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เลขประจำตัวประชาชนไม่ถูกต้อง',
+                        text: 'กรุณาตรวจสอบเลขประจำตัวประชาชนอีกครั้ง',
+                        confirmButtonText: 'ตกลง'
+                    }).then(() => {
+                        $(this).val('').focus();
+                    });
+                } else {
+                    // Check for duplicates within the current view
+                    var isDuplicate = false;
+                    var studentId = $('#stu_iden').val() ? $('#stu_iden').val().replace(/-/g, '') : '';
+                    var currentId = $(this).attr('id');
+
+                    // If it's a parent field, check against student field
+                    if (currentId !== 'stu_iden' && id === studentId) {
+                        isDuplicate = true;
+                        var label = "นักเรียน";
+                    }
+
+                    if (isDuplicate) {
+                        $(this).addClass('is-invalid');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'เลขประจำตัวประชาชนซ้ำ',
+                            text: 'เลขประจำตัวประชาชนต้องไม่ซ้ำกับของ' + label,
+                            confirmButtonText: 'ตกลง'
+                        }).then(() => {
+                            $(this).val('').focus();
+                        });
+                    } else {
+                        $(this).removeClass('is-invalid').addClass('is-valid');
+                    }
+                }
+            } else if (id !== '' && id.length < 13) {
+                $(this).addClass('is-invalid');
             }
         });
 
