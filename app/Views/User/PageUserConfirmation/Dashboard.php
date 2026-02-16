@@ -137,78 +137,7 @@
             </div>
         <?php endif; ?>
 
-        <!-- News Ticker Announcement -->
-        <div class="news-ticker shadow-sm mb-4">
-            <div class="ticker-header">
-                <i class='bx bxs-megaphone me-1'></i> ประกาศล่าสุด
-            </div>
-            <div class="ticker-content">
-                <div class="ticker-text">
-                    <span>📢 ยินดีต้อนรับสู่ระบบรายงานตัวนักเรียนใหม่ ปีการศึกษา <?= $checkYear[0]->openyear_year ?? '' ?></span>
-                    <span>✨ กรุณาตรวจสอบข้อมูลให้ถูกต้องครบถ้วนก่อนพิมพ์เอกสาร</span>
-                    <span>⚠️ หากพบปัญหาในการใช้งาน ติดต่อสอบถามได้ที่ฝ่ายรับสมัครของโรงเรียน</span>
-                </div>
-            </div>
-        </div>
 
-        <style>
-            .news-ticker {
-                display: flex;
-                background: white;
-                border-radius: 50px;
-                overflow: hidden;
-                border: 1px solid rgba(255, 158, 181, 0.2);
-            }
-            .ticker-header {
-                background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
-                color: white;
-                padding: 10px 20px;
-                font-weight: 700;
-                font-size: 0.9rem;
-                white-space: nowrap;
-                display: flex;
-                align-items: center;
-                z-index: 2;
-                box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-            }
-            .ticker-content {
-                flex-grow: 1;
-                overflow: hidden;
-                display: flex;
-                align-items: center;
-                background: #fff;
-                position: relative;
-            }
-            .ticker-text {
-                display: flex;
-                white-space: nowrap;
-                animation: ticker 30s linear infinite;
-                padding-left: 100%;
-            }
-            .ticker-text span {
-                padding: 0 40px;
-                color: #566a7f;
-                font-weight: 500;
-                font-size: 0.9rem;
-            }
-            @keyframes ticker {
-                0% { transform: translate3d(0, 0, 0); }
-                100% { transform: translate3d(-100%, 0, 0); }
-            }
-            .news-ticker:hover .ticker-text {
-                animation-play-state: paused;
-            }
-            @media (max-width: 576px) {
-                .ticker-header {
-                    padding: 8px 12px;
-                    font-size: 0.75rem;
-                }
-                .ticker-text span {
-                    font-size: 0.8rem;
-                    padding: 0 20px;
-                }
-            }
-        </style>
 
         <!-- Instruction & Announcement Alert -->
         <div class="alert alert-primary border-0 shadow-sm mb-4 overflow-hidden position-relative" role="alert" style="border-radius: 15px; background: linear-gradient(135deg, #fff5f7 0%, #f0f7ff 100%); border-left: 5px solid #ff9eb5 !important;">
@@ -225,7 +154,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <ul class="list-unstyled mb-0">
-                        <li class="mb-2 d-flex align-items-center">
+                        <li class="mb-1 d-flex align-items-center">
                             <i class='bx bxs-check-circle text-primary me-2'></i>
                             <span><strong>ข้อมูลนักเรียน:</strong> <span class="text-danger fw-bold">จำเป็นต้องกรอก</span></span>
                         </li>
@@ -245,6 +174,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- Menu Selection -->
         <div id="menu-selection" class="row g-3 g-md-4 mb-4">

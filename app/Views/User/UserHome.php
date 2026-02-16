@@ -1357,41 +1357,41 @@
 
 <?= $this->section('content') ?>
 
+
 <?php if (!empty($systemStatus->onoff_comment)): ?>
-<!-- Announcement Modal -->
-<div class="modal fade" id="announcementModal" tabindex="-1" aria-labelledby="announcementModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 25px 50px rgba(0,0,0,0.15);">
-            <!-- Premium Header -->
-            <div class="modal-header border-0" style="background: linear-gradient(135deg, #ff9eb5 0%, #f77062 100%); padding: 1.5rem 2rem;">
-                <div class="d-flex align-items-center gap-3">
-                    <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
-                        <i class='bx bxs-megaphone text-white' style="font-size: 1.8rem;"></i>
-                    </div>
-                    <div>
-                        <h5 class="modal-title text-white fw-bold mb-0" id="announcementModalLabel">
-                            <i class='bx bx-bell-ring me-1'></i> ประกาศแจ้งเตือน
-                        </h5>
-                        <small class="text-white-50">ข้อมูลสำคัญจากทางโรงเรียน</small>
-                    </div>
-                </div>
+<!-- Announcement Full-Screen Modal -->
+<div class="modal fade" id="announcementModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header border-0 py-3 text-white" style="background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);">
+                <h5 class="modal-title fw-bold text-white"><i class='bx bxs-megaphone bx-tada me-2'></i> ประกาศแจ้งเตือนและข้อควรทราบ</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <!-- Modal Body -->
-            <div class="modal-body" style="padding: 2rem;">
-                <div class="alert alert-warning border-0 mb-3" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 14px; padding: 1.25rem;">
-                    <div class="d-flex align-items-start gap-3">
-                        <i class='bx bx-info-circle text-warning' style="font-size: 1.5rem; margin-top: 2px;"></i>
-                        <div class="announcement-content" style="font-size: 1rem; color: #78350f; line-height: 1.7;">
+            <div class="modal-body p-4" style="background-color: #f8f9fa;">
+                <div class="text-center mb-4">
+                    <div class="bg-white shadow-sm rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class='bx bxs-info-circle text-primary' style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark">ประกาศสำคัญจากโรงเรียน</h4>
+                    <p class="text-muted small">โปรดศึกษาข้อมูลด้านล่างนี้อย่างละเอียด</p>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+                    <div class="card-body p-4">
+                        <div class="announcement-text text-dark" style="font-size: 1.1rem; line-height: 1.8;">
                             <?= nl2br(esc($systemStatus->onoff_comment)) ?>
                         </div>
                     </div>
                 </div>
+
+                <div class="alert alert-primary border-0 shadow-sm d-flex align-items-center mb-0" style="border-radius: 15px; background: rgba(132, 210, 246, 0.1);">
+                    <i class='bx bx-help-circle fs-4 text-primary me-3'></i>
+                    <div class="small">หากมีข้อสงสัยเพิ่มเติม สามารถติดต่อสอบถามได้ที่ฝ่ายรับสมัครของโรงเรียนในเวลาทำการ หรือ <br> หัวหน้างานรับนักเรียน ครูณัฏฐิกานต์ แสงอุทัย 09-2189-9145</div>
+                </div>
             </div>
-            <!-- Modal Footer -->
-            <div class="modal-footer border-0" style="padding: 1rem 2rem 1.5rem;">
-                <button type="button" class="btn btn-lg w-100" data-bs-dismiss="modal" style="background: linear-gradient(135deg, #ff9eb5 0%, #f77062 100%); color: white; border-radius: 12px; font-weight: 600; padding: 0.8rem;">
-                    <i class='bx bx-check me-1'></i> รับทราบ
+            <div class="modal-footer border-0 p-3 bg-white">
+                <button type="button" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm" data-bs-dismiss="modal">
+                    <i class='bx bx-check-double me-1'></i> รับทราบและปิดหน้าต่างนี้
                 </button>
             </div>
         </div>
@@ -1399,12 +1399,18 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
-        announcementModal.show();
+    document.addEventListener('DOMContentLoaded', function () {
+        // Show announcement modal every time page is loaded
+        const announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
+        setTimeout(() => {
+            announcementModal.show();
+        }, 800); // Slight delay for better UX
     });
 </script>
 <?php endif; ?>
+
+
+
 
 <!-- Hero Section -->
 <div class="hero-section">
@@ -1557,6 +1563,25 @@
     </div>
 </div>
 
+<!-- Home Announcement Alert Trigger -->
+<?php if (!empty($systemStatus->onoff_comment)): ?>
+<div class="container">
+    <div class="alert alert-primary border-0 shadow-sm mb-4 overflow-hidden position-relative" role="alert" style="border-radius: 20px; background: linear-gradient(135deg, #fff5f7 0%, #f0f7ff 100%); border-left: 5px solid #ff9eb5 !important;">
+        <div class="d-flex align-items-center">
+            <div class="flex-shrink-0 bg-white shadow-sm rounded-circle p-2 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                <i class='bx bxs-bell-ring bx-tada text-primary fs-3'></i>
+            </div>
+            <div class="flex-grow-1">
+                <h5 class="alert-heading fw-bold text-dark mb-0">ประกาศและคำชี้แจงสำคัญ</h5>
+                <p class="text-muted mb-0 small d-none d-md-block">คลิกปุ่มเพื่ออ่านรายละเอียดประกาศและคำชี้แจงฉบับเต็ม</p>
+            </div>
+            <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#announcementModal">
+                <i class='bx bx-expand-alt me-1'></i> <span class="d-none d-sm-inline">เปิดอ่านประกาศ</span><span class="d-inline d-sm-none">เปิด</span>
+            </button>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- Result Alert Box -->
 <?php if (isset($systemStatus) && isset($systemStatus->onoff_system) && $systemStatus->onoff_system == 'on'): ?>
