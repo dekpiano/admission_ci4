@@ -340,7 +340,10 @@
         </h4>
         <p class="text-muted mb-0">จัดการข้อมูลผู้สมัครเข้าศึกษาต่อ</p>
     </div>
-    <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center gap-3">
+        <a href="<?= site_url('skjadmin/recruits/register') ?>" class="btn btn-primary d-flex align-items-center">
+            <i class="bx bx-plus-circle me-1"></i> เพิ่มผู้สมัคร (Walk-in)
+        </a>
         <div class="year-selector-wrapper">
             <label class="year-selector-label">
                 <i class="bx bx-calendar"></i>

@@ -50,7 +50,245 @@ class AdminControlRecruit extends BaseController
         return view('Admin/PageAdminRecruit/PageAdminRecruitIndex', $data);
     }
 
+    	public function register()
+	{
+		$model = new AdmissionModel();
+
+		$level = $this->request->getVar('level') ?? '1';
+
+		$data['checkYear'] = $model->getOpenYear();
+		$data['systemStatus'] = $model->getSystemStatus();
+		$data['quotas'] = $model->getAllQuotas();
+		
+		// กรองแผนการเรียนตามระดับชั้น (ม.1 = ม.ต้น, ม.4 = ม.ปลาย)
+		$gradeName = ($level == '1') ? 'ม.ต้น' : 'ม.ปลาย';
+		$data['courses'] = $model->db->table('tb_course')->where('course_gradelevel', $gradeName)->get()->getResult();
+		
+		$data['level'] = $level;
+		$data['title'] = 'ลงทะเบียน Walk-in';
+
+		// Generate CAPTCHA numbers just in case
+		$data['captcha_num1'] = rand(1, 10);
+		$data['captcha_num2'] = rand(1, 10);
+
+		return view('Admin/PageAdminRecruit/PageAdminRecruitRegister', $data);
+	}
+
+
+	public function check_id_ajax()
+	{
+		if (!$this->request->isAJAX()) {
+			return $this->response->setJSON(['error' => 'Invalid Request']);
+		}
+
+		$idCard = $this->request->getPost('idCard');
+		$model = new AdmissionModel();
+		$year = $model->getOpenYear()->openyear_year;
+		$exists = $model->isIdCardRegistered($idCard, $year);
+
+		return $this->response->setJSON(['exists' => $exists]);
+	}
+
+
+    public function save_register()
+    {
+        if (!$this->request->isAJAX()) {
+            return redirect()->to(site_url('skjadmin/recruits/register'));
+        }
+
+        try {
+            $post = $this->request->getPost();
+            $model = new AdmissionModel();
+            $systemStatus = $model->getSystemStatus();
+            $year = $model->getOpenYear()->openyear_year;
+
+            // Basic Validation
+            if (
+                !$this->validate([
+                    'recruit_idCard' => [
+                        'rules' => 'required',
+                        'errors' => ['required' => 'กรุณากรอกเลขบัตรประชาชน']
+                    ],
+                    'recruit_firstName' => [
+                        'rules' => 'required',
+                        'errors' => ['required' => 'กรุณากรอกชื่อ']
+                    ],
+                    'recruit_lastName' => [
+                        'rules' => 'required',
+                        'errors' => ['required' => 'กรุณากรอกนามสกุล']
+                    ],
+                    'recruit_category' => [
+                        'rules' => 'required',
+                        'errors' => ['required' => 'กรุณาเลือกประเภทโควตา']
+                    ]
+                ])
+            ) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                    'errors' => $this->validator->getErrors()
+                ]);
+            }
+
+        // Check duplicate
+        if ($model->isIdCardRegistered($post['recruit_idCard'], $year)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'เลขบัตรประชาชนนี้ได้ทำการสมัครไปแล้ว'
+            ]);
+        }
+
+        // Robust MAX ID fetch directly from DB to prevent collisions
+        $db = \Config\Database::connect();
+        $builder = $db->table('tb_recruitstudent');
+        $maxIdRow = $builder->selectMax('recruit_id')->get()->getRow();
+        $lastId = $maxIdRow ? (int)$maxIdRow->recruit_id : 0;
+        
+        $openyear = $model->getOpenYear();
+        $prefix = (int)$openyear->openyear_year;
+        
+        if (strpos((string)$lastId, (string)$prefix) === 0) {
+            $recruit_id = (string)($lastId + 1);
+        } else {
+            $recruit_id = $prefix . "0001";
+        }
+        
+        // Double check if this ID exists
+        while ($db->table('tb_recruitstudent')->where('recruit_id', $recruit_id)->countAllResults() > 0) {
+            $recruit_id = (string)((int)$recruit_id + 1);
+        }
+
+        // Handle Birthday
+        $recruit_birthday = ($post['recruit_birthdayY'] - 543) . '-' . $post['recruit_birthdayM'] . '-' . $post['recruit_birthdayD'];
+
+        // Reprepare values
+        $courseModel = new \App\Models\CourseModel();
+        $courseDetails1 = $courseModel->find($post['recruit_tpyeRoom1']);
+        $course_fullname = $courseDetails1 ? $courseDetails1['course_fullname'] : '';
+        $course_branch = $courseDetails1 ? $courseDetails1['course_branch'] : '';
+        
+        $ranks = [];
+        if (!empty($post['recruit_tpyeRoom1'])) $ranks[] = $post['recruit_tpyeRoom1'];
+        if (!empty($post['recruit_tpyeRoom2'])) $ranks[] = $post['recruit_tpyeRoom2'];
+        if (!empty($post['recruit_tpyeRoom3'])) $ranks[] = $post['recruit_tpyeRoom3'];
+        $majorOrder = implode('|', $ranks);
+
+        // Prepare Data
+        $data_insert = [
+            'recruit_id' => $recruit_id,
+            'recruit_year' => $year,
+            'recruit_regLevel' => $post['recruit_regLevel'],
+            'recruit_prefix' => $post['recruit_prefix'],
+            'recruit_firstName' => $post['recruit_firstName'],
+            'recruit_lastName' => $post['recruit_lastName'],
+            'recruit_idCard' => \format_id_card($post['recruit_idCard']),
+            'recruit_birthday' => $recruit_birthday,
+            'recruit_race' => $post['recruit_race'],
+            'recruit_nationality' => $post['recruit_nationality'],
+            'recruit_religion' => $post['recruit_religion'],
+            'recruit_phone' => $post['recruit_phone'],
+            'recruit_homeNumber' => $post['recruit_homeNumber'],
+            'recruit_homeGroup' => $post['recruit_homeGroup'],
+            'recruit_homeRoad' => $post['recruit_homeRoad'] ?? '',
+            'recruit_homeSubdistrict' => $post['recruit_homeSubdistrict'],
+            'recruit_homedistrict' => $post['recruit_homedistrict'],
+            'recruit_homeProvince' => $post['recruit_homeProvince'],
+            'recruit_homePostcode' => $post['recruit_homePostcode'],
+            'recruit_oldSchool' => $post['recruit_oldSchool'],
+            'recruit_district' => $post['recruit_district'],
+            'recruit_province' => $post['recruit_province'],
+            'recruit_grade' => $post['recruit_grade'],
+            'recruit_category' => $post['recruit_category'],
+            'recruit_tpyeRoom' => $course_fullname,
+            'recruit_tpyeRoom_id' => $post['recruit_tpyeRoom1'],
+            'recruit_major' => $course_branch,
+            'recruit_majorOrder' => $majorOrder,
+            'recruit_nickname' => $post['recruit_nickname'] ?? '',
+            'recruit_agegroup' => !empty($post['recruit_agegroup']) ? (int)$post['recruit_agegroup'] : 0,
+            'recruit_weight' => !empty($post['recruit_weight']) ? (float)$post['recruit_weight'] : 0,
+            'recruit_height' => !empty($post['recruit_height']) ? (float)$post['recruit_height'] : 0,
+            'recruit_fatherName' => $post['recruit_fatherName'] ?? '',
+            'recruit_fatherJob' => $post['recruit_fatherJob'] ?? '',
+            'recruit_motherName' => $post['recruit_motherName'] ?? '',
+            'recruit_motherJob' => $post['recruit_motherJob'] ?? '',
+            'recruit_sportPosition' => $post['recruit_sportPosition'] ?? '',
+            'recruit_address' => "เลขที่ " . $post['recruit_homeNumber'] . " หมู่ที่ " . (!empty($post['recruit_homeGroup']) ? $post['recruit_homeGroup'] : '-') . " ถนน " . (!empty($post['recruit_homeRoad']) ? $post['recruit_homeRoad'] : '-') . " ตำบล" . $post['recruit_homeSubdistrict'] . " อำเภอ" . $post['recruit_homedistrict'] . " จังหวัด" . $post['recruit_homeProvince'] . " " . $post['recruit_homePostcode'],
+            'recruit_copyAddress' => '',
+            'recruit_status' => "ผ่านการตรวจสอบ", // Admin registered = automatic approved
+            'recruit_date' => date('Y-m-d H:i:s'),
+            'recruit_dateUpdate' => date('Y-m-d H:i:s'),
+            'recruit_StatusQuiz' => 'รอเข้าสอบ',
+            'recruit_statusSurrender' => '',
+            'recruit_certificateAbility' => '',
+            'recruit_sportSelectionResult' => '',
+            'recruit_userUpdate' => session()->get('pers_id')
+        ];
+
+        if ($year >= 2569) {
+            $data_insert['recruit_round'] = (int)($systemStatus->onoff_round ?? 1);
+        }
+
+        // Handle Files
+        $remoteUpload = new \App\Libraries\RemoteUpload();
+        $uploadedFiles = [];
+        $file_fields = ['recruit_img', 'recruit_certificateEdu', 'recruit_certificateEduB', 'recruit_copyidCard'];
+        $folder_map = [
+            'recruit_img' => 'img',
+            'recruit_certificateEdu' => 'certificate',
+            'recruit_certificateEduB' => 'certificateB',
+            'recruit_copyidCard' => 'copyidCard'
+        ];
+
+        foreach ($file_fields as $field) {
+            if ($field === 'recruit_img' && !empty($post['recruit_img_cropped'])) {
+                $base64Image = $post['recruit_img_cropped'];
+                $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64Image));
+                $fileName = $year . '-' . $post['recruit_idCard'] . '-' . uniqid() . '.png';
+                $tempFile = tempnam(sys_get_temp_dir(), 'img');
+                file_put_contents($tempFile, $imageData);
+                $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/img';
+                $result = $remoteUpload->upload($tempFile, $subPath, $fileName);
+                @unlink($tempFile);
+                if ($result && $result['status'] === 'success') {
+                    $data_insert[$field] = $result['filename'];
+                    $uploadedFiles[] = ['path' => $subPath, 'file' => $result['filename']];
+                }
+            } else {
+                $file = $this->request->getFile($field);
+                if ($file && $file->isValid() && !$file->hasMoved()) {
+                    $folder = $folder_map[$field];
+                    $subPath = 'admission/recruitstudent/m' . $post['recruit_regLevel'] . '/' . $folder;
+                    $result = $remoteUpload->upload($file, $subPath);
+                    if ($result && $result['status'] === 'success') {
+                        $data_insert[$field] = $result['filename'];
+                        $uploadedFiles[] = ['path' => $subPath, 'file' => $result['filename']];
+                    }
+                }
+            }
+        }
+
+            if ($model->insert($data_insert)) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'บันทึกข้อมูลนักเรียน (Walk-in) สำเร็จ',
+                    'redirect_url' => site_url('skjadmin/recruits')
+                ]);
+            }
+
+            return $this->response->setJSON(['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล']);
+        } catch (\Throwable $e) {
+            log_message('error', '[AdminControlRecruit::save_register] Throwable: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'เกิดข้อผิดพลาดภายในระบบ: ' . $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+        }
+    }
+
     public function view($id = null)
+
     {
         $model = new AdmissionModel();
         $courseModel = new \App\Models\CourseModel();

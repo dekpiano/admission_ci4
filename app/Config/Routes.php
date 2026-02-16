@@ -142,8 +142,11 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->add('recruits/ajax', 'AdminControlRecruit::getRecruitsAjax');
     $routes->add('recruits/ajax-all', 'AdminControlRecruit::getRecruitsAll');
     $routes->get('recruits/view/(:num)', 'AdminControlRecruit::view/$1');
+    $routes->get('recruits/register', 'AdminControlRecruit::register');
     $routes->get('recruits/edit/(:num)', 'AdminControlRecruit::edit/$1');
     $routes->post('recruits/update/(:num)', 'AdminControlRecruit::update/$1');
+    $routes->post('recruits/check-id-ajax', 'AdminControlRecruit::check_id_ajax');
+    $routes->add('recruits/save-register', 'AdminControlRecruit::save_register');
     $routes->get('recruits/delete/(:num)', 'AdminControlRecruit::delete/$1');
     $routes->add('recruits/update-status', 'AdminControlRecruit::updateStatus');
     $routes->post('recruits/update-sport-result', 'AdminControlRecruit::updateSportResult');
