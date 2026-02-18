@@ -77,6 +77,8 @@ class UserControlConfirmation extends BaseController
             // Check if student exists in recruit table for the current year
             // Check both plain and formatted ID to be safe
             $recruit = $this->db->table('tb_recruitstudent')
+                ->select('tb_recruitstudent.*, tb_quota.quota_key')
+                ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
                 ->groupStart()
                 ->where('recruit_idCard', $plainId)
                 ->orWhere('recruit_idCard', $formattedId)
@@ -92,34 +94,37 @@ class UserControlConfirmation extends BaseController
                 }
 
                 // 2. ตรวจสอบผลการคัดเลือก
-                // ตรวจสอบว่าเป็นนักกีฬาหรือไม่
+                // ตรวจสอบว่าเป็นนักกีฬาหรือความสามารถพิเศษหรือไม่
                 $isSportApplicant = (
                     (!empty($recruit->recruit_sportPosition) && $recruit->recruit_sportPosition !== '-') ||
-                    (isset($recruit->quota_key) && $recruit->quota_key === 'sport')
+                    (isset($recruit->quota_key) && $recruit->quota_key === 'sport') ||
+                    (isset($recruit->recruit_tpyeRoom) && mb_strpos($recruit->recruit_tpyeRoom, 'กีฬา') !== false) ||
+                    (isset($recruit->recruit_major) && mb_strpos($recruit->recruit_major, 'กีฬา') !== false)
                 );
 
+                $sportResult = trim($recruit->recruit_sportSelectionResult ?? '');
+                $quizResult = trim($recruit->recruit_StatusQuiz ?? '');
+
                 if ($isSportApplicant) {
-                    // นักกีฬา: ต้องผ่านการคัดเลือก
-                    $sportResult = $recruit->recruit_sportSelectionResult ?? 'รอคัดเลือก';
-                    if ($sportResult !== 'ผ่านการคัดเลือก') {
-                        if ($sportResult === 'ไม่ผ่านการคัดเลือก') {
-                            return redirect()->to('confirmation/login')->with('error', '❌ ไม่ผ่านการคัดเลือกความสามารถพิเศษ (กีฬา) ไม่สามารถรายงานตัวได้');
-                        } elseif ($sportResult === 'ไม่มาคัดเลือก') {
-                            return redirect()->to('confirmation/login')->with('error', '🚫 ไม่ได้เข้าร่วมการคัดเลือกความสามารถพิเศษ (กีฬา) ไม่สามารถรายงานตัวได้');
+                    // นักกีฬา: สามารถผ่านได้จากผลการคัดเลือกกีฬา หรือผลสอบ (ตามที่แอดมินระบุว่าใช้ สอบผ่าน/สอบไม่ผ่าน)
+                    if ($sportResult !== 'ผ่านการคัดเลือก' && $quizResult !== 'สอบผ่าน') {
+                        if ($sportResult === 'ไม่ผ่านการคัดเลือก' || $quizResult === 'สอบไม่ผ่าน') {
+                            return redirect()->to('confirmation/login')->with('error', '❌ ไม่ผ่านการคัดเลือกความสามารถพิเศษหรือการสอบ ไม่สามารถรายงานตัวได้');
+                        } elseif ($sportResult === 'ไม่มาคัดเลือก' || $quizResult === 'ไม่มาสอบ') {
+                            return redirect()->to('confirmation/login')->with('error', '🚫 ไม่ได้เข้าร่วมการคัดเลือกหรือการสอบ ไม่สามารถรายงานตัวได้');
                         } else {
-                            return redirect()->to('confirmation/login')->with('error', '⏳ รอผลการคัดเลือกความสามารถพิเศษ (กีฬา) กรุณารอประกาศผลจากทางโรงเรียน');
+                            return redirect()->to('confirmation/login')->with('error', '⏳ รอประกาศผลการคัดเลือกความสามารถพิเศษหรือผลสอบ กรุณารอประกาศผลจากทางโรงเรียน');
                         }
                     }
                 } else {
                     // นักเรียนทั่วไป: ต้องสอบผ่าน
-                    $quizResult = $recruit->recruit_StatusQuiz ?? 'รอสอบ';
                     if ($quizResult !== 'สอบผ่าน') {
                         if ($quizResult === 'สอบไม่ผ่าน') {
-                            return redirect()->to('confirmation/login')->with('error', '❌ ไม่ผ่านการสอบข้อเขียน ไม่สามารถรายงานตัวได้');
+                            return redirect()->to('confirmation/login')->with('error', '❌ คุณไม่ผ่านการสอบคัดเลือก ไม่สามารถรายงานตัวได้');
                         } elseif ($quizResult === 'ไม่มาสอบ') {
-                            return redirect()->to('confirmation/login')->with('error', '🚫 ไม่ได้เข้าสอบข้อเขียน ไม่สามารถรายงานตัวได้');
+                            return redirect()->to('confirmation/login')->with('error', '🚫 คุณไม่ได้เข้าสอบคัดเลือก ไม่สามารถรายงานตัวได้');
                         } else {
-                            return redirect()->to('confirmation/login')->with('error', '⏳ รอผลการสอบข้อเขียน กรุณารอประกาศผลจากทางโรงเรียน');
+                            return redirect()->to('confirmation/login')->with('error', '⏳ ยังไม่ประกาศผลสอบ หรือรอการประมวลผล กรุณารอประกาศผลจากทางโรงเรียน');
                         }
                     }
                 }
