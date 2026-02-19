@@ -360,7 +360,7 @@
 
 <!-- Stats Cards Row -->
 <div class="row g-4 mb-4" id="statsRow">
-    <div class="col-sm-6 col-xl-3">
+    <div class="col-6 col-xl">
         <div class="card stat-card h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
@@ -375,7 +375,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
+    <div class="col-6 col-xl">
         <div class="card stat-card h-100 cursor-pointer" data-filter="ผ่านการตรวจสอบ">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
@@ -390,7 +390,22 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
+    <div class="col-6 col-xl">
+        <div class="card stat-card h-100" style="cursor: pointer;" id="passedSelectionCard">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon" style="background: rgba(3, 195, 236, 0.15); color: #03c3ec;">
+                        <i class="bx bx-trophy"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value" style="color: #03c3ec;" id="passedSelectionCount">-</div>
+                        <div class="stat-label">ผ่านการคัดเลือก</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl">
         <div class="card stat-card h-100 cursor-pointer" data-filter="รอการตรวจสอบ">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
@@ -405,7 +420,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
+    <div class="col-6 col-xl">
         <div class="card stat-card h-100 cursor-pointer" data-filter="ไม่ผ่านการตรวจสอบ">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
@@ -621,6 +636,7 @@
                     if (response) {
                         $('#totalCount').text(response.total || 0);
                         $('#approvedCount').text(response.approved || 0);
+                        $('#passedSelectionCount').text(response.passedSelection || 0);
                         $('#pendingCount').text(response.pending || 0);
                         $('#rejectedCount').text(response.rejected || 0);
                     }

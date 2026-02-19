@@ -285,57 +285,63 @@
 </div>
 
 <?php
-// Calculate stats
-$totalStudents = count($students ?? []);
-$confirmedCount = 0;
-$pendingCount = 0;
-$approvedCount = 0;
+// Filter only students who passed selection or quiz
+$students = array_filter($students ?? [], function($student) {
+    $statusQuiz = $student->recruit_StatusQuiz ?? '';
+    return $statusQuiz == 'ผ่านการคัดเลือก' || $statusQuiz == 'สอบผ่าน';
+});
 
-foreach ($students ?? [] as $student) {
-    if (!empty($student->stu_UpdateConfirm) && $student->stu_UpdateConfirm == $student->recruit_year) {
+// Calculate stats
+$totalStudents = count($students);
+$confirmedCount = 0;
+$approvedCount = $totalStudents; // Since we filtered, all are approved
+
+foreach ($students as $student) {
+    // Check confirmed
+    $isConfirmed = (!empty($student->stu_UpdateConfirm) && $student->stu_UpdateConfirm == $student->recruit_year);
+    if ($isConfirmed) {
         $confirmedCount++;
-    } else {
-        $pendingCount++;
-    }
-    if ($student->recruit_status == 'ผ่านการตรวจสอบ') {
-        $approvedCount++;
     }
 }
+
+// Pending = Passed - Confirmed
+$pendingCount = $approvedCount - $confirmedCount;
+if ($pendingCount < 0) $pendingCount = 0;
 ?>
 
 <!-- Stats Cards Row -->
 <div class="row g-4 mb-4">
-    <div class="col-sm-6 col-xl-3">
+    <div class="col-sm-6 col-xl-4">
         <div class="card stat-card h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon" style="background: rgba(40, 167, 69, 0.15); color: #28a745;">
-                        <i class="bx bx-user"></i>
+                        <i class="bx bx-check-circle"></i>
                     </div>
                     <div>
-                        <div class="stat-value text-success"><?= $totalStudents ?></div>
-                        <div class="stat-label">ผู้สมัครทั้งหมด</div>
+                        <div class="stat-value text-success"><?= $approvedCount ?></div>
+                        <div class="stat-label">ผู้ที่ผ่านการคัดเลือก</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
+    <div class="col-sm-6 col-xl-4">
         <div class="card stat-card h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="stat-icon" style="background: rgba(113, 221, 55, 0.15); color: #71dd37;">
+                    <div class="stat-icon" style="background: rgba(3, 195, 236, 0.15); color: #03c3ec;">
                         <i class="bx bx-check-double"></i>
                     </div>
                     <div>
-                        <div class="stat-value" style="color: #71dd37;"><?= $confirmedCount ?></div>
+                        <div class="stat-value" style="color: #03c3ec;"><?= $confirmedCount ?></div>
                         <div class="stat-label">รายงานตัวแล้ว</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
+    <div class="col-sm-12 col-xl-4">
         <div class="card stat-card h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
@@ -345,21 +351,6 @@ foreach ($students ?? [] as $student) {
                     <div>
                         <div class="stat-value text-warning"><?= $pendingCount ?></div>
                         <div class="stat-label">รอรายงานตัว</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="stat-icon" style="background: rgba(3, 195, 236, 0.15); color: #03c3ec;">
-                        <i class="bx bx-check-circle"></i>
-                    </div>
-                    <div>
-                        <div class="stat-value" style="color: #03c3ec;"><?= $approvedCount ?></div>
-                        <div class="stat-label">ผ่านการตรวจสอบ</div>
                     </div>
                 </div>
             </div>
@@ -396,11 +387,11 @@ foreach ($students ?? [] as $student) {
                     <tr>
                         <th style="width: 80px;">รูป</th>
                         <th data-priority="1">ชื่อ - นามสกุล</th>
-                        <th data-priority="4">รหัส</th>
-                        <th data-priority="5">แผนการเรียน</th>
-                        <th data-priority="6">สถานะผู้สมัคร</th>
-                        <th data-priority="2">สถานะรายงานตัว</th>
-                        <th data-priority="3" style="width: 120px;" class="text-center">จัดการ</th>
+                        <th data-priority="4">รหัส / แผน</th>
+                        <th data-priority="2" class="text-center">รายงานตัว</th>
+                        <th data-priority="3" class="text-center">มอบตัว</th>
+                        <th data-priority="5" class="text-center">อนุมัติ</th>
+                        <th style="width: 120px;" class="text-center">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -408,12 +399,14 @@ foreach ($students ?? [] as $student) {
                         <?php foreach ($students as $student): ?>
                             <?php
                             $isConfirmed = (!empty($student->stu_UpdateConfirm) && $student->stu_UpdateConfirm == $student->recruit_year);
-                            $rStatus = $student->recruit_status ?? 'รอตรวจสอบ';
-                            $rClass = ($rStatus == 'ผ่านการตรวจสอบ') ? 'status-approved' : (($rStatus == 'ไม่ผ่าน' || strpos($rStatus, 'ไม่ผ่าน') !== false) ? 'status-rejected' : 'status-pending');
+                            $isSurrendered = !empty($student->recruit_statusSurrender ?? '');
+                            $isFinalApproved = (($student->recruit_statusFinal ?? '') == 'เสร็จสิ้น');
+                            
+                            $rQuiz = $student->recruit_StatusQuiz ?? 'รอผล';
+                            $quizClass = ($rQuiz == 'ผ่านการคัดเลือก' || $rQuiz == 'สอบผ่าน') ? 'bg-label-success' : ($rQuiz == 'ไม่ผ่านการคัดเลือก' || $rQuiz == 'สอบไม่ผ่าน' ? 'bg-label-danger' : 'bg-label-secondary');
 
                             // Generate avatar
                             $imgSrc = get_recruit_file_url($student->recruit_img ?? 'default.png', $student->recruit_regLevel ?? '1', 'img');
-                            $defaultImg = base_url('public/sneat-assets/img/avatars/1.png');
                             ?>
                             <tr data-status="<?= $isConfirmed ? 'confirmed' : 'pending' ?>">
                                 <td>
@@ -421,47 +414,64 @@ foreach ($students ?? [] as $student) {
                                         onerror="this.onerror=null;this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>';">
                                 </td>
                                 <td>
-                                    <div class="fw-semibold"><?= esc($student->recruit_prefix . $student->recruit_firstName) ?>
+                                    <div class="fw-semibold"><?= esc($student->recruit_prefix . $student->recruit_firstName) ?></div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <small class="text-muted"><?= esc($student->recruit_lastName) ?></small>
+                                        <span class="badge <?= $quizClass ?> p-0 px-1" style="font-size: 0.65rem;"><?= esc($rQuiz) ?></span>
                                     </div>
-                                    <small class="text-muted"><?= esc($student->recruit_lastName) ?></small>
                                 </td>
                                 <td>
-                                    <span
-                                        class="badge bg-label-secondary"><?= esc(sprintf('%04d', $student->recruit_id)) ?></span>
-                                </td>
-                                <td>
-                                    <span
-                                        class="badge bg-label-info"><?= esc($student->course_initials ?? $student->recruit_tpyeRoom) ?></span>
-                                </td>
-                                <td>
-                                    <span class="status-badge <?= $rClass ?>"><?= esc($rStatus) ?></span>
-                                </td>
-                                <td>
-                                    <?php if ($isConfirmed): ?>
-                                        <span class="status-badge status-confirmed">
-                                            <i class="bx bx-check-double me-1"></i>รายงานตัวแล้ว
-                                        </span>
-                                        <br><small class="text-muted"><?= esc($student->stu_UpdateConfirm) ?></small>
-                                    <?php else: ?>
-                                        <span class="status-badge status-pending">
-                                            <i class="bx bx-time-five me-1"></i>รอรายงานตัว
-                                        </span>
+                                    <div class="small fw-bold text-secondary">#<?= esc(sprintf('%04d', $student->recruit_id)) ?></div>
+                                    <div class="small text-info"><?= esc($student->course_initials ?? $student->recruit_tpyeRoom) ?></div>
+                                    <?php if (!empty($student->recruit_major)): ?>
+                                        <div class="small text-muted" style="font-size: 0.7rem;"><?= esc($student->recruit_major) ?></div>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
                                     <?php if ($isConfirmed): ?>
-                                        <a href="<?= site_url('skjadmin/surrender/print/' . $student->recruit_id) ?>"
-                                            target="_blank" class="action-btn print-btn" data-bs-toggle="tooltip"
-                                            title="พิมพ์ใบรายงานตัว">
-                                            <i class="bx bx-printer"></i>
-                                        </a>
+                                        <span class="badge bg-label-success" data-bs-toggle="tooltip" title="รายงานตัวออนไลน์แล้วเมื่อคราวปี <?= $student->recruit_year ?>">
+                                            <i class="bx bx-check-double"></i>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-label-warning" data-bs-toggle="tooltip" title="ยังไม่ดำเนินการรายงานตัวออนไลน์">
+                                            <i class="bx bx-time-five"></i>
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-flex justify-content-center">
+                                        <input class="form-check-input surrender-toggle" type="checkbox" 
+                                            data-id="<?= $student->recruit_id ?>" 
+                                            <?= $isSurrendered ? 'checked' : '' ?>
+                                            <?= !$isConfirmed ? 'disabled' : '' ?>>
+                                    </div>
+                                    <?php if ($isSurrendered): ?>
+                                        <small class="text-muted d-block" style="font-size: 0.6rem;"><?= date('d/m/y', strtotime($student->recruit_statusSurrender)) ?></small>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" 
+                                        class="btn btn-sm btn-icon final-approve-btn <?= $isFinalApproved ? 'btn-success' : 'btn-outline-secondary' ?>"
+                                        data-id="<?= $student->recruit_id ?>"
+                                        data-status="<?= $isFinalApproved ? '1' : '0' ?>"
+                                        <?= !$isSurrendered ? 'disabled' : '' ?>
+                                        data-bs-toggle="tooltip" title="<?= $isFinalApproved ? 'เป็นนักเรียนแล้ว' : 'กดเพื่ออนุมัติเป็นนักเรียน' ?>">
+                                        <i class="bx <?= $isFinalApproved ? 'bx-user-check' : 'bx-user-plus' ?>"></i>
+                                    </button>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <?php if ($isConfirmed): ?>
+                                            <a href="<?= site_url('skjadmin/surrender/print/' . $student->recruit_id) ?>"
+                                                target="_blank" class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="พิมพ์ใบรายงานตัว">
+                                                <i class="bx bx-printer"></i>
+                                            </a>
+                                        <?php endif; ?>
                                         <a href="<?= site_url('skjadmin/recruits/view/' . $student->recruit_id) ?>"
-                                            class="action-btn view-btn" data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                                            class="btn btn-icon btn-sm btn-outline-info" data-bs-toggle="tooltip" title="ดูข้อมูล">
                                             <i class="bx bx-show"></i>
                                         </a>
-                                    <?php else: ?>
-                                        <span class="badge bg-label-secondary">รอรายงานตัว</span>
-                                    <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -486,6 +496,98 @@ foreach ($students ?? [] as $student) {
             }
         });
 
+        // Surrender Toggle (Using event delegation for DataTables)
+        $(document).on('change', '.surrender-toggle', function() {
+            var $this = $(this);
+            var id = $this.attr('data-id');
+            var status = $this.is(':checked') ? 1 : 0;
+            
+            console.log('Surrender toggle clicked - ID:', id, 'Status:', status);
+            
+            if (!id) {
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่พบรหัสนักเรียน (data-id)', 'error');
+                return;
+            }
+
+            $.ajax({
+                url: '<?= site_url('skjadmin/surrender/update') ?>',
+                type: 'POST',
+                data: {
+                    recruit_id: id,
+                    status: status,
+                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                },
+                dataType: 'json',
+                success: function(res) {
+                    console.log('Response:', res);
+                    if(res.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ปรับปรุงสถานะมอบตัวเรียบร้อย',
+                            timer: 1000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', res.message || 'ไม่สามารถปรับปรุงข้อมูลได้', 'error');
+                        $this.prop('checked', !status);
+                    }
+                },
+                error: function(xhr) {
+                    console.log('Error:', xhr.status, xhr.responseText);
+                    Swal.fire('Error ' + xhr.status, xhr.responseText || 'เกิดข้อผิดพลาดในการส่งข้อมูล', 'error');
+                    $this.prop('checked', !status);
+                }
+            });
+        });
+
+        // Final Approval Button (Using event delegation)
+        $(document).on('click', '.final-approve-btn', function() {
+            var $this = $(this);
+            var id = $this.attr('data-id');
+            var currentStatus = $this.attr('data-status');
+            var newStatus = (currentStatus == '1') ? 0 : 1;
+            
+            Swal.fire({
+                title: (newStatus == 1) ? 'ยืนยันการอนุมัติ?' : 'ยกเลิกการอนุมัติ?',
+                text: (newStatus == 1) ? "นักเรียนคนนี้จะเปลี่ยนสถานะเป็นนักเรียนของโรงเรียนโดยสมบูรณ์" : "ต้องการยกเลิกการอนุมัติเป็นนักเรียนใช่หรือไม่?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '<?= site_url('skjadmin/surrender/update-final') ?>',
+                        type: 'POST',
+                        data: {
+                            recruit_id: id,
+                            status: newStatus,
+                            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                        },
+                        success: function(res) {
+                            if(res.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'ดำเนินการเรียบร้อย',
+                                    timer: 1000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถดำเนินการได้', 'error');
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire('Error ' + xhr.status, 'เกิดข้อผิดพลาดในการส่งข้อมูล', 'error');
+                        }
+                    });
+                }
+            });
+        });
+
         // Filter buttons functionality
         $('#statusFilter .filter-btn').on('click', function () {
             $('#statusFilter .filter-btn').removeClass('active');
@@ -494,19 +596,16 @@ foreach ($students ?? [] as $student) {
             var filterStatus = $(this).data('status');
 
             if (filterStatus === '') {
-                // Show all
                 $.fn.dataTable.ext.search.pop();
-                table.draw();
             } else {
-                // Filter by status
                 $.fn.dataTable.ext.search.pop();
                 $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
                     var row = table.row(dataIndex).node();
                     var rowStatus = $(row).data('status');
                     return rowStatus === filterStatus;
                 });
-                table.draw();
             }
+            table.draw();
         });
 
         // Initialize tooltips

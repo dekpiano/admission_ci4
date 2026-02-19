@@ -61,6 +61,7 @@ class AdmissionModel extends Model
         'recruit_address',
         'recruit_copyAddress',
         'recruit_statusSurrender',
+        'recruit_statusFinal',
         'recruit_StatusQuiz',
         'recruit_certificateAbility',
         'recruit_certificateEdu',

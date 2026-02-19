@@ -1194,11 +1194,21 @@ class AdminControlRecruit extends BaseController
             ->like('recruit_status', 'ไม่ผ่าน')
             ->countAllResults();
 
+        // Count students who passed selection (quiz or sport)
+        $passedSelection = (new AdmissionModel())
+            ->where('recruit_year', $year)
+            ->groupStart()
+                ->where('recruit_StatusQuiz', 'สอบผ่าน')
+                ->orWhere('recruit_sportSelectionResult', 'ผ่านการคัดเลือก')
+            ->groupEnd()
+            ->countAllResults();
+
         return $this->response->setJSON([
             'total' => $total,
             'approved' => $approved,
             'pending' => $pending,
-            'rejected' => $rejected
+            'rejected' => $rejected,
+            'passedSelection' => $passedSelection
         ]);
     }
 

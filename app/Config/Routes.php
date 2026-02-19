@@ -205,7 +205,8 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
 
     // Surrender
     $routes->get('surrender', 'AdminControlSurrender::index');
-    $routes->post('surrender/update', 'AdminControlSurrender::UpdateSurrender');
+    $routes->add('surrender/update', 'AdminControlSurrender::UpdateSurrender');
+    $routes->add('surrender/update-final', 'AdminControlSurrender::UpdateFinalStatus');
     $routes->get('surrender/print/(:num)', 'AdminControlSurrender::print/$1');
 
     // Service Area Schools

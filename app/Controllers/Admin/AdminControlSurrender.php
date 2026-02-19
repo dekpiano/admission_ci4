@@ -27,6 +27,14 @@ class AdminControlSurrender extends BaseController
 
     public function index()
     {
+        // Check and add columns if not exist
+        if (!$this->db->fieldExists('recruit_statusSurrender', 'tb_recruitstudent')) {
+            $this->db->query("ALTER TABLE tb_recruitstudent ADD COLUMN recruit_statusSurrender VARCHAR(20) NULL");
+        }
+        if (!$this->db->fieldExists('recruit_statusFinal', 'tb_recruitstudent')) {
+            $this->db->query("ALTER TABLE tb_recruitstudent ADD COLUMN recruit_statusFinal VARCHAR(50) NULL");
+        }
+
         $request = service('request');
         $year = $request->getVar('year') ?? date('Y');
 
@@ -53,11 +61,12 @@ class AdminControlSurrender extends BaseController
         $data['selected_year'] = $year;
 
         $builder = $this->db->table('tb_recruitstudent');
-        $builder->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials, skjacth_personnel.tb_students.stu_UpdateConfirm');
-        $builder->join('tb_quota', 'tb_quota.quota_key = tb_recruitstudent.recruit_category', 'left');
+        $builder->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials, tb_course.course_fullname, tb_course.course_branch, skjacth_personnel.tb_students.stu_UpdateConfirm');
+        $builder->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left');
         $builder->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left');
         $builder->join('skjacth_personnel.tb_students', 'tb_recruitstudent.recruit_idCard = skjacth_personnel.tb_students.stu_iden', 'left');
         $builder->where('recruit_year', $year);
+        $builder->groupBy('tb_recruitstudent.recruit_id');
         $builder->orderBy('recruit_id', 'DESC');
 
         $data['students'] = $builder->get()->getResult();
@@ -67,11 +76,57 @@ class AdminControlSurrender extends BaseController
 
     public function UpdateSurrender()
     {
-        $recruit_id = $this->request->getPost('recruit_id');
-        $data = ['recruit_statusSurrender' => date('Y-m-d H:i:s')];
-        $result = $this->db->table('tb_recruitstudent')->where('recruit_id', $recruit_id)->update($data);
+        try {
+            $recruit_id = $this->request->getVar('recruit_id');
+            $status = $this->request->getVar('status');
+            
+            if (empty($recruit_id)) {
+                return $this->response->setJSON(['success' => false, 'message' => 'recruit_id is empty']);
+            }
 
-        return $this->response->setJSON(['success' => $result]);
+            $data = ['recruit_statusSurrender' => ($status == 1 ? date('Y-m-d') : '')];
+            $this->db->table('tb_recruitstudent')->where('recruit_id', $recruit_id)->update($data);
+            $affected = $this->db->affectedRows();
+
+            return $this->response->setJSON([
+                'success' => $affected > 0,
+                'affected' => $affected,
+                'recruit_id' => $recruit_id,
+                'status' => $status
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function UpdateFinalStatus()
+    {
+        try {
+            $recruit_id = $this->request->getVar('recruit_id');
+            $status = $this->request->getVar('status');
+            
+            if (empty($recruit_id)) {
+                return $this->response->setJSON(['success' => false, 'message' => 'recruit_id is empty']);
+            }
+
+            // Ensure column exists
+            if (!$this->db->fieldExists('recruit_statusFinal', 'tb_recruitstudent')) {
+                $this->db->query("ALTER TABLE tb_recruitstudent ADD COLUMN recruit_statusFinal VARCHAR(50) NULL");
+            }
+
+            $data = ['recruit_statusFinal' => ($status == 1 ? 'เสร็จสิ้น' : '')];
+            $this->db->table('tb_recruitstudent')->where('recruit_id', $recruit_id)->update($data);
+            $affected = $this->db->affectedRows();
+
+            return $this->response->setJSON([
+                'success' => $affected > 0,
+                'affected' => $affected,
+                'recruit_id' => $recruit_id,
+                'status' => $status
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 
     public function print($id)
