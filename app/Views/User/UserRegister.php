@@ -1716,53 +1716,34 @@
                 }
 
                 function processCourseSelection(selectedCourse) {
-                    // Logic เดิมของการแสดง Age (ถ้า Course มี course_age)
-
+                    // Change: ตามคำขอของผู้ใช้ ให้เปลี่ยนจากเลือก (Radio) เป็นกรอกเอง (Manual Input) สำหรับรุ่นอายุ
+                    
                     if (selectedCourse && selectedCourse.course_age && selectedCourse.course_age.trim() !== '') {
-                        // ถ้า Course มีอายุ (เช่นแผนนักกีฬา)
-                        // แสดงช่วงอายุ
-                        ageRadioContainer.innerHTML = '<label class="form-label d-block">เลือกรุ่นอายุ <span class="text-danger">*</span></label>';
-                        ageGroupInput.value = '';
-
-                        const ages = selectedCourse.course_age.split(',').map(s => s.trim()).filter(s => s !== '');
-
-                        if (ages.length > 0) {
-                            const rowDiv = document.createElement('div');
-                            rowDiv.className = 'row g-2';
-
-                            ages.forEach(age => {
-                                const colDiv = document.createElement('div');
-                                colDiv.className = 'col-auto';
-
-                                const radioDiv = document.createElement('div');
-                                radioDiv.className = 'form-check form-check-inline';
-
-                                const radioInput = document.createElement('input');
-                                radioInput.className = 'form-check-input';
-                                radioInput.type = 'radio';
-                                radioInput.name = 'age_radio_group';
-                                radioInput.id = 'age_' + age;
-                                radioInput.value = age;
-                                radioInput.required = true;
-
-                                radioInput.addEventListener('change', function () {
-                                    ageGroupInput.value = this.value;
-                                });
-
-                                const radioLabel = document.createElement('label');
-                                radioLabel.className = 'form-check-label';
-                                radioLabel.htmlFor = 'age_' + age;
-                                radioLabel.innerText = age + ' ปี';
-
-                                radioDiv.appendChild(radioInput);
-                                radioDiv.appendChild(radioLabel);
-                                colDiv.appendChild(radioDiv);
-                                rowDiv.appendChild(colDiv);
-                            });
-
-                            ageRadioContainer.appendChild(rowDiv);
-                            ageRadioContainer.style.display = 'block';
+                        // ถ้า Course มีอายุ (มักจะเป็นแผนนักกีฬา)
+                        const agesHint = selectedCourse.course_age; // เช่น "13, 15, 18"
+                        
+                        ageRadioContainer.innerHTML = `
+                            <label for="recruit_agegroup_manual" class="form-label d-block">ระบุรุ่นอายุที่ลงสมัคร (ปี) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-time'></i></span>
+                                <input type="number" class="form-control" id="recruit_agegroup_manual" 
+                                    placeholder="เช่น ${agesHint}" required>
+                                <span class="input-group-text">ปี</span>
+                            </div>
+                            <div class="form-text text-muted small">* ระบุรุ่นอายุที่จะลงสมัครแข่งขันนักกีฬา</div>
+                        `;
+                        
+                        const manualInput = document.getElementById('recruit_agegroup_manual');
+                        manualInput.addEventListener('input', function() {
+                            ageGroupInput.value = this.value;
+                        });
+                        
+                        // Sync existing value if any
+                        if (ageGroupInput.value) {
+                            manualInput.value = ageGroupInput.value;
                         }
+
+                        ageRadioContainer.style.display = 'block';
                     } else {
                         // ถ้า Course ปกติ
                         ageRadioContainer.style.display = 'none';

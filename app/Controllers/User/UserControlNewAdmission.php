@@ -59,6 +59,12 @@ class UserControlNewAdmission extends BaseController
 
     public function pre_check($level = null)
     {
+        // Get level from query string if available (takes precedence for specific grades like M.2, M.3, M.5, M.6)
+        $queryLevel = $this->request->getGet('level');
+        if ($queryLevel) {
+            $level = $queryLevel;
+        }
+
         if (!$level) {
             return redirect()->to('new-admission');
         }
@@ -77,7 +83,7 @@ class UserControlNewAdmission extends BaseController
             return redirect()->to('new-admission')->with('error', 'ระบบปิดรับสมัคร หรือไม่ได้อยู่ในช่วงเวลาการรับสมัคร');
         }
 
-        $data['title'] = "ตรวจสอบสิทธิ์การสมัคร " . ($level == 1 ? "ม.1" : "ม.4");
+        $data['title'] = "ตรวจสอบสิทธิ์การสมัคร ม." . $level;
         $data['level'] = $level;
         $data['checkYear'] = $this->admissionModel->getOpenYear();
         $data['quotas'] = $this->admissionModel->getAllQuotas(); // Add quotas for menu generation
@@ -124,7 +130,7 @@ class UserControlNewAdmission extends BaseController
             return redirect()->to('new-admission/pre-check/' . $level);
         }
 
-        $data['title'] = "สมัครเรียน " . ($level == 1 ? "ม.1" : "ม.4");
+        $data['title'] = "สมัครเรียน ม." . $level;
         $data['level'] = $level;
         $data['checkYear'] = $this->admissionModel->getOpenYear();
         $data['quotas'] = $this->admissionModel->getAllQuotas(); // Filter in view or here
@@ -136,7 +142,7 @@ class UserControlNewAdmission extends BaseController
         $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
 
         // Get courses based on level
-        $gradeLevel = ($level == 1) ? 'ม.ต้น' : 'ม.ปลาย';
+        $gradeLevel = ($level <= 3) ? 'ม.ต้น' : 'ม.ปลาย';
         $data['courses'] = $this->admissionModel->getCoursesByGradeLevel($gradeLevel);
 
         // Generate CAPTCHA
@@ -568,7 +574,7 @@ class UserControlNewAdmission extends BaseController
                 $lineMsg .= "👤 ชื่อ: {$data_insert['recruit_prefix']}{$data_insert['recruit_firstName']} {$data_insert['recruit_lastName']}\n";
                 $lineMsg .= "🕒 เวลา: " . date('d/m/Y H:i') . " น.\n";
                 $lineMsg .= "📋 ปีการศึกษา: {$year}\n";
-                $lineMsg .= "🏫 ระดับชั้น: ม." . ($data_insert['recruit_regLevel'] == 1 ? "1" : "4") . "\n";
+                $lineMsg .= "🏫 ระดับชั้น: ม." . $data_insert['recruit_regLevel'] . "\n";
                 $lineMsg .= "🎯 รอบ: {$quotaName}\n";
                 $lineMsg .= "📚 แผนการเรียน: {$data_insert['recruit_tpyeRoom']}";
 
