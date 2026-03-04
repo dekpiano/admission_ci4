@@ -197,15 +197,38 @@ class UserControlNewAdmission extends BaseController
     public function statistics()
     {
         $checkYear = $this->admissionModel->getOpenYear();
-        $year = $checkYear->openyear_year;
+        $year = $this->request->getGet('year') ?: $checkYear->openyear_year;
+        $round = $this->request->getGet('round');
+        $category = $this->request->getGet('category');
+
+        $filters = [
+            'recruit_round' => $round,
+            'recruit_category' => $category
+        ];
 
         $data['title'] = "สถิติการรับสมัครปีการศึกษา " . $year;
         $data['checkYear'] = $checkYear;
+        $data['selectedYear'] = $year;
+        $data['selectedRound'] = $round;
+        $data['selectedCategory'] = $category;
+        
         $data['systemStatus'] = $this->admissionModel->getSystemStatus();
-        $data['quotas'] = $this->admissionModel->getAllQuotas();
-        $data['stats'] = $this->admissionModel->getAdmissionStats($year);
-        $data['dailyStats'] = $this->admissionModel->getDailyStats($year);
-        $data['statusByLevel'] = $this->admissionModel->getStatsByLevelAndStatus($year);
+        $data['allQuotas'] = $this->admissionModel->getAllQuotas(); // Keep for name lookups
+        $data['activeQuotas'] = $this->admissionModel->getQuotasWithApplicants($year);
+        $data['years'] = $this->admissionModel->getRecruitmentYears();
+        
+        // Get all unique rounds for filtering
+        $data['rounds'] = $this->db->table('tb_recruitstudent')
+            ->select('recruit_round')
+            ->where('recruit_year', $year)
+            ->groupBy('recruit_round')
+            ->orderBy('recruit_round', 'ASC')
+            ->get()
+            ->getResult();
+
+        $data['stats'] = $this->admissionModel->getAdmissionStats($year, $filters);
+        $data['dailyStats'] = $this->admissionModel->getDailyStats($year, $filters);
+        $data['statusByLevel'] = $this->admissionModel->getStatsByLevelAndStatus($year, $filters);
         $data['datethai'] = $this->datethai;
 
         return view('User/UserStatistics', $data);

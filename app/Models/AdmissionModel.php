@@ -216,6 +216,17 @@ class AdmissionModel extends Model
         return $this->db->table('tb_course')->get()->getResult();
     }
 
+    public function getQuotasWithApplicants($year)
+    {
+        return $this->db->table('tb_quota')
+            ->select('tb_quota.*')
+            ->join('tb_recruitstudent', 'tb_recruitstudent.recruit_category = tb_quota.quota_key')
+            ->where('tb_recruitstudent.recruit_year', $year)
+            ->groupBy('tb_quota.quota_key')
+            ->get()
+            ->getResult();
+    }
+
     public function getCoursesByGradeLevel($level)
     {
         return $this->db->table("tb_course")
@@ -283,62 +294,81 @@ class AdmissionModel extends Model
     }
 
     /**
-     * Get admission statistics for a specific year
+     * Get admission statistics for a specific year with optional filters
      */
-    public function getAdmissionStats($year)
+    public function getAdmissionStats($year, $filters = [])
     {
+        $builder = $this->db->table($this->table);
+        $builder->where('recruit_year', $year);
+        
+        if (!empty($filters['recruit_round'])) {
+            $builder->where('recruit_round', $filters['recruit_round']);
+        }
+        if (!empty($filters['recruit_category'])) {
+            $builder->where('recruit_category', $filters['recruit_category']);
+        }
+
         // Total by level and gender
-        $totalByLevel = $this->db->table($this->table)
+        $totalByLevelBuilder = clone $builder;
+        $totalByLevel = $totalByLevelBuilder
             ->select('recruit_regLevel, 
                      COUNT(*) as total,
                      SUM(CASE WHEN recruit_prefix IN ("เด็กชาย", "นาย") THEN 1 ELSE 0 END) as male,
                      SUM(CASE WHEN recruit_prefix IN ("เด็กหญิง", "นางสาว") THEN 1 ELSE 0 END) as female')
-            ->where('recruit_year', $year)
             ->groupBy('recruit_regLevel')
             ->get()
             ->getResult();
 
         // Total by status
-        $totalByStatus = $this->db->table($this->table)
+        $totalByStatusBuilder = clone $builder;
+        $totalByStatus = $totalByStatusBuilder
             ->select('recruit_status, COUNT(*) as total')
-            ->where('recruit_year', $year)
             ->groupBy('recruit_status')
             ->get()
             ->getResult();
 
         // Total by Program/Room and gender
-        $totalByRoom = $this->db->table($this->table)
+        $totalByRoomBuilder = clone $builder;
+        $totalByRoom = $totalByRoomBuilder
             ->select('recruit_regLevel, recruit_tpyeRoom, 
                      COUNT(*) as total,
                      SUM(CASE WHEN recruit_prefix IN ("เด็กชาย", "นาย") THEN 1 ELSE 0 END) as male,
                      SUM(CASE WHEN recruit_prefix IN ("เด็กหญิง", "นางสาว") THEN 1 ELSE 0 END) as female')
-            ->where('recruit_year', $year)
             ->groupBy('recruit_regLevel, recruit_tpyeRoom')
             ->orderBy('recruit_regLevel', 'ASC')
             ->get()
             ->getResult();
 
+        $grandTotalBuilder = clone $builder;
         return [
             'total_by_level' => $totalByLevel,
             'total_by_status' => $totalByStatus,
             'total_by_room' => $totalByRoom,
-            'grand_total' => $this->where('recruit_year', $year)->countAllResults()
+            'grand_total' => $grandTotalBuilder->countAllResults()
         ];
     }
 
     /**
-     * Get daily registration statistics
+     * Get daily registration statistics with optional filters
      */
-    public function getDailyStats($year)
+    public function getDailyStats($year, $filters = [])
     {
-        return $this->db->table($this->table)
-            ->select('DATE(recruit_date) as date, 
+        $builder = $this->db->table($this->table);
+        $builder->where('recruit_year', $year);
+
+        if (!empty($filters['recruit_round'])) {
+            $builder->where('recruit_round', $filters['recruit_round']);
+        }
+        if (!empty($filters['recruit_category'])) {
+            $builder->where('recruit_category', $filters['recruit_category']);
+        }
+
+        return $builder->select('DATE(recruit_date) as date, 
                      COUNT(*) as total,
                      SUM(CASE WHEN recruit_regLevel = 1 THEN 1 ELSE 0 END) as m1,
                      SUM(CASE WHEN recruit_regLevel = 4 THEN 1 ELSE 0 END) as m4,
                      SUM(CASE WHEN recruit_prefix IN ("เด็กชาย", "นาย") THEN 1 ELSE 0 END) as male,
                      SUM(CASE WHEN recruit_prefix IN ("เด็กหญิง", "นางสาว") THEN 1 ELSE 0 END) as female')
-            ->where('recruit_year', $year)
             ->groupBy('DATE(recruit_date)')
             ->orderBy('DATE(recruit_date)', 'ASC')
             ->get()
@@ -346,13 +376,21 @@ class AdmissionModel extends Model
     }
 
     /**
-     * Get statistics grouped by level and status
+     * Get statistics grouped by level and status with optional filters
      */
-    public function getStatsByLevelAndStatus($year)
+    public function getStatsByLevelAndStatus($year, $filters = [])
     {
-        return $this->db->table($this->table)
-            ->select('recruit_regLevel, recruit_status, COUNT(*) as total')
-            ->where('recruit_year', $year)
+        $builder = $this->db->table($this->table);
+        $builder->where('recruit_year', $year);
+
+        if (!empty($filters['recruit_round'])) {
+            $builder->where('recruit_round', $filters['recruit_round']);
+        }
+        if (!empty($filters['recruit_category'])) {
+            $builder->where('recruit_category', $filters['recruit_category']);
+        }
+
+        return $builder->select('recruit_regLevel, recruit_status, COUNT(*) as total')
             ->groupBy('recruit_regLevel, recruit_status')
             ->get()
             ->getResult();

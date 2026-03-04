@@ -215,6 +215,83 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
+    /* Filter Bar */
+    .filter-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+    }
+
+    .filter-label {
+        font-weight: 700;
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-select-skj {
+        border-radius: 12px;
+        border: 2px solid #f1f5f9;
+        padding: 0.6rem 1rem;
+        font-weight: 600;
+        color: #475569;
+        transition: all 0.2s;
+    }
+
+    .form-select-skj:focus {
+        border-color: var(--skj-pink);
+        box-shadow: 0 0 0 4px rgba(255, 158, 181, 0.1);
+    }
+
+    .btn-filter {
+        background: var(--skj-gradient);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.6rem 2rem;
+        font-weight: 700;
+        transition: all 0.3s;
+    }
+
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 158, 181, 0.3);
+        color: white;
+    }
+
+    .btn-reset {
+        background: #f1f5f9;
+        color: #64748b;
+        border: none;
+        border-radius: 12px;
+        padding: 0.6rem 1rem;
+        font-weight: 700;
+        transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .filter-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 158, 181, 0.1);
+        color: var(--skj-pink-dark);
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
     @media (max-width: 768px) {
         .stats-hero { padding: 2rem 1.5rem; }
         .stats-title { font-size: 1.8rem; }
@@ -228,15 +305,30 @@
         <!-- Hero Section -->
         <div class="stats-hero">
             <h1 class="stats-title">สรุปสถิติการรับสมัคร</h1>
-            <p class="stats-subtitle">
-                <i class='bx bxs-school me-1'></i> สถิติจำนวนผู้สมัครแยกตามระดับชั้นและเพศ (หญิง/ชาย)
-                <span class="mx-2 opacity-50">|</span>
-                <i class='bx bx-calendar me-1'></i> ปีการศึกษา <?= $checkYear->openyear_year ?>
-                <?php if (isset($checkYear->openyear_year) && $checkYear->openyear_year >= 2569): ?>
-                    (รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>)
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <p class="stats-subtitle mb-0">
+                    <i class='bx bxs-school me-1'></i> สถิติจำนวนผู้สมัครแยกตามระดับชั้นและเพศ (หญิง/ชาย)
+                    <span class="mx-2 opacity-50">|</span>
+                    <i class='bx bx-calendar me-1'></i> ปีการศึกษา <?= $selectedYear ?>
+                </p>
+                <?php if ($selectedRound): ?>
+                    <span class="badge bg-white text-pink rounded-pill py-2 px-3 text-dark">
+                        <i class='bx bx-git-branch me-1'></i> รอบที่ <?= $selectedRound ?>
+                    </span>
                 <?php endif; ?>
-            </p>
+                <?php if ($selectedCategory): ?>
+                    <?php 
+                    $catName = "ทั่วไป";
+                    foreach($allQuotas as $q) { if($q->quota_key == $selectedCategory) { $catName = $q->quota_explain; break; } }
+                    ?>
+                    <span class="badge bg-white text-pink rounded-pill py-2 px-3 text-dark">
+                        <i class='bx bx-category me-1'></i> <?= $catName ?>
+                    </span>
+                <?php endif; ?>
+            </div>
         </div>
+
+       
 
         <!-- Upper Summary Row: M.Link (Junior) & M.ปลาย (Senior) -->
         <div class="row g-4 mb-5">
@@ -323,7 +415,54 @@
                 </div>
             </div>
         </div>
-
+ <div class="filter-card">
+            <form action="<?= base_url('new-admission/statistics') ?>" method="GET" class="row g-3 align-items-end" id="filterForm">
+                <div class="col-md-3">
+                    <label class="filter-label">ปีการศึกษา</label>
+                    <select name="year" class="form-select form-select-skj" onchange="this.form.submit()">
+                        <?php foreach($years as $y): ?>
+                            <option value="<?= $y->recruit_year ?>" <?= $selectedYear == $y->recruit_year ? 'selected' : '' ?>>
+                                ปีการศึกษา <?= $y->recruit_year ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="filter-label">รอบการสมัคร</label>
+                    <select name="round" class="form-select form-select-skj" onchange="this.form.submit()">
+                        <option value="">ทั้งหมด</option>
+                        <?php foreach($rounds as $r): ?>
+                            <?php if($r->recruit_round): ?>
+                                <option value="<?= $r->recruit_round ?>" <?= $selectedRound == $r->recruit_round ? 'selected' : '' ?>>
+                                    รอบที่ <?= $r->recruit_round ?>
+                                </option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="filter-label">ประเภทตัวเอก/โควตา (เฉพาะที่มีผู้สมัคร)</label>
+                    <select name="category" class="form-select form-select-skj" onchange="this.form.submit()">
+                        <option value="">ทั้งหมด</option>
+                        <?php foreach($activeQuotas as $q): ?>
+                            <option value="<?= $q->quota_key ?>" <?= $selectedCategory == $q->quota_key ? 'selected' : '' ?>>
+                                <?= $q->quota_explain ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-filter flex-grow-1 d-none d-md-block">
+                            <i class='bx bx-sync me-2'></i> อัปเดต
+                        </button>
+                        <a href="<?= base_url('new-admission/statistics') ?>" class="btn btn-reset" title="ค่าเริ่มต้น">
+                            <i class='bx bx-refresh fs-4'></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
         <!-- Detailed Section -->
         <div class="row g-4 mb-5">
             <!-- Daily Log Table - Full Width or Wider for Many Columns -->
