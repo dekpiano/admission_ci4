@@ -36,29 +36,27 @@ class AdminControlSurrender extends BaseController
         }
 
         $request = service('request');
-        $year = $request->getVar('year') ?? date('Y');
-
-        $data['title'] = 'ข้อมูลการรายงานตัว';
-        $data['selected_year'] = $year;
-
-        // Fetch Years
-        $data['years'] = $this->db->table('tb_recruitstudent')
+        
+        // Fetch Available Years from data
+        $yearList = $this->db->table('tb_recruitstudent')
             ->select('recruit_year')
             ->groupBy('recruit_year')
             ->orderBy('recruit_year', 'DESC')
             ->get()->getResult();
+        $data['years'] = $yearList;
 
-        // Determine selected year
-        if (empty($year) || $year == date('Y')) {
-            if (!empty($data['years'])) {
-                if (!$request->getVar('year')) {
-                    $year = $data['years'][0]->recruit_year;
-                }
+        // Get selected year from request or default to latest year in DB
+        $year = $request->getVar('year');
+        if (empty($year)) {
+            if (!empty($yearList)) {
+                $year = $yearList[0]->recruit_year;
             } else {
                 $year = date('Y') + 543;
             }
         }
+        
         $data['selected_year'] = $year;
+        $data['title'] = 'ข้อมูลการรายงานตัว';
 
         $builder = $this->db->table('tb_recruitstudent');
         $builder->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials, tb_course.course_fullname, tb_course.course_branch, skjacth_personnel.tb_students.stu_UpdateConfirm');

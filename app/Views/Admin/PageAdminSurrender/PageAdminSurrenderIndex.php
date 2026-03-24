@@ -288,7 +288,11 @@
 // Filter only students who passed selection or quiz
 $students = array_filter($students ?? [], function($student) {
     $statusQuiz = $student->recruit_StatusQuiz ?? '';
-    return $statusQuiz == 'ผ่านการคัดเลือก' || $statusQuiz == 'สอบผ่าน';
+    $isSurrendered = !empty($student->recruit_statusSurrender ?? '');
+    $isFinal = ($student->recruit_statusFinal ?? '') == 'เสร็จสิ้น';
+    
+    // แสดงเฉพาะผู้ที่ผ่านการคัดเลือก หรือผู้ที่ได้มอบตัว/อนุมัติเป็นนักเรียนแล้ว (สำหรับข้อมูลย้อนหลัง)
+    return $statusQuiz == 'ผ่านการคัดเลือก' || $statusQuiz == 'สอบผ่าน' || $isSurrendered || $isFinal;
 });
 
 // Calculate stats

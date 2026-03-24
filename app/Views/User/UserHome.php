@@ -9,8 +9,8 @@
         padding: 3rem 2rem;
         color: white;
         position: relative;
-        overflow: hidden;
-        margin-bottom: 2rem;
+        overflow: visible;
+        margin-bottom: 3rem;
         min-height: 350px;
     }
 
@@ -613,15 +613,62 @@
             font-size: 1.4rem;
         }
 
-        .hero-date-info .date-item {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-        }
-
-        .hero-date-info .date-item i {
-            font-size: 1.1rem;
-        }
+        @keyframes jumpingText {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-10px) scale(1.05); }
     }
+    
+    .jumping-text {
+        display: inline-block;
+        animation: jumpingText 2s infinite ease-in-out;
+        position: relative;
+        z-index: 100;
+        transform-origin: center bottom;
+    }
+
+    @keyframes textShine {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .text-shine-vibrant {
+        background: linear-gradient(90deg, #ffffff, #fff200, #ffffff, #00ffa2, #ffffff);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: textShine 3s linear infinite;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .status-highlight-box {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+
+    /* Update Hero Status Badge for more impact */
+    .hero-status-badge.open {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        border: 4px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 15px 45px rgba(16, 185, 129, 0.6);
+        animation: fadeInUp 0.8s ease-out 0.5s both, pulseGreen 1.5s infinite;
+        transform: scale(1.1);
+    }
+
+    .hero-date-info .date-item {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .hero-date-info .date-item i {
+        font-size: 1.1rem;
+    }
+}
 
     @media (max-width: 991px) {
         .hero-section {
@@ -1447,11 +1494,6 @@
                     <div class="badge bg-white text-primary rounded-pill px-3 py-2 d-flex align-items-center shadow-sm">
                         <i class='bx bx-calendar-event me-1'></i> ปีการศึกษา <?= $checkYear->openyear_year ?? '-' ?>
                     </div>
-                    <?php if (isset($checkYear->openyear_year) && $checkYear->openyear_year >= 2569): ?>
-                        <div class="badge bg-warning text-dark rounded-pill px-3 py-2 d-flex align-items-center shadow-sm border-white border-2">
-                            <i class='bx bxs-star me-1'></i> รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>
-                        </div>
-                    <?php endif; ?>
                 </div>
 
                 <p class="hero-subtitle opacity-75 mb-4">
@@ -1471,15 +1513,39 @@
                 } elseif (isset($systemStatus->onoff_regis) && $systemStatus->onoff_regis == 'on') {
                     $is_open = true;
                 }
+
+                // Prepare quota names for display
+                $activeQuotas = [];
+                if (isset($quotas) && is_array($quotas)) {
+                    foreach ($quotas as $q) {
+                        if (isset($q->quota_status) && $q->quota_status == 'on') {
+                            $activeQuotas[] = $q->quota_explain ?? $q->quota_name ?? 'N/A';
+                        }
+                    }
+                }
+                $quotaNames = !empty($activeQuotas) ? implode(' / ', $activeQuotas) : 'รับสมัครนักเรียนใหม่';
                 ?>
 
                 <?php if ($is_not_open): ?>
                     <!-- Countdown to Open -->
-                    <div class="hero-countdown-box my-4">
-                        <p class="mb-3">
-                            <i class='bx bxs-time-five me-2 text-warning' style="font-size: 1.2em;"></i>
-                            นับถอยหลังสู่การรับสมัคร
-                        </p>
+                    <div class="hero-countdown-box my-4 pt-4" style="overflow: visible;">
+                        <div class="mb-2">
+                            <span class="badge bg-white text-primary mb-2 shadow-sm py-2 px-3 rounded-pill jumping-text">
+                                <i class='bx bxs-time-five me-1 text-warning'></i> นับถอยหลังสู่การรับสมัคร
+                            </span>
+                            <div class="status-highlight-box d-inline-block w-100">
+                                <div class="d-inline-flex align-items-center justify-content-center flex-wrap gap-3 py-2 w-100">
+                                    <h3 class="fw-bolder text-white mb-0 text-shine-vibrant jumping-text" style="font-size: clamp(1.8rem, 6vw, 3.5rem); line-height: 1;">
+                                        <?= $quotaNames ?>
+                                    </h3>
+                                    <?php if (isset($systemStatus->onoff_round)): ?>
+                                        <div class="badge bg-warning text-dark rounded-pill px-4 py-2 d-inline-flex align-items-center shadow-lg border-white border-2 animate__animated animate__pulse animate__infinite" style="font-size: 1.2rem;">
+                                            <i class='bx bxs-star me-1'></i> รอบที่ <?= $systemStatus->onoff_round ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
                         <div class="countdown-container" data-target="<?= $systemStatus->onoff_datetime_regis_open ?>">
                             <ul>
                                 <li><span class="days">0</span>
@@ -1499,47 +1565,58 @@
                     </div>
                 <?php elseif ($is_open): ?>
                     <!-- Currently Open - Clickable to Scroll -->
-                    <?php
-                    $activeQuotas = [];
-                    if (isset($quotas) && is_array($quotas)) {
-                        foreach ($quotas as $q) {
-                            if (isset($q->quota_status) && $q->quota_status == 'on') {
-                                $activeQuotas[] = isset($q->quota_explain) ? $q->quota_explain : (isset($q->quota_name) ? $q->quota_name : 'N/A');
-                            }
-                        }
-                    }
-                    $quotaNames = !empty($activeQuotas) ? implode(', ', $activeQuotas) : 'รับสมัครนักเรียนใหม่';
-                    ?>
                     <a href="#apply-section"
-                        class="hero-status-badge open my-4 text-decoration-none smooth-scroll d-inline-flex flex-column justify-content-center align-items-center py-3 px-5 h-auto">
-                        <span class="fs-6 fw-normal mb-1 opacity-75"><i class='bx bxs-check-circle me-1'></i>
+                        class="hero-status-badge open my-5 text-decoration-none smooth-scroll d-inline-flex flex-column justify-content-center align-items-center py-4 px-5 h-auto jumping-text w-100">
+                        <span class="fs-5 fw-bold mb-1 opacity-100 text-white"><i class='bx bxs-check-circle me-1 text-warning'></i>
                             เปิดรับสมัครแล้ว</span>
-                        <span class="fs-3 fw-bolder text-white text-uppercase"
-                            style="line-height: 1.2;"><?= $quotaNames ?></span>
+                        
+                        <div class="d-flex align-items-center justify-content-center flex-wrap gap-3 mt-1">
+                            <span class="fs-1 fw-bolder text-shine-vibrant text-uppercase"
+                                style="line-height: 1; font-size: clamp(2rem, 8vw, 4rem);"><?= $quotaNames ?></span>
+                            <?php if (isset($systemStatus->onoff_round)): ?>
+                                <span class="badge bg-warning text-dark rounded-pill px-4 py-2 d-inline-flex align-items-center shadow-lg border-white border-2 ms-lg-2 animate__animated animate__pulse animate__infinite" style="font-size: 1.5rem;">
+                                    <i class='bx bxs-star me-1'></i> รอบที่ <?= $systemStatus->onoff_round ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="mt-4 badge bg-white text-success rounded-pill px-4 py-2 shadow-sm fs-6">
+                            <i class='bx bxs-mouse-alt me-1'></i> คลิกที่นี่เพื่อสมัครเลย!
+                        </div>
                     </a>
                 <?php elseif ($is_closed): ?>
                     <!-- Closed -->
-                    <div class="hero-status-badge closed mb-3">
+                    <div class="hero-status-badge closed mb-3 jumping-text">
                         <i class='bx bx-x-circle me-1'></i> ปิดรับสมัครแล้ว
                     </div>
                 <?php endif; ?>
 
-                <!-- Date Info -->
+                <!-- Date Info - Enhanced Design (Optimized for Mobile Same-line) -->
                 <?php if (isset($systemStatus->onoff_datetime_regis_open) || isset($systemStatus->onoff_datetime_regis_close)): ?>
-                    <div class="hero-date-info d-flex flex-row flex-nowrap justify-content-center justify-content-lg-start gap-2 mb-3 overflow-auto"
-                        style="white-space: nowrap;">
+                    <div class="d-flex flex-row justify-content-center justify-content-lg-start gap-2 flex-nowrap mb-4 mt-3 px-1 w-100" style="overflow: visible;">
                         <?php if (isset($systemStatus->onoff_datetime_regis_open)): ?>
-                            <div class="date-item open flex-fill text-center">
-                                <i class='bx bx-calendar-check'></i>
-                                <span>เปิด:
-                                    <?= $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_open)) ?></span>
+                            <div class="badge bg-white text-success rounded-pill px-2 px-md-4 py-2 d-flex align-items-center shadow-lg border-success border-2 jumping-text flex-fill flex-grow-1" style="min-width: 0; max-width: 300px;">
+                                <div class="rounded-circle bg-success text-white me-2 me-md-3 d-none d-sm-flex align-items-center justify-content-center shadow-sm" style="width: 35px; height: 35px; flex-shrink: 0;">
+                                    <i class='bx bxs-calendar-check fs-5'></i>
+                                </div>
+                                <div class="text-start overflow-hidden">
+                                    <div class="fw-normal text-muted d-none d-md-block" style="font-size: 0.65rem; line-height: 1;">เริ่มเปิดรับสมัคร</div>
+                                    <div class="fw-normal text-muted d-block d-md-none" style="font-size: 0.55rem; line-height: 1;">เปิดสมัคร</div>
+                                    <div class="fw-bold text-truncate" style="font-size: clamp(0.7rem, 2.5vw, 1rem);"><?= $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_open)) ?></div>
+                                </div>
                             </div>
                         <?php endif; ?>
+
                         <?php if (isset($systemStatus->onoff_datetime_regis_close)): ?>
-                            <div class="date-item close flex-fill text-center">
-                                <i class='bx bx-calendar-x'></i>
-                                <span>ปิด:
-                                    <?= $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_close)) ?></span>
+                            <div class="badge bg-white text-danger rounded-pill px-2 px-md-4 py-2 d-flex align-items-center shadow-lg border-danger border-2 jumping-text flex-fill flex-grow-1" style="min-width: 0; max-width: 300px;">
+                                <div class="rounded-circle bg-danger text-white me-2 me-md-3 d-none d-sm-flex align-items-center justify-content-center shadow-sm" style="width: 35px; height: 35px; flex-shrink: 0;">
+                                    <i class='bx bxs-calendar-x fs-5'></i>
+                                </div>
+                                <div class="text-start overflow-hidden">
+                                    <div class="fw-normal text-muted d-none d-md-block" style="font-size: 0.65rem; line-height: 1;">สิ้นสุดวันรับสมัคร</div>
+                                    <div class="fw-normal text-muted d-block d-md-none" style="font-size: 0.55rem; line-height: 1;">สิ้นสุด</div>
+                                    <div class="fw-bold text-truncate" style="font-size: clamp(0.7rem, 2.5vw, 1rem);"><?= $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_close)) ?></div>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>
