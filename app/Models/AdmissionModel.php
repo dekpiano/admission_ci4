@@ -316,6 +316,7 @@ class AdmissionModel extends Model
                      SUM(CASE WHEN recruit_prefix IN ("เด็กชาย", "นาย") THEN 1 ELSE 0 END) as male,
                      SUM(CASE WHEN recruit_prefix IN ("เด็กหญิง", "นางสาว") THEN 1 ELSE 0 END) as female')
             ->groupBy('recruit_regLevel')
+            ->orderBy('recruit_regLevel', 'ASC')
             ->get()
             ->getResult();
 

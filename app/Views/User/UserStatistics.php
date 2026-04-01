@@ -328,67 +328,88 @@
             </div>
         </div>
 
+        <div class="filter-card">
+            <form action="<?= base_url('new-admission/statistics') ?>" method="GET" class="row g-3 align-items-end" id="filterForm">
+                <div class="col-md-3">
+                    <label class="filter-label">ปีการศึกษา</label>
+                    <select name="year" class="form-select form-select-skj" onchange="this.form.submit()">
+                        <?php foreach($years as $y): ?>
+                            <option value="<?= $y->recruit_year ?>" <?= $selectedYear == $y->recruit_year ? 'selected' : '' ?>>
+                                ปีการศึกษา <?= $y->recruit_year ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="filter-label">รอบการสมัคร</label>
+                    <select name="round" class="form-select form-select-skj" onchange="this.form.submit()">
+                        <option value="">ทั้งหมด</option>
+                        <?php foreach($rounds as $r): ?>
+                            <?php if($r->recruit_round): ?>
+                                <option value="<?= $r->recruit_round ?>" <?= $selectedRound == $r->recruit_round ? 'selected' : '' ?>>
+                                    รอบที่ <?= $r->recruit_round ?>
+                                </option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="filter-label">ประเภทตัวเอก/โควตา (เฉพาะที่มีผู้สมัคร)</label>
+                    <select name="category" class="form-select form-select-skj" onchange="this.form.submit()">
+                        <option value="">ทั้งหมด</option>
+                        <?php foreach($activeQuotas as $q): ?>
+                            <option value="<?= $q->quota_key ?>" <?= $selectedCategory == $q->quota_key ? 'selected' : '' ?>>
+                                <?= $q->quota_explain ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-filter flex-grow-1 d-none d-md-block">
+                            <i class='bx bx-sync me-2'></i> อัปเดต
+                        </button>
+                        <a href="<?= base_url('new-admission/statistics') ?>" class="btn btn-reset" title="ค่าเริ่มต้น">
+                            <i class='bx bx-refresh fs-4'></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
        
 
-        <!-- Upper Summary Row: M.Link (Junior) & M.ปลาย (Senior) -->
+        <!-- Summary Row: Dynamic by all Levels present in data -->
         <div class="row g-4 mb-5">
-            <?php
-            $m1_data = ['total' => 0, 'male' => 0, 'female' => 0];
-            $m4_data = ['total' => 0, 'male' => 0, 'female' => 0];
-            foreach ($stats['total_by_level'] as $l) {
-                if ($l->recruit_regLevel == 1) {
-                    $m1_data = ['total' => $l->total, 'male' => $l->male, 'female' => $l->female];
-                }
-                if ($l->recruit_regLevel == 4) {
-                    $m4_data = ['total' => $l->total, 'male' => $l->male, 'female' => $l->female];
-                }
-            }
-            ?>
-            <!-- Junior High Card -->
-            <div class="col-md-6 col-xl-4">
-                <div class="card-stat">
-                    <div class="stat-header">
-                        <div class="stat-icon m1"><i class='bx bxs-book-content'></i></div>
-                        <div class="stat-label">มัธยมศึกษาปีที่ 1 (ม.ต้น)</div>
-                    </div>
-                    <div class="stat-number"><?= number_format($m1_data['total']) ?></div>
-                    <div class="gender-split">
-                        <div class="gender-box male">
-                            <i class='bx bx-male-sign mb-1'></i>
-                            <span>ชาย</span>
-                            <span class="gender-val"><?= number_format($m1_data['male']) ?></span>
-                        </div>
-                        <div class="gender-box female">
-                            <i class='bx bx-female-sign mb-1'></i>
-                            <span>หญิง</span>
-                            <span class="gender-val"><?= number_format($m1_data['female']) ?></span>
+            <?php if (empty($stats['total_by_level'])): ?>
+                <div class="col-12 text-center text-muted py-5">ยังไม่มีข้อมูลสถิติสำหรับเงื่อนไขที่ระบุ</div>
+            <?php else: ?>
+                <?php foreach ($stats['total_by_level'] as $l): ?>
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card-stat">
+                            <div class="stat-header">
+                                <div class="stat-icon" style="background: rgba(132, 210, 246, 0.15); color: var(--skj-blue-dark);">
+                                    <i class='bx <?= ($l->recruit_regLevel == 1 || $l->recruit_regLevel == 4) ? "bxs-book-content" : "bx-book-open" ?>'></i>
+                                </div>
+                                <div class="stat-label">มัธยมศึกษาปีที่ <?= $l->recruit_regLevel ?> <?= ($l->recruit_regLevel <= 3) ? "(ม.ต้น)" : "(ม.ปลาย)" ?></div>
+                            </div>
+                            <div class="stat-number"><?= number_format($l->total) ?></div>
+                            <div class="gender-split">
+                                <div class="gender-box male">
+                                    <i class='bx bx-male-sign mb-1'></i>
+                                    <span>ชาย</span>
+                                    <span class="gender-val"><?= number_format($l->male) ?></span>
+                                </div>
+                                <div class="gender-box female">
+                                    <i class='bx bx-female-sign mb-1'></i>
+                                    <span>หญิง</span>
+                                    <span class="gender-val"><?= number_format($l->female) ?></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Senior High Card -->
-            <div class="col-md-6 col-xl-4">
-                <div class="card-stat">
-                    <div class="stat-header">
-                        <div class="stat-icon total" style="background: rgba(132, 210, 246, 0.15); color: #5cbbf2;"><i class='bx bxs-book-heart'></i></div>
-                        <div class="stat-label">มัธยมศึกษาปีที่ 4 (ม.ปลาย)</div>
-                    </div>
-                    <div class="stat-number"><?= number_format($m4_data['total']) ?></div>
-                    <div class="gender-split">
-                        <div class="gender-box male">
-                            <i class='bx bx-male-sign mb-1'></i>
-                            <span>ชาย</span>
-                            <span class="gender-val"><?= number_format($m4_data['male']) ?></span>
-                        </div>
-                        <div class="gender-box female">
-                            <i class='bx bx-female-sign mb-1'></i>
-                            <span>หญิง</span>
-                            <span class="gender-val"><?= number_format($m4_data['female']) ?></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
 
             <!-- Grand Total Card -->
             <div class="col-md-12 col-xl-4">
@@ -399,8 +420,9 @@
                     </div>
                     <div class="stat-number text-white"><?= number_format($stats['grand_total']) ?></div>
                     <?php
-                    $total_male = $m1_data['male'] + $m4_data['male'];
-                    $total_female = $m1_data['female'] + $m4_data['female'];
+                    // Dynamic calculation for all levels to ensure accuracy
+                    $total_male = array_sum(array_column($stats['total_by_level'], 'male'));
+                    $total_female = array_sum(array_column($stats['total_by_level'], 'female'));
                     ?>
                     <div class="gender-split">
                         <div class="gender-box" style="background: rgba(255,255,255,0.15); color: white;">
@@ -471,17 +493,17 @@
                     <div class="stats-card-header">
                         <h5 class="stats-card-title"><i class='bx bx-history'></i> ความเคลื่อนไหวรายวัน (แยกตามประเภท)</h5>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0 text-center" style="font-size: 0.95rem;">
-                            <thead class="table-light">
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0 text-center" style="font-size: 0.95rem; border-collapse: separate; border-spacing: 0;">
+                            <thead class="table-light" style="position: sticky; top: 0; z-index: 10;">
                                 <tr>
-                                    <th class="text-start ps-4">วันที่สมัคร</th>
-                                    <th style="color: var(--skj-blue-dark);">ม.1 (คน)</th>
-                                    <th style="color: #48bb78;">ม.4 (คน)</th>
-                                    <th style="color: var(--male-color);"><i class='bx bx-male-sign'></i> ชาย</th>
-                                    <th style="color: var(--female-color);"><i class='bx bx-female-sign'></i> หญิง</th>
-                                    <th class="bg-light fw-bold text-dark">รวม (คน)</th>
-                                    <th class="pe-4" style="width: 15%;">สัดส่วน</th>
+                                    <th class="text-start ps-4" style="background: #f8f9fa;">วันที่สมัคร</th>
+                                    <th style="color: var(--skj-blue-dark); background: #f8f9fa;">ม.1 (คน)</th>
+                                    <th style="color: #48bb78; background: #f8f9fa;">ม.4 (คน)</th>
+                                    <th style="color: var(--male-color); background: #f8f9fa;"><i class='bx bx-male-sign'></i> ชาย</th>
+                                    <th style="color: var(--female-color); background: #f8f9fa;"><i class='bx bx-female-sign'></i> หญิง</th>
+                                    <th class="bg-light fw-bold text-dark" style="background: #f8f9fa !important;">รวม (คน)</th>
+                                    <th class="pe-4" style="width: 15%; background: #f8f9fa;">สัดส่วน</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -522,83 +544,56 @@
                     <div class="stats-card-header d-flex flex-column flex-sm-row align-items-sm-center gap-3">
                         <h5 class="stats-card-title me-auto"><i class='bx bx-receipt'></i> จำนวนผู้สมัครแยกตามแผนงาน</h5>
                         <ul class="nav nav-skj" id="detailTab" role="tablist">
-                            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#m1-detail">ม.ต้น (1)</button></li>
-                            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#m4-detail">ม.ปลาย (4)</button></li>
+                            <?php foreach($stats['total_by_level'] as $index => $l): ?>
+                                <li class="nav-item">
+                                    <button class="nav-link <?= $index === 0 ? 'active' : '' ?>" 
+                                            data-bs-toggle="tab" 
+                                            data-bs-target="#m<?= $l->recruit_regLevel ?>-detail">
+                                        ม.<?= $l->recruit_regLevel ?>
+                                    </button>
+                                </li>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
                     <div class="p-4">
                         <div class="tab-content">
-                            <!-- M1 Detail -->
-                            <div class="tab-pane fade show active" id="m1-detail">
-                                <?php
-                                $m1_rooms = array_filter($stats['total_by_room'], function ($r) {
-                                    return $r->recruit_regLevel == 1; });
-                                ?>
-                                <?php if (empty($m1_rooms)): ?>
-                                        <div class="text-center py-5 text-muted">ยังไม่มีข้อมูล</div>
-                                <?php else: ?>
-                                        <div class="row">
-                                            <?php foreach ($m1_rooms as $room): ?>
-                                                    <div class="col-md-6">
-                                                        <div class="program-item">
-                                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                                <div class="program-title pe-2"><?= $room->recruit_tpyeRoom ?></div>
-                                                                <span class="program-total-badge"><?= $room->total ?></span>
-                                                            </div>
-                                                            <div class="mini-gender-bar">
-                                                                <?php
-                                                                $male_p = ($room->total > 0) ? ($room->male / $room->total) * 100 : 0;
-                                                                $female_p = ($room->total > 0) ? ($room->female / $room->total) * 100 : 0;
-                                                                ?>
-                                                                <div class="bg-male" style="width: <?= $male_p ?>%"></div>
-                                                                <div class="bg-female" style="width: <?= $female_p ?>%"></div>
-                                                            </div>
-                                                            <div class="d-flex justify-content-between small fw-bold">
-                                                                <span class="text-primary"><i class='bx bx-male-sign'></i> ช: <?= $room->male ?></span>
-                                                                <span style="color: var(--female-color);"><i class='bx bx-female-sign'></i> ญ: <?= $room->female ?></span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                <?php endif; ?>
-                            </div>
-
-                            <!-- M4 Detail -->
-                            <div class="tab-pane fade" id="m4-detail">
-                                <?php
-                                $m4_rooms = array_filter($stats['total_by_room'], function ($r) {
-                                    return $r->recruit_regLevel == 4; });
-                                ?>
-                                <?php if (empty($m4_rooms)): ?>
-                                        <div class="text-center py-5 text-muted">ยังไม่มีข้อมูล</div>
-                                <?php else: ?>
-                                        <div class="row">
-                                            <?php foreach ($m4_rooms as $room): ?>
-                                                    <div class="col-md-6">
-                                                        <div class="program-item">
-                                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                                <div class="program-title pe-2 text-info"><?= $room->recruit_tpyeRoom ?></div>
-                                                                <span class="program-total-badge" style="background: var(--skj-blue);"><?= $room->total ?></span>
-                                                            </div>
-                                                            <div class="mini-gender-bar">
-                                                                <?php
-                                                                $male_p = ($room->total > 0) ? ($room->male / $room->total) * 100 : 0;
-                                                                $female_p = ($room->total > 0) ? ($room->female / $room->total) * 100 : 0;
-                                                                ?>
-                                                                <div class="bg-male" style="width: <?= $male_p ?>%"></div>
-                                                                <div class="bg-female" style="width: <?= $female_p ?>%"></div>
-                                                            </div>
-                                                            <div class="d-flex justify-content-between small fw-bold">
-                                                                <span class="text-primary"><i class='bx bx-male-sign'></i> ช: <?= $room->male ?></span>
-                                                                <span style="color: var(--female-color);"><i class='bx bx-female-sign'></i> ญ: <?= $room->female ?></span>
+                            <?php foreach($stats['total_by_level'] as $index => $levelData): ?>
+                                <div class="tab-pane fade <?= $index === 0 ? 'show active' : '' ?>" id="m<?= $levelData->recruit_regLevel ?>-detail">
+                                    <?php
+                                    $rooms = array_filter($stats['total_by_room'], function ($r) use ($levelData) {
+                                        return $r->recruit_regLevel == $levelData->recruit_regLevel; 
+                                    });
+                                    ?>
+                                    <?php if (empty($rooms)): ?>
+                                            <div class="text-center py-5 text-muted">ยังไม่มีข้อมูลแผนงานสำหรับ ม.<?= $levelData->recruit_regLevel ?></div>
+                                    <?php else: ?>
+                                            <div class="row">
+                                                <?php foreach ($rooms as $room): ?>
+                                                        <div class="col-md-6">
+                                                            <div class="program-item">
+                                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                                    <div class="program-title pe-2"><?= $room->recruit_tpyeRoom ?></div>
+                                                                    <span class="program-total-badge"><?= $room->total ?></span>
+                                                                </div>
+                                                                <div class="mini-gender-bar">
+                                                                    <?php
+                                                                    $male_p = ($room->total > 0) ? ($room->male / $room->total) * 100 : 0;
+                                                                    $female_p = ($room->total > 0) ? ($room->female / $room->total) * 100 : 0;
+                                                                    ?>
+                                                                    <div class="bg-male" style="width: <?= $male_p ?>%"></div>
+                                                                    <div class="bg-female" style="width: <?= $female_p ?>%"></div>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between small fw-bold">
+                                                                    <span class="text-primary"><i class='bx bx-male-sign'></i> ช: <?= $room->male ?></span>
+                                                                    <span style="color: var(--female-color);"><i class='bx bx-female-sign'></i> ญ: <?= $room->female ?></span>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                <?php endif; ?>
-                            </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
