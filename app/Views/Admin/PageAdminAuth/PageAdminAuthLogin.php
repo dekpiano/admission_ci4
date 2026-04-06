@@ -156,7 +156,7 @@
               <div class="d-flex justify-content-center">
                   <!-- Google Sign-In Button (New Way) -->
                   <div id="g_id_onload"
-                      data-client_id="29638025169-aeobhq04v0lvimcjd27osmhlpua380gl.apps.googleusercontent.com"
+                      data-client_id="<?= (new \Config\Google())->clientId ?>"
                       data-context="signin"
                       data-ux_mode="popup"
                       data-callback="handleCredentialResponse"

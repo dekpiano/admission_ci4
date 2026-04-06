@@ -6,8 +6,8 @@ use CodeIgniter\Config\BaseConfig;
 
 class Google extends BaseConfig
 {
-    public $clientId = '29638025169-aeobhq04v0lvimcjd27osmhlpua380gl.apps.googleusercontent.com'; // Replace with your actual Client ID
-    public $clientSecret = 'RSANANTRl84lnYm54Hi0icGa'; // Replace with your actual Client Secret
+    public $clientId = '29638025169-aeobhq04v0lvimcjd27osmhlpua380gl.apps.googleusercontent.com';
+    public $clientSecret = 'RSANANTRl84lnYm54Hi0icGa';
     public $redirectUri;
 
     public function __construct()

@@ -14,7 +14,13 @@ use Psr\Log\LoggerInterface;
 
 class UserControlAuth extends \App\Controllers\BaseController
 {
-    private $clientId = '29638025169-aeobhq04v0lvimcjd27osmhlpua380gl.apps.googleusercontent.com';
+    private $googleConfig;
+
+    public function __construct()
+    {
+        $this->googleConfig = new \Config\Google();
+    }
+
 
     /**
      * An array of helpers to be loaded automatically upon
@@ -93,7 +99,7 @@ class UserControlAuth extends \App\Controllers\BaseController
         }
 
         // Validate Client ID (Audience)
-        if ($payload['aud'] !== $this->clientId) {
+        if ($payload['aud'] !== $this->googleConfig->clientId) {
              return redirect()->to(base_url('auth/login'))->with('error', 'Client ID ไม่ถูกต้อง');
         }
 

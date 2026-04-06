@@ -30,9 +30,10 @@ class UserControlLogin extends BaseController
         if (class_exists('Google_Client')) {
             $redirect_uri = base_url('loginGoogle');
 
-            $this->googleClient = new Google_Client();
-            $this->googleClient->setClientId('112583025699-4qiv5d413kebk4s53cc1450fopts7n3m.apps.googleusercontent.com');
-            $this->googleClient->setClientSecret('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');
+            $googleConfig = new \Config\Google();
+            $this->googleClient = new \Google_Client();
+            $this->googleClient->setClientId($googleConfig->clientId);
+            $this->googleClient->setClientSecret($googleConfig->clientSecret);
             $this->googleClient->setRedirectUri($redirect_uri);
             $this->googleClient->addScope('email');
             $this->googleClient->addScope('profile');
