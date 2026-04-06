@@ -13,18 +13,43 @@
                         </h4>
                         <p class="text-muted mb-0">ข้อมูลอัปเดตแบบ Real-time แยกตามเพศและระดับชั้น</p>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <label for="yearFilter" class="form-label mb-0 text-nowrap">เลือกปีการศึกษา:</label>
-                        <select class="form-select w-px-150" id="yearFilter"
-                            onchange="window.location.href='<?= site_url('skjadmin/statistics/') ?>' + this.value">
-                            <?php foreach ($years as $y): ?>
-                                <option value="<?= $y->recruit_year ?>" <?= $y->recruit_year == $selectedYear ? 'selected' : '' ?>>
-                                    ปีการศึกษา
-                                    <?= $y->recruit_year ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                    <form method="GET" action="<?= site_url('skjadmin/statistics') ?>" class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="yearFilter" class="form-label mb-0 text-nowrap">ปีการศึกษา:</label>
+                            <select name="year" class="form-select w-px-150" id="yearFilter" onchange="this.form.submit()">
+                                <?php foreach ($years as $y): ?>
+                                    <option value="<?= $y->recruit_year ?>" <?= $y->recruit_year == $selectedYear ? 'selected' : '' ?>>
+                                        <?= $y->recruit_year ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="roundFilter" class="form-label mb-0 text-nowrap">รอบ:</label>
+                            <select name="round" class="form-select w-px-150" id="roundFilter" onchange="this.form.submit()">
+                                <option value="">--- ทั้งหมด ---</option>
+                                <?php if (!empty($rounds)): foreach ($rounds as $r): ?>
+                                    <option value="<?= $r->recruit_round ?>" <?= $selectedRound == $r->recruit_round ? 'selected' : '' ?>>
+                                        รอบที่ <?= $r->recruit_round ?>
+                                    </option>
+                                <?php endforeach; endif; ?>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="dateFilter" class="form-label mb-0 text-nowrap">วันที่:</label>
+                            <select name="date" class="form-select w-px-150" id="dateFilter" onchange="this.form.submit()">
+                                <option value="">--- ทั้งหมด ---</option>
+                                <?php if (!empty($dates)): foreach ($dates as $d): ?>
+                                    <option value="<?= $d->recruit_date ?>" <?= $selectedDate == $d->recruit_date ? 'selected' : '' ?>>
+                                        <?= $datethai->thai_date_short(strtotime($d->recruit_date)) ?>
+                                    </option>
+                                <?php endforeach; endif; ?>
+                            </select>
+                        </div>
+                        <a href="<?= site_url('skjadmin/statistics') ?>" class="btn btn-outline-secondary">
+                            <i class='bx bx-refresh'></i> รีเซ็ต
+                        </a>
+                    </form>
                 </div>
             </div>
         </div>

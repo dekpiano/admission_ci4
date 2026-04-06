@@ -17,6 +17,9 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('public/sneat-assets/img/favicon/favicon.ico') ?>" />
+20: 
+    <!-- Google Sign-In (New Way) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -151,7 +154,22 @@
               <?php endif; ?>
 
               <div class="d-flex justify-content-center">
-                  <a href="<?= base_url('auth/google_login') ?>" id="googleLoginBtn" class="btn btn-primary me-3 w-auto"><i class="tf-icons bx bxl-google-plus"></i> เข้าสู่ระบบด้วย Google </a>
+                  <!-- Google Sign-In Button (New Way) -->
+                  <div id="g_id_onload"
+                      data-client_id="29638025169-aeobhq04v0lvimcjd27osmhlpua380gl.apps.googleusercontent.com"
+                      data-context="signin"
+                      data-ux_mode="popup"
+                      data-callback="handleCredentialResponse"
+                      data-auto_prompt="false">
+                  </div>
+                  <div class="g_id_signin"
+                      data-type="standard"
+                      data-shape="pill"
+                      data-theme="outline"
+                      data-text="signin_with"
+                      data-size="large"
+                      data-logo_alignment="left">
+                  </div>
               </div>
             </div>
           </div>
@@ -177,6 +195,23 @@
     
     <!-- Page JS -->
     <script src="<?= base_url('public/sneat-assets/js/pages-auth.js') ?>"></script>
+    
+    <script>
+        function handleCredentialResponse(response) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '<?= base_url('auth/googleLogin') ?>';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'credential';
+            input.value = response.credential;
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
 
     <!-- Place this tag before closing body tag for github widget button. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

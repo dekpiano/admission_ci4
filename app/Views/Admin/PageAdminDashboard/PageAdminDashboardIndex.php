@@ -129,6 +129,66 @@
         font-weight: 600;
         font-size: 0.75rem;
     }
+
+    /* Dashboard Mobile Adjustments */
+    @media (max-width: 767.98px) {
+        .welcome-card {
+            padding: 1.5rem !important;
+        }
+        
+        .welcome-card h3 {
+            font-size: 1.25rem;
+        }
+
+        .stat-card .card-body {
+            padding: 1rem;
+        }
+
+        .stat-card h3 {
+            font-size: 1.25rem;
+        }
+
+        .icon-box {
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
+        }
+
+        .chart-container {
+            height: 220px !important;
+        }
+
+        .action-card {
+            padding: 15px 10px;
+        }
+
+        .action-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .action-card h6 {
+            font-size: 0.85rem;
+        }
+
+        .action-card small {
+            font-size: 0.7rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .table-custom thead th {
+            font-size: 0.65rem;
+            padding: 0.5rem 0.25rem !important;
+        }
+        
+        .table-custom tbody td {
+            font-size: 0.8rem;
+            padding: 0.75rem 0.25rem !important;
+        }
+    }
 </style>
 
 <!-- Banner section -->

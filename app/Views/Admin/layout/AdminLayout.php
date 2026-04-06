@@ -61,6 +61,54 @@
     .swal2-styled.swal2-confirm {
         background-color: #28a745 !important;
     }
+
+    /* Mobile Enhancements */
+    @media (max-width: 991.98px) {
+      .app-brand-text {
+        font-size: 1.2rem !important;
+      }
+      
+      .layout-navbar .navbar-nav-right {
+        gap: 0.5rem;
+      }
+
+      .navbar-dropdown .avatar {
+        width: 32px !important;
+        height: 32px !important;
+      }
+
+      .badge {
+        font-size: 0.7rem;
+        padding: 0.4em 0.6em;
+      }
+      
+      /* Better spacing for mobile content */
+      .container-xxl {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+      }
+
+      /* Adjust card padding for mobile */
+      .card-body {
+        padding: 1rem !important;
+      }
+      
+      /* Make tables scrollable on mobile */
+      .table-responsive {
+        border: 0;
+        margin-bottom: 0;
+      }
+    }
+
+    /* Force scrollbar visibility on mobile for tables if needed */
+    .table-responsive::-webkit-scrollbar {
+      height: 4px;
+      width: 4px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+      background: #cbd5e0;
+      border-radius: 10px;
+    }
   </style>
 
   <!-- Icons. Uncomment required icon fonts -->
@@ -159,7 +207,7 @@
 
           <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/announcements') !== false) ? 'active' : '' ?>">
             <a href="<?= site_url('skjadmin/announcements') ?>" class="menu-link">
-              <i class="menu-icon tf-icons bx bx-megaphone"></i>
+              <i class="menu-icon tf-icons bx bx-bell"></i>
               <div data-i18n="Announcements">ประกาศผลคัดเลือก</div>
             </a>
           </li>

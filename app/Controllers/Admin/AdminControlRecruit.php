@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
+use Mpdf\Mpdf;
 
 helper('upload');
 
@@ -1391,27 +1392,28 @@ class AdminControlRecruit extends BaseController
             return "ไม่พบข้อมูลผู้สมัคร";
         }
 
-        // Load mPDF using SHARED_LIB_PATH
-        if (file_exists(SHARED_LIB_PATH . '/mpdf/vendor/autoload.php')) {
-            require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        } else {
-            return "mPDF library not found at: " . SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        }
+        // Standard Composer autoloading
 
-        $customFontDir = SHARED_LIB_PATH . '/vendor/mpdf/mpdf/ttfonts';
+
+        $customFontDir = FCPATH . 'public/fonts/sarabun';
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
         $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
-        $mpdf = new \Mpdf\Mpdf([
+        $tempDir = WRITEPATH . 'temp';
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        $mpdf = new Mpdf([
             'fontDir' => array_merge($fontDirs, [$customFontDir]),
             'fontdata' => $fontData + [
                 'sarabun' => [
-                    'R' => 'THSarabun.ttf',
-                    'I' => 'THSarabun-Italic.ttf',
-                    'B' => 'THSarabun-Bold.ttf',
-                    'BI' => 'THSarabun-BoldItalic.ttf',
+                    'R' => 'thsarabun.ttf',
+                    'I' => 'thsarabun-italic.ttf',
+                    'B' => 'thsarabun-bold.ttf',
+                    'BI' => 'thsarabun-bolditalic.ttf',
                 ]
             ],
             'default_font_size' => 16,
@@ -1677,27 +1679,28 @@ class AdminControlRecruit extends BaseController
             return "ไม่พบข้อมูลผู้สมัคร";
         }
 
-        // Load mPDF using SHARED_LIB_PATH
-        if (file_exists(SHARED_LIB_PATH . '/mpdf/vendor/autoload.php')) {
-            require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        } else {
-            return "mPDF library not found at: " . SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        }
+        // Standard Composer autoloading
 
-        $customFontDir = SHARED_LIB_PATH . '/vendor/mpdf/mpdf/ttfonts';
+
+        $customFontDir = FCPATH . 'public/fonts/sarabun';
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
         $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
-        $mpdf = new \Mpdf\Mpdf([
+        $tempDir = WRITEPATH . 'temp';
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        $mpdf = new Mpdf([
             'fontDir' => array_merge($fontDirs, [$customFontDir]),
             'fontdata' => $fontData + [
                 'sarabun' => [
-                    'R' => 'THSarabun.ttf',
-                    'I' => 'THSarabun-Italic.ttf',
-                    'B' => 'THSarabun-Bold.ttf',
-                    'BI' => 'THSarabun-BoldItalic.ttf',
+                    'R' => 'thsarabun.ttf',
+                    'I' => 'thsarabun-italic.ttf',
+                    'B' => 'thsarabun-bold.ttf',
+                    'BI' => 'thsarabun-bolditalic.ttf',
                 ]
             ],
             'default_font_size' => 16,

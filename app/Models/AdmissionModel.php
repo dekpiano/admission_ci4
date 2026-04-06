@@ -307,6 +307,9 @@ class AdmissionModel extends Model
         if (!empty($filters['recruit_category'])) {
             $builder->where('recruit_category', $filters['recruit_category']);
         }
+        if (!empty($filters['recruit_date'])) {
+            $builder->where('DATE(recruit_date)', $filters['recruit_date']);
+        }
 
         // Total by level and gender
         $totalByLevelBuilder = clone $builder;
@@ -363,6 +366,9 @@ class AdmissionModel extends Model
         if (!empty($filters['recruit_category'])) {
             $builder->where('recruit_category', $filters['recruit_category']);
         }
+        if (!empty($filters['recruit_date'])) {
+            $builder->where('DATE(recruit_date)', $filters['recruit_date']);
+        }
 
         return $builder->select('DATE(recruit_date) as date, 
                      COUNT(*) as total,
@@ -389,6 +395,9 @@ class AdmissionModel extends Model
         }
         if (!empty($filters['recruit_category'])) {
             $builder->where('recruit_category', $filters['recruit_category']);
+        }
+        if (!empty($filters['recruit_date'])) {
+            $builder->where('DATE(recruit_date)', $filters['recruit_date']);
         }
 
         return $builder->select('recruit_regLevel, recruit_status, COUNT(*) as total')

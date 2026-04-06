@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use Mpdf\Mpdf;
 
 class AdminControlReport extends BaseController
 {
@@ -170,15 +171,11 @@ class AdminControlReport extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Batch session expired']);
         }
 
-        // Load mPDF FIRST
-        if (file_exists(SHARED_LIB_PATH . '/mpdf/vendor/autoload.php')) {
-            require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        } else {
-             return $this->response->setJSON(['success' => false, 'message' => 'mPDF library not found']);
-        }
+        // Standard Composer autoloading
+
 
         // Font Config
-        $customFontDir = SHARED_LIB_PATH . '/vendor/mpdf/mpdf/ttfonts';
+        $customFontDir = FCPATH . 'public/fonts/sarabun';
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
         $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
@@ -330,13 +327,10 @@ class AdminControlReport extends BaseController
         }
 
         // Load mPDF
-        if (file_exists(SHARED_LIB_PATH . '/mpdf/vendor/autoload.php')) {
-            require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        } else {
-            return "mPDF library not found at: " . SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        }
+        // Standard Composer autoloading
 
-        $customFontDir = SHARED_LIB_PATH . '/vendor/mpdf/mpdf/ttfonts';
+
+        $customFontDir = FCPATH . 'public/fonts/sarabun';
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
         $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
@@ -492,14 +486,14 @@ class AdminControlReport extends BaseController
             return '';
         }
 
-        $mpdf = new \Mpdf\Mpdf([
+        $mpdf = new Mpdf([
             'fontDir' => array_merge($fontDirs, [$customFontDir]),
             'fontdata' => $fontData + [
                 'sarabun' => [
-                    'R' => 'THSarabun.ttf',
-                    'I' => 'THSarabun-Italic.ttf',
-                    'B' => 'THSarabun-Bold.ttf',
-                    'BI' => 'THSarabun-BoldItalic.ttf',
+                    'R' => 'thsarabun.ttf',
+                    'I' => 'thsarabun-italic.ttf',
+                    'B' => 'thsarabun-bold.ttf',
+                    'BI' => 'thsarabun-bolditalic.ttf',
                 ]
             ],
             'default_font_size' => 16,
@@ -536,14 +530,14 @@ class AdminControlReport extends BaseController
             return ''; // Student hasn't confirmed yet
         }
 
-        $mpdf = new \Mpdf\Mpdf([
+        $mpdf = new Mpdf([
             'fontDir' => array_merge($fontDirs, [$customFontDir]),
             'fontdata' => $fontData + [
                 'sarabun' => [
-                    'R' => 'THSarabun.ttf',
-                    'I' => 'THSarabun-Italic.ttf',
-                    'B' => 'THSarabun-Bold.ttf',
-                    'BI' => 'THSarabun-BoldItalic.ttf',
+                    'R' => 'thsarabun.ttf',
+                    'I' => 'thsarabun-italic.ttf',
+                    'B' => 'thsarabun-bold.ttf',
+                    'BI' => 'thsarabun-bolditalic.ttf',
                 ]
             ],
             'default_font_size' => 16,

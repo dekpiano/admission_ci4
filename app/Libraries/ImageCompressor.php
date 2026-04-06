@@ -53,21 +53,21 @@ class ImageCompressor
     public function compress($sourcePath, $destPath = null)
     {
         // Check for GD library
-        if (!extension_loaded('gd')) {
+        if (!\extension_loaded('gd')) {
             return ['success' => false, 'message' => 'เครื่องเซิร์ฟเวอร์ไม่ได้ติดตั้ง GD Library (จำเป็นสำหรับการปรับขนาดรูปภาพ)'];
         }
 
-        if (!file_exists($sourcePath)) {
+        if (!\file_exists($sourcePath)) {
             return ['success' => false, 'message' => 'ไม่พบไฟล์ต้นทาง'];
         }
 
-        $originalSize = filesize($sourcePath);
+        $originalSize = \filesize($sourcePath);
         $maxBytes = $this->maxFileSize * 1024 * 1024;
 
         // ถ้าไฟล์เล็กกว่า limit อยู่แล้ว ไม่ต้อง compress
         if ($originalSize <= $maxBytes) {
             if ($destPath && $destPath !== $sourcePath) {
-                copy($sourcePath, $destPath);
+                \copy($sourcePath, $destPath);
             }
             return [
                 'success' => true,
@@ -79,10 +79,10 @@ class ImageCompressor
         }
 
         // ตรวจสอบประเภทไฟล์
-        $mimeType = mime_content_type($sourcePath);
+        $mimeType = \mime_content_type($sourcePath);
         $imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 
-        if (!in_array($mimeType, $imageTypes)) {
+        if (!\in_array($mimeType, $imageTypes)) {
             // ถ้าเป็น PDF หรือไฟล์อื่น ไม่สามารถ compress ได้
             return [
                 'success' => false, 
@@ -99,8 +99,8 @@ class ImageCompressor
             }
 
             // ดึงขนาดเดิม
-            $origWidth = imagesx($image);
-            $origHeight = imagesy($image);
+            $origWidth = \imagesx($image);
+            $origHeight = \imagesy($image);
 
             // คำนวณขนาดใหม่
             $newWidth = $origWidth;
@@ -110,25 +110,25 @@ class ImageCompressor
             if ($origWidth > $this->maxWidth || $origHeight > $this->maxHeight) {
                 $ratioWidth = $this->maxWidth / $origWidth;
                 $ratioHeight = $this->maxHeight / $origHeight;
-                $ratio = min($ratioWidth, $ratioHeight);
+                $ratio = \min($ratioWidth, $ratioHeight);
 
-                $newWidth = round($origWidth * $ratio);
-                $newHeight = round($origHeight * $ratio);
+                $newWidth = \round($origWidth * $ratio);
+                $newHeight = \round($origHeight * $ratio);
             }
 
             // สร้างรูปใหม่
-            $newImage = imagecreatetruecolor($newWidth, $newHeight);
+            $newImage = \imagecreatetruecolor($newWidth, $newHeight);
 
             // สำหรับ PNG - รักษาความโปร่งใส
             if ($mimeType === 'image/png') {
-                imagealphablending($newImage, false);
-                imagesavealpha($newImage, true);
-                $transparent = imagecolorallocatealpha($newImage, 0, 0, 0, 127);
-                imagefill($newImage, 0, 0, $transparent);
+                \imagealphablending($newImage, false);
+                \imagesavealpha($newImage, true);
+                $transparent = \imagecolorallocatealpha($newImage, 0, 0, 0, 127);
+                \imagefill($newImage, 0, 0, $transparent);
             }
 
             // Resize
-            imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
+            \imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
 
             // กำหนด path ปลายทาง
             $outputPath = $destPath ?: $sourcePath;
@@ -141,12 +141,12 @@ class ImageCompressor
             do {
                 // บันทึกเป็น JPEG เพื่อลดขนาด (เว้นแต่เป็น PNG และต้องการรักษาความโปร่งใส)
                 if ($mimeType === 'image/png') {
-                    imagepng($newImage, $outputPath, $this->pngQuality);
+                    \imagepng($newImage, $outputPath, $this->pngQuality);
                 } else {
-                    imagejpeg($newImage, $outputPath, $quality);
+                    \imagejpeg($newImage, $outputPath, $quality);
                 }
 
-                $newSize = filesize($outputPath);
+                $newSize = \filesize($outputPath);
                 
                 // ถ้ายังใหญ่เกิน ลด quality ลง
                 if ($newSize > $maxBytes && $mimeType !== 'image/png') {
@@ -160,36 +160,36 @@ class ImageCompressor
             // ถ้ายังใหญ่เกินและเป็น PNG ให้แปลงเป็น JPEG
             if ($newSize > $maxBytes && $mimeType === 'image/png') {
                 // เปลี่ยนนามสกุลเป็น jpg
-                $jpgPath = preg_replace('/\.png$/i', '.jpg', $outputPath);
+                $jpgPath = \preg_replace('/\.png$/i', '.jpg', $outputPath);
                 if ($jpgPath === $outputPath) {
                     $jpgPath = $outputPath . '.jpg';
                 }
 
                 // สร้างพื้นหลังขาวสำหรับ PNG ที่มีความโปร่งใส
-                $whiteImage = imagecreatetruecolor($newWidth, $newHeight);
-                $white = imagecolorallocate($whiteImage, 255, 255, 255);
-                imagefill($whiteImage, 0, 0, $white);
-                imagecopy($whiteImage, $newImage, 0, 0, 0, 0, $newWidth, $newHeight);
+                $whiteImage = \imagecreatetruecolor($newWidth, $newHeight);
+                $white = \imagecolorallocate($whiteImage, 255, 255, 255);
+                \imagefill($whiteImage, 0, 0, $white);
+                \imagecopy($whiteImage, $newImage, 0, 0, 0, 0, $newWidth, $newHeight);
 
-                imagejpeg($whiteImage, $jpgPath, $this->jpegQuality);
-                imagedestroy($whiteImage);
+                \imagejpeg($whiteImage, $jpgPath, $this->jpegQuality);
+                \imagedestroy($whiteImage);
 
                 // ลบไฟล์ PNG เดิม
-                if (file_exists($outputPath) && $outputPath !== $sourcePath) {
-                    @unlink($outputPath);
+                if (\file_exists($outputPath) && $outputPath !== $sourcePath) {
+                    @\unlink($outputPath);
                 }
 
                 $outputPath = $jpgPath;
-                $newSize = filesize($outputPath);
+                $newSize = \filesize($outputPath);
 
                 log_message('info', "ImageCompressor: แปลง PNG เป็น JPG: {$outputPath}");
             }
 
             // Cleanup
-            imagedestroy($image);
-            imagedestroy($newImage);
+            \imagedestroy($image);
+            \imagedestroy($newImage);
 
-            $compressionRatio = round((1 - ($newSize / $originalSize)) * 100, 1);
+            $compressionRatio = \round((1 - ($newSize / $originalSize)) * 100, 1);
 
             log_message('info', "ImageCompressor: Compressed {$sourcePath}");
             log_message('info', "ImageCompressor: {$this->formatSize($originalSize)} -> {$this->formatSize($newSize)} (ลดลง {$compressionRatio}%)");
@@ -231,13 +231,18 @@ class ImageCompressor
         switch ($mimeType) {
             case 'image/jpeg':
             case 'image/jpg':
-                return imagecreatefromjpeg($path);
+                if (\function_exists('\imagecreatefromjpeg')) {
+                    return \imagecreatefromjpeg($path);
+                } elseif (\function_exists('imagecreatefromjpeg')) {
+                    return imagecreatefromjpeg($path);
+                }
+                throw new \Exception('PHP GD function imagecreatefromjpeg is not available on this server.');
             case 'image/png':
-                return imagecreatefrompng($path);
+                return \imagecreatefrompng($path);
             case 'image/gif':
-                return imagecreatefromgif($path);
+                return \imagecreatefromgif($path);
             case 'image/webp':
-                return imagecreatefromwebp($path);
+                return \imagecreatefromwebp($path);
             default:
                 return false;
         }

@@ -13,6 +13,7 @@ $routes->get('/', 'User\UserControlNewAdmission::index');
 $routes->group('auth', ['namespace' => 'App\Controllers\User'], function ($routes) {
     $routes->get('login', 'UserControlAuth::login');
     $routes->get('google_login', 'UserControlAuth::googleAuth');
+    $routes->post('googleLogin', 'UserControlAuth::googleLogin');
     $routes->get('google_callback', 'UserControlAuth::googleCallback');
     $routes->get('logout', 'UserControlAuth::logout');
 });
@@ -27,6 +28,7 @@ $routes->get('new-admission/status', 'User\UserControlNewAdmission::status');
 $routes->get('new-admission/statistics', 'User\UserControlNewAdmission::statistics');
 $routes->get('new-admission/school-search', 'User\UserControlNewAdmission::ajax_school_search'); // Route for Select2 school search
 $routes->post('new-admission/save', 'User\UserControlNewAdmission::save_register');
+$routes->get('new-admission/save', 'User\UserControlNewAdmission::index'); // Redirect GET requests to prevent 404
 $routes->post('new-admission/refresh-captcha', 'User\UserControlNewAdmission::refresh_captcha');
 $routes->get('new-admission/update-db-charset', 'User\UserControlNewAdmission::updateDatabaseCharset');
 $routes->get('new-admission/show-schema', 'User\UserControlNewAdmission::showTableSchema');

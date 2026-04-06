@@ -5,6 +5,7 @@ namespace App\Controllers\User;
 use App\Controllers\BaseController;
 use App\Models\AdmissionModel;
 use App\Libraries\Datethai;
+use Mpdf\Mpdf;
 
 class UserControlConfirmation extends BaseController
 {
@@ -684,8 +685,7 @@ class UserControlConfirmation extends BaseController
 
         $studentId = $this->session->get('confirmation_student_id');
 
-        // Load mPDF using SHARED_LIB_PATH
-        require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
+
 
         // Fetch Data
         $checkYear = $this->db->table('tb_openyear')->get()->getRow();
@@ -731,9 +731,25 @@ class UserControlConfirmation extends BaseController
         $date_D_birt = (int) date('d', strtotime($confrim[0]->stu_birthDay));
         $date_M_birt = date('n', strtotime($confrim[0]->stu_birthDay));
 
-        $mpdf = new \Mpdf\Mpdf([
-            'default_font_size' => 16,
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
+        $mpdf = new Mpdf([
+            'fontDir' => array_merge($fontDirs, [
+                FCPATH . 'public/fonts/sarabun/',
+            ]),
+            'fontdata' => $fontData + [
+                'sarabun' => [
+                    'R' => 'thsarabun.ttf',
+                    'B' => 'thsarabun-bold.ttf',
+                    'I' => 'thsarabun-italic.ttf',
+                    'BI' => 'thsarabun-bolditalic.ttf',
+                ]
+            ],
             'default_font' => 'sarabun',
+            'default_font_size' => 16,
             'debug' => false
         ]);
         $mpdf->SetTitle($confrim[0]->stu_prefix . $confrim[0]->stu_fristName . ' ' . $confrim[0]->stu_lastName);

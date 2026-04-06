@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use Mpdf\Mpdf;
 
 class AdminControlSurrender extends BaseController
 {
@@ -129,12 +130,8 @@ class AdminControlSurrender extends BaseController
 
     public function print($id)
     {
-        // Load mPDF using SHARED_LIB_PATH
-        if (file_exists(SHARED_LIB_PATH . '/mpdf/vendor/autoload.php')) {
-            require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        } else {
-            return "mPDF library not found at: " . SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        }
+        // Load mPDF using project vendor/autoload.php automatically by CodeIgniter
+
 
         // Fetch recruit data first to get studentId
         $recruit = $this->db->table('tb_recruitstudent')->where('recruit_id', $id)->get()->getResult();
@@ -166,9 +163,31 @@ class AdminControlSurrender extends BaseController
         $date_D_birt = (int) date('d', strtotime($confrim[0]->stu_birthDay));
         $date_M_birt = date('n', strtotime($confrim[0]->stu_birthDay));
 
-        $mpdf = new \Mpdf\Mpdf([
+        $customFontDir = FCPATH . 'public/fonts/sarabun';
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
+        // Make sure temp folder exists
+        $tempDir = WRITEPATH . 'temp';
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        $mpdf = new Mpdf([
+            'fontDir' => array_merge($fontDirs, [$customFontDir]),
+            'fontdata' => $fontData + [
+                'sarabun' => [
+                    'R' => 'thsarabun.ttf',
+                    'I' => 'thsarabun-italic.ttf',
+                    'B' => 'thsarabun-bold.ttf',
+                    'BI' => 'thsarabun-bolditalic.ttf',
+                ]
+            ],
             'default_font_size' => 16,
             'default_font' => 'sarabun',
+            'tempDir' => $tempDir,
             'debug' => false
         ]);
         $mpdf->SetTitle($confrim[0]->stu_prefix . $confrim[0]->stu_fristName . ' ' . $confrim[0]->stu_lastName);

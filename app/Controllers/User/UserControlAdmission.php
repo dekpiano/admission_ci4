@@ -8,6 +8,7 @@ use App\Libraries\Timeago;
 use App\Libraries\Datethai;
 use App\Libraries\RemoteUpload;
 use CodeIgniter\I18n\Time;
+use Mpdf\Mpdf;
 
 class UserControlAdmission extends BaseController
 {
@@ -644,12 +645,8 @@ class UserControlAdmission extends BaseController
 
     public function pdf($id)
     {
-        // 1. Load mPDF using SHARED_LIB_PATH
-        if (file_exists(SHARED_LIB_PATH . '/mpdf/vendor/autoload.php')) {
-            require_once SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        } else {
-            return "mPDF library not found at: " . SHARED_LIB_PATH . '/mpdf/vendor/autoload.php';
-        }
+        // Standard Composer autoloading
+
 
         if (!class_exists('\Mpdf\Mpdf')) {
             return "ไม่พบไลบรารี mPDF กรุณาติดตั้ง";
@@ -700,22 +697,27 @@ class UserControlAdmission extends BaseController
         if (ob_get_length())
             ob_clean();
 
-        $customFontDir = SHARED_LIB_PATH . '/vendor/mpdf/mpdf/ttfonts';
+        $customFontDir = FCPATH . 'public/fonts/sarabun';
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
         $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
-        $mpdf = new \Mpdf\Mpdf([
+        $tempDir = WRITEPATH . 'temp';
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4', // Use A4 for both sports and regular forms
             'fontDir' => array_merge($fontDirs, [$customFontDir]),
             'fontdata' => $fontData + [
                 'sarabun' => [
-                    'R' => 'THSarabun.ttf',
-                    'I' => 'THSarabun-Italic.ttf',
-                    'B' => 'THSarabun-Bold.ttf',
-                    'BI' => 'THSarabun-BoldItalic.ttf',
+                    'R' => 'thsarabun.ttf',
+                    'I' => 'thsarabun-italic.ttf',
+                    'B' => 'thsarabun-bold.ttf',
+                    'BI' => 'thsarabun-bolditalic.ttf',
                 ]
             ],
             'default_font_size' => 16,
