@@ -405,4 +405,34 @@ class AdmissionModel extends Model
             ->get()
             ->getResult();
     }
+
+    /**
+     * Get daily statistics grouped by course branch (excellence)
+     */
+    public function getDailyExcellenceStats($year, $filters = [])
+    {
+        $builder = $this->db->table($this->table);
+        $builder->select('DATE(recruit_date) as date, 
+                         recruit_regLevel, 
+                         tb_course.course_branch,
+                         tb_course.course_fullname,
+                         COUNT(*) as total,
+                         SUM(CASE WHEN recruit_prefix IN ("เด็กชาย", "นาย") THEN 1 ELSE 0 END) as male,
+                         SUM(CASE WHEN recruit_prefix IN ("เด็กหญิง", "นางสาว") THEN 1 ELSE 0 END) as female');
+        $builder->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left');
+        $builder->where('recruit_year', $year);
+
+        if (!empty($filters['recruit_round'])) {
+            $builder->where('recruit_round', $filters['recruit_round']);
+        }
+        if (!empty($filters['recruit_date'])) {
+            $builder->where('DATE(recruit_date)', $filters['recruit_date']);
+        }
+        
+        return $builder->groupBy('DATE(recruit_date), recruit_regLevel, tb_course.course_branch')
+            ->orderBy('DATE(recruit_date)', 'DESC')
+            ->orderBy('recruit_regLevel', 'ASC')
+            ->get()
+            ->getResult();
+    }
 }

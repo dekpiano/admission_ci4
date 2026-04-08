@@ -79,6 +79,8 @@ class AdminControlStatistic extends BaseController
         $data['systemStatus'] = $this->admissionModel->getSystemStatus();
         $data['stats'] = $this->admissionModel->getAdmissionStats($year, $filters);
         $data['dailyStats'] = $this->admissionModel->getDailyStats($year, $filters);
+        $data['dailyExcellenceStats'] = $this->admissionModel->getDailyExcellenceStats($year, $filters);
+        $data['allCourses'] = $this->admissionModel->getAllCourses();
         $data['statusByLevel'] = $this->admissionModel->getStatsByLevelAndStatus($year, $filters);
         $data['datethai'] = $this->datethai;
 

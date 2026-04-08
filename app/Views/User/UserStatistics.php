@@ -296,6 +296,39 @@
         .stats-hero { padding: 2rem 1.5rem; }
         .stats-title { font-size: 1.8rem; }
     }
+
+    /* Pivot Table Specific Styles */
+    .th-vertical {
+        height: 160px;
+        vertical-align: bottom !important;
+        padding-bottom: 1.5rem !important;
+        width: 35px !important;
+        min-width: 35px !important;
+        background: #f8fafc;
+    }
+    .vertical-text {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        white-space: nowrap;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        color: #475569;
+    }
+    .tab-skj-pill .nav-link {
+        border-radius: 12px;
+        margin-right: 8px;
+        font-weight: 700;
+        color: #64748b;
+        background: #f1f5f9;
+        border: none;
+        padding: 0.6rem 1.5rem;
+    }
+    .tab-skj-pill .nav-link.active {
+        background: var(--skj-gradient);
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 158, 181, 0.3);
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -328,10 +361,10 @@
             </div>
         </div>
 
-        <div class="filter-card">
+        <div class="filter-card border-0 shadow-sm">
             <form action="<?= base_url('new-admission/statistics') ?>" method="GET" class="row g-3 align-items-end" id="filterForm">
                 <div class="col-md-3">
-                    <label class="filter-label">ปีการศึกษา</label>
+                    <label class="filter-label"><i class='bx bx-calendar-star me-1'></i>ปีการศึกษา</label>
                     <select name="year" class="form-select form-select-skj" onchange="this.form.submit()">
                         <?php foreach($years as $y): ?>
                             <option value="<?= $y->recruit_year ?>" <?= $selectedYear == $y->recruit_year ? 'selected' : '' ?>>
@@ -340,10 +373,10 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="filter-label">รอบการสมัคร</label>
+                <div class="col-md-3">
+                    <label class="filter-label"><i class='bx bx-git-branch me-1'></i>รอบการสมัคร</label>
                     <select name="round" class="form-select form-select-skj" onchange="this.form.submit()">
-                        <option value="">ทั้งหมด</option>
+                        <option value="">ทุกรอบการสมัคร</option>
                         <?php foreach($rounds as $r): ?>
                             <?php if($r->recruit_round): ?>
                                 <option value="<?= $r->recruit_round ?>" <?= $selectedRound == $r->recruit_round ? 'selected' : '' ?>>
@@ -353,23 +386,25 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="filter-label">ประเภทตัวเอก/โควตา (เฉพาะที่มีผู้สมัคร)</label>
-                    <select name="category" class="form-select form-select-skj" onchange="this.form.submit()">
-                        <option value="">ทั้งหมด</option>
-                        <?php foreach($activeQuotas as $q): ?>
-                            <option value="<?= $q->quota_key ?>" <?= $selectedCategory == $q->quota_key ? 'selected' : '' ?>>
-                                <?= $q->quota_explain ?>
-                            </option>
-                        <?php endforeach; ?>
+                <div class="col-md-3">
+                    <label class="filter-label"><i class='bx bx-time-five me-1'></i>ระบุวันที่สมัคร</label>
+                    <select name="date" class="form-select form-select-skj" onchange="this.form.submit()">
+                        <option value="">ทุกวันที่</option>
+                        <?php if(!empty($dates)): ?>
+                            <?php foreach($dates as $d): ?>
+                                <option value="<?= $d->recruit_date ?>" <?= $selectedDate == $d->recruit_date ? 'selected' : '' ?>>
+                                    <?= $datethai->thai_date_short(strtotime($d->recruit_date)) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-filter flex-grow-1 d-none d-md-block">
-                            <i class='bx bx-sync me-2'></i> อัปเดต
+                        <button type="submit" class="btn btn-filter flex-grow-1">
+                            <i class='bx bx-search-alt me-2'></i> ค้นหา
                         </button>
-                        <a href="<?= base_url('new-admission/statistics') ?>" class="btn btn-reset" title="ค่าเริ่มต้น">
+                        <a href="<?= base_url('new-admission/statistics') ?>" class="btn btn-reset" title="คืนค่าเดิม">
                             <i class='bx bx-refresh fs-4'></i>
                         </a>
                     </div>
@@ -437,56 +472,129 @@
                 </div>
             </div>
         </div>
- <div class="filter-card">
-            <form action="<?= base_url('new-admission/statistics') ?>" method="GET" class="row g-3 align-items-end" id="filterForm">
-                <div class="col-md-3">
-                    <label class="filter-label">ปีการศึกษา</label>
-                    <select name="year" class="form-select form-select-skj" onchange="this.form.submit()">
-                        <?php foreach($years as $y): ?>
-                            <option value="<?= $y->recruit_year ?>" <?= $selectedYear == $y->recruit_year ? 'selected' : '' ?>>
-                                ปีการศึกษา <?= $y->recruit_year ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="filter-label">รอบการสมัคร</label>
-                    <select name="round" class="form-select form-select-skj" onchange="this.form.submit()">
-                        <option value="">ทั้งหมด</option>
-                        <?php foreach($rounds as $r): ?>
-                            <?php if($r->recruit_round): ?>
-                                <option value="<?= $r->recruit_round ?>" <?= $selectedRound == $r->recruit_round ? 'selected' : '' ?>>
-                                    รอบที่ <?= $r->recruit_round ?>
-                                </option>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="filter-label">ประเภทตัวเอก/โควตา (เฉพาะที่มีผู้สมัคร)</label>
-                    <select name="category" class="form-select form-select-skj" onchange="this.form.submit()">
-                        <option value="">ทั้งหมด</option>
-                        <?php foreach($activeQuotas as $q): ?>
-                            <option value="<?= $q->quota_key ?>" <?= $selectedCategory == $q->quota_key ? 'selected' : '' ?>>
-                                <?= $q->quota_explain ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-filter flex-grow-1 d-none d-md-block">
-                            <i class='bx bx-sync me-2'></i> อัปเดต
-                        </button>
-                        <a href="<?= base_url('new-admission/statistics') ?>" class="btn btn-reset" title="ค่าเริ่มต้น">
-                            <i class='bx bx-refresh fs-4'></i>
-                        </a>
-                    </div>
-                </div>
-            </form>
-        </div>
         <!-- Detailed Section -->
         <div class="row g-4 mb-5">
+            <!-- Pivot Table Card (New) -->
+            <div class="col-12">
+                <div class="stats-card-main">
+                    <div class="stats-card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="stats-card-title"><i class='bx bx-table'></i> สรุปแผนการสมัครแยกตามสาขาและความเป็นเลิศ</h5>
+                            <small class="text-muted ms-4 d-none d-md-inline">วิเคราะห์จำนวนผู้สมัครสะสมรายวันแยกตามแผนการเรียน</small>
+                        </div>
+                        <ul class="nav nav-pills tab-skj-pill" id="pivotTabs" role="tablist">
+                            <?php 
+                            // 1. Data Preparation (Same as Admin)
+                            $headerRows = [];
+                            $dailyPivot = [];
+                            $totalsByCat = [];
+                            $availableLevels = [];
+
+                            $normalizeLevel = function($l_str) {
+                                if (is_numeric($l_str)) return (int)$l_str;
+                                if (preg_match('/\d+/', $l_str, $matches)) return (int)$matches[0];
+                                if (strpos($l_str, 'ต้น') !== false) return 1;
+                                if (strpos($l_str, 'ปลาย') !== false) return 4;
+                                return 0;
+                            };
+
+                            foreach ($allCourses as $c) {
+                                $level_num = $normalizeLevel($c->course_gradelevel ?? '');
+                                if ($level_num > 0) {
+                                    if (!isset($headerRows[$level_num])) $headerRows[$level_num] = [];
+                                    $branch = $c->course_branch ?: 'ทั่วไป/อื่นๆ';
+                                    if (!in_array($branch, $headerRows[$level_num])) $headerRows[$level_num][] = $branch;
+                                }
+                            }
+
+                            foreach ($dailyExcellenceStats as $row) {
+                                $date = $row->date;
+                                $level = (int)$row->recruit_regLevel;
+                                $branch = $row->course_branch ?: 'ทั่วไป/อื่นๆ';
+                                if (!in_array($level, $availableLevels)) $availableLevels[] = $level;
+                                if (!isset($headerRows[$level])) $headerRows[$level] = [];
+                                if (!in_array($branch, $headerRows[$level])) $headerRows[$level][] = $branch;
+                                if (!isset($dailyPivot[$date])) $dailyPivot[$date] = [];
+                                if (!isset($dailyPivot[$date][$level])) $dailyPivot[$date][$level] = [];
+                                $dailyPivot[$date][$level][$branch] = ($dailyPivot[$date][$level][$branch] ?? 0) + $row->total;
+                                $totalsByCat[$level][$branch] = ($totalsByCat[$level][$branch] ?? 0) + $row->total;
+                            }
+                            sort($availableLevels);
+                            krsort($dailyPivot);
+
+                            foreach ($availableLevels as $index => $l): ?>
+                                <li class="nav-item">
+                                    <button class="nav-link <?= $index === 0 ? 'active' : '' ?>" 
+                                            data-bs-toggle="tab" data-bs-target="#pivot-m<?= $l ?>-pane" type="button">ม.<?= $l ?></button>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                    <div class="p-4 pt-3">
+                        <div class="tab-content">
+                            <?php foreach ($availableLevels as $index => $currentL): ?>
+                            <div class="tab-pane fade <?= $index === 0 ? 'show active' : '' ?>" id="pivot-m<?= $currentL ?>-pane">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered text-center align-middle">
+                                        <thead class="bg-light text-secondary fw-bold">
+                                            <tr>
+                                                <th style="width: 150px; vertical-align: middle;">วันที่สมัคร</th>
+                                                <?php 
+                                                $branches = $headerRows[$currentL] ?? [];
+                                                foreach ($branches as $branch): ?>
+                                                    <th class="th-vertical">
+                                                        <span class="vertical-text"><?= $branch ?></span>
+                                                    </th>
+                                                <?php endforeach; ?>
+                                                <th style="background: var(--skj-pink); color: white; width: 65px; vertical-align: middle;" class="border-0">รวม</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php 
+                                            $levelGrandTotal = 0;
+                                            $levelHasData = false;
+                                            foreach ($dailyPivot as $date => $levelData): 
+                                                if (!isset($levelData[$currentL])) continue;
+                                                $levelHasData = true;
+                                                $daySum = 0;
+                                            ?>
+                                                <tr>
+                                                    <td class="bg-light fw-bold text-secondary">
+                                                        <small><i class='bx bx-calendar me-1 opacity-50'></i><?= $datethai->thai_date_short(strtotime($date)) ?></small>
+                                                    </td>
+                                                    <?php 
+                                                    foreach ($branches as $branch): 
+                                                        $val = $levelData[$currentL][$branch] ?? 0;
+                                                        $daySum += $val;
+                                                        ?>
+                                                        <td class="<?= $val > 0 ? 'fw-bold text-dark' : 'text-muted opacity-25' ?>">
+                                                            <?= $val > 0 ? number_format($val) : '-' ?>
+                                                        </td>
+                                                    <?php endforeach; ?>
+                                                    <td class="fw-bold fs-5" style="color: var(--skj-pink-dark); background: rgba(255, 158, 181, 0.05);"><?= number_format($daySum) ?></td>
+                                                </tr>
+                                            <?php $levelGrandTotal += $daySum; endforeach; ?>
+                                        </tbody>
+                                        <tfoot class="fw-bold">
+                                            <tr style="background: var(--skj-gradient); color: white;">
+                                                <td class="text-white">รวมสะสม ม.<?= $currentL ?></td>
+                                                <?php 
+                                                foreach ($branches as $branch): 
+                                                    $val = $totalsByCat[$currentL][$branch] ?? 0;
+                                                    ?>
+                                                    <td class="text-white"><?= number_format($val) ?></td>
+                                                <?php endforeach; ?>
+                                                <td style="background: var(--skj-pink-dark); color: white;" class="border-0"><?= number_format($levelGrandTotal) ?></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Daily Log Table - Full Width or Wider for Many Columns -->
             <div class="col-12">
                 <div class="stats-card-main">

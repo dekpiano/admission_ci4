@@ -103,13 +103,30 @@ class UserControlStatistic extends BaseController
         $data['quota'] = $this->db->table("tb_quota")->get()->getResult();
         $data['datethai'] = $this->datethai;
 
-        // $db2 = \Config\Database::connect('skjmain'); // Not used in original code logic shown
+        // New data for the Pivot Table (same as Admin)
+        $filters = [
+            'recruit_round' => $this->request->getGet('round'),
+            'recruit_date' => $this->request->getGet('date')
+        ];
+        
+        $admissionModel = new \App\Models\AdmissionModel();
+        $data['allCourses'] = $admissionModel->getAllCourses();
+        $data['dailyExcellenceStats'] = $admissionModel->getDailyExcellenceStats($year, $filters);
+        $data['dates'] = $this->db->table('tb_recruitstudent')
+            ->select('DATE(recruit_date) as recruit_date')
+            ->where('recruit_year', $year)
+            ->groupBy('DATE(recruit_date)')
+            ->orderBy('DATE(recruit_date)', 'DESC')
+            ->get()->getResult();
+
         $data['title'] = "สถิติการรับสมัครนักเรียน" . $data['checkYear'][0]->openyear_year;
         $data['description'] = "ดูสถิติแบบเรียลไทม์";
         $data['banner'] = base_url() . "asset/img/Statistics.png";
         $data['url'] = "Statistic";
-
-        return view('AdminssionStatistic', $data);
+        $data['selectedYear'] = $year;
+        $data['selectedRound'] = $filters['recruit_round'];
+        $data['selectedDate'] = $filters['recruit_date'];
+        $data['selectedCategory'] = $this->request->getGet('category');
     }
 
     public function StatisticViewQuotaSport($year)

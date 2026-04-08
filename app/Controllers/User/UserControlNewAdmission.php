@@ -199,23 +199,27 @@ class UserControlNewAdmission extends BaseController
         $checkYear = $this->admissionModel->getOpenYear();
         $year = $this->request->getGet('year') ?: $checkYear->openyear_year;
         $round = $this->request->getGet('round');
+        $date = $this->request->getGet('date');
         $category = $this->request->getGet('category');
 
         $filters = [
             'recruit_round' => $round,
-            'recruit_category' => $category
+            'recruit_category' => $category,
+            'recruit_date' => $date
         ];
 
         $data['title'] = "สถิติการรับสมัครปีการศึกษา " . $year;
         $data['checkYear'] = $checkYear;
         $data['selectedYear'] = $year;
         $data['selectedRound'] = $round;
+        $data['selectedDate'] = $date;
         $data['selectedCategory'] = $category;
         
         $data['systemStatus'] = $this->admissionModel->getSystemStatus();
-        $data['allQuotas'] = $this->admissionModel->getAllQuotas(); // Keep for name lookups
+        $data['allQuotas'] = $this->admissionModel->getAllQuotas();
         $data['activeQuotas'] = $this->admissionModel->getQuotasWithApplicants($year);
         $data['years'] = $this->admissionModel->getRecruitmentYears();
+        $data['allCourses'] = $this->admissionModel->getAllCourses();
         
         // Get all unique rounds for filtering
         $data['rounds'] = $this->db->table('tb_recruitstudent')
@@ -226,6 +230,15 @@ class UserControlNewAdmission extends BaseController
             ->get()
             ->getResult();
 
+        // Get all available dates for filtering
+        $data['dates'] = $this->db->table('tb_recruitstudent')
+            ->select('DATE(recruit_date) as recruit_date')
+            ->where('recruit_year', $year)
+            ->groupBy('DATE(recruit_date)')
+            ->orderBy('DATE(recruit_date)', 'DESC')
+            ->get()->getResult();
+
+        $data['dailyExcellenceStats'] = $this->admissionModel->getDailyExcellenceStats($year, $filters);
         $data['stats'] = $this->admissionModel->getAdmissionStats($year, $filters);
         $data['dailyStats'] = $this->admissionModel->getDailyStats($year, $filters);
         $data['statusByLevel'] = $this->admissionModel->getStatsByLevelAndStatus($year, $filters);
