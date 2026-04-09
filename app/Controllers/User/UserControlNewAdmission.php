@@ -398,14 +398,18 @@ class UserControlNewAdmission extends BaseController
         $recruit_birthday = ($post['recruit_birthdayY'] - 543) . '-' . $post['recruit_birthdayM'] . '-' . $post['recruit_birthdayD'];
 
         // Reprepare values from sanitized inputs
-        $courseDetails1 = $this->admissionModel->getCourseDetails($post['recruit_tpyeRoom1']);
+        $tpyeRoom1 = $post['recruit_tpyeRoom1'] ?? '';
+        $tpyeRoom2 = $post['recruit_tpyeRoom2'] ?? '';
+        $tpyeRoom3 = $post['recruit_tpyeRoom3'] ?? '';
+
+        $courseDetails1 = $this->admissionModel->getCourseDetails($tpyeRoom1);
         $course_fullname = $courseDetails1 ? $courseDetails1->course_fullname : '';
         $course_branch = $courseDetails1 ? $courseDetails1->course_branch : '';
         
         $ranks = [];
-        if (!empty($post['recruit_tpyeRoom1'])) $ranks[] = $post['recruit_tpyeRoom1'];
-        if (!empty($post['recruit_tpyeRoom2'])) $ranks[] = $post['recruit_tpyeRoom2'];
-        if (!empty($post['recruit_tpyeRoom3'])) $ranks[] = $post['recruit_tpyeRoom3'];
+        if (!empty($tpyeRoom1)) $ranks[] = $tpyeRoom1;
+        if (!empty($tpyeRoom2)) $ranks[] = $tpyeRoom2;
+        if (!empty($tpyeRoom3)) $ranks[] = $tpyeRoom3;
         $majorOrder = implode('|', $ranks);
 
 
@@ -429,14 +433,14 @@ class UserControlNewAdmission extends BaseController
             'recruit_homeSubdistrict' => $post['recruit_homeSubdistrict'],
             'recruit_homedistrict' => $post['recruit_homedistrict'],
             'recruit_homeProvince' => $post['recruit_homeProvince'],
-            'recruit_homePostcode' => $post['recruit_homePostcode'],
-            'recruit_oldSchool' => $post['recruit_oldSchool'],
-            'recruit_district' => $post['recruit_district'],
-            'recruit_province' => $post['recruit_province'],
-            'recruit_grade' => $post['recruit_grade'],
-            'recruit_category' => $post['recruit_category'],
+            'recruit_homePostcode' => $post['recruit_homePostcode'] ?? '',
+            'recruit_oldSchool' => $post['recruit_oldSchool'] ?? '',
+            'recruit_district' => $post['recruit_district'] ?? '',
+            'recruit_province' => $post['recruit_province'] ?? '',
+            'recruit_grade' => $post['recruit_grade'] ?? '',
+            'recruit_category' => $post['recruit_category'] ?? '',
             'recruit_tpyeRoom' => $course_fullname,
-            'recruit_tpyeRoom_id' => $post['recruit_tpyeRoom1'],
+            'recruit_tpyeRoom_id' => $tpyeRoom1,
             'recruit_major' => $course_branch,
             'recruit_majorOrder' => $majorOrder,
             'recruit_nickname' => $post['recruit_nickname'] ?? '',
