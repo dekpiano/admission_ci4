@@ -7,13 +7,13 @@
     }
 
     :root {
-        --skj-pink: #ff9eb5;
-        --skj-blue: #84d2f6;
-        --skj-pink-dark: #ff7da0;
-        --skj-blue-dark: #5cbbf2;
-        --skj-gradient: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
-        --male-color: #3b82f6;
-        --female-color: #f472b6;
+        --skj-pink: #e11d48;
+        --skj-blue: #0284c7;
+        --skj-pink-dark: #be123c;
+        --skj-blue-dark: #0369a1;
+        --skj-gradient: linear-gradient(135deg, #e11d48 0%, #ff2d75 35%, #0284c7 80%, #0369a1 100%);
+        --male-color: #0284c7;
+        --female-color: #e11d48;
     }
 
     .stats-hero {
@@ -22,7 +22,7 @@
         padding: 3rem 2rem;
         color: white;
         margin-bottom: 2rem;
-        box-shadow: 0 20px 40px rgba(255, 158, 181, 0.2);
+        box-shadow: 0 20px 40px rgba(225, 29, 72, 0.25);
         position: relative;
         overflow: hidden;
     }
@@ -32,7 +32,7 @@
         position: absolute;
         width: 300px;
         height: 300px;
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.12);
         border-radius: 50%;
         top: -100px;
         right: -100px;
@@ -42,11 +42,12 @@
         font-size: 2.5rem;
         font-weight: 800;
         margin-bottom: 0.5rem;
+        color: #ffffff;
     }
 
     .stats-subtitle {
         font-size: 1.1rem;
-        opacity: 0.95;
+        color: rgba(255, 255, 255, 0.95);
     }
 
     /* Summary Cards */
@@ -56,13 +57,14 @@
         padding: 1.5rem;
         height: 100%;
         transition: all 0.3s ease;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+        border: 1.5px solid #cbd5e1;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.03);
     }
 
     .card-stat:hover {
         transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        border-color: var(--skj-pink);
     }
 
     .stat-header {
@@ -82,13 +84,13 @@
         font-size: 1.5rem;
     }
 
-    .stat-icon.total { background: rgba(255, 158, 181, 0.15); color: var(--skj-pink-dark); }
-    .stat-icon.m1 { background: rgba(132, 210, 246, 0.15); color: var(--skj-blue-dark); }
-    .stat-icon.verified { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .stat-icon.total { background: #fff1f2; color: #e11d48; }
+    .stat-icon.m1 { background: #f0f9ff; color: #0284c7; }
+    .stat-icon.verified { background: rgba(16, 185, 129, 0.12); color: #10b981; }
 
     .stat-label {
         font-weight: 800;
-        color: #4a5568;
+        color: #475569;
         font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -97,7 +99,7 @@
     .stat-number {
         font-size: 2.5rem;
         font-weight: 800;
-        color: #2d3748;
+        color: #0f172a;
         line-height: 1;
         margin-bottom: 1rem;
     }
@@ -119,8 +121,8 @@
         align-items: center;
     }
 
-    .gender-box.male { background: rgba(59, 130, 246, 0.08); color: var(--male-color); }
-    .gender-box.female { background: rgba(244, 114, 182, 0.08); color: var(--female-color); }
+    .gender-box.male { background: #f0f9ff; color: var(--male-color); }
+    .gender-box.female { background: #fff1f2; color: var(--female-color); }
 
     .gender-val { font-size: 1.1rem; font-weight: 800; }
 
@@ -129,8 +131,8 @@
         background: white;
         border-radius: 24px;
         overflow: hidden;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        border: 1.5px solid #cbd5e1;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
         height: 100%;
     }
 
@@ -206,13 +208,14 @@
         border-radius: 50px;
         padding: 0.6rem 2rem;
         font-weight: 700;
-        color: #64748b;
+        color: #475569;
         border: none;
+        transition: all 0.2s ease;
     }
     .nav-skj .nav-link.active {
-        background: white;
-        color: var(--skj-pink);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        background: linear-gradient(135deg, #e11d48 0%, #0284c7 100%);
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(225, 29, 72, 0.25);
     }
 
     /* Filter Bar */

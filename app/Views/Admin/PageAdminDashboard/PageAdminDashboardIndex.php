@@ -4,14 +4,14 @@
 
 <style>
     :root {
-        --primary-color: #28a745;
+        --primary-color: #ff6b8b;
         --secondary-color: #697a8d;
-        --success-color: #71dd37;
-        --warning-color: #ffab00;
-        --danger-color: #ff3e1d;
-        --info-color: #03c3ec;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #56ccf2;
         --card-shadow: 0 2px 6px 0 rgba(67, 89, 113, 0.12);
-        --primary-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        --primary-gradient: linear-gradient(135deg, #ff6b8b 0%, #56ccf2 100%);
     }
 
     /* Welcome Banner */
@@ -21,7 +21,7 @@
         border: none;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.25);
+        box-shadow: 0 8px 25px rgba(255, 107, 139, 0.35);
     }
 
     .welcome-card::before {
@@ -197,11 +197,11 @@
         <div class="card welcome-card text-white p-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                 <div>
-                    <h3 class="fw-bold mb-1">ยินดีต้อนรับกลับมา, <?= session()->get('pers_firstname') ?>! 👋</h3>
-                    <p class="mb-0 opacity-75">สรุปภาพรวมระบบรับสมัครนักเรียนปีการศึกษา <?= $selected_year ?></p>
+                    <h3 class="fw-bold mb-1 text-white" style="text-shadow: 0 1px 3px rgba(0,0,0,0.2);">ยินดีต้อนรับกลับมา, <?= session()->get('pers_firstname') ?>! 👋</h3>
+                    <p class="mb-0 text-white" style="opacity: 0.95;">สรุปภาพรวมระบบรับสมัครนักเรียนปีการศึกษา <?= $selected_year ?></p>
                 </div>
                 <div class="year-selector-wrapper">
-                    <label class="small mb-0 me-2 text-white-50"><i class='bx bx-calendar'></i> ปีการศึกษา:</label>
+                    <label class="small mb-0 me-2 text-white fw-semibold"><i class='bx bx-calendar'></i> ปีการศึกษา:</label>
                     <select class="year-select" onchange="window.location.href='<?= site_url('skjadmin/dashboard') ?>/' + this.value">
                         <?php foreach ($years as $y): ?>
                             <option value="<?= $y->recruit_year ?>" <?= $y->recruit_year == $selected_year ? 'selected' : '' ?>><?= $y->recruit_year ?></option>
@@ -493,8 +493,8 @@
                 datasets: [{
                     label: 'จำนวนผู้สมัคร (คน)',
                     data: dailyData,
-                    backgroundColor: 'rgba(40, 167, 69, 0.7)',
-                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(255, 107, 139, 0.75)',
+                    borderColor: '#ff6b8b',
                     borderWidth: 1,
                     borderRadius: 4,
                 }]

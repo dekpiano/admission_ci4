@@ -26,8 +26,12 @@ class AdminControlReport extends BaseController
             ->orderBy('recruit_year', 'DESC')
             ->get()->getResult();
 
+        // Always get open year from configuration
+        $yearConfig = $this->db->table('tb_openyear')->where('openyear_id', 1)->get()->getRow();
+        $defaultOpenYear = ($yearConfig && !empty($yearConfig->openyear_year)) ? $yearConfig->openyear_year : (!empty($data['years']) ? $data['years'][0]->recruit_year : (date('Y') + 543));
+
         // Get default selected year
-        $data['selected_year'] = !empty($data['years']) ? $data['years'][0]->recruit_year : date('Y');
+        $data['selected_year'] = $this->request->getVar('year') ?? $defaultOpenYear;
 
         // Fetch Courses with gradelevel
         $data['courses'] = $this->db->table('tb_course')
@@ -82,7 +86,7 @@ class AdminControlReport extends BaseController
         // For confirmation type, also join with tb_students to check if confirmed
         if ($type === 'confirmation') {
             $builder->select('skjacth_personnel.tb_students.stu_UpdateConfirm');
-            $builder->join('skjacth_personnel.tb_students', 'tb_recruitstudent.recruit_idCard = skjacth_personnel.tb_students.stu_iden', 'left');
+            $builder->join('skjacth_personnel.tb_students', 'REPLACE(tb_recruitstudent.recruit_idCard, "-", "") = REPLACE(skjacth_personnel.tb_students.stu_iden, "-", "")', 'left');
         }
         
         $builder->where('recruit_year', $year);
@@ -591,7 +595,8 @@ class AdminControlReport extends BaseController
         $date_D_birt = (int)date('d', strtotime($confrim->stu_birthDay));
         $date_M_birt = date('n', strtotime($confrim->stu_birthDay));
 
-        $imgUrl = get_recruit_file_url($recruit->recruit_img, $recruit->recruit_regLevel, 'img');
+        $imgPath = get_recruit_image_path_for_pdf($recruit->recruit_img, $recruit->recruit_regLevel, 'img');
+        $imgSrc = (!empty($imgPath) && file_exists($imgPath)) ? $imgPath : get_recruit_file_url($recruit->recruit_img, $recruit->recruit_regLevel, 'img');
 
         $html = '<div style="position:absolute;top:577px;left:263px; width:100%; font-size:1.5rem">' . $idstu[0] . '</div>';
         $html .= '<div style="position:absolute;top:577px;left:305px; width:100%; font-size:1.5rem">' . $idstu[1] . '</div>';
@@ -611,7 +616,7 @@ class AdminControlReport extends BaseController
         $html .= '<div style="position:absolute;top:463px;left:420px; width:100%">' . $date_D . '</div>';
         $html .= '<div style="position:absolute;top:463px;left:475px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
         $html .= '<div style="position:absolute;top:463px;left:550px; width:100%">' . $date_Y . '</div>';
-        $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . $imgUrl . '"></div>';
+        $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . $imgSrc . '"></div>';
         
         $regLevel = $confrim->stu_regLevel ?? $recruit->recruit_regLevel;
         

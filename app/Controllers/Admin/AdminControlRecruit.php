@@ -17,12 +17,18 @@ class AdminControlRecruit extends BaseController
         // Get distinct years
         $years = $model->select('recruit_year')->distinct()->orderBy('recruit_year', 'DESC')->findColumn('recruit_year');
 
+        // Always get open year from configuration
+        $openYearObj = $model->getOpenYear();
+        $defaultOpenYear = ($openYearObj && !empty($openYearObj->openyear_year)) ? $openYearObj->openyear_year : (date('Y') + 543);
+
         if (empty($years)) {
-            $years = [date('Y')];
+            $years = [$defaultOpenYear];
+        } elseif (!in_array($defaultOpenYear, $years)) {
+            array_unshift($years, $defaultOpenYear);
         }
 
-        // Get selected year
-        $selectedYear = $this->request->getVar('year') ?? $years[0];
+        // Get selected year (defaults to the currently configured open academic year)
+        $selectedYear = $this->request->getVar('year') ?? $defaultOpenYear;
 
         // Join with Quota table to get readable category names
         $data['recruits'] = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials')
@@ -311,14 +317,14 @@ class AdminControlRecruit extends BaseController
             // Fetch course full names for each ID
             if (!empty($courseIds)) {
                 // Using whereIn for a single query to get all courses
-                $courses = $courseModel->select('course_id, course_fullname')
+                $courses = $courseModel->select('course_id, course_initials, course_branch, course_fullname')
                     ->whereIn('course_id', $courseIds)
                     ->findAll();
 
-                // Map course_id to course_fullname for easy lookup
+                // Map course_id to course_initials (or fallback) for clean concise lookup
                 $courseMap = [];
                 foreach ($courses as $course) {
-                    $courseMap[$course['course_id']] = $course['course_fullname'];
+                    $courseMap[$course['course_id']] = !empty($course['course_initials']) ? $course['course_initials'] : (!empty($course['course_branch']) ? $course['course_branch'] : $course['course_fullname']);
                 }
 
                 // Reconstruct the list in the original order specified by recruit_majorOrder
@@ -339,6 +345,58 @@ class AdminControlRecruit extends BaseController
         $data['remote_base_url'] = get_upload_base_url();
         $data['title'] = 'รายละเอียดผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitView', $data);
+    }
+
+    /**
+     * AJAX Quick View Modal Content
+     */
+    public function quickViewAjax($id = null)
+    {
+        $model = new AdmissionModel();
+        $courseModel = new \App\Models\CourseModel();
+        $data['recruit'] = $model->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_quota.quota_key, tb_course.course_fullname as course_name_joined, tb_course.course_branch, skjacth_personnel.tb_personnel.pers_prefix as verifier_prefix, skjacth_personnel.tb_personnel.pers_firstname as verifier_fname, skjacth_personnel.tb_personnel.pers_lastname as verifier_lname')
+            ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
+            ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
+            ->join('skjacth_personnel.tb_personnel', 'skjacth_personnel.tb_personnel.pers_id = tb_recruitstudent.recruit_userUpdate', 'left')
+            ->find($id);
+
+        if (empty($data['recruit'])) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'ไม่พบข้อมูลผู้สมัคร ID: ' . $id]);
+        }
+
+        // Process recruit_majorOrder
+        if (!empty($data['recruit']['recruit_majorOrder'])) {
+            $courseIds = explode('|', $data['recruit']['recruit_majorOrder']);
+            $majorOrderList = [];
+            if (!empty($courseIds)) {
+                $courses = $courseModel->select('course_id, course_initials, course_branch, course_fullname')
+                    ->whereIn('course_id', $courseIds)
+                    ->findAll();
+                $courseMap = [];
+                foreach ($courses as $course) {
+                    $courseMap[$course['course_id']] = !empty($course['course_initials']) ? $course['course_initials'] : (!empty($course['course_branch']) ? $course['course_branch'] : $course['course_fullname']);
+                }
+                foreach ($courseIds as $cId) {
+                    if (isset($courseMap[$cId])) {
+                        $majorOrderList[] = $courseMap[$cId];
+                    } else {
+                        $majorOrderList[] = 'ไม่พบหลักสูตร (' . $cId . ')';
+                    }
+                }
+            }
+            $data['recruit']['major_order_list'] = $majorOrderList;
+        } else {
+            $data['recruit']['major_order_list'] = [];
+        }
+
+        $data['datethai'] = new \App\Libraries\Datethai();
+        $html = view('Admin/PageAdminRecruit/QuickViewModal', $data);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'html' => $html,
+            'recruit' => $data['recruit']
+        ]);
     }
 
     public function edit($id = null)
@@ -363,6 +421,41 @@ class AdminControlRecruit extends BaseController
         $data['remote_base_url'] = get_upload_base_url();
         $data['title'] = 'แก้ไขข้อมูลผู้สมัคร';
         return view('Admin/PageAdminRecruit/PageAdminRecruitEdit', $data);
+    }
+
+    /**
+     * AJAX Quick Edit Modal Content
+     */
+    public function quickEditAjax($id = null)
+    {
+        $model = new AdmissionModel();
+        $courseModel = new \App\Models\CourseModel();
+        $data['recruit'] = $model->find($id);
+
+        if (empty($data['recruit'])) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'ไม่พบข้อมูลผู้สมัคร ID: ' . $id]);
+        }
+
+        // Process recruit_majorOrder
+        $data['major_order_ids'] = [];
+        if (!empty($data['recruit']['recruit_majorOrder'])) {
+            $data['major_order_ids'] = explode('|', $data['recruit']['recruit_majorOrder']);
+        }
+
+        $data['courses'] = $model->getAllCourses();
+        $data['quotas'] = $model->getAllQuotas();
+        $data['courses_json'] = json_encode($data['courses']);
+        $data['datethai'] = new \App\Libraries\Datethai();
+
+        $html = view('Admin/PageAdminRecruit/QuickEditModal', $data);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'html' => $html,
+            'recruit' => $data['recruit'],
+            'courses' => $data['courses'],
+            'major_order_ids' => $data['major_order_ids']
+        ]);
     }
 
     public function update($id = null)
@@ -435,21 +528,21 @@ class AdminControlRecruit extends BaseController
             'recruit_religion' => $this->request->getPost('recruit_religion'),
             'recruit_district' => $this->request->getPost('recruit_district'),
             'recruit_province' => $this->request->getPost('recruit_province'),
-            'recruit_major' => $this->request->getPost('recruit_major') ?: $course['course_branch'] ?? '',
+            'recruit_major' => $this->request->getPost('recruit_major') ?: ($course ? ($course['course_branch'] ?? '') : ''),
             'recruit_address' => "เลขที่ " . $this->request->getPost('recruit_homeNumber') . " หมู่ที่ " . (!empty($this->request->getPost('recruit_homeGroup')) ? $this->request->getPost('recruit_homeGroup') : '-') . " ถนน " . (!empty($this->request->getPost('recruit_homeRoad')) ? $this->request->getPost('recruit_homeRoad') : '-') . " ตำบล" . $this->request->getPost('recruit_homeSubdistrict') . " อำเภอ" . $this->request->getPost('recruit_homedistrict') . " จังหวัด" . $this->request->getPost('recruit_homeProvince') . " " . $this->request->getPost('recruit_homePostcode'),
             'recruit_dateUpdate' => date('Y-m-d H:i:s'),
             'recruit_userUpdate' => session()->get('pers_id'),
-            'recruit_sportSelectionResult' => $this->request->getPost('recruit_sportSelectionResult'),
+            'recruit_sportSelectionResult' => $this->request->getPost('recruit_sportSelectionResult') ?: '',
             // Sport fields (for athlete applicants)
-            'recruit_agegroup' => $this->request->getPost('recruit_agegroup') ?: null,
-            'recruit_sportPosition' => $this->request->getPost('recruit_sportPosition') ?: null,
-            'recruit_nickname' => $this->request->getPost('recruit_nickname') ?: null,
-            'recruit_weight' => $this->request->getPost('recruit_weight') ?: null,
-            'recruit_height' => $this->request->getPost('recruit_height') ?: null,
-            'recruit_fatherName' => $this->request->getPost('recruit_fatherName') ?: null,
-            'recruit_motherName' => $this->request->getPost('recruit_motherName') ?: null,
-            'recruit_fatherJob' => $this->request->getPost('recruit_fatherJob') ?: null,
-            'recruit_motherJob' => $this->request->getPost('recruit_motherJob') ?: null,
+            'recruit_agegroup' => !empty($this->request->getPost('recruit_agegroup')) ? (int)$this->request->getPost('recruit_agegroup') : 0,
+            'recruit_sportPosition' => $this->request->getPost('recruit_sportPosition') ?: '',
+            'recruit_nickname' => $this->request->getPost('recruit_nickname') ?: '',
+            'recruit_weight' => !empty($this->request->getPost('recruit_weight')) ? (float)$this->request->getPost('recruit_weight') : 0,
+            'recruit_height' => !empty($this->request->getPost('recruit_height')) ? (float)$this->request->getPost('recruit_height') : 0,
+            'recruit_fatherName' => $this->request->getPost('recruit_fatherName') ?: '',
+            'recruit_motherName' => $this->request->getPost('recruit_motherName') ?: '',
+            'recruit_fatherJob' => $this->request->getPost('recruit_fatherJob') ?: '',
+            'recruit_motherJob' => $this->request->getPost('recruit_motherJob') ?: '',
         ];
 
         $currentRecruit = $model->find($id);
@@ -518,6 +611,13 @@ class AdminControlRecruit extends BaseController
         }
 
         $model->update($id, $data);
+
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'บันทึกการแก้ไขข้อมูลผู้สมัครเรียบร้อยแล้ว'
+            ]);
+        }
 
         return redirect()->to(site_url('skjadmin/recruits/view/' . $id))->with('success', 'อัปเดตข้อมูลผู้สมัครสำเร็จ');
     }
@@ -835,197 +935,20 @@ class AdminControlRecruit extends BaseController
         }
 
 
-        // ลบ groupBy ออกเพราะ recruit_id เป็น Primary Key ไม่ต้อง GROUP BY
-        $builder->orderBy('tb_recruitstudent.recruit_id', 'DESC');
+        // Fetch courses for majorOrder mapping
+        $courseModel = new \App\Models\CourseModel();
+        $courses = $courseModel->select('course_id, course_initials, course_branch, course_fullname')->findAll();
+        $courseMap = [];
+        foreach ($courses as $c) {
+            $courseMap[$c['course_id']] = !empty($c['course_initials']) ? $c['course_initials'] : (!empty($c['course_branch']) ? $c['course_branch'] : $c['course_fullname']);
+        }
 
+        $builder->orderBy('tb_recruitstudent.recruit_id', 'DESC');
         $recruits = $builder->get()->getResultArray();
 
         $data = [];
         foreach ($recruits as $recruit) {
-            $status = $recruit['recruit_status'] ?? 'รอการตรวจสอบ';
-            $statusClass = 'status-pending'; // Default: orange/warning
-            if ($status === 'ผ่านการตรวจสอบ') {
-                $statusClass = 'status-approved'; // Green
-            } elseif ($status === 'รอการตรวจสอบ') {
-                $statusClass = 'status-pending'; // Orange
-            } elseif (strpos($status, 'ไม่ผ่าน') !== false) {
-                $statusClass = 'status-rejected'; // Red
-            }
-
-            // Generate avatar with lazy loading - use direct URL for better browser accessibility
-            $imgSrc = get_recruit_file_url(($recruit['recruit_img'] ?? 'default.png'), ($recruit['recruit_regLevel'] ?? '1'), 'img', true);
-            $defaultImg = base_url('sneat-assets/img/avatars/1.png');
-            $avatar = '<img src="' . $imgSrc . '" class="recruit-avatar" alt="Avatar" loading="lazy" onerror="this.onerror=null;this.src=\'' . $defaultImg . '\';">';
-
-            // Check if this is a sports applicant
-            $isSport = (
-                (!empty($recruit['recruit_sportPosition']) && $recruit['recruit_sportPosition'] !== '-') ||
-                (isset($recruit['course_fullname']) && mb_strpos($recruit['course_fullname'], 'กีฬา') !== false) ||
-                (isset($recruit['course_branch']) && mb_strpos($recruit['course_branch'], 'กีฬา') !== false) ||
-                (isset($recruit['quota_key']) && $recruit['quota_key'] === 'sport')
-            );
-
-            // Generate action dropdown menu
-            $printMenuItems = '';
-            if ($isSport) {
-                // Sport applicant: show both print options
-                $printMenuItems = '
-                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-run me-2 text-purple"></i>พิมพ์ใบสมัครกีฬา</a></li>
-                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print-normal/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-2 text-info"></i>พิมพ์ใบสมัครธรรมดา</a></li>';
-            } else {
-                // Regular applicant: show only normal print
-                $printMenuItems = '
-                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-2 text-info"></i>พิมพ์ใบสมัคร</a></li>';
-            }
-
-            // Build download menu items based on available files
-            $regLevel = $recruit['recruit_regLevel'] ?? '1';
-            $downloadMenuItems = '';
-            
-            // Check and add download links for each file type
-            if (!empty($recruit['recruit_certificateEdu'])) {
-                $certEduUrl = get_recruit_file_url($recruit['recruit_certificateEdu'], $regLevel, 'certificate');
-                $downloadMenuItems .= '<li><a class="dropdown-item" href="' . $certEduUrl . '" target="_blank" download><i class="bx bx-download me-2 text-success"></i>ปพ.1 ด้านหน้า</a></li>';
-            }
-            if (!empty($recruit['recruit_certificateEduB'])) {
-                $certEduBUrl = get_recruit_file_url($recruit['recruit_certificateEduB'], $regLevel, 'certificateB');
-                $downloadMenuItems .= '<li><a class="dropdown-item" href="' . $certEduBUrl . '" target="_blank" download><i class="bx bx-download me-2 text-success"></i>ปพ.1 ด้านหลัง</a></li>';
-            }
-            if (!empty($recruit['recruit_copyidCard'])) {
-                $copyIdUrl = get_recruit_file_url($recruit['recruit_copyidCard'], $regLevel, 'copyidCard');
-                $downloadMenuItems .= '<li><a class="dropdown-item" href="' . $copyIdUrl . '" target="_blank" download><i class="bx bx-download me-2 text-success"></i>สำเนาบัตรประชาชน</a></li>';
-            }
-            
-            // Add divider and download section only if there are files
-            $downloadSection = '';
-            if (!empty($downloadMenuItems)) {
-                $downloadSection = '
-                    <li><hr class="dropdown-divider"></li>
-                    <li class="dropdown-header px-3 py-1 text-muted small"><i class="bx bx-folder-open me-1"></i>ดาวน์โหลดเอกสาร</li>
-                    ' . $downloadMenuItems;
-            }
-
-            $actions = '
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bx bx-cog"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) . '"><i class="bx bx-show me-2 text-primary"></i>ดูข้อมูลทั้งหมด</a></li>
-                        <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/edit/' . $recruit['recruit_id']) . '"><i class="bx bx-edit me-2 text-warning"></i>แก้ไขข้อมูล</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        ' . $printMenuItems . $downloadSection . '
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="confirmDelete(' . $recruit['recruit_id'] . ')"><i class="bx bx-trash me-2"></i>ลบข้อมูล</a></li>
-                    </ul>
-                </div>';
-
-
-            // Build course display with all ranks from recruit_majorOrder
-            $courseHtml = '';
-            if (!empty($recruit['recruit_majorOrder'])) {
-                $courseIds = explode('|', $recruit['recruit_majorOrder']);
-                if (count($courseIds) > 0) {
-                    // Get course model and fetch all courses at once
-                    $courseModel = new \App\Models\CourseModel();
-                    $courses = $courseModel->select('course_id, course_branch')
-                        ->whereIn('course_id', $courseIds)
-                        ->findAll();
-
-                    // Create a map for quick lookup
-                    $courseMap = [];
-                    foreach ($courses as $course) {
-                        $courseMap[$course['course_id']] = $course['course_branch'];
-                    }
-
-                    // Build HTML with order numbers
-                    $courseItems = [];
-                    foreach ($courseIds as $index => $id) {
-                        $orderNum = $index + 1;
-                        $courseName = $courseMap[$id] ?? 'ไม่พบ';
-                        $badgeColor = 'bg-label-info';
-                        if ($orderNum == 1) {
-                            $badgeColor = 'bg-label-primary';
-                        } elseif ($orderNum == 2) {
-                            $badgeColor = 'bg-label-success';
-                        } elseif ($orderNum == 3) {
-                            $badgeColor = 'bg-label-warning';
-                        }
-                        $courseItems[] = '<span class="badge ' . $badgeColor . ' me-1 mb-1" title="อันดับที่ ' . $orderNum . '">' . $orderNum . '. ' . esc($courseName) . '</span>';
-                    }
-                    $courseHtml = '<div class="d-flex flex-wrap gap-1">' . implode('', $courseItems) . '</div>';
-                }
-            }
-
-            // Fallback if no majorOrder
-            if (empty($courseHtml)) {
-                $courseHtml = '<span class="badge bg-label-info">' . esc($recruit['course_branch'] ?? $recruit['course_fullname'] ?? $recruit['recruit_tpyeRoom']) . '</span>';
-            }
-
-            // Build selection result display - single column for both sport and non-sport
-            // Shows sport selection for sport applicants, quiz result for non-sport
-            $selectionResultHtml = '';
-            if ($isSport) {
-                // Sport applicant - show sport selection dropdown
-                $sportResult = $recruit['recruit_sportSelectionResult'] ?? 'รอคัดเลือก';
-                $selectionResultHtml = '
-                    <div class="d-flex align-items-center gap-1 justify-content-center">
-                        <span class="badge bg-label-purple rounded-pill" title="นักกีฬา"><i class="bx bx-run"></i></span>
-                        <select class="form-select form-select-sm sport-result-select" data-id="' . $recruit['recruit_id'] . '" style="width: auto; font-size: 0.75rem; padding: 0.25rem 1.5rem 0.25rem 0.5rem;">
-                            <option value="รอคัดเลือก"' . ($sportResult === 'รอคัดเลือก' || empty($sportResult) ? ' selected' : '') . '>⏳ รอคัดเลือก</option>
-                            <option value="ผ่านการคัดเลือก"' . ($sportResult === 'ผ่านการคัดเลือก' ? ' selected' : '') . '>✅ ผ่านการคัดเลือก</option>
-                            <option value="ไม่ผ่านการคัดเลือก"' . ($sportResult === 'ไม่ผ่านการคัดเลือก' ? ' selected' : '') . '>❌ ไม่ผ่านการคัดเลือก</option>
-                            <option value="ไม่มาคัดเลือก"' . ($sportResult === 'ไม่มาคัดเลือก' ? ' selected' : '') . '>🚫 ไม่มาคัดเลือก</option>
-                        </select>
-                    </div>';
-            } else {
-                // Non-sport applicant - show quiz result dropdown
-                $quizResult = $recruit['recruit_StatusQuiz'] ?? 'รอสอบ';
-                $selectionResultHtml = '
-                    <div class="d-flex align-items-center gap-1 justify-content-center">
-                        <span class="badge bg-label-info rounded-pill" title="สอบข้อเขียน"><i class="bx bx-edit"></i></span>
-                        <select class="form-select form-select-sm quiz-result-select" data-id="' . $recruit['recruit_id'] . '" style="width: auto; font-size: 0.75rem; padding: 0.25rem 1.5rem 0.25rem 0.5rem;">
-                            <option value="รอสอบ"' . ($quizResult === 'รอสอบ' || empty($quizResult) ? ' selected' : '') . '>⏳ รอสอบ</option>
-                            <option value="สอบผ่าน"' . ($quizResult === 'สอบผ่าน' ? ' selected' : '') . '>✅ สอบผ่าน</option>
-                            <option value="สอบไม่ผ่าน"' . ($quizResult === 'สอบไม่ผ่าน' ? ' selected' : '') . '>❌ สอบไม่ผ่าน</option>
-                            <option value="ไม่มาสอบ"' . ($quizResult === 'ไม่มาสอบ' ? ' selected' : '') . '>🚫 ไม่มาสอบ</option>
-                        </select>
-                    </div>';
-            }
-
-            $verifierName = '-';
-            if (!empty($recruit['verifier_fname'])) {
-                $verifierName = esc($recruit['verifier_prefix'] . $recruit['verifier_fname'] . ' ' . $recruit['verifier_lname']);
-                if (!empty($recruit['recruit_dateUpdate'])) {
-                    $verifierName .= '<div class="text-muted" style="font-size: 0.65rem; line-height: 1.2;">(' . date('d/m/Y H:i', strtotime($recruit['recruit_dateUpdate'])) . ')</div>';
-                }
-            }
-
-            // Build excellence type display based on course_initials
-            $excellenceTypeHtml = '';
-            $courseInitials = $recruit['course_initials'] ?? '';
-            if (!empty($courseInitials)) {
-                // Has course_initials = Excellence/Special program
-                $excellenceTypeHtml = '<span class="text-purple fw-semibold">' . esc($courseInitials) . '</span>';
-            } else {
-                // No course_initials = Normal program
-                $excellenceTypeHtml = '<span class="text-muted">ทั่วไป</span>';
-            }
-
-            $data[] = [
-                'avatar' => $avatar,
-                'recruit_id' => '<span class="badge bg-label-secondary">' . esc(sprintf('%04d', $recruit['recruit_id'] ?? 0)) . '</span>',
-                'name' => '<div class="fw-semibold">' . esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '')) . '</div><small class="text-muted">' . esc($recruit['recruit_lastName'] ?? '') . '</small>',
-                'round' => '<span class="badge bg-label-dark">รอบที่ ' . esc($recruit['recruit_round'] ?? '1') . '</span>',
-                'reg_level' => '<span class="badge bg-label-primary">ม.' . esc($recruit['recruit_regLevel'] ?? '') . '</span>',
-                'category' => '<small>' . esc($recruit['quota_explain'] ?? $recruit['recruit_category']) . '</small>',
-                'excellence_type' => $excellenceTypeHtml,
-                'course' => $courseHtml,
-                'selection_result' => $selectionResultHtml,
-                'status' => '<span class="status-badge ' . $statusClass . '">' . esc($status) . '</span>',
-                'verifier' => $verifierName,
-                'actions' => $actions
-            ];
+            $data[] = $this->formatRecruitRow($recruit, $courseMap);
         }
 
         $output = [
@@ -1052,7 +975,7 @@ class AdminControlRecruit extends BaseController
 
         // Build query
         $builder = $model->builder();
-        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_recruitstudent.recruit_round, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_course.course_initials, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key, tb_recruitstudent.recruit_sportPosition, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz, tb_recruitstudent.recruit_dateUpdate, tb_recruitstudent.recruit_certificateEdu, tb_recruitstudent.recruit_certificateEduB, tb_recruitstudent.recruit_copyidCard, skjacth_personnel.tb_personnel.pers_prefix as verifier_prefix, skjacth_personnel.tb_personnel.pers_firstname as verifier_fname, skjacth_personnel.tb_personnel.pers_lastname as verifier_lname')
+        $builder->select('tb_recruitstudent.recruit_id, tb_recruitstudent.recruit_prefix, tb_recruitstudent.recruit_firstName, tb_recruitstudent.recruit_lastName, tb_recruitstudent.recruit_regLevel, tb_recruitstudent.recruit_img, tb_recruitstudent.recruit_round, tb_recruitstudent.recruit_phone, tb_recruitstudent.recruit_idCard, tb_quota.quota_explain, tb_recruitstudent.recruit_category, tb_course.course_branch, tb_course.course_fullname, tb_course.course_initials, tb_recruitstudent.recruit_tpyeRoom, tb_recruitstudent.recruit_status, tb_recruitstudent.recruit_majorOrder, tb_quota.quota_key, tb_recruitstudent.recruit_sportPosition, tb_recruitstudent.recruit_sportSelectionResult, tb_recruitstudent.recruit_StatusQuiz, tb_recruitstudent.recruit_dateUpdate, tb_recruitstudent.recruit_certificateEdu, tb_recruitstudent.recruit_certificateEduB, tb_recruitstudent.recruit_copyidCard, skjacth_personnel.tb_personnel.pers_prefix as verifier_prefix, skjacth_personnel.tb_personnel.pers_firstname as verifier_fname, skjacth_personnel.tb_personnel.pers_lastname as verifier_lname')
             ->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left')
             ->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left')
             ->join('skjacth_personnel.tb_personnel', 'skjacth_personnel.tb_personnel.pers_id = tb_recruitstudent.recruit_userUpdate', 'left')
@@ -1072,101 +995,235 @@ class AdminControlRecruit extends BaseController
             $builder->where('tb_recruitstudent.recruit_round', $roundFilter);
         }
 
+        // Fetch courses for majorOrder mapping
+        $courseModel = new \App\Models\CourseModel();
+        $courses = $courseModel->select('course_id, course_initials, course_branch, course_fullname')->findAll();
+        $courseMap = [];
+        foreach ($courses as $c) {
+            $courseMap[$c['course_id']] = !empty($c['course_initials']) ? $c['course_initials'] : (!empty($c['course_branch']) ? $c['course_branch'] : $c['course_fullname']);
+        }
+
         $builder->orderBy('tb_recruitstudent.recruit_id', 'DESC');
         $recruits = $builder->get()->getResultArray();
 
         // Build data array
         $data = [];
         foreach ($recruits as $recruit) {
-            // Avatar - use same method as getRecruitsAjax
-            $imgSrc = get_recruit_file_url(($recruit['recruit_img'] ?? 'default.png'), ($recruit['recruit_regLevel'] ?? '1'), 'img', true);
-            $defaultImg = base_url('sneat-assets/img/avatars/1.png');
-            $avatar = '<img src="' . $imgSrc . '" class="recruit-avatar" alt="Avatar" loading="lazy" onerror="this.onerror=null;this.src=\'' . $defaultImg . '\';">';
-
-            // Status
-            $status = $recruit['recruit_status'] ?? 'รอการตรวจสอบ';
-            $statusClass = 'status-pending';
-            if ($status === 'ผ่านการตรวจสอบ') {
-                $statusClass = 'status-approved';
-            } elseif (strpos($status, 'ไม่ผ่าน') !== false) {
-                $statusClass = 'status-rejected';
-            }
-
-            // Check if sport candidate
-            $quotaKey = $recruit['quota_key'] ?? '';
-            $isSport = !empty($quotaKey) && strpos($quotaKey, 'A') === 0;
-
-            // Print menu items
-            if ($isSport) {
-                $printMenuItems = '
-                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-run me-2 text-purple"></i>พิมพ์ใบสมัครกีฬา</a></li>
-                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print-normal/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-2 text-info"></i>พิมพ์ใบสมัครธรรมดา</a></li>';
-            } else {
-                $printMenuItems = '
-                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-2 text-info"></i>พิมพ์ใบสมัคร</a></li>';
-            }
-
-            // Actions dropdown
-            $actions = '
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bx bx-cog"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) . '"><i class="bx bx-show me-2 text-primary"></i>ดูข้อมูล</a></li>
-                        <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/edit/' . $recruit['recruit_id']) . '"><i class="bx bx-edit me-2 text-warning"></i>แก้ไข</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        ' . $printMenuItems . '
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="confirmDelete(' . $recruit['recruit_id'] . ')"><i class="bx bx-trash me-2"></i>ลบ</a></li>
-                    </ul>
-                </div>';
-
-            // Course display
-            $courseHtml = '<span class="badge bg-label-info">' . esc($recruit['course_branch'] ?? $recruit['course_fullname'] ?? $recruit['recruit_tpyeRoom']) . '</span>';
-
-            // Selection result
-            if ($isSport) {
-                $sportResult = $recruit['recruit_sportSelectionResult'] ?? 'รอคัดเลือก';
-                $selectionResultHtml = '
-                    <select class="form-select form-select-sm sport-result-select" data-id="' . $recruit['recruit_id'] . '" style="width: auto; font-size: 0.75rem;">
-                        <option value="รอคัดเลือก"' . ($sportResult === 'รอคัดเลือก' || empty($sportResult) ? ' selected' : '') . '>⏳ รอ</option>
-                        <option value="ผ่านการคัดเลือก"' . ($sportResult === 'ผ่านการคัดเลือก' ? ' selected' : '') . '>✅ ผ่าน</option>
-                        <option value="ไม่ผ่านการคัดเลือก"' . ($sportResult === 'ไม่ผ่านการคัดเลือก' ? ' selected' : '') . '>❌ ไม่ผ่าน</option>
-                    </select>';
-            } else {
-                $quizResult = $recruit['recruit_StatusQuiz'] ?? 'รอสอบ';
-                $selectionResultHtml = '
-                    <select class="form-select form-select-sm quiz-result-select" data-id="' . $recruit['recruit_id'] . '" style="width: auto; font-size: 0.75rem;">
-                        <option value="รอสอบ"' . ($quizResult === 'รอสอบ' || empty($quizResult) ? ' selected' : '') . '>⏳ รอ</option>
-                        <option value="สอบผ่าน"' . ($quizResult === 'สอบผ่าน' ? ' selected' : '') . '>✅ ผ่าน</option>
-                        <option value="สอบไม่ผ่าน"' . ($quizResult === 'สอบไม่ผ่าน' ? ' selected' : '') . '>❌ ไม่ผ่าน</option>
-                    </select>';
-            }
-
-            // Excellence type
-            $courseInitials = $recruit['course_initials'] ?? '';
-            if (!empty($courseInitials)) {
-                $excellenceTypeHtml = '<span class="text-purple fw-semibold">' . esc($courseInitials) . '</span>';
-            } else {
-                $excellenceTypeHtml = '<span class="text-muted">ทั่วไป</span>';
-            }
-
-            $data[] = [
-                'avatar' => $avatar,
-                'recruit_id' => '<span class="badge bg-label-secondary">' . esc(sprintf('%04d', $recruit['recruit_id'] ?? 0)) . '</span>',
-                'name' => '<div class="fw-semibold">' . esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '')) . '</div><small class="text-muted">' . esc($recruit['recruit_lastName'] ?? '') . '</small>',
-                'round' => '<span class="badge bg-label-dark">รอบที่ ' . esc($recruit['recruit_round'] ?? '1') . '</span>',
-                'reg_level' => '<span class="badge bg-label-primary">ม.' . esc($recruit['recruit_regLevel'] ?? '') . '</span>',
-                'excellence_type' => $excellenceTypeHtml,
-                'course' => $courseHtml,
-                'selection_result' => $selectionResultHtml,
-                'status' => '<span class="status-badge ' . $statusClass . '">' . esc($status) . '</span>',
-                'actions' => $actions
-            ];
+            $data[] = $this->formatRecruitRow($recruit, $courseMap);
         }
 
         return $this->response->setJSON(['data' => $data]);
+    }
+
+    /**
+     * Helper to format a single recruit row for DataTables (compact & unified)
+     */
+    private function formatRecruitRow($recruit, $courseMap = [])
+    {
+        $status = $recruit['recruit_status'] ?? 'รอการตรวจสอบ';
+        $statusClass = 'status-pending';
+        $statusIcon = '<i class="bx bx-time-five me-1"></i>';
+        if ($status === 'ผ่านการตรวจสอบ') {
+            $statusClass = 'status-approved';
+            $statusIcon = '<i class="bx bx-check-circle me-1"></i>';
+        } elseif (strpos($status, 'ไม่ผ่าน') !== false) {
+            $statusClass = 'status-rejected';
+            $statusIcon = '<i class="bx bx-x-circle me-1"></i>';
+        }
+
+        // Avatar & Applicant Info
+        $imgSrc = get_recruit_file_url(($recruit['recruit_img'] ?? 'default.png'), ($recruit['recruit_regLevel'] ?? '1'), 'img', true);
+        $defaultImg = base_url('sneat-assets/img/avatars/1.png');
+        $idFormatted = sprintf('%04d', $recruit['recruit_id'] ?? 0);
+        $fullName = esc(($recruit['recruit_prefix'] ?? '') . ($recruit['recruit_firstName'] ?? '') . ' ' . ($recruit['recruit_lastName'] ?? ''));
+        $phone = !empty($recruit['recruit_phone']) ? esc($recruit['recruit_phone']) : '';
+        $idCard = !empty($recruit['recruit_idCard']) ? esc($recruit['recruit_idCard']) : '';
+
+        $subInfo = [];
+        if (!empty($phone)) {
+            $subInfo[] = '<span class="text-nowrap"><i class="bx bx-phone" style="color: #ff6b8b;"></i> ' . $phone . '</span>';
+        }
+        if (!empty($idCard)) {
+            $subInfo[] = '<span class="text-nowrap text-muted"><i class="bx bx-id-card"></i> ' . $idCard . '</span>';
+        }
+        $subInfoHtml = !empty($subInfo) ? '<div class="text-muted d-flex align-items-center gap-2 flex-wrap mt-1" style="font-size: 0.74rem;">' . implode('<span class="text-muted opacity-50">|</span>', $subInfo) . '</div>' : '';
+
+        $applicantHtml = '<span class="d-none">' . sprintf('%010d', (int)($recruit['recruit_id'] ?? 0)) . '</span>
+        <div class="d-flex align-items-center gap-2 py-1">
+            <div class="position-relative flex-shrink-0">
+                <img src="' . $imgSrc . '" class="recruit-avatar shadow-sm" alt="Avatar" loading="lazy" onerror="this.onerror=null;this.src=\'' . $defaultImg . '\';">
+            </div>
+            <div class="min-w-0">
+                <div class="d-flex align-items-center gap-1 flex-wrap">
+                    <span class="badge bg-label-secondary font-monospace fw-bold" style="font-size: 0.72rem; padding: 2px 6px;">#' . $idFormatted . '</span>
+                    <a href="javascript:void(0);" onclick="openQuickViewModal(' . $recruit['recruit_id'] . ')" class="fw-bold text-dark text-truncate recruit-name-link" style="font-size: 0.88rem;">' . $fullName . '</a>
+                </div>
+                ' . $subInfoHtml . '
+            </div>
+        </div>';
+
+        // Level & Quota
+        $regLevel = esc($recruit['recruit_regLevel'] ?? '1');
+        $levelBadge = ($regLevel === '1') 
+            ? '<span class="badge" style="background: rgba(255, 107, 139, 0.15); color: #ff6b8b; font-weight: 700; border: 1px solid rgba(255, 107, 139, 0.3);">ม.1</span>' 
+            : '<span class="badge" style="background: rgba(86, 204, 242, 0.15); color: #0284c7; font-weight: 700; border: 1px solid rgba(86, 204, 242, 0.3);">ม.4</span>';
+        $roundBadge = (!empty($recruit['recruit_round'])) 
+            ? '<span class="badge bg-label-dark" style="font-size: 0.7rem; padding: 2px 6px;">รอบ ' . esc($recruit['recruit_round']) . '</span>' 
+            : '';
+        $quotaName = esc($recruit['quota_explain'] ?? $recruit['recruit_category'] ?? 'ทั่วไป');
+
+        $levelQuotaHtml = '
+        <div class="py-1">
+            <div class="d-flex align-items-center gap-1 mb-1">
+                ' . $levelBadge . '
+                ' . $roundBadge . '
+            </div>
+            <div class="small fw-semibold text-secondary text-truncate" style="max-width: 140px; font-size: 0.78rem;" title="' . $quotaName . '">' . $quotaName . '</div>
+        </div>';
+
+        // Check if sport candidate
+        $isSport = (
+            (!empty($recruit['recruit_sportPosition']) && $recruit['recruit_sportPosition'] !== '-') ||
+            (isset($recruit['course_fullname']) && mb_strpos($recruit['course_fullname'], 'กีฬา') !== false) ||
+            (isset($recruit['course_branch']) && mb_strpos($recruit['course_branch'], 'กีฬา') !== false) ||
+            (isset($recruit['quota_key']) && ($recruit['quota_key'] === 'sport' || strpos($recruit['quota_key'], 'A') === 0))
+        );
+
+        // Course Preferences
+        $courseHtml = '';
+        if (!empty($recruit['recruit_majorOrder'])) {
+            $courseIds = explode('|', $recruit['recruit_majorOrder']);
+            $courseItems = [];
+            foreach ($courseIds as $index => $id) {
+                $orderNum = $index + 1;
+                $courseName = $courseMap[$id] ?? '';
+                if (empty($courseName)) continue;
+                
+                $badgeClass = ($orderNum === 1) ? 'bg-label-primary' : (($orderNum === 2) ? 'bg-label-info' : 'bg-label-secondary');
+                $courseItems[] = '<span class="badge ' . $badgeClass . ' me-1 mb-1 text-truncate" style="max-width: 220px; font-size: 0.74rem;" title="อันดับ ' . $orderNum . ': ' . esc($courseName) . '">' . $orderNum . '. ' . esc($courseName) . '</span>';
+            }
+            if (!empty($courseItems)) {
+                $courseHtml = '<div class="d-flex flex-wrap align-items-center gap-1">' . implode('', $courseItems) . '</div>';
+            }
+        }
+        if (empty($courseHtml)) {
+            $cName = esc($recruit['course_branch'] ?? $recruit['course_fullname'] ?? $recruit['recruit_tpyeRoom'] ?? '-');
+            $courseHtml = '<span class="badge bg-label-info text-truncate" style="max-width: 220px; font-size: 0.76rem;">' . $cName . '</span>';
+        }
+
+        // Status & Verifier
+        $verifierInfo = '';
+        if (!empty($recruit['verifier_fname'])) {
+            $vName = esc($recruit['verifier_prefix'] . $recruit['verifier_fname']);
+            $vDate = !empty($recruit['recruit_dateUpdate']) ? date('d/m/y', strtotime($recruit['recruit_dateUpdate'])) : '';
+            $verifierInfo = '<div class="text-muted mt-1" style="font-size: 0.68rem; line-height: 1.1;">โดย: ' . $vName . ($vDate ? ' (' . $vDate . ')' : '') . '</div>';
+        }
+
+        $statusHtml = '
+        <div class="text-center py-1">
+            <span class="status-badge ' . $statusClass . ' d-inline-flex align-items-center">' . $statusIcon . esc($status) . '</span>
+            ' . $verifierInfo . '
+        </div>';
+
+        // Selection Result Dropdown
+        if ($isSport) {
+            $sportResult = $recruit['recruit_sportSelectionResult'] ?? 'รอคัดเลือก';
+            $selectBg = ($sportResult === 'ผ่านการคัดเลือก') ? 'border-success text-success' : (($sportResult === 'ไม่ผ่านการคัดเลือก') ? 'border-danger text-danger' : 'border-warning text-warning');
+            $selectionResultHtml = '
+            <div class="d-flex flex-column align-items-center gap-1 py-1">
+                <div class="d-flex align-items-center gap-1">
+                    <span class="badge bg-label-primary p-1" style="font-size: 0.68rem;" title="นักกีฬา"><i class="bx bx-run"></i> กีฬา</span>
+                    <select class="form-select form-select-sm sport-result-select fw-bold ' . $selectBg . '" data-id="' . $recruit['recruit_id'] . '" style="width: 115px; font-size: 0.75rem; padding: 2px 6px; border-radius: 8px;">
+                        <option value="รอคัดเลือก"' . ($sportResult === 'รอคัดเลือก' || empty($sportResult) ? ' selected' : '') . '>⏳ รอคัดเลือก</option>
+                        <option value="ผ่านการคัดเลือก"' . ($sportResult === 'ผ่านการคัดเลือก' ? ' selected' : '') . '>✅ ผ่าน</option>
+                        <option value="ไม่ผ่านการคัดเลือก"' . ($sportResult === 'ไม่ผ่านการคัดเลือก' ? ' selected' : '') . '>❌ ไม่ผ่าน</option>
+                        <option value="ไม่มาคัดเลือก"' . ($sportResult === 'ไม่มาคัดเลือก' ? ' selected' : '') . '>🚫 ขาดคัด</option>
+                    </select>
+                </div>
+            </div>';
+        } else {
+            $quizResult = $recruit['recruit_StatusQuiz'] ?? 'รอสอบ';
+            $selectBg = ($quizResult === 'สอบผ่าน') ? 'border-success text-success' : (($quizResult === 'สอบไม่ผ่าน') ? 'border-danger text-danger' : 'border-warning text-warning');
+            $selectionResultHtml = '
+            <div class="d-flex flex-column align-items-center gap-1 py-1">
+                <div class="d-flex align-items-center gap-1">
+                    <span class="badge bg-label-info p-1" style="font-size: 0.68rem;" title="ข้อเขียน"><i class="bx bx-edit"></i> สอบ</span>
+                    <select class="form-select form-select-sm quiz-result-select fw-bold ' . $selectBg . '" data-id="' . $recruit['recruit_id'] . '" style="width: 115px; font-size: 0.75rem; padding: 2px 6px; border-radius: 8px;">
+                        <option value="รอสอบ"' . ($quizResult === 'รอสอบ' || empty($quizResult) ? ' selected' : '') . '>⏳ รอสอบ</option>
+                        <option value="สอบผ่าน"' . ($quizResult === 'สอบผ่าน' ? ' selected' : '') . '>✅ สอบผ่าน</option>
+                        <option value="สอบไม่ผ่าน"' . ($quizResult === 'สอบไม่ผ่าน' ? ' selected' : '') . '>❌ ไม่ผ่าน</option>
+                        <option value="ไม่มาสอบ"' . ($quizResult === 'ไม่มาสอบ' ? ' selected' : '') . '>🚫 ขาดสอบ</option>
+                    </select>
+                </div>
+            </div>';
+        }
+
+        // Print & Download menu items
+        $printMenuItems = '';
+        if ($isSport) {
+            $printMenuItems = '
+                <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-run me-2 text-primary"></i>พิมพ์ใบสมัครกีฬา</a></li>
+                <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print-normal/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-2 text-info"></i>พิมพ์ใบสมัครธรรมดา</a></li>';
+        } else {
+            $printMenuItems = '
+                <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/print/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-printer me-2 text-info"></i>พิมพ์ใบสมัคร</a></li>';
+        }
+
+        $regLevel = $recruit['recruit_regLevel'] ?? '1';
+        $downloadMenuItems = '';
+        if (!empty($recruit['recruit_certificateEdu'])) {
+            $certEduUrl = get_recruit_file_url($recruit['recruit_certificateEdu'], $regLevel, 'certificate');
+            $downloadMenuItems .= '<li><a class="dropdown-item" href="' . $certEduUrl . '" target="_blank" download><i class="bx bx-download me-2 text-success"></i>ปพ.1 ด้านหน้า</a></li>';
+        }
+        if (!empty($recruit['recruit_certificateEduB'])) {
+            $certEduBUrl = get_recruit_file_url($recruit['recruit_certificateEduB'], $regLevel, 'certificateB');
+            $downloadMenuItems .= '<li><a class="dropdown-item" href="' . $certEduBUrl . '" target="_blank" download><i class="bx bx-download me-2 text-success"></i>ปพ.1 ด้านหลัง</a></li>';
+        }
+        if (!empty($recruit['recruit_copyidCard'])) {
+            $copyIdUrl = get_recruit_file_url($recruit['recruit_copyidCard'], $regLevel, 'copyidCard');
+            $downloadMenuItems .= '<li><a class="dropdown-item" href="' . $copyIdUrl . '" target="_blank" download><i class="bx bx-download me-2 text-success"></i>สำเนาบัตรประชาชน</a></li>';
+        }
+        
+        $downloadSection = '';
+        if (!empty($downloadMenuItems)) {
+            $downloadSection = '
+                <li><hr class="dropdown-divider"></li>
+                <li class="dropdown-header px-3 py-1 text-muted small"><i class="bx bx-folder-open me-1"></i>เอกสารแนบ</li>
+                ' . $downloadMenuItems;
+        }
+
+        // Action buttons
+        $actions = '
+        <div class="d-flex align-items-center justify-content-center gap-1 py-1">
+            <button type="button" onclick="openQuickViewModal(' . $recruit['recruit_id'] . ')" class="btn btn-icon btn-sm btn-outline-primary" title="ดูข้อมูล & ตรวจสอบด่วน" style="width: 32px; height: 32px; border-radius: 8px;">
+                <i class="bx bx-show"></i>
+            </button>
+            <button type="button" onclick="openQuickEditModal(' . $recruit['recruit_id'] . ')" class="btn btn-icon btn-sm btn-outline-info" title="แก้ไขข้อมูลด่วน" style="width: 32px; height: 32px; border-radius: 8px;">
+                <i class="bx bx-edit"></i>
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-icon btn-sm btn-light dropdown-toggle hide-arrow" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <i class="bx bx-dots-vertical-rounded"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; min-width: 190px; z-index: 1050;">
+                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-window-open me-2 text-primary"></i>เปิดหน้าเต็ม (แท็บใหม่)</a></li>
+                    <li><a class="dropdown-item" href="' . site_url('skjadmin/recruits/edit/' . $recruit['recruit_id']) . '" target="_blank"><i class="bx bx-edit-alt me-2 text-info"></i>แก้ไขหน้าเต็ม (แท็บใหม่)</a></li>
+                    ' . $printMenuItems . '
+                    ' . $downloadSection . '
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger fw-semibold" href="javascript:void(0);" onclick="confirmDelete(' . $recruit['recruit_id'] . ')"><i class="bx bx-trash me-2"></i>ลบข้อมูล</a></li>
+                </ul>
+            </div>
+        </div>';
+
+        return [
+            'applicant' => $applicantHtml,
+            'level_quota' => $levelQuotaHtml,
+            'course' => $courseHtml,
+            'status' => $statusHtml,
+            'selection_result' => $selectionResultHtml,
+            'actions' => $actions
+        ];
     }
 
     /**
@@ -1445,7 +1502,7 @@ class AdminControlRecruit extends BaseController
         // Generate HTML
         $html = '';
         $baseUrl = get_upload_base_url();
-        $imgUrl = get_recruit_file_url($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
+        $imgPath = get_recruit_image_path_for_pdf($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
 
         // Check if this is a sports excellence applicant
         $isSport = (
@@ -1465,8 +1522,8 @@ class AdminControlRecruit extends BaseController
             $mpdf->AddPage();
 
             // Image (168, 10, 30, 40) - Adjusted to be further right but still safe
-            if (!empty($recruit['recruit_img'])) {
-                $mpdf->Image($imgUrl, 173, 10, 30, 40);
+            if (!empty($imgPath) && file_exists($imgPath)) {
+                $mpdf->Image($imgPath, 173, 10, 30, 40);
             }
 
             // Top Content - Year
@@ -1580,8 +1637,8 @@ class AdminControlRecruit extends BaseController
 
         } else {
             // Layout for Regular Application (registerSKJ.pdf)
-            if (!empty($recruit['recruit_img'])) {
-                $html .= '<div style="position:absolute;top:110px;left:620px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
+            if (!empty($imgPath) && file_exists($imgPath)) {
+                $html .= '<div style="position:absolute;top:110px;left:620px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgPath . '"></div>';
             }
 
             $quotaDisplay = $recruit['quota_explain'];
@@ -1731,10 +1788,10 @@ class AdminControlRecruit extends BaseController
 
         // Generate HTML - Always use Regular Application Layout
         $html = '';
-        $imgUrl = get_recruit_file_url($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
+        $imgPath = get_recruit_image_path_for_pdf($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
 
-        if (!empty($recruit['recruit_img'])) {
-            $html .= '<div style="position:absolute;top:110px;left:620px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
+        if (!empty($imgPath) && file_exists($imgPath)) {
+            $html .= '<div style="position:absolute;top:110px;left:620px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgPath . '"></div>';
         }
 
         $quotaDisplay = $recruit['quota_explain'];

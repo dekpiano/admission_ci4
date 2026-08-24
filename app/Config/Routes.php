@@ -81,51 +81,60 @@ $routes->group('confirmation', ['namespace' => 'App\Controllers\User'], function
     $routes->get('logout', 'UserControlConfirmation::logout');
 });
 
-// Admin
+// Admin (Legacy route group redirected to modern skjadmin panel)
 $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
-    $routes->get('/', 'AdminControlDashboard::index'); // Updated to use Dashboard controller directly
-    // Print (Legacy/Admission)
-    $routes->get('Print/(:any)/(:any)/(:num)', 'AdminControlAdmission::pdf_type_all/$1/$2/$3');
+    $routes->get('/', 'AdminControlDashboard::index');
+    $routes->get('login', function() {
+        return redirect()->to(site_url('auth/login'));
+    });
+    $routes->get('dashboard', function() {
+        return redirect()->to(site_url('skjadmin/dashboard'));
+    });
 
-    // Admission / Recruitment
-    $routes->get('Student/Update/(:any)', 'AdminControlAdmission::update_recruitstudent/$1');
-    $routes->get('Recruitment/(:num)', 'AdminControlAdmission::index/$1');
-    $routes->get('Recruitment/CheckData/(:any)', 'AdminControlAdmission::edit_recruitstudent/$1');
-
-    // Admission Actions (POST)
-    $routes->post('admission/switch_regis', 'AdminControlAdmission::switch_regis');
-    $routes->post('admission/switch_system', 'AdminControlAdmission::switch_system');
-    $routes->post('admission/switch_report', 'AdminControlAdmission::switch_report');
-    $routes->post('admission/quotaType', 'AdminControlAdmission::quotaType');
-    $routes->post('admission/switch_year', 'AdminControlAdmission::switch_year');
-    $routes->post('admission/update_recruitstudent/(:num)', 'AdminControlAdmission::update_recruitstudent/$1');
-    $routes->post('admission/delete_recruitstudent/(:num)', 'AdminControlAdmission::delete_recruitstudent/$1');
-    $routes->post('admission/confrim_report/(:num)', 'AdminControlAdmission::confrim_report/$1');
-    $routes->post('admission/SchoolList', 'AdminControlAdmission::SchoolList');
-    $routes->post('admission/SelectThailand', 'AdminControlAdmission::SelectThailand');
-    $routes->post('admission/DataRecruitment', 'AdminControlAdmission::DataRecruitment');
+    // Recruitment / Admissions
+    $routes->get('Recruitment', function() {
+        return redirect()->to(site_url('skjadmin/recruits'));
+    });
+    $routes->get('Recruitment/(:num)', function($year) {
+        return redirect()->to(site_url('skjadmin/recruits?year=' . $year));
+    });
+    $routes->get('Student/Update/(:any)', function($id) {
+        return redirect()->to(site_url('skjadmin/recruits/edit/' . $id));
+    });
+    $routes->get('Recruitment/CheckData/(:any)', function($id) {
+        return redirect()->to(site_url('skjadmin/recruits/view/' . $id));
+    });
 
     // Surrender
-    $routes->get('Surrender/(:any)', 'AdminControlSurrender::PageSurrenderMain/$1');
+    $routes->get('Surrender', function() {
+        return redirect()->to(site_url('skjadmin/surrender'));
+    });
+    $routes->get('Surrender/(:any)', function($year) {
+        return redirect()->to(site_url('skjadmin/surrender?year=' . $year));
+    });
     $routes->post('surrender/UpdateSurrender', 'AdminControlSurrender::UpdateSurrender');
     $routes->get('surrender/print/(:num)', 'AdminControlSurrender::print/$1');
 
-    // Quiz
-    $routes->get('Quiz/(:any)', 'AdminControlQuiz::PageQuizMain/$1');
-    $routes->post('quiz/UpdateStatusQuiz', 'AdminControlQuiz::UpdateStatusQuiz');
-
     // Statistic
-    $routes->get('Statistic/(:any)', 'AdminControlStatistic::statistic_student/$1');
-    $routes->post('Statistic/ChartStudentsRecruitM1', 'AdminControlStatistic::ChartStudentsRecruitM1');
-    $routes->post('Statistic/ChartStudentsRecruitM4', 'AdminControlStatistic::ChartStudentsRecruitM4');
-    $routes->post('Statistic/ChartStudentsRecruitMOther', 'AdminControlStatistic::ChartStudentsRecruitMOther');
+    $routes->get('Statistic', function() {
+        return redirect()->to(site_url('skjadmin/statistics'));
+    });
+    $routes->get('Statistic/(:any)', function($year) {
+        return redirect()->to(site_url('skjadmin/statistics/' . $year));
+    });
 
-    // News
-    $routes->get('news', 'AdminControlNews::index');
-    $routes->get('news/add', 'AdminControlNews::add');
+    // Announcements / News
+    $routes->get('news', function() {
+        return redirect()->to(site_url('skjadmin/announcements'));
+    });
+    $routes->get('news/add', function() {
+        return redirect()->to(site_url('skjadmin/announcements'));
+    });
 
     // Local Sync (Compatibility)
-    $routes->get('local-sync', 'AdminControlLocalSync::index');
+    $routes->get('local-sync', function() {
+        return redirect()->to(site_url('skjadmin/local-sync'));
+    });
     $routes->post('local-sync/sync-all', 'AdminControlLocalSync::syncAll');
     $routes->post('local-sync/sync-single', 'AdminControlLocalSync::syncSingle');
     $routes->get('local-sync/api-check-status', 'AdminControlLocalSync::apiCheckStatus');
@@ -144,8 +153,10 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->add('recruits/ajax', 'AdminControlRecruit::getRecruitsAjax');
     $routes->add('recruits/ajax-all', 'AdminControlRecruit::getRecruitsAll');
     $routes->get('recruits/view/(:num)', 'AdminControlRecruit::view/$1');
+    $routes->get('recruits/quick-view/(:num)', 'AdminControlRecruit::quickViewAjax/$1');
     $routes->get('recruits/register', 'AdminControlRecruit::register');
     $routes->get('recruits/edit/(:num)', 'AdminControlRecruit::edit/$1');
+    $routes->get('recruits/quick-edit/(:num)', 'AdminControlRecruit::quickEditAjax/$1');
     $routes->post('recruits/update/(:num)', 'AdminControlRecruit::update/$1');
     $routes->post('recruits/check-id-ajax', 'AdminControlRecruit::check_id_ajax');
     $routes->add('recruits/save-register', 'AdminControlRecruit::save_register');
@@ -272,6 +283,22 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('line-notify/test/(:num)', 'AdminControlLineNotify::test/$1');
     $routes->post('line-notify/create-table', 'AdminControlLineNotify::createTable');
 
+    // Telegram Notify Management
+    $routes->get('telegram-notify', 'AdminControlTelegram::index');
+    $routes->post('telegram-notify/update', 'AdminControlTelegram::updateConfig');
+    $routes->post('telegram-notify/test', 'AdminControlTelegram::sendTestMessage');
+    $routes->post('telegram-notify/detect-chat', 'AdminControlTelegram::detectChatId');
+    $routes->post('telegram-notify/set-webhook', 'AdminControlTelegram::setWebhook');
+    $routes->post('telegram-notify/get-webhook', 'AdminControlTelegram::getWebhookInfo');
+    $routes->post('telegram-notify/delete-webhook', 'AdminControlTelegram::deleteWebhook');
+
+    // Live Chat Management (Admin)
+    $routes->get('live-chat', 'AdminControlChat::index');
+    $routes->get('live-chat/sessions', 'AdminControlChat::getSessions');
+    $routes->get('live-chat/messages/(:num)', 'AdminControlChat::getSessionMessages/$1');
+    $routes->post('live-chat/reply', 'AdminControlChat::sendReply');
+    $routes->post('live-chat/toggle-status/(:num)', 'AdminControlChat::toggleStatus/$1');
+
     // Announcement Management
     $routes->get('announcements', 'AdminControlAnnouncement::index');
     $routes->add('announcements/store', 'AdminControlAnnouncement::store');
@@ -281,8 +308,14 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
 
 });
 
-// LINE Webhook (Public - ไม่ต้อง login)
+// LINE & Telegram Webhook (Public - ไม่ต้อง login)
 $routes->post('api/line/webhook', 'Api\LineWebhook::webhook');
+$routes->post('api/telegram/webhook', 'Api\TelegramWebhook::handle');
+
+// Public Live Chat API (For Floating Chat Widget)
+$routes->post('api/chat/init', 'Api\ChatApi::initSession');
+$routes->post('api/chat/send', 'Api\ChatApi::sendMessage');
+$routes->get('api/chat/messages', 'Api\ChatApi::getMessages');
 
 // Compatibility / Legacy Routes (Mapping old CI3 controller names to new CI4 controllers)
 $routes->post('admin/Control_admin_admission/DataRecruitment', 'Admin\AdminControlAdmission::DataRecruitment');

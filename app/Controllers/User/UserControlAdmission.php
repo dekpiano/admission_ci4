@@ -729,7 +729,7 @@ class UserControlAdmission extends BaseController
 
         // 6. Generate HTML
         $html = '';
-        $imgUrl = get_recruit_file_url($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
+        $imgPath = get_recruit_image_path_for_pdf($recruit['recruit_img'], $recruit['recruit_regLevel'], 'img');
 
         if ($isSport) {
             // Layout for Sport Excellence (A4) - Synced with generate_pdf.php coordinates
@@ -741,8 +741,8 @@ class UserControlAdmission extends BaseController
             $mpdf->AddPage();
 
             // Image (173, 10, 30, 40)
-            if (!empty($recruit['recruit_img'])) {
-                $mpdf->Image($imgUrl, 173, 10, 30, 40);
+            if (!empty($imgPath) && file_exists($imgPath)) {
+                $mpdf->Image($imgPath, 173, 10, 30, 40);
             }
 
             // Top Content
@@ -863,8 +863,8 @@ class UserControlAdmission extends BaseController
             $mpdf->SetDocTemplate($regularPdfTemplate, true);
             $mpdf->AddPage();
 
-            if (!empty($recruit['recruit_img'])) {
-                $html .= '<div style="position:absolute;top:90px;left:640px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgUrl . '"></div>';
+            if (!empty($imgPath) && file_exists($imgPath)) {
+                $html .= '<div style="position:absolute;top:90px;left:640px; width:100%"><img style="width: 113.38px;height:151.18px;" src="' . $imgPath . '"></div>';
             }
 
             $quotaDisplay = ($recruit['quota_explain'] ?? '');

@@ -3,12 +3,12 @@
 <?= $this->section('content') ?>
 
 <style>
-    /* Color Variables - Green Theme */
+    /* Color Variables - Suankularb Pink & Sky Blue Theme */
     :root {
-        --primary-color: #28a745;
-        --primary-dark: #1e7e34;
-        --primary-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        --primary-light: rgba(40, 167, 69, 0.15);
+        --primary-color: #ff6b8b;
+        --primary-dark: #e04869;
+        --primary-gradient: linear-gradient(135deg, #ff6b8b 0%, #56ccf2 100%);
+        --primary-light: rgba(255, 107, 139, 0.15);
     }
 
     /* Report Type Cards */
@@ -27,7 +27,7 @@
 
     .report-card.active {
         border-color: var(--primary-color);
-        box-shadow: 0 15px 35px rgba(40, 167, 69, 0.25);
+        box-shadow: 0 15px 35px rgba(255, 107, 139, 0.35);
     }
 
     .report-card .card-icon {
@@ -225,7 +225,7 @@
     <div class="col-md-6">
         <div class="card report-card active" data-type="application" id="cardApplication">
             <div class="card-body text-center py-4">
-                <div class="card-icon" style="background: rgba(40, 167, 69, 0.15); color: #28a745;">
+                <div class="card-icon" style="background: rgba(255, 107, 139, 0.15); color: #ff6b8b;">
                     <i class="bx bx-file"></i>
                 </div>
                 <h5 class="mb-2">พิมพ์ใบสมัคร</h5>
@@ -236,7 +236,7 @@
     <div class="col-md-6">
         <div class="card report-card" data-type="confirmation" id="cardConfirmation">
             <div class="card-body text-center py-4">
-                <div class="card-icon" style="background: rgba(32, 201, 151, 0.15); color: #20c997;">
+                <div class="card-icon" style="background: rgba(86, 204, 242, 0.15); color: #249ecd;">
                     <i class="bx bx-id-card"></i>
                 </div>
                 <h5 class="mb-2">พิมพ์ใบรายงานตัว</h5>

@@ -347,6 +347,30 @@ class RemoteUpload
     }
 
     /**
+     * Upload Base64 image data
+     */
+    public function uploadBase64($base64Data, $subPath, $customPrefix = 'image')
+    {
+        try {
+            $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64Data));
+            if (!$imageData) {
+                return ['status' => 'error', 'message' => 'Invalid base64 image data'];
+            }
+
+            $fileName = $customPrefix . '_' . uniqid() . '.png';
+            $tempFile = tempnam(sys_get_temp_dir(), 'b64_img');
+            file_put_contents($tempFile, $imageData);
+
+            $result = $this->upload($tempFile, $subPath, $fileName);
+            @unlink($tempFile);
+
+            return $result;
+        } catch (\Throwable $e) {
+            return ['status' => 'error', 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
      * Format file size for logging
      */
     protected function formatFileSize($bytes)

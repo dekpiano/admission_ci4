@@ -278,3 +278,77 @@ if (!function_exists('get_file_storage_location')) {
         return 'remote';
     }
 }
+
+if (!function_exists('get_recruit_image_path_for_pdf')) {
+    /**
+     * Get absolute local filesystem path for mPDF image rendering with automatic caching from remote
+     * 
+     * @param string|null $filename
+     * @param int|string $level
+     * @param string $folder
+     * @return string Absolute local filesystem path or empty string
+     */
+    function get_recruit_image_path_for_pdf(?string $filename, $level = 1, string $folder = 'img'): string
+    {
+        if (empty($filename)) {
+            return '';
+        }
+
+        $subPath = "recruitstudent/m{$level}/{$folder}/{$filename}";
+        
+        // 1. Check local uploads folder
+        $localPaths = [
+            FCPATH . 'uploads/admission/' . $subPath,
+            FCPATH . 'uploads/' . $subPath,
+        ];
+        foreach ($localPaths as $path) {
+            if (file_exists($path) && is_file($path)) {
+                return $path;
+            }
+        }
+
+        // 2. Check local temp cache
+        $cacheDir = WRITEPATH . 'temp/img_cache/';
+        if (!is_dir($cacheDir)) {
+            @mkdir($cacheDir, 0777, true);
+        }
+        $cachedFilePath = $cacheDir . md5($subPath) . '_' . basename($filename);
+        if (file_exists($cachedFilePath) && filesize($cachedFilePath) > 0) {
+            return $cachedFilePath;
+        }
+
+        // 3. Download from remote server if not local
+        $remoteHosts = [
+            getenv('upload.server.host') ?: "https://skj.nsnpao.go.th",
+            "https://skj.ac.th"
+        ];
+
+        foreach ($remoteHosts as $host) {
+            $remoteUrl = rtrim($host, '/') . '/uploads/admission/' . $subPath;
+            $ch = curl_init($remoteUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
+            $imageData = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && !empty($imageData)) {
+                @file_put_contents($cachedFilePath, $imageData);
+                return $cachedFilePath;
+            }
+        }
+
+        // Fallback default avatar if available
+        $defaultAvatar = FCPATH . 'sneat-assets/img/avatars/1.png';
+        if (file_exists($defaultAvatar)) {
+            return $defaultAvatar;
+        }
+
+        return '';
+    }
+}
+

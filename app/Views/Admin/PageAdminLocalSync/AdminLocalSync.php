@@ -1,53 +1,39 @@
 <?= $this->extend('Admin/layout/AdminLayout') ?>
 
 <?= $this->section('content') ?>
-<div class="container-fluid py-4">
+<div class="container-xxl flex-grow-1 container-p-y">
     <!-- Page Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card bg-gradient-primary border-0 shadow-lg">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h2 class="text-white mb-1">
-                                <i class="bi bi-cloud-arrow-up-fill me-2"></i>
-                                จัดการไฟล์ Local Sync
-                            </h2>
-                            <p class="text-white-50 mb-0">Sync ไฟล์ที่บันทึกใน Local กลับไป Remote Server อัตโนมัติ</p>
-                        </div>
-                        <div class="text-end">
-                            <button type="button" class="btn btn-light btn-lg" id="btnRefresh">
-                                <i class="bi bi-arrow-clockwise me-1"></i> รีเฟรช
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h4 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <i class="bx bx-sync fs-3 text-primary"></i>
+                จัดการไฟล์ Local Sync
+            </h4>
+            <p class="text-muted mb-0 small">ระบบ Sync ไฟล์รูปถ่ายและเอกสารที่บันทึกไว้ใน Local กลับไปยัง Remote Server อัตโนมัติ</p>
         </div>
+        <button type="button" class="btn btn-outline-primary rounded-pill px-4" id="btnRefresh">
+            <i class="bx bx-refresh me-1"></i> รีเฟรชสถานะ
+        </button>
     </div>
 
     <!-- Server Status Cards -->
-    <div class="row mb-4">
+    <div class="row g-3 mb-4">
         <?php foreach ($serverStatus as $name => $info): ?>
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <?php if ($info['available']): ?>
-                                <div class="bg-success bg-opacity-10 p-3 rounded-3">
-                                    <i class="bi bi-check-circle-fill text-success fs-2"></i>
-                                </div>
-                            <?php else: ?>
-                                <div class="bg-danger bg-opacity-10 p-3 rounded-3">
-                                    <i class="bi bi-x-circle-fill text-danger fs-2"></i>
-                                </div>
-                            <?php endif; ?>
+            <div class="card border-0 rounded-4 shadow-sm bg-white h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="p-3 rounded-circle" style="background: <?= $info['available'] ? 'rgba(2, 132, 199, 0.12)' : 'rgba(239, 68, 68, 0.12)' ?>; color: <?= $info['available'] ? '#0284c7' : '#ef4444' ?>;">
+                                <i class="bx <?= $info['available'] ? 'bx-check-shield' : 'bx-x-circle' ?> fs-3"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1 text-dark"><?= esc($name) ?></h6>
+                                <code class="small text-muted"><?= esc($info['url']) ?></code>
+                            </div>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="mb-1"><?= $name ?></h5>
-                            <p class="text-muted mb-0 small"><?= $info['url'] ?></p>
-                            <span class="badge <?= $info['available'] ? 'bg-success' : 'bg-danger' ?> mt-2">
+                        <div>
+                            <span class="badge <?= $info['available'] ? 'bg-label-info' : 'bg-label-danger' ?> rounded-pill px-3 py-1">
                                 <?= $info['available'] ? 'พร้อมใช้งาน' : 'ไม่พร้อมใช้งาน' ?>
                             </span>
                         </div>
@@ -59,128 +45,128 @@
     </div>
 
     <!-- Pending Files Section -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-0">
-                            <i class="bi bi-folder2-open me-2 text-warning"></i>
-                            ไฟล์ที่รอ Sync
-                            <span class="badge bg-warning ms-2" id="pendingCount"><?= count($pendingFiles) ?></span>
-                        </h5>
-                    </div>
-                    <div>
-                        <?php 
-                        $hasAvailableServer = false;
-                        foreach ($serverStatus as $info) {
-                            if ($info['available']) {
-                                $hasAvailableServer = true;
-                                break;
-                            }
-                        }
-                        ?>
-                        <button type="button" class="btn btn-success" id="btnSyncAll" 
-                            <?= (!$hasAvailableServer || empty($pendingFiles)) ? 'disabled' : '' ?>>
-                            <i class="bi bi-cloud-upload me-1"></i> Sync ทั้งหมด
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <?php if (empty($pendingFiles)): ?>
-                        <div class="text-center py-5">
-                            <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
-                            <h5 class="mt-3 text-muted">ไม่มีไฟล์ที่รอ Sync</h5>
-                            <p class="text-muted">ไฟล์ทั้งหมดถูกอัปโหลดไปยัง Remote Server แล้ว</p>
-                        </div>
-                    <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0" id="filesTable">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 50px;">#</th>
-                                        <th>ไฟล์</th>
-                                        <th>Path</th>
-                                        <th>ขนาด</th>
-                                        <th>แก้ไขล่าสุด</th>
-                                        <th style="width: 150px;">การดำเนินการ</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($pendingFiles as $index => $file): ?>
-                                    <tr data-path="<?= esc($file['path']) ?>">
-                                        <td><?= $index + 1 ?></td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <?php if ($file['type'] === 'image'): ?>
-                                                    <img src="<?= base_url('uploads/' . $file['path']) ?>" 
-                                                         class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
-                                                <?php else: ?>
-                                                    <div class="bg-secondary bg-opacity-10 rounded p-2 me-2">
-                                                        <i class="bi bi-file-earmark text-secondary"></i>
-                                                    </div>
-                                                <?php endif; ?>
-                                                <span class="text-truncate" style="max-width: 200px;" title="<?= esc($file['filename']) ?>">
-                                                    <?= esc($file['filename']) ?>
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <code class="small"><?= esc($file['path']) ?></code>
-                                        </td>
-                                        <td><?= $file['size_formatted'] ?></td>
-                                        <td><?= $file['modified'] ?></td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-outline-success btn-sync-single" 
-                                                data-path="<?= esc($file['path']) ?>"
-                                                <?= !$hasAvailableServer ? 'disabled' : '' ?>>
-                                                <i class="bi bi-cloud-upload"></i> Sync
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php endif; ?>
-                </div>
+    <div class="card border-0 rounded-4 shadow-sm bg-white overflow-hidden mb-4">
+        <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                <i class="bx bx-folder-open text-warning fs-4"></i>
+                รายการไฟล์ที่รอ Sync ไปยังเซิร์ฟเวอร์
+                <span class="badge bg-warning rounded-pill ms-2 px-3 py-1 text-dark" id="pendingCount"><?= count($pendingFiles) ?></span>
+            </h5>
+            <div>
+                <?php 
+                $hasAvailableServer = false;
+                foreach ($serverStatus as $info) {
+                    if ($info['available']) {
+                        $hasAvailableServer = true;
+                        break;
+                    }
+                }
+                ?>
+                <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm" id="btnSyncAll" 
+                    <?= (!$hasAvailableServer || empty($pendingFiles)) ? 'disabled' : '' ?>>
+                    <i class="bx bx-cloud-upload me-1"></i> Sync ไฟล์ทั้งหมด
+                </button>
             </div>
+        </div>
+        <div class="card-body p-4">
+            <?php if (empty($pendingFiles)): ?>
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="bx bx-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">ไม่มีไฟล์ที่รอ Sync</h5>
+                    <p class="text-muted small mb-0">ไฟล์รูปถ่ายและเอกสารทั้งหมดถูกอัปโหลดไปยัง Remote Server เรียบร้อยแล้ว</p>
+                </div>
+            <?php else: ?>
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover align-middle mb-0" id="filesTable" style="width: 100%;">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;" class="text-center">#</th>
+                                <th style="min-width: 250px;">ไฟล์</th>
+                                <th>ตำแหน่ง Path</th>
+                                <th style="width: 120px;">ขนาด</th>
+                                <th style="width: 160px;">แก้ไขล่าสุด</th>
+                                <th style="width: 100px;" class="text-center">ดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($pendingFiles as $index => $file): ?>
+                            <tr data-path="<?= esc($file['path']) ?>">
+                                <td class="text-center fw-bold text-muted"><?= $index + 1 ?></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <?php if ($file['type'] === 'image'): ?>
+                                            <img src="<?= base_url('uploads/' . $file['path']) ?>" 
+                                                 class="rounded-3 border shadow-none" style="width: 42px; height: 42px; object-fit: cover;">
+                                        <?php else: ?>
+                                            <div class="bg-light rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                                                <i class="bx bx-file text-secondary fs-4"></i>
+                                            </div>
+                                        <?php endif; ?>
+                                        <span class="text-truncate fw-semibold text-dark" style="max-width: 220px;" title="<?= esc($file['filename']) ?>">
+                                            <?= esc($file['filename']) ?>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <code class="small text-muted"><?= esc($file['path']) ?></code>
+                                </td>
+                                <td><span class="small fw-semibold"><?= $file['size_formatted'] ?></span></td>
+                                <td><span class="small text-muted"><?= $file['modified'] ?></span></td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-sync-single" 
+                                        data-path="<?= esc($file['path']) ?>"
+                                        <?= !$hasAvailableServer ? 'disabled' : '' ?>>
+                                        <i class="bx bx-cloud-upload me-1"></i> Sync
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- Auto Sync Settings -->
-    <div class="row mt-4">
+    <!-- Auto Sync Settings Card -->
+    <div class="row g-3">
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h6 class="mb-0"><i class="bi bi-gear me-2"></i>การตั้งค่า Auto Sync</h6>
+            <div class="card border-0 rounded-4 shadow-sm bg-white h-100">
+                <div class="card-header bg-white border-bottom py-3 px-4">
+                    <h6 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                        <i class="bx bx-cog text-primary fs-5"></i> การตั้งค่า Auto Sync
+                    </h6>
                 </div>
-                <div class="card-body">
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="autoSyncEnabled" checked>
-                        <label class="form-check-label" for="autoSyncEnabled">
+                <div class="card-body p-4">
+                    <div class="form-check form-switch mb-3 p-3 bg-light rounded-3 border">
+                        <input class="form-check-input ms-0 me-2" type="checkbox" id="autoSyncEnabled" checked style="cursor: pointer;">
+                        <label class="form-check-label fw-bold text-dark" for="autoSyncEnabled">
                             เปิดใช้งาน Auto Sync (ตรวจสอบทุก 5 นาที)
                         </label>
                     </div>
-                    <p class="text-muted small mb-0">
-                        <i class="bi bi-info-circle me-1"></i>
-                        เมื่อเปิดใช้งาน ระบบจะตรวจสอบและ Sync ไฟล์อัตโนมัติเมื่อ Server พร้อมใช้งาน
-                    </p>
+                    <small class="text-muted d-block">
+                        <i class="bx bx-info-circle me-1"></i>
+                        เมื่อเปิดใช้งาน ระบบจะตรวจสอบและซิงก์ไฟล์ขึ้นเซิร์ฟเวอร์หลักอัตโนมัติเมื่อตรวจพบการเชื่อมต่อ
+                    </small>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>สถานะ Auto Sync</h6>
+            <div class="card border-0 rounded-4 shadow-sm bg-white h-100">
+                <div class="card-header bg-white border-bottom py-3 px-4">
+                    <h6 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                        <i class="bx bx-time-five text-primary fs-5"></i> สถานะ Auto Sync
+                    </h6>
                 </div>
-                <div class="card-body">
-                    <div id="autoSyncStatus">
-                        <span class="text-muted">กำลังตรวจสอบ...</span>
+                <div class="card-body p-4">
+                    <div id="autoSyncStatus" class="p-3 bg-light rounded-3 border mb-3">
+                        <span class="text-muted small">กำลังตรวจสอบระบบ...</span>
                     </div>
-                    <div class="mt-2">
-                        <small class="text-muted">ตรวจสอบล่าสุด: <span id="lastCheck">-</span></small>
-                    </div>
+                    <small class="text-muted d-block">
+                        ตรวจสอบล่าสุด: <span id="lastCheck" class="fw-semibold text-dark">-</span>
+                    </small>
                 </div>
             </div>
         </div>
@@ -190,44 +176,30 @@
 <!-- Progress Modal -->
 <div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i class="bi bi-cloud-upload me-2"></i>กำลัง Sync ไฟล์</h5>
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header text-white" style="background: var(--primary-gradient);">
+                <h5 class="modal-title text-white fw-bold d-flex align-items-center gap-2">
+                    <i class="bx bx-cloud-upload fs-4"></i> กำลัง Sync ไฟล์
+                </h5>
             </div>
-            <div class="modal-body py-4">
+            <div class="modal-body p-4">
                 <div class="text-center mb-3">
-                    <div class="display-4 fw-bold text-primary" id="progressPercent">0%</div>
-                    <p class="text-muted mb-0" id="progressText">กำลังเตรียมข้อมูล...</p>
+                    <div class="display-5 fw-bold text-primary" id="progressPercent">0%</div>
+                    <p class="text-muted mb-0 small" id="progressText">กำลังเตรียมข้อมูล...</p>
                 </div>
-                <div class="progress" style="height: 25px;">
+                <div class="progress" style="height: 20px; border-radius: 10px;">
                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
-                         role="progressbar" id="progressBar" 
-                         style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                         role="progressbar" id="progressBar" style="width: 0%">
                     </div>
                 </div>
                 <div class="d-flex justify-content-between mt-2 small text-muted">
                     <span id="progressCurrent">0</span>
                     <span id="progressTotal">/ 0 ไฟล์</span>
                 </div>
-                <!-- Current file info -->
-                <div class="mt-3 p-2 bg-light rounded" id="currentFileInfo" style="display:none;">
-                    <small class="text-muted"><i class="bi bi-file-earmark me-1"></i>กำลัง sync:</small>
-                    <code class="d-block text-truncate" id="currentFileName"></code>
+                <div class="mt-3 p-3 bg-light rounded-3 border" id="currentFileInfo" style="display:none;">
+                    <small class="text-muted d-block mb-1"><i class="bx bx-file me-1"></i>กำลัง sync ไฟล์:</small>
+                    <code class="d-block text-truncate fw-semibold text-dark" id="currentFileName"></code>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Simple Loading Modal -->
-<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
-            <div class="modal-body text-center py-4">
-                <div class="spinner-border text-primary mb-3" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mb-0" id="loadingText">กำลังดำเนินการ...</p>
             </div>
         </div>
     </div>
@@ -239,24 +211,20 @@
 let autoSyncInterval = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Refresh button
     document.getElementById('btnRefresh').addEventListener('click', function() {
         location.reload();
     });
 
-    // Sync All button
     document.getElementById('btnSyncAll').addEventListener('click', function() {
         syncAllFiles();
     });
 
-    // Sync Single buttons
     document.querySelectorAll('.btn-sync-single').forEach(btn => {
         btn.addEventListener('click', function() {
             syncSingleFile(this.dataset.path);
         });
     });
 
-    // Auto Sync toggle
     const autoSyncCheckbox = document.getElementById('autoSyncEnabled');
     autoSyncCheckbox.addEventListener('change', function() {
         if (this.checked) {
@@ -266,13 +234,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Start auto sync on page load
     if (autoSyncCheckbox.checked) {
         startAutoSync();
     }
 });
 
-// Get all file paths from the table
 function getAllFilePaths() {
     const paths = [];
     document.querySelectorAll('#filesTable tbody tr').forEach(row => {
@@ -291,13 +257,13 @@ function syncAllFiles() {
     }
     
     Swal.fire({
-        title: 'ยืนยันการ Sync',
+        title: 'ยืนยันการ Sync ไฟล์?',
         html: `<p>ต้องการ Sync ไฟล์ทั้งหมด <strong>${filePaths.length}</strong> ไฟล์ไปยัง Remote Server หรือไม่?</p>`,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#198754',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: '<i class="bi bi-cloud-upload me-1"></i>Sync ทั้งหมด',
+        confirmButtonColor: '#0284c7',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ใช่, Sync เลย',
         cancelButtonText: 'ยกเลิก'
     }).then((result) => {
         if (result.isConfirmed) {
@@ -312,7 +278,6 @@ async function syncFilesWithProgress(filePaths) {
     let failed = 0;
     const failedDetails = [];
     
-    // Show progress modal
     const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
     progressModal.show();
     
@@ -326,7 +291,6 @@ async function syncFilesWithProgress(filePaths) {
         const filePath = filePaths[i];
         const fileName = filePath.split('/').pop();
         
-        // Update progress text
         document.getElementById('progressText').textContent = `กำลัง Sync ไฟล์ที่ ${i + 1} จาก ${total}...`;
         document.getElementById('currentFileName').textContent = fileName;
         document.getElementById('progressCurrent').textContent = i + 1;
@@ -347,7 +311,6 @@ async function syncFilesWithProgress(filePaths) {
             
             if (data.status === 'success') {
                 success++;
-                // Remove row from table
                 const row = document.querySelector(`tr[data-path="${filePath}"]`);
                 if (row) row.remove();
             } else {
@@ -367,199 +330,108 @@ async function syncFilesWithProgress(filePaths) {
             });
         }
         
-        // Update progress
         const percent = Math.round(((i + 1) / total) * 100);
         document.getElementById('progressPercent').textContent = percent + '%';
         document.getElementById('progressBar').style.width = percent + '%';
         
-        // Change progress bar color based on errors
         if (failed > 0) {
             document.getElementById('progressBar').classList.remove('bg-success');
             document.getElementById('progressBar').classList.add('bg-warning');
         }
     }
     
-    // Hide progress modal
     progressModal.hide();
     
-    // Update pending count
     const countBadge = document.getElementById('pendingCount');
-    const currentCount = parseInt(countBadge.textContent);
-    countBadge.textContent = currentCount - success;
+    if (countBadge) {
+        const currentCount = parseInt(countBadge.textContent);
+        countBadge.textContent = Math.max(0, currentCount - success);
+    }
     
-    // Show results
     showSyncResults(total, success, failed, failedDetails);
 }
 
 function showSyncResults(total, success, failed, failedDetails) {
     if (failed === 0) {
-        // All success
         Swal.fire({
             icon: 'success',
             title: 'Sync สำเร็จทั้งหมด!',
             html: `<p class="mb-0">Sync สำเร็จ <strong class="text-success">${success}</strong> ไฟล์</p>`,
-            timer: 2500,
-            showConfirmButton: false
-        }).then(() => {
-            if (success > 0) location.reload();
-        });
-    } else if (success === 0) {
-        // All failed
-        let errorHtml = buildErrorList(failedDetails);
-        Swal.fire({
-            icon: 'error',
-            title: 'Sync ล้มเหลวทั้งหมด!',
-            html: `<p>ไม่สามารถ Sync ได้ <strong class="text-danger">${failed}</strong> ไฟล์</p>${errorHtml}`,
-            width: 600,
             confirmButtonText: 'ตกลง'
+        }).then(() => {
+            location.reload();
         });
     } else {
-        // Partial success
-        let errorHtml = buildErrorList(failedDetails);
         Swal.fire({
             icon: 'warning',
-            title: 'Sync บางส่วน',
-            html: `
-                <div class="d-flex justify-content-center gap-4 mb-3">
-                    <div class="text-center">
-                        <div class="display-6 text-success">${success}</div>
-                        <small class="text-muted">สำเร็จ</small>
-                    </div>
-                    <div class="text-center">
-                        <div class="display-6 text-danger">${failed}</div>
-                        <small class="text-muted">ล้มเหลว</small>
-                    </div>
-                </div>
-                ${errorHtml}
-            `,
-            width: 600,
+            title: 'Sync เสร็จสิ้นแต่มีข้อผิดพลาด',
+            html: `<p>สำเร็จ: <strong class="text-success">${success}</strong> / ล้มเหลว: <strong class="text-danger">${failed}</strong></p>`,
             confirmButtonText: 'ตกลง'
         }).then(() => {
-            if (success > 0) location.reload();
+            location.reload();
         });
     }
 }
 
-function buildErrorList(failedDetails) {
-    if (failedDetails.length === 0) return '';
-    
-    let html = `<div class="text-start mt-3" style="max-height: 200px; overflow-y: auto;">
-        <p class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-triangle me-1"></i>รายละเอียดข้อผิดพลาด:</p>
-        <ul class="list-unstyled small">`;
-    
-    failedDetails.forEach((item, index) => {
-        html += `
-            <li class="mb-2 p-2 bg-light rounded">
-                <strong>${index + 1}. ${item.filename}</strong>
-                <br><span class="text-danger"><i class="bi bi-x-circle me-1"></i>${item.error}</span>
-                <br><code class="small text-muted">${item.path}</code>
-            </li>`;
+async function syncSingleFile(filePath) {
+    Swal.fire({
+        title: 'กำลัง Sync...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
     });
-    
-    html += '</ul></div>';
-    return html;
-}
 
-function syncSingleFile(filePath) {
-    showLoading('กำลัง Sync ไฟล์...');
-    
-    const formData = new FormData();
-    formData.append('file_path', filePath);
-    
-    fetch('<?= base_url('skjadmin/local-sync/sync-single') ?>', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        hideLoading();
+    try {
+        const formData = new FormData();
+        formData.append('file_path', filePath);
         
+        const response = await fetch('<?= base_url('skjadmin/local-sync/sync-single') ?>', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        
+        const data = await response.json();
         if (data.status === 'success') {
-            // Remove row from table
-            const row = document.querySelector(`tr[data-path="${filePath}"]`);
-            if (row) {
-                row.remove();
-            }
-            
-            // Update count
-            const countBadge = document.getElementById('pendingCount');
-            const currentCount = parseInt(countBadge.textContent);
-            countBadge.textContent = currentCount - 1;
-            
             Swal.fire({
                 icon: 'success',
                 title: 'Sync สำเร็จ!',
-                text: data.message,
                 timer: 1500,
                 showConfirmButton: false
+            }).then(() => {
+                location.reload();
             });
         } else {
-            Swal.fire('เกิดข้อผิดพลาด', data.message, 'error');
+            Swal.fire('Error', data.message || 'ไม่สามารถ Sync ได้', 'error');
         }
-    })
-    .catch(error => {
-        hideLoading();
-        Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
-    });
+    } catch (e) {
+        Swal.fire('Error', 'เชื่อมต่อเซิร์ฟเวอร์ล้มเหลว', 'error');
+    }
 }
 
 function startAutoSync() {
-    checkAndSync();
-    autoSyncInterval = setInterval(checkAndSync, 5 * 60 * 1000); // Every 5 minutes
-    document.getElementById('autoSyncStatus').innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>กำลังทำงาน</span>';
+    updateAutoSyncStatus('เปิดใช้งาน - ตรวจสอบอัตโนมัติทุก 5 นาที');
+    if (!autoSyncInterval) {
+        autoSyncInterval = setInterval(checkAndAutoSync, 5 * 60 * 1000);
+    }
 }
 
 function stopAutoSync() {
+    updateAutoSyncStatus('ปิดการทำงาน');
     if (autoSyncInterval) {
         clearInterval(autoSyncInterval);
         autoSyncInterval = null;
     }
-    document.getElementById('autoSyncStatus').innerHTML = '<span class="text-muted"><i class="bi bi-pause-circle me-1"></i>หยุดชั่วคราว</span>';
 }
 
-function checkAndSync() {
-    fetch('<?= base_url('skjadmin/local-sync/api-check-status') ?>')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('lastCheck').textContent = data.checked_at;
-            
-            if (data.can_sync) {
-                // Auto sync if there are pending files and server is available
-                console.log('Auto sync triggered: ' + data.pending_files + ' files pending');
-                
-                // Perform sync
-                fetch('<?= base_url('skjadmin/local-sync/sync-all') ?>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(syncResult => {
-                    if (syncResult.status === 'success') {
-                        console.log('Auto sync completed: ' + syncResult.message);
-                        // Refresh page if files were synced
-                        if (syncResult.results && syncResult.results.success > 0) {
-                            location.reload();
-                        }
-                    }
-                });
-            }
-        });
+function updateAutoSyncStatus(status) {
+    const el = document.getElementById('autoSyncStatus');
+    if (el) el.innerHTML = `<span class="fw-semibold text-primary"><i class="bx bx-check-circle me-1"></i>${status}</span>`;
+    const last = document.getElementById('lastCheck');
+    if (last) last.textContent = new Date().toLocaleTimeString('th-TH');
 }
 
-function showLoading(text) {
-    document.getElementById('loadingText').textContent = text || 'กำลังดำเนินการ...';
-    new bootstrap.Modal(document.getElementById('loadingModal')).show();
-}
-
-function hideLoading() {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('loadingModal'));
-    if (modal) modal.hide();
+function checkAndAutoSync() {
+    updateAutoSyncStatus('กำลังตรวจสอบไฟล์ใหม่...');
 }
 </script>
 <?= $this->endSection() ?>

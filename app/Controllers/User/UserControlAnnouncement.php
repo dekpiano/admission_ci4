@@ -51,8 +51,8 @@ class UserControlAnnouncement extends BaseController
             $yearList = [date('Y') + 543];
         }
 
-        $selectedYear = $this->request->getVar('year') ?? $yearList[0];
-        $selectedType = $this->request->getVar('type') ?? '';
+        $selectedYear = (method_exists($this->request, 'getVar') ? $this->request->getVar('year') : null) ?? $yearList[0];
+        $selectedType = (method_exists($this->request, 'getVar') ? $this->request->getVar('type') : null) ?? '';
 
         // Query builder
         $builder = $this->db->table('tb_announcements')

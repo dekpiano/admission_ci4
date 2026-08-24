@@ -3,12 +3,12 @@
 <?= $this->section('content') ?>
 
 <style>
-    /* Color Variables - Green Theme */
+    /* Color Variables - Suankularb Pink & Sky Blue Theme */
     :root {
-        --primary-color: #28a745;
-        --primary-dark: #1e7e34;
-        --primary-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        --primary-light: rgba(40, 167, 69, 0.15);
+        --primary-color: #ff6b8b;
+        --primary-dark: #e04869;
+        --primary-gradient: linear-gradient(135deg, #ff6b8b 0%, #56ccf2 100%);
+        --primary-light: rgba(255, 107, 139, 0.15);
     }
 
     /* Full Width Override */
@@ -242,7 +242,7 @@
     }
 
     .status-strip.active {
-        background: linear-gradient(90deg, #28a745, #20c997);
+        background: linear-gradient(90deg, #ff6b8b, #56ccf2);
     }
 
     .status-strip.inactive {
@@ -289,7 +289,7 @@
 <!-- Stats Row -->
 <div class="announce-stats mb-4">
     <div class="announce-stat-item">
-        <div class="announce-stat-icon" style="background: rgba(40, 167, 69, 0.15); color: #28a745;">
+        <div class="announce-stat-icon" style="background: rgba(255, 107, 139, 0.15); color: #ff6b8b;">
             <i class="bx bx-file"></i>
         </div>
         <div>
@@ -319,11 +319,11 @@
         </div>
     </div>
     <div class="announce-stat-item">
-        <div class="announce-stat-icon" style="background: rgba(113, 221, 55, 0.15); color: #28a745;">
+        <div class="announce-stat-icon" style="background: rgba(2, 132, 199, 0.12); color: #0284c7;">
             <i class="bx bx-show"></i>
         </div>
         <div>
-            <div class="announce-stat-value text-success" id="activeCount">
+            <div class="announce-stat-value text-info" id="activeCount">
                 <?= count(array_filter($announcements, fn($a) => $a['announce_status'] === 'on')) ?>
             </div>
             <div class="announce-stat-label">เปิดแสดงผล</div>
@@ -334,7 +334,7 @@
 <!-- System Sync Condition - New Section -->
 <div class="row mb-4">
     <div class="col-xl-12">
-        <div class="card h-100 border-primary" style="border-left: 5px solid #696cff; border-radius: 16px;">
+        <div class="card h-100 border-primary" style="border-left: 5px solid #ff6b8b; border-radius: 16px;">
             <div class="card-body">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div class="d-flex align-items-center gap-3">
@@ -533,7 +533,7 @@
                                     <?php if ($announce['announce_file_type'] === 'image'): ?>
                                         <img src="<?= $fileUrl ?>" alt="<?= esc($announce['announce_title']) ?>" loading="lazy">
                                     <?php elseif ($announce['announce_file_type'] === 'link'): ?>
-                                        <div class="text-center" style="color: #696cff;">
+                                        <div class="text-center" style="color: #0284c7;">
                                             <i class="bx bx-link-external" style="font-size: 2.5rem;"></i>
                                             <p class="mt-1 mb-0 small">เปิดลิงก์</p>
                                         </div>
@@ -1133,7 +1133,7 @@
             showCancelButton: true,
             confirmButtonText: 'ยืนยัน',
             cancelButtonText: 'ยกเลิก',
-            confirmButtonColor: '#696cff'
+            confirmButtonColor: '#ff6b8b'
         }).then((result) => {
             if (result.isConfirmed) {
                 // 1. Update text

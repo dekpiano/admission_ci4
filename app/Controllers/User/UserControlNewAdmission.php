@@ -34,12 +34,54 @@ class UserControlNewAdmission extends BaseController
         $data['quotas'] = $this->admissionModel->getAllQuotas();
         $data['courses'] = $this->admissionModel->getAllCourses();
         $data['datethai'] = $this->datethai; // Pass Datethai library to view
+        $data['openLevels'] = $this->getOpenLevels();
 
         $data['schedules'] = $this->admissionModel->getAdmissionSchedule($data['checkYear']->openyear_year);
         $data['stats'] = $this->admissionModel->getAdmissionStats($data['checkYear']->openyear_year);
         $data['contact_info'] = $this->getContactInfo();
 
         return view('User/UserHome', $data);
+    }
+
+    /**
+     * Get array of currently open grade levels based on system status and active quotas
+     */
+    private function getOpenLevels()
+    {
+        $systemStatus = $this->admissionModel->getSystemStatus();
+        $currentTime = time();
+        $openTime = isset($systemStatus->onoff_datetime_regis_open) && !empty($systemStatus->onoff_datetime_regis_open) ? strtotime($systemStatus->onoff_datetime_regis_open) : 0;
+        $closeTime = isset($systemStatus->onoff_datetime_regis_close) && !empty($systemStatus->onoff_datetime_regis_close) ? strtotime($systemStatus->onoff_datetime_regis_close) : 0;
+
+        if (
+            (!$systemStatus) ||
+            ($systemStatus->onoff_regis != 'on') ||
+            ($openTime > 0 && $currentTime < $openTime) ||
+            ($closeTime > 0 && $currentTime > $closeTime)
+        ) {
+            return [];
+        }
+
+        $quotas = $this->admissionModel->getAllQuotas();
+        $openLevels = [];
+
+        if (!empty($quotas)) {
+            foreach ($quotas as $quota) {
+                if (isset($quota->quota_status) && $quota->quota_status == 'on' && !empty($quota->quota_level)) {
+                    $levels = preg_split('/[|,]/', $quota->quota_level);
+                    foreach ($levels as $l) {
+                        $num = preg_replace('/[^0-9]/', '', trim($l));
+                        if (is_numeric($num) && !empty($num)) {
+                            $openLevels[] = intval($num);
+                        }
+                    }
+                }
+            }
+        }
+
+        $openLevels = array_values(array_unique($openLevels));
+        sort($openLevels);
+        return $openLevels;
     }
 
     private function getContactInfo()
@@ -69,25 +111,24 @@ class UserControlNewAdmission extends BaseController
             return redirect()->to('new-admission');
         }
 
-        // Security Check: System Status & Time
-        $systemStatus = $this->admissionModel->getSystemStatus();
-        $currentTime = time();
-        $openTime = isset($systemStatus->onoff_datetime_regis_open) ? strtotime($systemStatus->onoff_datetime_regis_open) : 0;
-        $closeTime = isset($systemStatus->onoff_datetime_regis_close) ? strtotime($systemStatus->onoff_datetime_regis_close) : 0;
-
-        if (
-            ($systemStatus->onoff_regis != 'on') ||
-            ($openTime > 0 && $currentTime < $openTime) ||
-            ($closeTime > 0 && $currentTime > $closeTime)
-        ) {
+        // Security Check: System Status & Time & Open Quota Level
+        $openLevels = $this->getOpenLevels();
+        if (empty($openLevels)) {
             return redirect()->to('new-admission')->with('error', 'ระบบปิดรับสมัคร หรือไม่ได้อยู่ในช่วงเวลาการรับสมัคร');
         }
+
+        if (!in_array(intval($level), $openLevels)) {
+            return redirect()->to('new-admission')->with('error', 'ระดับชั้น ม.' . $level . ' ยังไม่เปิดรับสมัครในขณะนี้');
+        }
+
+        $systemStatus = $this->admissionModel->getSystemStatus();
 
         $data['title'] = "ตรวจสอบสิทธิ์การสมัคร ม." . $level;
         $data['level'] = $level;
         $data['checkYear'] = $this->admissionModel->getOpenYear();
         $data['quotas'] = $this->admissionModel->getAllQuotas(); // Add quotas for menu generation
         $data['systemStatus'] = $systemStatus; // Pass system status
+        $data['openLevels'] = $openLevels;
 
         return view('User/UserPreCheck', $data);
     }
@@ -122,6 +163,16 @@ class UserControlNewAdmission extends BaseController
             return redirect()->to('new-admission');
         }
 
+        // Security Check: Open Quota Level
+        $openLevels = $this->getOpenLevels();
+        if (empty($openLevels)) {
+            return redirect()->to('new-admission')->with('error', 'ระบบปิดรับสมัคร หรือไม่ได้อยู่ในช่วงเวลาการรับสมัคร');
+        }
+
+        if (!in_array(intval($level), $openLevels)) {
+            return redirect()->to('new-admission')->with('error', 'ระดับชั้น ม.' . $level . ' ยังไม่เปิดรับสมัครในขณะนี้');
+        }
+
         // Check if ID Card is passed from pre-check
         $preCheckIdCard = $this->session->getFlashdata('pre_check_idCard');
 
@@ -140,6 +191,7 @@ class UserControlNewAdmission extends BaseController
         $data['preCheckDistrict'] = $this->session->getFlashdata('pre_check_district');
         $data['preCheckProvince'] = $this->session->getFlashdata('pre_check_province');
         $data['systemStatus'] = $this->admissionModel->getSystemStatus(); // Pass system status
+        $data['openLevels'] = $openLevels;
 
         // Get courses based on level
         $gradeLevel = ($level <= 3) ? 'ม.ต้น' : 'ม.ปลาย';
@@ -604,24 +656,11 @@ class UserControlNewAdmission extends BaseController
 
             $this->db->transCommit();
 
-            // --- LINE Notifications (OA Broadcast + LINE Notify) ---
+            // --- Telegram Notifications ---
             try {
-                // Get quota name
-                $quotaInfo = $this->admissionModel->getQuotaByKey($data_insert['recruit_category']);
-                $quotaName = $quotaInfo ? $quotaInfo->quota_explain : 'ทั่วไป';
-
-                $lineMsg = "\n📢 มีนักเรียนสมัครใหม่\n\n";
-                $lineMsg .= "👤 ชื่อ: {$data_insert['recruit_prefix']}{$data_insert['recruit_firstName']} {$data_insert['recruit_lastName']}\n";
-                $lineMsg .= "🕒 เวลา: " . date('d/m/Y H:i') . " น.\n";
-                $lineMsg .= "📋 ปีการศึกษา: {$year}\n";
-                $lineMsg .= "🏫 ระดับชั้น: ม." . $data_insert['recruit_regLevel'] . "\n";
-                $lineMsg .= "🎯 รอบ: {$quotaName}\n";
-                $lineMsg .= "📚 แผนการเรียน: {$data_insert['recruit_tpyeRoom']}";
-
-                // ส่งทั้ง LINE OA Broadcast และ LINE Notify
-                $this->sendLineAll($lineMsg);
+                $this->sendTelegramApplicantNotification($data_insert, $year);
             } catch (\Exception $e) {
-                log_message('error', 'LINE Notification Error: ' . $e->getMessage());
+                log_message('error', 'Telegram Notification Error: ' . $e->getMessage());
             }
 
             // --- Create Admin Notification ---

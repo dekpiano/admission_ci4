@@ -19,8 +19,8 @@ class AdminControlSchedule extends BaseController
     public function index()
     {
         // Check if user is logged in
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to(site_url('admin/login'));
+        if (!session()->get('isLoggedIn') && !session()->has('pers_id') && !session()->has('login_id')) {
+            return redirect()->to(site_url('auth/login'));
         }
 
         // Get current academic year from tb_openyear
@@ -76,6 +76,44 @@ class AdminControlSchedule extends BaseController
         ]);
     }
 
+    private function toGregorianDateTime($dateStr)
+    {
+        if (empty($dateStr)) {
+            return null;
+        }
+
+        $dateStr = trim($dateStr);
+        if (preg_match('/^(\d{4})([-\/])(.*)$/', $dateStr, $matches)) {
+            $year = intval($matches[1]);
+            if ($year > 2400) {
+                $year -= 543;
+                $dateStr = $year . $matches[2] . $matches[3];
+            }
+        }
+
+        $timestamp = strtotime($dateStr);
+        return ($timestamp !== false) ? date('Y-m-d H:i:s', $timestamp) : null;
+    }
+
+    private function toGregorianDate($dateStr)
+    {
+        if (empty($dateStr)) {
+            return null;
+        }
+
+        $dateStr = trim($dateStr);
+        if (preg_match('/^(\d{4})([-\/])(.*)$/', $dateStr, $matches)) {
+            $year = intval($matches[1]);
+            if ($year > 2400) {
+                $year -= 543;
+                $dateStr = $year . $matches[2] . $matches[3];
+            }
+        }
+
+        $timestamp = strtotime($dateStr);
+        return ($timestamp !== false) ? date('Y-m-d', $timestamp) : null;
+    }
+
     /**
      * Add new schedule (AJAX)
      */
@@ -85,23 +123,16 @@ class AdminControlSchedule extends BaseController
             return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid request']);
         }
 
-        $validation = \Config\Services::validation();
-        $validation->setRules([
-            'schedule_round' => 'required',
-            'schedule_level' => 'required',
-            'schedule_year' => 'required|numeric',
-            'schedule_recruit_start' => 'required|valid_date',
-            'schedule_recruit_end' => 'required|valid_date',
-            'schedule_exam' => 'permit_empty|valid_date',
-            'schedule_announce' => 'permit_empty|valid_date',
-            'schedule_report' => 'permit_empty|valid_date'
-        ]);
+        $recruitStart = $this->toGregorianDateTime($this->request->getPost('schedule_recruit_start'));
+        $recruitEnd = $this->toGregorianDateTime($this->request->getPost('schedule_recruit_end'));
+        $exam = $this->toGregorianDate($this->request->getPost('schedule_exam'));
+        $announce = $this->toGregorianDate($this->request->getPost('schedule_announce'));
+        $report = $this->toGregorianDate($this->request->getPost('schedule_report'));
 
-        if (!$validation->withRequest($this->request)->run()) {
+        if (empty($recruitStart) || empty($recruitEnd)) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน',
-                'errors' => $validation->getErrors()
+                'message' => 'กรุณาระบุวัน-เวลาเริ่มและปิดรับสมัครให้ถูกต้อง'
             ]);
         }
 
@@ -109,11 +140,11 @@ class AdminControlSchedule extends BaseController
             'schedule_round' => $this->request->getPost('schedule_round'),
             'schedule_level' => $this->request->getPost('schedule_level'),
             'schedule_year' => $this->request->getPost('schedule_year'),
-            'schedule_recruit_start' => $this->request->getPost('schedule_recruit_start'),
-            'schedule_recruit_end' => $this->request->getPost('schedule_recruit_end'),
-            'schedule_exam' => $this->request->getPost('schedule_exam') ?: null,
-            'schedule_announce' => $this->request->getPost('schedule_announce') ?: null,
-            'schedule_report' => $this->request->getPost('schedule_report') ?: null
+            'schedule_recruit_start' => $recruitStart,
+            'schedule_recruit_end' => $recruitEnd,
+            'schedule_exam' => $exam,
+            'schedule_announce' => $announce,
+            'schedule_report' => $report
         ];
 
         try {
@@ -142,25 +173,16 @@ class AdminControlSchedule extends BaseController
         }
 
         $scheduleId = $this->request->getPost('schedule_id');
+        $recruitStart = $this->toGregorianDateTime($this->request->getPost('schedule_recruit_start'));
+        $recruitEnd = $this->toGregorianDateTime($this->request->getPost('schedule_recruit_end'));
+        $exam = $this->toGregorianDate($this->request->getPost('schedule_exam'));
+        $announce = $this->toGregorianDate($this->request->getPost('schedule_announce'));
+        $report = $this->toGregorianDate($this->request->getPost('schedule_report'));
 
-        $validation = \Config\Services::validation();
-        $validation->setRules([
-            'schedule_id' => 'required|numeric',
-            'schedule_round' => 'required',
-            'schedule_level' => 'required',
-            'schedule_year' => 'required|numeric',
-            'schedule_recruit_start' => 'required|valid_date',
-            'schedule_recruit_end' => 'required|valid_date',
-            'schedule_exam' => 'permit_empty|valid_date',
-            'schedule_announce' => 'permit_empty|valid_date',
-            'schedule_report' => 'permit_empty|valid_date'
-        ]);
-
-        if (!$validation->withRequest($this->request)->run()) {
+        if (empty($recruitStart) || empty($recruitEnd)) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน',
-                'errors' => $validation->getErrors()
+                'message' => 'กรุณาระบุวัน-เวลาเริ่มและปิดรับสมัครให้ถูกต้อง'
             ]);
         }
 
@@ -168,11 +190,11 @@ class AdminControlSchedule extends BaseController
             'schedule_round' => $this->request->getPost('schedule_round'),
             'schedule_level' => $this->request->getPost('schedule_level'),
             'schedule_year' => $this->request->getPost('schedule_year'),
-            'schedule_recruit_start' => $this->request->getPost('schedule_recruit_start'),
-            'schedule_recruit_end' => $this->request->getPost('schedule_recruit_end'),
-            'schedule_exam' => $this->request->getPost('schedule_exam') ?: null,
-            'schedule_announce' => $this->request->getPost('schedule_announce') ?: null,
-            'schedule_report' => $this->request->getPost('schedule_report') ?: null
+            'schedule_recruit_start' => $recruitStart,
+            'schedule_recruit_end' => $recruitEnd,
+            'schedule_exam' => $exam,
+            'schedule_announce' => $announce,
+            'schedule_report' => $report
         ];
 
         try {

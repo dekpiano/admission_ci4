@@ -75,6 +75,12 @@ class UserControlLogin extends BaseController
                 'year' => $year->openyear_year
             ]);
 
+            $redirectUrl = $this->session->get('redirect_url');
+            if (!empty($redirectUrl)) {
+                $this->session->remove('redirect_url');
+                return redirect()->to($redirectUrl);
+            }
+
             return redirect()->to('skjadmin'); // Redirect to new admin dashboard
         } else {
             return redirect()->to('auth/login')->with('error', 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');

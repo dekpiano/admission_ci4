@@ -3,7 +3,7 @@
 <?= $this->section('styles') ?>
 <style>
     .countdown-container {
-        font-family: 'Prompt', sans-serif;
+        font-family: 'K2D', sans-serif;
         color: #fff;
         display: inline-block;
         text-align: center;

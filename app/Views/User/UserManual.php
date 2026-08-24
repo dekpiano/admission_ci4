@@ -2,15 +2,16 @@
 
 <?= $this->section('styles') ?>
 <style>
-    /* ===== Premium Hero Banner (Booking Style) ===== */
+    /* ===== Premium Hero Banner (Suankularb Style) ===== */
     .manual-banner {
-        background: linear-gradient(135deg, #ff9eb5 0%, #f77062 100%);
-        border-radius: 20px;
+        background: linear-gradient(135deg, #e11d48 0%, #ff2d75 35%, #0284c7 80%, #0369a1 100%);
+        border-radius: 24px;
         padding: 2.5rem;
         color: white;
         position: relative;
         overflow: hidden;
         margin-bottom: 2rem;
+        box-shadow: 0 20px 40px rgba(225, 29, 72, 0.25);
     }
 
     .manual-banner::before {

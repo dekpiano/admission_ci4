@@ -1,43 +1,72 @@
 <?= $this->extend('Admin/layout/AdminLayout') ?>
 
+<?= $this->section('styles') ?>
+<style>
+    .school-stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4">
-        <span class="text-muted fw-light">จัดการข้อมูล /</span> โรงเรียนทั้งหมด
-    </h4>
+    <!-- Page Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h4 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <i class="bx bxs-building fs-3 text-primary"></i>
+                จัดการฐานข้อมูลโรงเรียนทั้งหมด
+            </h4>
+            <p class="text-muted mb-0 small">ฐานข้อมูลโรงเรียนเดิมของผู้สมัครทั่วประเทศสำหรับระบบแนะนำอัตโนมัติ</p>
+        </div>
+    </div>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+    <div class="row g-3 mb-4">
+        <!-- Total Schools Card -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card border-0 rounded-4 shadow-sm bg-white h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="badge bg-label-primary rounded-pill mb-2">สถิติ</span>
-                            <h4 class="card-title mb-1 fw-bold text-primary"><?= number_format($stats['total'] ?? 0) ?></h4>
-                            <small class="text-muted">โรงเรียนทั้งหมดในระบบ</small>
+                            <span class="text-muted small fw-bold d-block mb-1">โรงเรียนทั้งหมดในฐานข้อมูล</span>
+                            <h2 class="fw-bold text-primary mb-0"><?= number_format($stats['total'] ?? 0) ?></h2>
+                            <small class="text-muted">แห่งทั่วประเทศ</small>
                         </div>
-                        <div class="avatar avatar-md bg-primary rounded-circle">
-                            <i class="bx bx-building fs-4 text-white"></i>
+                        <div class="school-stat-icon" style="background: rgba(255, 107, 139, 0.15); color: #ff6b8b;">
+                            <i class="bx bxs-school"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-8 col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header d-flex align-items-center justify-content-between pb-0">
-                    <h6 class="mb-0">จังหวัดที่มีโรงเรียนมากที่สุด (10 อันดับ)</h6>
+
+        <!-- Top Provinces Card -->
+        <div class="col-lg-8 col-md-6">
+            <div class="card border-0 rounded-4 shadow-sm bg-white h-100">
+                <div class="card-header bg-white border-bottom py-2 px-4 d-flex align-items-center justify-content-between">
+                    <h6 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                        <i class="bx bx-map-pin text-primary"></i>
+                        จังหวัดที่มีโรงเรียนมากที่สุด (10 อันดับแรก)
+                    </h6>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-3">
                     <div class="row g-2">
                         <?php foreach (($stats['by_province'] ?? []) as $index => $prov): ?>
                         <div class="col-6 col-md-4 col-lg-3">
-                            <div class="d-flex align-items-center">
-                                <span class="badge bg-label-<?= ['primary', 'success', 'info', 'warning', 'danger', 'secondary', 'dark', 'primary', 'success', 'info'][$index % 10] ?> me-2"><?= $index + 1 ?></span>
-                                <div>
-                                    <small class="d-block text-truncate" style="max-width: 120px;" title="<?= $prov->schoola_province ?>"><?= $prov->schoola_province ?: 'ไม่ระบุ' ?></small>
-                                    <small class="text-muted"><?= number_format($prov->count) ?> โรง</small>
+                            <div class="d-flex align-items-center p-2 rounded-3 bg-light border">
+                                <span class="badge bg-label-primary rounded-pill me-2 px-2"><?= $index + 1 ?></span>
+                                <div class="overflow-hidden">
+                                    <span class="d-block text-truncate fw-semibold text-dark small" title="<?= esc($prov->schoola_province) ?>">
+                                        <?= esc($prov->schoola_province ?: 'ไม่ระบุ') ?>
+                                    </span>
+                                    <small class="text-muted"><?= number_format($prov->count) ?> แห่ง</small>
                                 </div>
                             </div>
                         </div>
@@ -48,49 +77,44 @@
         </div>
     </div>
 
-    <!-- Add School Card -->
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="bx bx-plus-circle me-2"></i>เพิ่มโรงเรียนใหม่</h5>
-            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#addSchoolForm">
-                <i class="bx bx-chevron-down"></i>
+    <!-- Add School Form Card -->
+    <div class="card border-0 rounded-4 shadow-sm bg-white mb-4 overflow-hidden">
+        <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                <i class="bx bx-plus-circle text-primary fs-4"></i>
+                เพิ่มโรงเรียนใหม่เข้าสู่ฐานข้อมูล
+            </h5>
+            <button type="button" class="btn btn-sm btn-icon btn-light rounded-circle" data-bs-toggle="collapse" data-bs-target="#addSchoolForm" title="ย่อ/ขยายฟอร์ม">
+                <i class="bx bx-chevron-down fs-5"></i>
             </button>
         </div>
         <div class="collapse show" id="addSchoolForm">
-            <div class="card-body">
+            <div class="card-body p-4">
                 <form id="formAddSchool" class="ajax-form">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="add_school_name" name="school_name" placeholder="ชื่อโรงเรียน" required>
-                                <label for="add_school_name">ชื่อโรงเรียน <span class="text-danger">*</span></label>
-                            </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="add_school_name" class="form-label fw-bold text-dark small">ชื่อโรงเรียน <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-3" id="add_school_name" name="school_name" placeholder="เช่น โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="add_school_province" name="school_province" placeholder="จังหวัด">
-                                <label for="add_school_province">จังหวัด</label>
-                            </div>
+                        <div class="col-md-6">
+                            <label for="add_school_province" class="form-label fw-bold text-dark small">จังหวัด</label>
+                            <input type="text" class="form-control rounded-3" id="add_school_province" name="school_province" placeholder="เช่น นครสวรรค์">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="add_school_amphur" name="school_amphur" placeholder="อำเภอ/เขต">
-                                <label for="add_school_amphur">อำเภอ/เขต</label>
-                            </div>
+                        <div class="col-md-6">
+                            <label for="add_school_amphur" class="form-label fw-bold text-dark small">อำเภอ / เขต</label>
+                            <input type="text" class="form-control rounded-3" id="add_school_amphur" name="school_amphur" placeholder="เช่น เมืองนครสวรรค์">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="add_school_district" name="school_district" placeholder="ตำบล/แขวง">
-                                <label for="add_school_district">ตำบล/แขวง</label>
-                            </div>
+                        <div class="col-md-6">
+                            <label for="add_school_district" class="form-label fw-bold text-dark small">ตำบล / แขวง</label>
+                            <input type="text" class="form-control rounded-3" id="add_school_district" name="school_district" placeholder="เช่น นครสวรรค์ออก">
                         </div>
                     </div>
-                    <div class="text-end">
-                        <button type="button" class="btn btn-outline-secondary me-2" id="btnResetAdd">
-                            <i class="bx bx-x-circle me-1"></i>ล้างฟอร์ม
+                    <div class="text-end mt-4 pt-2 border-top">
+                        <button type="button" class="btn btn-light rounded-pill px-4 me-2" id="btnResetAdd">
+                            <i class="bx bx-refresh me-1"></i> ล้างฟอร์ม
                         </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bx bx-plus me-1"></i>เพิ่มโรงเรียน
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm">
+                            <i class="bx bx-plus me-1"></i> เพิ่มโรงเรียน
                         </button>
                     </div>
                 </form>
@@ -98,32 +122,35 @@
         </div>
     </div>
 
-    <!-- Schools Table -->
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <h5 class="mb-0"><i class="bx bx-list-ul me-2"></i>รายชื่อโรงเรียนทั้งหมด</h5>
-            <div class="d-flex gap-2">
-                <button type="button" class="btn btn-outline-primary btn-sm" id="btnRefreshTable">
-                    <i class="bx bx-refresh me-1"></i>รีเฟรช
-                </button>
-            </div>
+    <!-- Schools Table Card -->
+    <div class="card border-0 rounded-4 shadow-sm bg-white overflow-hidden">
+        <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                <i class="bx bx-list-ul text-primary fs-4"></i>
+                รายชื่อโรงเรียนทั้งหมด
+            </h5>
+            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="btnRefreshTable">
+                <i class="bx bx-refresh me-1"></i> รีเฟรชข้อมูล
+            </button>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover" id="tableSchools">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 80px;">รหัส</th>
-                        <th>ชื่อโรงเรียน</th>
-                        <th>อำเภอ/เขต</th>
-                        <th>ตำบล/แขวง</th>
-                        <th>จังหวัด</th>
-                        <th style="width: 120px;">จัดการ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data will be loaded via DataTables -->
-                </tbody>
-            </table>
+        <div class="card-body p-4">
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover align-middle" id="tableSchools" style="width: 100%;">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 70px;" class="text-center">รหัส</th>
+                            <th style="min-width: 250px;">ชื่อโรงเรียน</th>
+                            <th style="width: 140px;">อำเภอ / เขต</th>
+                            <th style="width: 140px;">ตำบล / แขวง</th>
+                            <th style="width: 140px;">จังหวัด</th>
+                            <th style="width: 100px;" class="text-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loaded via Ajax DataTables -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -131,45 +158,37 @@
 <!-- Edit School Modal -->
 <div class="modal fade" id="editSchoolModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
             <form id="formEditSchool" class="ajax-form">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bx bx-edit me-2"></i>แก้ไขข้อมูลโรงเรียน</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header text-white" style="background: var(--primary-gradient);">
+                    <h5 class="modal-title text-white fw-bold d-flex align-items-center gap-2">
+                        <i class="bx bx-edit fs-4"></i> แก้ไขข้อมูลโรงเรียน
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <input type="hidden" id="edit_school_id" name="school_id">
                     <div class="mb-3">
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="edit_school_name" name="school_name" placeholder="ชื่อโรงเรียน" required>
-                            <label for="edit_school_name">ชื่อโรงเรียน <span class="text-danger">*</span></label>
-                        </div>
+                        <label for="edit_school_name" class="form-label fw-bold text-dark small">ชื่อโรงเรียน <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control rounded-3" id="edit_school_name" name="school_name" placeholder="ชื่อโรงเรียน" required>
                     </div>
                     <div class="mb-3">
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="edit_school_province" name="school_province" placeholder="จังหวัด">
-                            <label for="edit_school_province">จังหวัด</label>
-                        </div>
+                        <label for="edit_school_province" class="form-label fw-bold text-dark small">จังหวัด</label>
+                        <input type="text" class="form-control rounded-3" id="edit_school_province" name="school_province" placeholder="จังหวัด">
                     </div>
                     <div class="mb-3">
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="edit_school_amphur" name="school_amphur" placeholder="อำเภอ/เขต">
-                            <label for="edit_school_amphur">อำเภอ/เขต</label>
-                        </div>
+                        <label for="edit_school_amphur" class="form-label fw-bold text-dark small">อำเภอ / เขต</label>
+                        <input type="text" class="form-control rounded-3" id="edit_school_amphur" name="school_amphur" placeholder="อำเภอ/เขต">
                     </div>
                     <div class="mb-3">
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="edit_school_district" name="school_district" placeholder="ตำบล/แขวง">
-                            <label for="edit_school_district">ตำบล/แขวง</label>
-                        </div>
+                        <label for="edit_school_district" class="form-label fw-bold text-dark small">ตำบล / แขวง</label>
+                        <input type="text" class="form-control rounded-3" id="edit_school_district" name="school_district" placeholder="ตำบล/แขวง">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="bx bx-x me-1"></i>ยกเลิก
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bx bx-check me-1"></i>บันทึกการแก้ไข
+                <div class="modal-footer border-top p-3 bg-light">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm">
+                        <i class="bx bx-save me-1"></i> บันทึกการแก้ไข
                     </button>
                 </div>
             </form>
@@ -179,27 +198,8 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-<style>
-    .table-hover tbody tr:hover {
-        background-color: rgba(105, 108, 255, 0.08);
-    }
-    .dataTables_wrapper .dataTables_length select {
-        padding-right: 2rem !important;
-    }
-    .avatar-md {
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-</style>
 <script>
 $(document).ready(function() {
-    // Initialize DataTable
     const table = $('#tableSchools').DataTable({
         processing: true,
         serverSide: true,
@@ -208,65 +208,64 @@ $(document).ready(function() {
             type: 'POST'
         },
         columns: [
-            { data: 'schoola_id' },
-            { data: 'schoola_name' },
+            { data: 'schoola_id', className: 'text-center fw-bold text-muted' },
+            { 
+                data: 'schoola_name',
+                render: function(data) {
+                    return `<span class="fw-bold text-dark">${data}</span>`;
+                }
+            },
             { data: 'schoola_amphur', render: function(data) { return data || '-'; } },
             { data: 'schoola_district', render: function(data) { return data || '-'; } },
-            { data: 'schoola_province', render: function(data) { return data || '-'; } },
+            { 
+                data: 'schoola_province',
+                render: function(data) {
+                    return data ? `<span class="badge bg-label-info rounded-pill px-3 py-1">${data}</span>` : '-';
+                }
+            },
             {
                 data: null,
                 orderable: false,
+                className: 'text-center',
                 render: function(data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-icon btn-outline-primary btn-edit me-1" data-id="${row.schoola_id}" title="แก้ไข">
-                            <i class="bx bx-edit"></i>
-                        </button>
-                        <button class="btn btn-sm btn-icon btn-outline-danger btn-delete" data-id="${row.schoola_id}" data-name="${row.schoola_name}" title="ลบ">
-                            <i class="bx bx-trash"></i>
-                        </button>
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-sm btn-icon btn-light rounded-circle shadow-none" data-bs-toggle="dropdown">
+                                <i class="bx bx-dots-vertical-rounded fs-5"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                                <a class="dropdown-item py-2 btn-edit" href="javascript:void(0);" data-id="${row.schoola_id}">
+                                    <i class="bx bx-edit-alt text-warning me-2"></i> แก้ไขข้อมูล
+                                </a>
+                                <a class="dropdown-item py-2 text-danger btn-delete" href="javascript:void(0);" data-id="${row.schoola_id}" data-name="${row.schoola_name}">
+                                    <i class="bx bx-trash me-2"></i> ลบโรงเรียน
+                                </a>
+                            </div>
+                        </div>
                     `;
                 }
             }
         ],
         language: {
-            processing: "กำลังประมวลผล...",
-            search: "ค้นหา:",
-            lengthMenu: "แสดง _MENU_ รายการ",
-            info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
-            infoEmpty: "แสดง 0 ถึง 0 จาก 0 รายการ",
-            infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
-            infoPostFix: "",
-            loadingRecords: "กำลังโหลดข้อมูล...",
-            zeroRecords: "ไม่พบข้อมูล",
-            emptyTable: "ไม่มีข้อมูลในตาราง",
-            paginate: {
-                first: "หน้าแรก",
-                previous: "ก่อนหน้า",
-                next: "ถัดไป",
-                last: "หน้าสุดท้าย"
-            }
+            "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json"
         },
         pageLength: 25,
         order: [[0, 'asc']]
     });
 
-    // Refresh table
     $('#btnRefreshTable').click(function() {
         table.ajax.reload();
     });
 
-    // Reset add form
     $('#btnResetAdd').click(function() {
         $('#formAddSchool')[0].reset();
     });
 
-    // Add school
     $('#formAddSchool').submit(function(e) {
         e.preventDefault();
         const formData = $(this).serialize();
         const $btn = $('#formAddSchool button[type="submit"]');
         
-        // Disable button and show loading
         $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>กำลังบันทึก...');
 
         $.ajax({
@@ -275,7 +274,6 @@ $(document).ready(function() {
             data: formData,
             dataType: 'json',
             success: function(response) {
-                // Re-enable button first
                 $btn.prop('disabled', false).html('<i class="bx bx-plus me-1"></i>เพิ่มโรงเรียน');
                 
                 if (response.status === 'success') {
@@ -283,18 +281,12 @@ $(document).ready(function() {
                         icon: 'success',
                         title: 'สำเร็จ',
                         text: response.message,
-                        timer: 2000,
+                        timer: 1500,
                         showConfirmButton: false
                     });
                     
-                    // Reset form completely
                     $('#formAddSchool')[0].reset();
-                    $('#add_school_name, #add_school_province, #add_school_amphur, #add_school_district').val('');
-                    
-                    // Reload table without page refresh
                     table.ajax.reload(null, false);
-                    
-                    // Focus on first input
                     $('#add_school_name').focus();
                 } else {
                     Swal.fire({
@@ -305,9 +297,7 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr) {
-                // Re-enable button on error
                 $btn.prop('disabled', false).html('<i class="bx bx-plus me-1"></i>เพิ่มโรงเรียน');
-                
                 const response = xhr.responseJSON;
                 Swal.fire({
                     icon: 'error',
@@ -318,9 +308,6 @@ $(document).ready(function() {
         });
     });
 
-
-
-    // Edit school - load data
     $(document).on('click', '.btn-edit', function() {
         const id = $(this).data('id');
         
@@ -348,7 +335,6 @@ $(document).ready(function() {
         });
     });
 
-    // Edit school - submit
     $('#formEditSchool').submit(function(e) {
         e.preventDefault();
         const id = $('#edit_school_id').val();
@@ -366,10 +352,10 @@ $(document).ready(function() {
                         icon: 'success',
                         title: 'สำเร็จ',
                         text: response.message,
-                        timer: 2000,
+                        timer: 1500,
                         showConfirmButton: false
                     });
-                    table.ajax.reload();
+                    table.ajax.reload(null, false);
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -389,20 +375,19 @@ $(document).ready(function() {
         });
     });
 
-    // Delete school
     $(document).on('click', '.btn-delete', function() {
         const id = $(this).data('id');
         const name = $(this).data('name');
 
         Swal.fire({
             title: 'ยืนยันการลบ?',
-            html: `คุณต้องการลบโรงเรียน<br><strong>"${name}"</strong><br>ใช่หรือไม่?`,
+            html: `คุณต้องการลบโรงเรียน<br><strong class="text-primary">"${name}"</strong><br>ใช่หรือไม่?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: '<i class="bx bx-trash me-1"></i>ใช่, ลบเลย!',
-            cancelButtonText: '<i class="bx bx-x me-1"></i>ยกเลิก'
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'ใช่, ลบเลย',
+            cancelButtonText: 'ยกเลิก'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -415,10 +400,10 @@ $(document).ready(function() {
                                 icon: 'success',
                                 title: 'ลบสำเร็จ',
                                 text: response.message,
-                                timer: 2000,
+                                timer: 1500,
                                 showConfirmButton: false
                             });
-                            table.ajax.reload();
+                            table.ajax.reload(null, false);
                         } else {
                             Swal.fire({
                                 icon: 'error',

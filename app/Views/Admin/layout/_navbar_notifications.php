@@ -60,7 +60,7 @@
   }
 
   .notification-item.unread {
-    background-color: rgba(40, 167, 69, 0.08);
+    background-color: rgba(225, 29, 72, 0.06);
   }
 
   .notification-item.unread::before {
@@ -69,8 +69,9 @@
     left: 0;
     top: 0;
     bottom: 0;
-    width: 3px;
-    background-color: #28a745;
+    width: 4px;
+    background: linear-gradient(180deg, #ff6b8b 0%, #56ccf2 100%);
+    border-radius: 0 4px 4px 0;
   }
 
   .notification-icon {
@@ -85,18 +86,18 @@
   }
 
   .notification-icon.new_applicant {
-    background-color: rgba(40, 167, 69, 0.15);
-    color: #28a745;
+    background-color: rgba(255, 107, 139, 0.15);
+    color: #ff6b8b;
   }
 
   .notification-icon.system {
-    background-color: rgba(0, 123, 255, 0.15);
-    color: #007bff;
+    background-color: rgba(86, 204, 242, 0.15);
+    color: #249ecd;
   }
 
   .notification-icon.warning {
-    background-color: rgba(255, 193, 7, 0.15);
-    color: #ffc107;
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
   }
 
   .notification-content {

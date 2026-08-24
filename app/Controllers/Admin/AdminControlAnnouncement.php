@@ -61,11 +61,17 @@ class AdminControlAnnouncement extends BaseController
         $years = $this->db->query("SELECT DISTINCT announce_year FROM tb_announcements ORDER BY announce_year DESC")->getResultArray();
         $yearList = array_column($years, 'announce_year');
 
+        // Always get open year from configuration
+        $yearConfig = $this->db->table('tb_openyear')->where('openyear_id', 1)->get()->getRow();
+        $defaultOpenYear = ($yearConfig && !empty($yearConfig->openyear_year)) ? $yearConfig->openyear_year : (date('Y') + 543);
+
         if (empty($yearList)) {
-            $yearList = [date('Y') + 543]; // Buddhist year
+            $yearList = [$defaultOpenYear];
+        } elseif (!in_array($defaultOpenYear, $yearList)) {
+            array_unshift($yearList, $defaultOpenYear);
         }
 
-        $selectedYear = $this->request->getVar('year') ?? $yearList[0];
+        $selectedYear = $this->request->getVar('year') ?? $defaultOpenYear;
 
         $announcements = $this->db->table('tb_announcements')
             ->where('announce_year', $selectedYear)

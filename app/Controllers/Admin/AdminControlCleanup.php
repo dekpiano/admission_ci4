@@ -52,8 +52,10 @@ class AdminControlCleanup extends BaseController
         }
 
         // Check local temp files
-        $data['local_temp_count'] = count(glob(WRITEPATH . 'temp/*')) - 1;
-        $data['local_cache_count'] = count(glob(WRITEPATH . 'cache/*')) - 1;
+        $tempFiles = glob(WRITEPATH . 'temp/*') ?: [];
+        $cacheFiles = glob(WRITEPATH . 'cache/*') ?: [];
+        $data['local_temp_count'] = max(0, count($tempFiles) - 1);
+        $data['local_cache_count'] = max(0, count($cacheFiles) - 1);
 
         return view('Admin/PageAdminCleanup/PageAdminCleanupIndex', $data);
     }
@@ -64,8 +66,8 @@ class AdminControlCleanup extends BaseController
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 
-        $temp_files = glob(WRITEPATH . 'temp/*');
-        $cache_files = glob(WRITEPATH . 'cache/*');
+        $temp_files = glob(WRITEPATH . 'temp/*') ?: [];
+        $cache_files = glob(WRITEPATH . 'cache/*') ?: [];
         $deleted = 0;
 
         foreach (array_merge($temp_files, $cache_files) as $file) {

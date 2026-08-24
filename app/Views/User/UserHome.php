@@ -2,2455 +2,1492 @@
 
 <?= $this->section('styles') ?>
 <style>
-    /* Hero Section - Enhanced with Mascot Animation */
-    .hero-section {
-        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
-        border-radius: 25px;
-        padding: 3rem 2rem;
-        color: white;
-        position: relative;
-        overflow: visible;
-        margin-bottom: 3rem;
-        min-height: 350px;
+    :root {
+        --primary-pink: #ff6b8b;
+        --primary-pink-dark: #e04869;
+        --primary-blue: #56ccf2;
+        --primary-blue-dark: #2f80ed;
+        --accent-gradient: linear-gradient(135deg, #ff6b8b 0%, #ff8ea7 50%, #56ccf2 100%);
+        --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+        --card-shadow-hover: 0 20px 30px -10px rgba(255, 107, 139, 0.25), 0 10px 15px -5px rgba(86, 204, 242, 0.2);
     }
 
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
+    body {
+        background-color: #f8fafc;
     }
 
-    .hero-section::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 100px;
-        background: linear-gradient(to top, rgba(255, 255, 255, 0.1), transparent);
+    /* Full-Width Home Container Layout - Expansive & Fluid */
+    .home-content-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto;
     }
 
-    @keyframes rotate {
-        from {
-            transform: rotate(0deg);
+    .container-xxl.container-p-y,
+    .content-wrapper > .container-p-y {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        padding-top: 1.25rem !important;
+    }
+
+    @media (min-width: 1400px) {
+        .container-xxl.container-p-y,
+        .content-wrapper > .container-p-y {
+            padding-left: 2.5rem !important;
+            padding-right: 2.5rem !important;
         }
 
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 2;
-    }
-
-    /* Mascot Animation */
-    .hero-mascot {
-        position: relative;
-        z-index: 3;
-    }
-
-    .mascot-image {
-        max-width: 420px;
-        width: 100%;
-        height: auto;
-        animation: float 3s ease-in-out infinite, fadeInUp 1s ease-out;
-        filter: drop-shadow(0 20px 35px rgba(0, 0, 0, 0.25));
-    }
-
-    @keyframes float {
-
-        0%,
-        100% {
-            transform: translateY(0px) rotate(-2deg);
+        .hero-banner {
+            padding: 3.5rem 4rem !important;
+            border-radius: 36px !important;
         }
 
-        50% {
-            transform: translateY(-15px) rotate(2deg);
+        .action-card {
+            padding: 1.8rem 1.4rem !important;
+            border-radius: 24px !important;
+        }
+
+        .action-icon-wrap {
+            width: 68px !important;
+            height: 68px !important;
+            font-size: 2rem !important;
         }
     }
 
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
+    @media (min-width: 992px) and (max-width: 1399px) {
+        .hero-banner {
+            padding: 2.8rem 3rem !important;
+            border-radius: 30px !important;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Welcome Text Animation */
-    .welcome-badge {
-        display: inline-block;
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(10px);
-        padding: 0.5rem 1.5rem;
-        border-radius: 50px;
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        animation: slideInDown 0.8s ease-out;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-
-    @keyframes slideInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-30px);
+        .action-card {
+            padding: 1.5rem 1.2rem !important;
+            border-radius: 22px !important;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        .action-icon-wrap {
+            width: 60px !important;
+            height: 60px !important;
+            font-size: 1.8rem !important;
         }
     }
 
-    .hero-title {
-        font-size: clamp(1.8rem, 5vw, 2.8rem);
-        font-weight: 800;
-        text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
-        margin-bottom: 0.5rem;
-        letter-spacing: -0.5px;
-        animation: fadeInUp 0.8s ease-out 0.2s both;
-    }
-
-    .hero-subtitle {
-        font-size: clamp(0.9rem, 4vw, 1.3rem);
-        font-weight: 600;
-        opacity: 0.95;
-        margin-bottom: 1.5rem;
-        animation: fadeInUp 0.8s ease-out 0.4s both;
-        text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Typing Effect */
-    .typing-text {
-        display: inline-block;
-        overflow: hidden;
-        white-space: nowrap;
-        border-right: 3px solid white;
-        animation: typing 3s steps(40) 1s forwards, blink 0.7s steps(1) infinite;
-    }
-
-    @keyframes typing {
-        from {
-            width: 0;
-        }
-
-        to {
-            width: 100%;
-        }
-    }
-
-    @keyframes blink {
-        50% {
-            border-color: transparent;
-        }
-    }
-
-    /* Sparkles */
-    .sparkle {
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        background: white;
-        border-radius: 50%;
-        opacity: 0;
-        animation: sparkle 2s ease-in-out infinite;
-    }
-
-    .sparkle:nth-child(1) {
-        top: 20%;
-        left: 10%;
-        animation-delay: 0s;
-    }
-
-    .sparkle:nth-child(2) {
-        top: 60%;
-        left: 85%;
-        animation-delay: 0.5s;
-    }
-
-    .sparkle:nth-child(3) {
-        top: 30%;
-        left: 70%;
-        animation-delay: 1s;
-    }
-
-    .sparkle:nth-child(4) {
-        top: 80%;
-        left: 20%;
-        animation-delay: 1.5s;
-    }
-
-    .sparkle:nth-child(5) {
-        top: 15%;
-        left: 50%;
-        animation-delay: 0.8s;
-    }
-
-    @keyframes sparkle {
-
-        0%,
-        100% {
-            opacity: 0;
-            transform: scale(0);
-        }
-
-        50% {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-
-    /* Decorative Bubbles */
-    .bubble {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.15);
-        border-radius: 50%;
-        animation: rise 8s ease-in infinite;
-    }
-
-    .bubble:nth-child(1) {
-        width: 40px;
-        height: 40px;
-        left: 5%;
-        animation-delay: 0s;
-    }
-
-    .bubble:nth-child(2) {
-        width: 25px;
-        height: 25px;
-        left: 15%;
-        animation-delay: 2s;
-    }
-
-    .bubble:nth-child(3) {
-        width: 35px;
-        height: 35px;
-        left: 80%;
-        animation-delay: 4s;
-    }
-
-    .bubble:nth-child(4) {
-        width: 20px;
-        height: 20px;
-        left: 90%;
-        animation-delay: 1s;
-    }
-
-    @keyframes rise {
-        0% {
-            bottom: -50px;
-            opacity: 0;
-        }
-
-        50% {
-            opacity: 0.6;
-        }
-
-        100% {
-            bottom: 110%;
-            opacity: 0;
-        }
-    }
-
-    /* Hero Buttons Animation */
-    .hero-buttons {
-        animation: fadeInUp 0.8s ease-out 0.6s both;
-    }
-
-    .hero-buttons .btn {
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        font-size: 0.85rem;
-        padding: 0.6rem 1rem;
-    }
-
-    .hero-buttons .btn::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: width 0.4s, height 0.4s;
-    }
-
-    .hero-buttons .btn:hover::after {
-        width: 200px;
-        height: 200px;
-    }
-
-    .hero-buttons .btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Hero Countdown Box - Prominent Design (Mobile First Optimized) */
-    .hero-countdown-box {
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-radius: 20px;
-        padding: 1rem;
-        /* Compact padding for mobile */
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        animation: fadeInUp 0.8s ease-out 0.5s both, boxPulse 3s infinite alternate;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        margin-top: 1rem;
-        width: 100%;
-        /* Ensure it fits container */
-    }
-
-    @keyframes boxPulse {
-        0% {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 0 0 rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        100% {
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), 0 0 15px rgba(255, 255, 255, 0.4);
-            border-color: rgba(255, 255, 255, 0.8);
-        }
-    }
-
-    .hero-countdown-box p {
-        font-size: 1rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.8rem;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .hero-countdown-box .countdown-container ul {
-        gap: 6px;
-        /* Tight gap for mobile */
-        justify-content: center;
-        display: flex;
-        flex-wrap: nowrap;
-        /* Force single row if possible, or careful wrap */
-    }
-
-    .hero-countdown-box .countdown-container li {
-        flex: 1;
-        /* Distribute space evenly */
-        min-width: 60px;
-        /* Small enough for 320px screens */
-        padding: 0.8rem 0.2rem;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 14px;
-        color: #333;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        border: none;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .hero-countdown-box .countdown-container li::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        /* Thinner line for mobile */
-        background: linear-gradient(90deg, #ff9eb5 0%, #84d2f6 100%);
-    }
-
-    .hero-countdown-box .countdown-container li span {
-        font-size: 1.8rem;
-        /* readable on mobile */
-        font-weight: 800;
-        line-height: 1;
-        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        display: block;
-        margin-bottom: 2px;
-        font-family: 'K2D', sans-serif;
-    }
-
-    .hero-countdown-box .countdown-container li .label {
-        font-size: 0.65rem;
-        margin-top: 0;
-        color: #666;
-        font-weight: 600;
-        white-space: nowrap;
-        /* Prevent breaking 'ชั่วโมง' */
-    }
-
-    /* Hero Status Badge - Mobile First */
-    /* Hero Status Badge - Prominent Application Open Design */
-    .hero-status-badge {
-        display: inline-block;
-        padding: 1.2rem 2.5rem;
-        border-radius: 50px;
-        font-weight: 800;
-        font-size: 1.5rem;
-        animation: fadeInUp 0.8s ease-out 0.5s both;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        position: relative;
-        z-index: 1;
-        width: 100%;
-        max-width: 450px;
-    }
-
-    .hero-status-badge.open {
-        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-        color: white;
-        border: none;
-        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
-        animation: fadeInUp 0.8s ease-out 0.5s both, pulseGreen 2s infinite;
-    }
-
-    .hero-status-badge.open i {
-        font-size: 1.4em;
-        vertical-align: middle;
-        margin-right: 8px;
-        animation: rotateSuccess 5s linear infinite;
-    }
-
-    @keyframes pulseGreen {
-        0% {
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
-        }
-
-        70% {
-            transform: scale(1.03);
-            box-shadow: 0 0 0 20px rgba(52, 211, 153, 0);
-        }
-
-        100% {
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
-        }
-    }
-
-    @keyframes rotateSuccess {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        10% {
-            transform: rotate(15deg);
-        }
-
-        20% {
-            transform: rotate(-15deg);
-        }
-
-        30% {
-            transform: rotate(10deg);
-        }
-
-        40% {
-            transform: rotate(-10deg);
-        }
-
-        50% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(0deg);
-        }
-    }
-
-    .hero-status-badge.closed {
-        background: rgba(245, 101, 101, 0.2);
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(245, 101, 101, 0.6);
-        color: #e53e3e;
-        padding: 0.8rem 1.5rem;
-        font-size: 1rem;
-    }
-
-    /* Hero Date Info - Mobile First */
-    .hero-date-info {
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-        animation: fadeInUp 0.8s ease-out 0.55s both;
-    }
-
-    .hero-date-info .date-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.3rem 0.6rem;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.15);
-    }
-
-    .hero-date-info .date-item i {
-        font-size: 0.9rem;
-    }
-
-    .hero-date-info .date-item.open i {
-        color: #48BB78;
-    }
-
-    .hero-date-info .date-item.close i {
-        color: #F56565;
-    }
-
-    /* Tablet (min-width: 576px) */
-    @media (min-width: 576px) {
-        .hero-buttons .btn {
-            font-size: 0.95rem;
-            padding: 0.8rem 1.5rem;
-        }
-
-        .hero-countdown-box {
-            padding: 2rem;
-            max-width: 550px;
-            margin-left: 0;
-            /* Align left or center depending on layout */
-        }
-
-        .hero-countdown-box p {
-            font-size: 1.25rem;
-        }
-
-        .hero-countdown-box .countdown-container ul {
-            gap: 20px;
-        }
-
-        .hero-countdown-box .countdown-container li {
-            min-width: 90px;
-            padding: 1.2rem 0.8rem;
-        }
-
-        .hero-countdown-box .countdown-container li span {
-            font-size: 3rem;
-        }
-
-        .hero-countdown-box .countdown-container li .label {
-            font-size: 0.85rem;
-        }
-
-        .hero-status-badge {
-            font-size: 1.1rem;
-            padding: 0.8rem 1.5rem;
-            max-width: 300px;
-        }
-
-        .hero-date-info {
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-
-        .hero-date-info .date-item {
-            font-size: 0.85rem;
-            padding: 0.4rem 0.8rem;
-        }
-    }
-
-    /* Desktop (min-width: 992px) */
-    @media (min-width: 992px) {
-        .hero-buttons .btn {
-            font-size: 1rem;
-            padding: 1rem 1.8rem;
-        }
-
-        .hero-countdown-box {
-            padding: 2rem 2.5rem;
-            max-width: none;
-            /* Allow full width if needed, or restrict */
-        }
-
-        .hero-countdown-box p {
-            font-size: 1.4rem;
-        }
-
-        .hero-countdown-box .countdown-container ul {
-            gap: 24px;
-        }
-
-        .hero-countdown-box .countdown-container li {
-            min-width: 110px;
-            padding: 1.5rem 1rem;
-        }
-
-        .hero-countdown-box .countdown-container li span {
-            font-size: 4rem;
-            margin-bottom: 8px;
-        }
-
-        .hero-countdown-box .countdown-container li .label {
-            font-size: 0.95rem;
-        }
-
-        .hero-status-badge {
-            font-size: 1.2rem;
-            padding: 1rem 2rem;
-            max-width: 350px;
-        }
-
-        .hero-status-badge.open {
-            font-size: 1.4rem;
-        }
-
-        @keyframes jumpingText {
-        0%, 100% { transform: translateY(0) scale(1); }
-        50% { transform: translateY(-10px) scale(1.05); }
-    }
-    
-    .jumping-text {
-        display: inline-block;
-        animation: jumpingText 2s infinite ease-in-out;
-        position: relative;
-        z-index: 100;
-        transform-origin: center bottom;
-    }
-
-    @keyframes textShine {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    
-    .text-shine-vibrant {
-        background: linear-gradient(90deg, #ffffff, #fff200, #ffffff, #00ffa2, #ffffff);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: textShine 3s linear infinite;
-        text-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-
-    .status-highlight-box {
-        background: rgba(0, 0, 0, 0.2);
-        padding: 0.5rem 1rem;
-        border-radius: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        margin-bottom: 1rem;
-        display: inline-block;
-    }
-
-    /* Update Hero Status Badge for more impact */
-    .hero-status-badge.open {
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        color: white;
-        border: 4px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 15px 45px rgba(16, 185, 129, 0.6);
-        animation: fadeInUp 0.8s ease-out 0.5s both, pulseGreen 1.5s infinite;
-        transform: scale(1.1);
-    }
-
-    .hero-date-info .date-item {
-        font-size: 0.9rem;
-        padding: 0.5rem 1rem;
-    }
-
-    .hero-date-info .date-item i {
-        font-size: 1.1rem;
-    }
-}
-
-    @media (max-width: 991px) {
-        .hero-section {
-            min-height: auto;
-            padding: 2rem 1.5rem;
-        }
-
-        .mascot-image {
-            max-width: 320px;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero-title {
-            font-size: 1.6rem;
-        }
-
-        .hero-subtitle {
-            font-size: 1.1rem;
+    @media (max-width: 992px) {
+        .container-xxl.container-p-y,
+        .content-wrapper > .container-p-y {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
         }
     }
 
     @media (max-width: 576px) {
-        .hero-title {
-            font-size: 1.4rem;
-        }
-
-        .hero-subtitle {
-            font-size: 1rem;
-        }
-
-        .mascot-image {
-            max-width: 160px;
+        .container-xxl.container-p-y,
+        .content-wrapper > .container-p-y {
+            padding-left: 6px !important;
+            padding-right: 6px !important;
+            padding-top: 4px !important;
+            padding-bottom: 6px !important;
         }
     }
 
-    /* Status Check Alert Box - Premium Design */
-    .status-alert-box {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 20px;
-        padding: 1.5rem;
+    /* ============================================================
+       HERO SECTION (EXPANSIVE & LUXURIOUS)
+       ============================================================ */
+    .hero-banner {
+        background: linear-gradient(135deg, #ff6b8b 0%, #e04869 45%, #56ccf2 100%);
+        border-radius: 28px;
+        padding: 2.4rem 1.8rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-        border: 1px solid rgba(132, 210, 246, 0.3);
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-        animation: fadeInUp 0.8s ease-out 0.8s both;
-        position: relative;
-        overflow: hidden;
+        box-shadow: 0 20px 45px -10px rgba(255, 107, 139, 0.4), 0 10px 25px -5px rgba(86, 204, 242, 0.25);
     }
 
-    .status-alert-box::before {
+    .hero-banner::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 8px;
-        height: 100%;
-        background: linear-gradient(to bottom, #84d2f6, #ff9eb5);
-    }
-
-    .status-icon-pulse {
-        width: 60px;
-        height: 60px;
-        background: #e0f2fe;
+        top: -50%;
+        right: -20%;
+        width: 550px;
+        height: 550px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 70%);
         border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.8rem;
-        color: #0284c7;
-        position: relative;
-        flex-shrink: 0;
+        pointer-events: none;
     }
 
-    .status-icon-pulse::after {
+    .hero-banner::after {
         content: '';
         position: absolute;
-        width: 100%;
-        height: 100%;
-        background: inherit;
+        bottom: -40%;
+        left: -15%;
+        width: 450px;
+        height: 450px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
         border-radius: 50%;
-        z-index: -1;
-        animation: iconPulse 2s infinite;
-        opacity: 0.4;
+        pointer-events: none;
     }
 
-    @keyframes iconPulse {
-        0% {
-            transform: scale(1);
-            opacity: 0.4;
-        }
-
-        100% {
-            transform: scale(1.8);
-            opacity: 0;
-        }
-    }
-
-    .status-text h5 {
-        color: #0c4a6e;
-        font-weight: 800;
-        margin-bottom: 0.2rem;
-    }
-
-    .status-text p {
-        color: #334155;
-        margin-bottom: 0;
-        font-size: 0.95rem;
-    }
-
-    @media (max-width: 768px) {
-        .status-alert-box {
-            flex-direction: column;
-            text-align: center;
-            padding: 2rem 1.5rem;
-        }
-
-        .status-alert-box .btn {
-            width: 100%;
-        }
-    }
-
-    /* Result Announcement Alert Box - Mega Prominent */
-    .result-alert-box {
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-        border-radius: 20px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 15px 35px rgba(99, 102, 241, 0.35);
-        color: white;
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-        animation: fadeInUp 0.8s ease-out 0.75s both, alertPulse 2s infinite alternate;
-        position: relative;
-        overflow: hidden;
-        border: none;
-    }
-
-    .result-alert-box::after {
-        content: '';
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 150px;
-        height: 150px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
-
-    @keyframes alertPulse {
-        from { transform: scale(1); }
-        to { transform: scale(1.02); }
-    }
-
-    .result-icon-pulse {
-        width: 65px;
-        height: 65px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.2rem;
-        color: white;
-        position: relative;
-        flex-shrink: 0;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-    }
-
-    .result-text h4 {
-        color: white;
-        font-weight: 800;
-        margin-bottom: 0.3rem;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .result-text p {
-        color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 0;
-        font-size: 1.05rem;
-    }
-
-    .result-action .btn-white {
-        background: white;
-        color: #6366f1;
-        font-weight: 700;
-        border-radius: 50px;
-        padding: 0.8rem 2rem;
-        transition: all 0.3s ease;
-        border: none;
+    .hero-badge {
         display: inline-flex;
         align-items: center;
-        text-decoration: none;
-    }
-
-    .result-action .btn-white:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        background: #f8f9fa;
-        color: #4f46e5;
-    }
-
-    @media (max-width: 991px) {
-        .result-alert-box {
-            flex-direction: column;
-            text-align: center;
-            padding: 2rem 1.5rem;
-        }
-
-        .result-action {
-            width: 100%;
-        }
-
-        .result-action .btn-white {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-
-    /* Report Alert Box - Golden/Green Success Design */
-    .report-alert-box {
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        border-radius: 20px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.35);
-        color: white;
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-        animation: fadeInUp 0.8s ease-out 0.7s both, reportPulse 2s infinite alternate;
-        position: relative;
-        overflow: hidden;
-        border: none;
-    }
-
-    .report-alert-box::after {
-        content: '';
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 150px;
-        height: 150px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
-
-    @keyframes reportPulse {
-        from { transform: scale(1); }
-        to { transform: scale(1.02); }
-    }
-
-    .report-icon-pulse {
-        width: 65px;
-        height: 65px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.2rem;
-        color: white;
-        position: relative;
-        flex-shrink: 0;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-    }
-    
-    .report-text h4 {
-        color: white;
-        font-weight: 800;
-        margin-bottom: 0.3rem;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .report-text p {
-        color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 0;
-        font-size: 1.05rem;
-    }
-
-    .report-action .btn-white {
-        background: white;
-        color: #059669;
-        font-weight: 700;
-        border-radius: 50px;
-        padding: 0.8rem 2rem;
-        transition: all 0.3s ease;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none;
-    }
-
-    .report-action .btn-white:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        background: #f8f9fa;
-        color: #047857;
-    }
-
-    @media (max-width: 991px) {
-        .report-alert-box {
-            flex-direction: column;
-            text-align: center;
-            padding: 2rem 1.5rem;
-        }
-
-        .report-action {
-            width: 100%;
-        }
-
-        .report-action .btn-white {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-
-    /* Excellence Section - Mobile First */
-    .excellence-section {
-        background: white;
-        border-radius: 15px;
-        padding: 1rem;
-        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
-    }
-
-    .excellence-icon-wrapper {
-        width: 45px;
-        height: 45px;
-        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.3rem;
-        color: white;
-        box-shadow: 0 5px 15px rgba(255, 158, 181, 0.3);
-    }
-
-    .excellence-header h4 {
-        color: #333;
-        font-size: 0.95rem;
-    }
-
-    .excellence-header h4 i {
-        color: #ff9eb5;
-    }
-
-    .excellence-header p {
-        font-size: 0.8rem;
-    }
-
-    /* Excellence Cards - Mobile First */
-    .excellence-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 0.8rem 0.5rem;
-        background: #f8f9fa;
-        border-radius: 12px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-        height: 100%;
-        width: 100%;
-        cursor: pointer;
-        outline: none;
-    }
-
-    .excellence-card:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(255, 158, 181, 0.3);
-    }
-
-    .excellence-card:active {
-        transform: scale(0.95);
-        background: white;
-    }
-
-    .excellence-card-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        color: white;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .excellence-card-icon.academic {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    }
-
-    .excellence-card-icon.sport {
-        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-    }
-
-    .excellence-card-icon.art {
-        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-    }
-
-    .excellence-card-icon.career {
-        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
-    }
-
-    .excellence-card-icon.language {
-        background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
-    }
-
-    .excellence-card-title {
-        font-size: 0.7rem;
-        font-weight: 600;
-        color: #333;
-        text-align: center;
-        line-height: 1.2;
-    }
-
-    /* Tablet and up (min-width: 576px) */
-    @media (min-width: 576px) {
-        .excellence-section {
-            padding: 1.5rem;
-            border-radius: 18px;
-        }
-
-        .excellence-icon-wrapper {
-            width: 50px;
-            height: 50px;
-            font-size: 1.5rem;
-        }
-
-        .excellence-header h4 {
-            font-size: 1.1rem;
-        }
-
-        .excellence-header p {
-            font-size: 0.85rem;
-        }
-
-        .excellence-card {
-            padding: 1rem 0.6rem;
-        }
-
-        .excellence-card-icon {
-            width: 45px;
-            height: 45px;
-            font-size: 1.3rem;
-        }
-
-        .excellence-card-title {
-            font-size: 0.75rem;
-        }
-    }
-
-    /* Desktop (min-width: 992px) */
-    @media (min-width: 992px) {
-        .excellence-section {
-            padding: 2rem;
-            border-radius: 20px;
-        }
-
-        .excellence-icon-wrapper {
-            width: 60px;
-            height: 60px;
-            font-size: 1.8rem;
-        }
-
-        .excellence-header h4 {
-            font-size: 1.25rem;
-        }
-
-        .excellence-header p {
-            font-size: 0.9rem;
-        }
-
-        .excellence-card {
-            padding: 1.2rem 0.8rem;
-            border-radius: 15px;
-        }
-
-        .excellence-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            background: white;
-        }
-
-        .excellence-card:hover .excellence-card-icon {
-            transform: scale(1.1);
-        }
-
-        .excellence-card:hover .excellence-card-title {
-            color: #ff9eb5;
-        }
-
-        .excellence-card-icon {
-            width: 50px;
-            height: 50px;
-            font-size: 1.5rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .excellence-card-title {
-            font-size: 0.85rem;
-            line-height: 1.3;
-        }
-    }
-
-    /* Announcement Card */
-    .announcement-card {
-        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
-        border-radius: 20px;
-        padding: 2.5rem;
-        color: white;
-        box-shadow: 0 10px 30px rgba(255, 158, 181, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .announcement-card::after {
-        content: '';
-        position: absolute;
-        top: -100px;
-        right: -100px;
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
-
-    /* Countdown */
-    .countdown-container {
-        font-family: 'Prompt', sans-serif;
-        color: #fff;
-        display: inline-block;
-        text-align: center;
-    }
-
-    .countdown-container ul {
-        padding: 0;
-        margin: 0;
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-    }
-
-    .countdown-container li {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        list-style-type: none;
-        padding: 1rem 0.75rem;
+        gap: 8px;
         background: rgba(255, 255, 255, 0.25);
-        border-radius: 12px;
-        min-width: 80px;
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    }
-
-    .countdown-container li span {
-        display: block;
-        font-size: 2rem;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        padding: 6px 18px;
+        border-radius: 50px;
+        font-size: 0.88rem;
         font-weight: 700;
-        line-height: 1;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        margin-bottom: 1.2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .countdown-container li .label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        margin-top: 8px;
+    .hero-badge .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #22c55e;
+        box-shadow: 0 0 12px #22c55e;
+        animation: pulse 1.8s infinite;
+    }
+
+    .hero-badge.closed .status-dot {
+        background-color: #ef4444;
+        box-shadow: 0 0 12px #ef4444;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.3); opacity: 0.7; }
+    }
+
+    .hero-title {
+        font-size: clamp(1.75rem, 5vw, 2.85rem);
+        font-weight: 800;
+        line-height: 1.25;
+        margin-bottom: 0.6rem;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+    }
+
+    .hero-subtitle {
+        font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+        font-weight: 500;
         opacity: 0.95;
+        margin-bottom: 1.6rem;
+        line-height: 1.55;
+    }
+
+    /* Live Countdown Box */
+    .countdown-card {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 22px;
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1.6rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .countdown-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 0.9rem;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .countdown-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+
+    .countdown-unit {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 10px 4px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .countdown-num {
+        font-size: clamp(1.4rem, 4.5vw, 2.1rem);
+        font-weight: 800;
+        line-height: 1.1;
+        font-family: 'K2D', sans-serif;
+    }
+
+    .countdown-label {
+        font-size: 0.72rem;
         font-weight: 600;
+        opacity: 0.92;
+        margin-top: 3px;
     }
 
-    /* Application Cards */
-    .app-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        border: 2px solid transparent;
-        height: 100%;
-        position: relative;
-        overflow: hidden;
+    .hero-btn-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
     }
 
-    .app-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, #ff9eb5 0%, #84d2f6 100%);
-    }
-
-    .app-card:hover {
-        transform: translateY(-15px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        border-color: #ff9eb5;
-    }
-
-    .app-card.m4:hover {
-        border-color: #84d2f6;
-    }
-
-    .app-card.m4::before {
-        background: linear-gradient(90deg, #84d2f6 0%, #ff9eb5 100%);
-    }
-
-    .level-badge {
-        display: inline-block;
-        background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%);
-        color: white;
-        padding: 0.5rem 1.5rem;
-        border-radius: 50px;
+    .hero-btn {
+        padding: 0.95rem 1.2rem;
+        border-radius: 18px;
         font-weight: 700;
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 15px rgba(255, 158, 181, 0.3);
-    }
-
-    .app-card.m4 .level-badge {
-        background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%);
-        box-shadow: 0 4px 15px rgba(132, 210, 246, 0.3);
-    }
-
-    .apply-button {
-        width: 100%;
-        padding: 1rem;
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 1.1rem;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         border: none;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease;
+    }
+
+    .hero-btn-primary {
+        background: #ffffff;
+        color: var(--primary-pink-dark);
+    }
+
+    .hero-btn-primary:hover {
+        background: #fff0f3;
+        color: var(--primary-pink-dark);
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.22);
+    }
+
+    .hero-btn-secondary {
+        background: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+        border: 1.5px solid rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(12px);
+    }
+
+    .hero-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.4);
+        color: #ffffff;
+        transform: translateY(-3px) scale(1.02);
+    }
+
+    /* ============================================================
+       QUICK ACTION CARDS (SMART HUB - FULL WIDTH EXPANSIVE GRID)
+       ============================================================ */
+    .section-header {
+        margin-bottom: 1.4rem;
+    }
+
+    .section-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i {
+        color: var(--primary-pink);
+        font-size: 1.6rem;
+    }
+
+    .section-desc {
+        font-size: 0.88rem;
+        color: #64748b;
+        margin-top: 3px;
+        margin-bottom: 0;
+    }
+
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-bottom: 2.2rem;
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .action-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+    }
+
+    @media (min-width: 1100px) {
+        .action-grid {
+            grid-template-columns: repeat(6, 1fr);
+            gap: 18px;
+        }
+    }
+
+    .action-card {
+        background: #ffffff;
+        border-radius: 22px;
+        padding: 1.4rem 1.1rem;
+        text-align: center;
+        text-decoration: none;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 4px 10px -2px rgba(15, 23, 42, 0.02);
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         position: relative;
         overflow: hidden;
     }
 
-    .apply-button::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
+    .action-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 20px 35px -8px rgba(225, 29, 72, 0.2), 0 8px 16px -4px rgba(2, 132, 199, 0.15);
+        border-color: rgba(255, 117, 140, 0.45);
+    }
+
+    .action-icon-wrap {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        color: white;
+        margin-bottom: 0.85rem;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+        transition: all 0.3s ease;
+    }
+
+    .action-card:hover .action-icon-wrap {
+        transform: scale(1.12) rotate(6deg);
+    }
+
+    .icon-pink { background: linear-gradient(135deg, #ff6b8b 0%, #e04869 100%); }
+    .icon-blue { background: linear-gradient(135deg, #56ccf2 0%, #2f80ed 100%); }
+    .icon-purple { background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); }
+    .icon-emerald { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+    .icon-amber { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .icon-rose { background: linear-gradient(135deg, #ff6b8b 0%, #ff8ea7 100%); }
+
+    .action-title {
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 3px;
+    }
+
+    .action-subtitle {
+        font-size: 0.74rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    /* ============================================================
+       ADMISSION STEP CARDS
+       ============================================================ */
+    .steps-card {
+        background: #ffffff;
+        border-radius: 26px;
+        padding: 1.8rem;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
+        margin-bottom: 2.2rem;
+        width: 100%;
+    }
+
+    .step-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    @media (min-width: 768px) {
+        .step-list {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .step-list {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+    }
+
+    .step-item {
+        background: #f8fafc;
+        border-radius: 18px;
+        padding: 1.2rem 1.1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .step-item:hover {
+        background: #ffffff;
+        border-color: var(--primary-pink);
+        box-shadow: 0 8px 20px rgba(255, 107, 139, 0.18);
+        transform: translateY(-2px);
+    }
+
+    .step-badge {
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
+        background: linear-gradient(135deg, #ff6b8b 0%, #56ccf2 100%);
+        color: white;
+        font-weight: 800;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 10px rgba(255, 107, 139, 0.25);
     }
 
-    .apply-button:hover::before {
-        width: 300px;
-        height: 300px;
+    .step-text h6 {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 3px;
     }
 
-    .apply-button:hover {
+    .step-text p {
+        font-size: 0.78rem;
+        color: #64748b;
+        margin-bottom: 0;
+        line-height: 1.45;
+    }
+
+    /* ============================================================
+       QUOTA & COURSE EXPLORER (SEGMENTED TABS)
+       ============================================================ */
+    .explorer-card {
+        background: #ffffff;
+        border-radius: 26px;
+        padding: 1.8rem;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
+        margin-bottom: 2.2rem;
+        width: 100%;
+    }
+
+    .nav-pills-custom {
+        display: flex;
+        background: #f1f5f9;
+        padding: 5px;
+        border-radius: 18px;
+        margin-bottom: 1.6rem;
+        gap: 6px;
+    }
+
+    .nav-pills-custom .nav-link {
+        flex: 1;
+        text-align: center;
+        padding: 11px 16px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 0.98rem;
+        color: #64748b;
+        transition: all 0.25s ease;
+        border: none;
+    }
+
+    .nav-pills-custom .nav-link.active {
+        background: linear-gradient(135deg, #ff6b8b 0%, #e04869 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(255, 107, 139, 0.35);
+    }
+
+    .course-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 1.1rem 1.3rem;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 12px;
+        transition: all 0.25s ease;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.02);
+        height: calc(100% - 12px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .course-card:hover {
+        background: #ffffff;
+        border-color: #56ccf2;
+        box-shadow: 0 6px 18px rgba(86, 204, 242, 0.2);
         transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
     }
 
-    /* Custom Button Colors - Pastel Pink/Blue */
-    .btn-primary {
-        background: linear-gradient(135deg, #ff9eb5 0%, #ffc4d6 100%);
-        border: none;
-        color: white;
+    .course-title {
+        font-weight: 700;
+        font-size: 0.93rem;
+        color: #0f172a;
+        line-height: 1.4;
+        margin-bottom: 0.4rem;
     }
 
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #ff89a8 0%, #ffb3c6 100%);
+    .branch-badge-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 6px;
     }
 
-    .btn-info {
-        background: linear-gradient(135deg, #84d2f6 0%, #a8e0ff 100%);
-        border: none;
-        color: white;
+    .branch-pill {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #334155;
+        border: 1px solid #e2e8f0;
+        display: inline-flex;
+        align-items: center;
     }
 
-    .btn-info:hover {
-        background: linear-gradient(135deg, #6ec6f0 0%, #95d9ff 100%);
-    }
-
-    /* Schedule Table */
-    .schedule-card {
-        background: white;
+    .course-tag {
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 4px 9px;
         border-radius: 20px;
+        background: rgba(86, 204, 242, 0.15);
+        color: #2f80ed;
+        white-space: nowrap;
+    }
+
+    /* ============================================================
+       SCHEDULE TIMELINE
+       ============================================================ */
+    .timeline-card {
+        background: #ffffff;
+        border-radius: 26px;
+        padding: 1.8rem;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
+        margin-bottom: 2rem;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 34px;
+        padding-bottom: 22px;
+        border-left: 2px dashed #cbd5e1;
+    }
+
+    .timeline-item:last-child {
+        padding-bottom: 0;
+        border-left-color: transparent;
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: -9px;
+        top: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 3px solid var(--primary-pink);
+        box-shadow: 0 0 0 3px rgba(255, 107, 139, 0.2);
+    }
+
+    .timeline-dot.active {
+        border-color: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+        background: #22c55e;
+    }
+
+    .timeline-date {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #2f80ed;
+        margin-bottom: 2px;
+    }
+
+    .timeline-event {
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 2px;
+    }
+
+    .timeline-desc {
+        font-size: 0.82rem;
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    /* ============================================================
+       STATS BAR & CONTACT
+       ============================================================ */
+    .stats-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 26px;
+        padding: 1.8rem;
+        color: #ffffff;
+        margin-bottom: 2rem;
+        box-shadow: 0 18px 35px rgba(15, 23, 42, 0.25);
+        border: 1.5px solid #334155;
+        border-top: 3px solid #ff6b8b;
+        border-bottom: 3px solid #56ccf2;
+        position: relative;
         overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     }
 
-    .schedule-header {
-        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+    .stat-box-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 1.1rem 0.8rem;
+        text-align: center;
+        transition: all 0.25s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .stat-box-item:hover {
+        background: rgba(255, 255, 255, 0.09);
+        transform: translateY(-2px);
+    }
+
+    .stat-val {
+        font-size: clamp(1.5rem, 4vw, 2.2rem);
+        font-weight: 800;
+        font-family: 'K2D', sans-serif;
+        line-height: 1.1;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-lbl {
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 6px;
+    }
+
+    /* Mobile Responsive Rules for Explorer and Stats */
+    @media (max-width: 767.98px) {
+        .explorer-card {
+            padding: 1.25rem 1rem !important;
+            border-radius: 20px !important;
+        }
+
+        .quota-badge-wrap {
+            gap: 6px !important;
+            margin-bottom: 1rem !important;
+        }
+
+        .quota-chip-pink, .quota-chip-blue {
+            font-size: 0.78rem !important;
+            padding: 5px 10px !important;
+        }
+
+        .nav-pills-custom {
+            padding: 4px !important;
+            border-radius: 16px !important;
+            margin-bottom: 1rem !important;
+        }
+
+        .nav-pills-custom .nav-link {
+            padding: 9px 10px !important;
+            font-size: 0.88rem !important;
+            border-radius: 12px !important;
+        }
+
+        .course-card-m1, .course-card-m4 {
+            padding: 1rem !important;
+            border-radius: 16px !important;
+        }
+
+        .course-group-title {
+            font-size: 0.92rem !important;
+        }
+
+        .btn-apply-course-pink, .btn-apply-course-blue {
+            width: 100% !important;
+            text-align: center;
+            padding: 8px 16px !important;
+            font-size: 0.85rem !important;
+            display: block !important;
+        }
+
+        .course-card-m1 .d-flex.justify-content-between,
+        .course-card-m4 .d-flex.justify-content-between {
+            flex-direction: column !important;
+            gap: 8px !important;
+            align-items: stretch !important;
+        }
+
+        .stats-card {
+            padding: 1.25rem 1rem !important;
+            border-radius: 20px !important;
+        }
+
+        .stat-box-item {
+            padding: 0.8rem 0.4rem !important;
+            border-radius: 14px !important;
+        }
+
+        .stat-val {
+            font-size: 1.5rem !important;
+        }
+
+        .stat-lbl {
+            font-size: 0.72rem !important;
+        }
+    }
+
+    .contact-card {
+        background: #ffffff;
+        border-radius: 26px;
+        padding: 1.8rem;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
+        margin-bottom: 2rem;
+    }
+
+    .contact-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0.95rem 1.3rem;
+        border-radius: 18px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.98rem;
+        margin-bottom: 12px;
+        transition: all 0.25s ease;
+    }
+
+    .contact-btn-line {
+        background: #06c755;
         color: white;
-        padding: 1.5rem;
+    }
+    .contact-btn-line:hover {
+        background: #05b04b;
+        color: white;
+        transform: translateY(-2px);
     }
 
-    .table-hover tbody tr {
-        transition: all 0.2s ease;
+    .contact-btn-phone {
+        background: #f1f5f9;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+    }
+    .contact-btn-phone:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+        transform: translateY(-2px);
     }
 
-    .table-hover tbody tr:hover {
-        background: linear-gradient(90deg, rgba(255, 158, 181, 0.1) 0%, rgba(132, 210, 246, 0.1) 100%);
-        transform: scale(1.01);
+    /* Modal Styling */
+    .modal-content-modern {
+        border-radius: 24px;
+        border: none;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
 
-    @media (max-width: 768px) {
-        .hero-section {
-            padding: 2rem 1rem;
-        }
-
-        .countdown-container li {
-            min-width: 60px;
-            padding: 0.75rem 0.5rem;
-        }
-
-        .countdown-container li span {
-            font-size: 1.5rem;
-        }
-
-        .app-card {
-            margin-bottom: 1.5rem;
-        }
+    .modal-header-gradient {
+        background: linear-gradient(135deg, #ff758c 0%, #38bdf8 100%);
+        color: white;
+        padding: 1.2rem 1.5rem;
+        border: none;
     }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 
+<?php
+$isOpen = ($systemStatus->onoff_regis ?? 'off') === 'on';
+$currentYear = $checkYear->openyear_year ?? (date('Y') + 543);
+$currentRound = $systemStatus->onoff_round ?? 1;
 
-<?php if (!empty($systemStatus->onoff_comment)): ?>
-<!-- Announcement Full-Screen Modal -->
-<div class="modal fade" id="announcementModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-            <div class="modal-header border-0 py-3 text-white" style="background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);">
-                <h5 class="modal-title fw-bold text-white"><i class='bx bxs-megaphone bx-tada me-2'></i> ประกาศแจ้งเตือนและข้อควรทราบ</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4" style="background-color: #f8f9fa;">
-                <div class="text-center mb-4">
-                    <div class="bg-white shadow-sm rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class='bx bxs-info-circle text-primary' style="font-size: 3rem;"></i>
-                    </div>
-                    <h4 class="fw-bold text-dark">ประกาศสำคัญจากโรงเรียน</h4>
-                    <p class="text-muted small">โปรดศึกษาข้อมูลด้านล่างนี้อย่างละเอียด</p>
+// Dates for Countdown
+$openDateTime = !empty($systemStatus->onoff_datetime_regis_open) ? $systemStatus->onoff_datetime_regis_open : (!empty($systemStatus->onoff_open) ? $systemStatus->onoff_open . ' 08:30:00' : '');
+$closeDateTime = !empty($systemStatus->onoff_datetime_regis_close) ? $systemStatus->onoff_datetime_regis_close : (!empty($systemStatus->onoff_close) ? $systemStatus->onoff_close . ' 16:30:00' : '');
+
+$currentTimeHome = time();
+$isTimeOpen = true;
+if (!empty($openDateTime) && $currentTimeHome < strtotime($openDateTime)) {
+    $isTimeOpen = false;
+}
+if (!empty($closeDateTime) && $currentTimeHome > strtotime($closeDateTime)) {
+    $isTimeOpen = false;
+}
+$isActualOpen = $isOpen && $isTimeOpen;
+
+// Extract Open Levels from Quotas or controller passed variable
+if (!isset($openLevels)) {
+    $openLevels = [];
+    if ($isActualOpen && !empty($quotas)) {
+        foreach ($quotas as $quota) {
+            if (isset($quota->quota_status) && $quota->quota_status == 'on' && !empty($quota->quota_level)) {
+                $levels = preg_split('/[|,]/', $quota->quota_level);
+                foreach ($levels as $l) {
+                    $num = preg_replace('/[^0-9]/', '', trim($l));
+                    if (is_numeric($num) && !empty($num)) {
+                        $openLevels[] = intval($num);
+                    }
+                }
+            }
+        }
+    }
+    $openLevels = array_values(array_unique($openLevels));
+    sort($openLevels);
+}
+?>
+
+<div class="w-100 home-content-wrapper">
+
+    <!-- ============================================================
+         1. HERO SECTION & LIVE COUNTDOWN (RESPONSIVE)
+         ============================================================ -->
+    <div class="hero-banner">
+        <div class="row align-items-center">
+            <div class="col-lg-7 col-xl-8">
+                <!-- Status Badge -->
+                <div class="hero-badge <?= ($isActualOpen && !empty($openLevels)) ? '' : 'closed' ?>">
+                    <span class="status-dot"></span>
+                    <span><?= ($isActualOpen && !empty($openLevels)) ? 'เปิดรับสมัครรอบที่ ' . esc($currentRound) . ' ปีการศึกษา ' . esc($currentYear) : 'ระบบปิดรับสมัครในขณะนี้' ?></span>
                 </div>
 
-                <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-                    <div class="card-body p-4">
-                        <div class="announcement-text text-dark" style="font-size: 1.1rem; line-height: 1.8;">
-                            <?= nl2br(esc($systemStatus->onoff_comment)) ?>
+                <h1 class="hero-title">
+                    ระบบรับสมัครนักเรียนออนไลน์<br>
+                    <span style="font-weight: 600; opacity: 0.95;">ปีการศึกษา <?= esc($currentYear) ?></span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์<br>
+                    <small class="opacity-75">สังกัดองค์การบริหารส่วนจังหวัดนครสวรรค์</small>
+                </p>
+
+                <!-- Countdown Timer -->
+                <?php if (!empty($closeDateTime) || !empty($openDateTime)): ?>
+                <div class="countdown-card">
+                    <div class="countdown-title">
+                        <i class='bx bx-stopwatch fs-5'></i>
+                        <span id="countdownTitle"><?= $isActualOpen ? 'นับถอยหลังปิดรับสมัคร' : 'นับถอยหลังเปิดรับสมัคร' ?></span>
+                    </div>
+                    <div class="countdown-grid">
+                        <div class="countdown-unit">
+                            <div class="countdown-num" id="cdDays">00</div>
+                            <div class="countdown-label">วัน</div>
+                        </div>
+                        <div class="countdown-unit">
+                            <div class="countdown-num" id="cdHours">00</div>
+                            <div class="countdown-label">ชั่วโมง</div>
+                        </div>
+                        <div class="countdown-unit">
+                            <div class="countdown-num" id="cdMinutes">00</div>
+                            <div class="countdown-label">นาที</div>
+                        </div>
+                        <div class="countdown-unit">
+                            <div class="countdown-num" id="cdSeconds">00</div>
+                            <div class="countdown-label">วินาที</div>
                         </div>
                     </div>
                 </div>
+                <?php endif; ?>
 
-                <div class="alert alert-primary border-0 shadow-sm d-flex align-items-center mb-0" style="border-radius: 15px; background: rgba(132, 210, 246, 0.1);">
-                    <i class='bx bx-help-circle fs-4 text-primary me-3'></i>
-                    <div class="small">หากมีข้อสงสัยเพิ่มเติม สามารถติดต่อสอบถามได้ที่ฝ่ายรับสมัครของโรงเรียนในเวลาทำการ หรือ <br> หัวหน้างานรับนักเรียน ครูณัฏฐิกานต์ แสงอุทัย 09-2189-9145</div>
+                <!-- Action Buttons -->
+                <div class="hero-btn-group" id="apply-section" style="<?= count($openLevels) > 2 ? 'grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));' : '' ?>">
+                    <?php if ($isActualOpen && !empty($openLevels)): ?>
+                        <?php foreach ($openLevels as $l_num): 
+                            $is_jr = $l_num <= 3;
+                            $btn_color = $is_jr ? 'var(--primary-pink-dark)' : 'var(--primary-blue-dark)';
+                            $icon_cls = $is_jr ? 'bx-user-plus' : 'bx-award';
+                        ?>
+                            <a href="javascript:void(0);" onclick="openRegisterPDPA(<?= $l_num ?>)" class="hero-btn hero-btn-primary" style="color: <?= $btn_color ?>;">
+                                <i class='bx <?= $icon_cls ?>'></i> สมัคร ม.<?= $l_num ?>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <button type="button" class="hero-btn hero-btn-secondary w-100" style="grid-column: 1 / -1;" onclick="alertClosedSystem()">
+                            <i class='bx bx-lock-alt'></i> ระบบปิดรับสมัครในขณะนี้
+                        </button>
+                    <?php endif; ?>
                 </div>
             </div>
-            <div class="modal-footer border-0 p-3 bg-white">
-                <button type="button" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm" data-bs-dismiss="modal">
-                    <i class='bx bx-check-double me-1'></i> รับทราบและปิดหน้าต่างนี้
-                </button>
+
+            <!-- Mascot / Hero Graphic on Desktop -->
+            <div class="col-lg-5 col-xl-4 d-none d-lg-flex justify-content-center">
+                <img src="<?= base_url('public/images/mascot.png') ?>" alt="SKJ Admission Mascot" class="img-fluid" style="max-height: 420px; filter: drop-shadow(0 18px 30px rgba(0,0,0,0.25));" onerror="this.src='https://skj.ac.th/uploads/logoSchool/LogoSKJ_4.png';">
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Show announcement modal every time page is loaded
-        const announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
-        setTimeout(() => {
-            announcementModal.show();
-        }, 800); // Slight delay for better UX
-    });
-</script>
-<?php endif; ?>
+    <!-- ============================================================
+         2. SMART QUICK ACTIONS (TOUCH-FRIENDLY CARDS)
+         ============================================================ -->
+    <div class="section-header">
+        <h2 class="section-title"><i class='bx bxs-grid-alt'></i> เมนูบริการหลัก</h2>
+        <p class="section-desc">เข้าถึงบริการและระบบตรวจสอบต่างๆ ได้สะดวกรวดเร็ว</p>
+    </div>
 
+    <div class="action-grid">
+        <!-- สมัครเรียน Action Cards (Dynamic) -->
+        <?php if ($isActualOpen && !empty($openLevels)): ?>
+            <?php if (count($openLevels) <= 3): ?>
+                <?php foreach ($openLevels as $l_num): 
+                    $is_jr = $l_num <= 3;
+                    $icon_class = $is_jr ? 'icon-pink' : 'icon-blue';
+                    $icon_i = $is_jr ? 'bx-user-voice' : 'bx-award';
+                    $sub_label = ($l_num == 1) ? 'มัธยมศึกษาปีที่ 1' : (($l_num == 4) ? 'มัธยมศึกษาปีที่ 4' : 'มัธยมศึกษาปีที่ ' . $l_num);
+                ?>
+                <a href="javascript:void(0);" onclick="openRegisterPDPA(<?= $l_num ?>)" class="action-card">
+                    <div class="action-icon-wrap <?= $icon_class ?>">
+                        <i class='bx <?= $icon_i ?>'></i>
+                    </div>
+                    <div class="action-title">สมัคร ม.<?= $l_num ?></div>
+                    <div class="action-subtitle"><?= $sub_label ?></div>
+                </a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <a href="javascript:void(0);" onclick="showLevelChoiceModal()" class="action-card">
+                    <div class="action-icon-wrap icon-pink">
+                        <i class='bx bx-user-plus'></i>
+                    </div>
+                    <div class="action-title">สมัครเรียน</div>
+                    <div class="action-subtitle">เลือก ม.<?= implode(', ม.', $openLevels) ?></div>
+                </a>
+            <?php endif; ?>
+        <?php else: ?>
+            <a href="javascript:void(0);" onclick="alertClosedSystem()" class="action-card">
+                <div class="action-icon-wrap icon-pink" style="opacity: 0.6;">
+                    <i class='bx bx-lock-alt'></i>
+                </div>
+                <div class="action-title">สมัครเรียน</div>
+                <div class="action-subtitle">ปิดรับสมัคร</div>
+            </a>
+        <?php endif; ?>
 
+        <!-- ตรวจสอบสถานะ -->
+        <a href="<?= site_url('new-admission/status') ?>" class="action-card">
+            <div class="action-icon-wrap icon-purple">
+                <i class='bx bx-search-alt'></i>
+            </div>
+            <div class="action-title">ตรวจสถานะ</div>
+            <div class="action-subtitle">เช็คผลการสมัคร</div>
+        </a>
 
+        <!-- รายงานตัว / มอบตัว -->
+        <a href="<?= site_url('confirmation/login') ?>" class="action-card">
+            <div class="action-icon-wrap icon-emerald">
+                <i class='bx bx-id-card'></i>
+            </div>
+            <div class="action-title">รายงานตัว</div>
+            <div class="action-subtitle">มอบตัวนักเรียนใหม่</div>
+        </a>
 
-<!-- Hero Section -->
-<div class="hero-section">
-    <!-- Decorative Elements -->
-    <div class="sparkle"></div>
-    <div class="sparkle"></div>
-    <div class="sparkle"></div>
-    <div class="sparkle"></div>
-    <div class="sparkle"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
+        <!-- ประกาศผล -->
+        <a href="<?= site_url('new-admission/announcements') ?>" class="action-card">
+            <div class="action-icon-wrap icon-amber">
+                <i class='bx bx-bell'></i>
+            </div>
+            <div class="action-title">ประกาศผล</div>
+            <div class="action-subtitle">รายชื่อผู้มีสิทธิ์</div>
+        </a>
 
-    <div class="container">
-        <div class="row align-items-center">
-            <!-- Mascot Image -->
-            <div class="col-lg-5 text-center hero-mascot order-lg-1 order-2">
-                <img src="<?= base_url('public/assets/images/student_welcome.png') ?>" alt="นักเรียนต้อนรับ"
-                    class="mascot-image">
+        <!-- สถิติ -->
+        <a href="<?= site_url('new-admission/statistics') ?>" class="action-card">
+            <div class="action-icon-wrap icon-rose">
+                <i class='bx bx-bar-chart-alt-2'></i>
+            </div>
+            <div class="action-title">สถิติผู้สมัคร</div>
+            <div class="action-subtitle">ดูจำนวนผู้สมัครสด</div>
+        </a>
+    </div>
+
+    <!-- ============================================================
+         3. 4-STEP APPLICATION GUIDE
+         ============================================================ -->
+    <div class="steps-card">
+        <div class="section-header mb-3">
+            <h3 class="section-title"><i class='bx bx-list-check'></i> 4 ขั้นตอนการสมัครเรียนง่ายๆ</h3>
+            <p class="section-desc">ทำความเข้าใจขั้นตอนเพื่อเตรียมเอกสารและสมัครได้อย่างถูกต้อง</p>
+        </div>
+
+        <div class="step-list">
+            <div class="step-item">
+                <div class="step-badge">1</div>
+                <div class="step-text">
+                    <h6>เลือกแผนการเรียน</h6>
+                    <p>ตรวจสอบคุณสมบัติและเลือกแผนการเรียนที่ตรงกับความสนใจ</p>
+                </div>
             </div>
 
-            <!-- Welcome Text Content -->
-            <div class="col-lg-7 text-center text-lg-start hero-content order-lg-2 order-1 mb-4 mb-lg-0">
-                <div class="welcome-badge mb-3">
-                    <i class='bx bxs-smile me-1'></i> ยินดีต้อนรับสู่ครอบครัว สกจ.
+            <div class="step-item">
+                <div class="step-badge">2</div>
+                <div class="step-text">
+                    <h6>กรอกข้อมูลออนไลน์</h6>
+                    <p>กรอกข้อมูลส่วนตัว ประวัติการศึกษา และอัปโหลดไฟล์หลักฐาน</p>
                 </div>
+            </div>
 
-                <h1 class="hero-title mb-2" style="line-height: 1.2;">
-                    ระบบรับสมัครนักเรียนออนไลน์
-                </h1>
-
-                <div class="d-flex flex-wrap gap-2 mb-3 justify-content-center justify-content-lg-start animate__animated animate__fadeInUp animate__delay-1s">
-                    <div class="badge bg-white text-primary rounded-pill px-3 py-2 d-flex align-items-center shadow-sm">
-                        <i class='bx bx-calendar-event me-1'></i> ปีการศึกษา <?= $checkYear->openyear_year ?? '-' ?>
-                    </div>
+            <div class="step-item">
+                <div class="step-badge">3</div>
+                <div class="step-text">
+                    <h6>ตรวจสอบสถานะ</h6>
+                    <p>ติดตามผลการตรวจสอบเอกสารจากเจ้าหน้าที่ผ่านเมนูตรวจสถานะ</p>
                 </div>
+            </div>
 
-                <p class="hero-subtitle opacity-75 mb-4">
-                    <i class='bx bx-building-house me-1'></i> โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์
-                </p>
+            <div class="step-item">
+                <div class="step-badge">4</div>
+                <div class="step-text">
+                    <h6>พิมพ์บัตรเข้าสอบ</h6>
+                    <p>พิมพ์บัตรประจำตัวผู้สมัคร เพื่อใช้เป็นหลักฐานในวันสอบคัดเลือก</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <?php
-                // Check registration status
-                $is_not_open = false;
-                $is_closed = false;
-                $is_open = false;
+    <!-- ============================================================
+         4. QUOTA & COURSE EXPLORER
+         ============================================================ -->
+    <div class="explorer-card">
+        <div class="section-header">
+            <h3 class="section-title" style="font-size: 1.25rem;"><i class='bx bx-book-open text-primary'></i> แผนการเรียนและโควต้าที่เปิดรับ</h3>
+            <p class="section-desc mb-2">สำรวจแผนการเรียนและประเภทโควต้าประจำปีการศึกษา <?= esc($currentYear) ?></p>
+        </div>
 
-                if (isset($systemStatus->onoff_datetime_regis_open) && time() < strtotime($systemStatus->onoff_datetime_regis_open)) {
-                    $is_not_open = true;
-                } elseif (isset($systemStatus->onoff_datetime_regis_close) && time() > strtotime($systemStatus->onoff_datetime_regis_close)) {
-                    $is_closed = true;
-                } elseif (isset($systemStatus->onoff_regis) && $systemStatus->onoff_regis == 'on') {
-                    $is_open = true;
+        <?php if (!empty($quotas)): ?>
+        <div class="mb-3 d-flex flex-wrap gap-2">
+            <?php 
+            $uniqueQuotas = [];
+            foreach ($quotas as $q) {
+                $name = trim($q->quota_explain);
+                if (!in_array($name, $uniqueQuotas) && !empty($name)) {
+                    $uniqueQuotas[] = $name;
                 }
+            }
+            ?>
+            <?php foreach ($uniqueQuotas as $quotaName): ?>
+                <span class="badge rounded-pill border shadow-sm" style="background: rgba(255, 107, 139, 0.1); color: #ff6b8b; border-color: rgba(255, 107, 139, 0.3) !important; font-size: 0.78rem; font-weight: 600; padding: 6px 12px;">
+                    <?= esc($quotaName) ?>
+                </span>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
 
-                // Prepare quota names for display
-                $activeQuotas = [];
-                if (isset($quotas) && is_array($quotas)) {
-                    foreach ($quotas as $q) {
-                        if (isset($q->quota_status) && $q->quota_status == 'on') {
-                            $activeQuotas[] = $q->quota_explain ?? $q->quota_name ?? 'N/A';
+        <ul class="nav nav-pills-custom" role="tablist">
+            <li class="nav-item flex-fill" role="presentation">
+                <button class="nav-link active w-100" id="pills-m1-tab" data-bs-toggle="pill" data-bs-target="#pills-m1" type="button" role="tab">
+                    <i class='bx bx-user me-1'></i> ระดับชั้น ม.ต้น (ม.1 - ม.3)
+                </button>
+            </li>
+            <li class="nav-item flex-fill" role="presentation">
+                <button class="nav-link w-100" id="pills-m4-tab" data-bs-toggle="pill" data-bs-target="#pills-m4" type="button" role="tab">
+                    <i class='bx bx-award me-1'></i> ระดับชั้น ม.ปลาย (ม.4 - ม.6)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content pt-1">
+            <!-- M.1 Tab -->
+            <div class="tab-pane fade show active" id="pills-m1" role="tabpanel">
+                <div class="row g-3">
+                    <?php 
+                    $m1Courses = array_filter($courses ?? [], function($c) {
+                        $level = is_object($c) ? ($c->course_gradelevel ?? '') : ($c['course_gradelevel'] ?? '');
+                        return strpos($level, 'ต้น') !== false || strpos($level, '1') !== false;
+                    });
+                    $m1Grouped = [];
+                    foreach ($m1Courses as $c) {
+                        $cFullname = is_object($c) ? ($c->course_fullname ?? '') : ($c['course_fullname'] ?? '');
+                        $cInitials = is_object($c) ? ($c->course_initials ?? '') : ($c['course_initials'] ?? '');
+                        $cBranch = is_object($c) ? ($c->course_branch ?? '') : ($c['course_branch'] ?? '');
+
+                        $name = trim($cFullname);
+                        if (!isset($m1Grouped[$name])) {
+                            $m1Grouped[$name] = [
+                                'fullname' => $cFullname,
+                                'initials' => $cInitials,
+                                'branches' => []
+                            ];
+                        }
+                        if (!empty($cBranch)) {
+                            $b = trim($cBranch);
+                            if (!in_array($b, $m1Grouped[$name]['branches'])) {
+                                $m1Grouped[$name]['branches'][] = $b;
+                            }
                         }
                     }
-                }
-                $quotaNames = !empty($activeQuotas) ? implode(' / ', $activeQuotas) : 'รับสมัครนักเรียนใหม่';
-                ?>
-
-                <?php if ($is_not_open): ?>
-                    <!-- Countdown to Open -->
-                    <div class="hero-countdown-box my-4 pt-4" style="overflow: visible;">
-                        <div class="mb-2">
-                            <span class="badge bg-white text-primary mb-2 shadow-sm py-2 px-3 rounded-pill jumping-text">
-                                <i class='bx bxs-time-five me-1 text-warning'></i> นับถอยหลังสู่การรับสมัคร
-                            </span>
-                            <div class="status-highlight-box d-inline-block w-100">
-                                <div class="d-inline-flex align-items-center justify-content-center flex-wrap gap-3 py-2 w-100">
-                                    <h3 class="fw-bolder text-white mb-0 text-shine-vibrant jumping-text" style="font-size: clamp(1.8rem, 6vw, 3.5rem); line-height: 1;">
-                                        <?= $quotaNames ?>
-                                    </h3>
-                                    <?php if (isset($systemStatus->onoff_round)): ?>
-                                        <div class="badge bg-warning text-dark rounded-pill px-4 py-2 d-inline-flex align-items-center shadow-lg border-white border-2 animate__animated animate__pulse animate__infinite" style="font-size: 1.2rem;">
-                                            <i class='bx bxs-star me-1'></i> รอบที่ <?= $systemStatus->onoff_round ?>
+                    ?>
+                    <?php if (!empty($m1Grouped)): ?>
+                        <?php foreach ($m1Grouped as $g): ?>
+                            <div class="col-xxl-3 col-xl-4 col-md-6 col-12">
+                                <div class="course-card">
+                                    <div class="course-title">
+                                        <i class='bx bx-book-bookmark text-primary me-1'></i> <?= esc($g['fullname']) ?>
+                                    </div>
+                                    <?php if (!empty($g['branches'])): ?>
+                                        <div class="branch-badge-wrap">
+                                            <?php foreach ($g['branches'] as $b): ?>
+                                                <span class="branch-pill">
+                                                    <i class='bx bx-chevron-right text-muted' style="font-size: 0.8rem;"></i> <?= esc($b) ?>
+                                                </span>
+                                            <?php endforeach; ?>
                                         </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                        </div>
-                        <div class="countdown-container" data-target="<?= $systemStatus->onoff_datetime_regis_open ?>">
-                            <ul>
-                                <li><span class="days">0</span>
-                                    <div class="label">วัน</div>
-                                </li>
-                                <li><span class="hours">0</span>
-                                    <div class="label">ชั่วโมง</div>
-                                </li>
-                                <li><span class="minutes">0</span>
-                                    <div class="label">นาที</div>
-                                </li>
-                                <li><span class="seconds">0</span>
-                                    <div class="label">วินาที</div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                <?php elseif ($is_open): ?>
-                    <!-- Currently Open - Clickable to Scroll -->
-                    <a href="#apply-section"
-                        class="hero-status-badge open my-5 text-decoration-none smooth-scroll d-inline-flex flex-column justify-content-center align-items-center py-4 px-5 h-auto jumping-text w-100">
-                        <span class="fs-5 fw-bold mb-1 opacity-100 text-white"><i class='bx bxs-check-circle me-1 text-warning'></i>
-                            เปิดรับสมัครแล้ว</span>
-                        
-                        <div class="d-flex align-items-center justify-content-center flex-wrap gap-3 mt-1">
-                            <span class="fs-1 fw-bolder text-shine-vibrant text-uppercase"
-                                style="line-height: 1; font-size: clamp(2rem, 8vw, 4rem);"><?= $quotaNames ?></span>
-                            <?php if (isset($systemStatus->onoff_round)): ?>
-                                <span class="badge bg-warning text-dark rounded-pill px-4 py-2 d-inline-flex align-items-center shadow-lg border-white border-2 ms-lg-2 animate__animated animate__pulse animate__infinite" style="font-size: 1.5rem;">
-                                    <i class='bx bxs-star me-1'></i> รอบที่ <?= $systemStatus->onoff_round ?>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-
-                        <div class="mt-4 badge bg-white text-success rounded-pill px-4 py-2 shadow-sm fs-6">
-                            <i class='bx bxs-mouse-alt me-1'></i> คลิกที่นี่เพื่อสมัครเลย!
-                        </div>
-                    </a>
-                <?php elseif ($is_closed): ?>
-                    <!-- Closed -->
-                    <div class="hero-status-badge closed mb-3 jumping-text">
-                        <i class='bx bx-x-circle me-1'></i> ปิดรับสมัครแล้ว
-                    </div>
-                <?php endif; ?>
-
-                <!-- Date Info - Enhanced Design (Optimized for Mobile Same-line) -->
-                <?php if (isset($systemStatus->onoff_datetime_regis_open) || isset($systemStatus->onoff_datetime_regis_close)): ?>
-                    <div class="d-flex flex-row justify-content-center justify-content-lg-start gap-2 flex-nowrap mb-4 mt-3 px-1 w-100" style="overflow: visible;">
-                        <?php if (isset($systemStatus->onoff_datetime_regis_open)): ?>
-                            <div class="badge bg-white text-success rounded-pill px-2 px-md-4 py-2 d-flex align-items-center shadow-lg border-success border-2 jumping-text flex-fill flex-grow-1" style="min-width: 0; max-width: 300px;">
-                                <div class="rounded-circle bg-success text-white me-2 me-md-3 d-none d-sm-flex align-items-center justify-content-center shadow-sm" style="width: 35px; height: 35px; flex-shrink: 0;">
-                                    <i class='bx bxs-calendar-check fs-5'></i>
-                                </div>
-                                <div class="text-start overflow-hidden">
-                                    <div class="fw-normal text-muted d-none d-md-block" style="font-size: 0.65rem; line-height: 1;">เริ่มเปิดรับสมัคร</div>
-                                    <div class="fw-normal text-muted d-block d-md-none" style="font-size: 0.55rem; line-height: 1;">เปิดสมัคร</div>
-                                    <div class="fw-bold text-truncate" style="font-size: clamp(0.7rem, 2.5vw, 1rem);"><?= $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_open)) ?></div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if (isset($systemStatus->onoff_datetime_regis_close)): ?>
-                            <div class="badge bg-white text-danger rounded-pill px-2 px-md-4 py-2 d-flex align-items-center shadow-lg border-danger border-2 jumping-text flex-fill flex-grow-1" style="min-width: 0; max-width: 300px;">
-                                <div class="rounded-circle bg-danger text-white me-2 me-md-3 d-none d-sm-flex align-items-center justify-content-center shadow-sm" style="width: 35px; height: 35px; flex-shrink: 0;">
-                                    <i class='bx bxs-calendar-x fs-5'></i>
-                                </div>
-                                <div class="text-start overflow-hidden">
-                                    <div class="fw-normal text-muted d-none d-md-block" style="font-size: 0.65rem; line-height: 1;">สิ้นสุดวันรับสมัคร</div>
-                                    <div class="fw-normal text-muted d-block d-md-none" style="font-size: 0.55rem; line-height: 1;">สิ้นสุด</div>
-                                    <div class="fw-bold text-truncate" style="font-size: clamp(0.7rem, 2.5vw, 1rem);"><?= $datethai->thai_date_fullmonth(strtotime($systemStatus->onoff_datetime_regis_close)) ?></div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
-
-                <div class="hero-buttons d-flex justify-content-center justify-content-lg-start gap-2 flex-wrap">
-                    <a href="<?= base_url('new-admission/manual') ?>" class="btn btn-light btn-lg rounded-pill px-4">
-                        <i class='bx bx-book-open me-2'></i> คู่มือการสมัคร
-                    </a>
-                    <a href="<?= base_url('new-admission/status') ?>"
-                        class="btn btn-outline-light btn-lg rounded-pill px-4">
-                        <i class='bx bx-search-alt me-2'></i> ตรวจสอบสถานะ
-                    </a>
-                    <a href="<?= base_url('new-admission/statistics') ?>"
-                        class="btn btn-outline-light btn-lg rounded-pill px-4">
-                        <i class='bx bx-bar-chart-alt-2 me-2'></i> สถิติการสมัคร
-                    </a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12 text-center text-muted py-3" style="font-size: 0.85rem;">ไม่มีข้อมูลแผนการเรียน ม.ต้น</div>
+                    <?php endif; ?>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- Home Announcement Alert Trigger -->
-<?php if (!empty($systemStatus->onoff_comment)): ?>
-<div class="container">
-    <div class="alert alert-primary border-0 shadow-sm mb-4 overflow-hidden position-relative" role="alert" style="border-radius: 20px; background: linear-gradient(135deg, #fff5f7 0%, #f0f7ff 100%); border-left: 5px solid #ff9eb5 !important;">
-        <div class="d-flex align-items-center">
-            <div class="flex-shrink-0 bg-white shadow-sm rounded-circle p-2 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                <i class='bx bxs-bell-ring bx-tada text-primary fs-3'></i>
-            </div>
-            <div class="flex-grow-1">
-                <h5 class="alert-heading fw-bold text-dark mb-0">ประกาศและคำชี้แจงสำคัญ</h5>
-                <p class="text-muted mb-0 small d-none d-md-block">คลิกปุ่มเพื่ออ่านรายละเอียดประกาศและคำชี้แจงฉบับเต็ม</p>
-            </div>
-            <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#announcementModal">
-                <i class='bx bx-expand-alt me-1'></i> <span class="d-none d-sm-inline">เปิดอ่านประกาศ</span><span class="d-inline d-sm-none">เปิด</span>
-            </button>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
+            <!-- M.4 Tab -->
+            <div class="tab-pane fade" id="pills-m4" role="tabpanel">
+                <div class="row g-3">
+                    <?php 
+                    $m4Courses = array_filter($courses ?? [], function($c) {
+                        $level = is_object($c) ? ($c->course_gradelevel ?? '') : ($c['course_gradelevel'] ?? '');
+                        return strpos($level, 'ปลาย') !== false || strpos($level, '4') !== false;
+                    });
+                    $m4Grouped = [];
+                    foreach ($m4Courses as $c) {
+                        $cFullname = is_object($c) ? ($c->course_fullname ?? '') : ($c['course_fullname'] ?? '');
+                        $cInitials = is_object($c) ? ($c->course_initials ?? '') : ($c['course_initials'] ?? '');
+                        $cBranch = is_object($c) ? ($c->course_branch ?? '') : ($c['course_branch'] ?? '');
 
-<!-- Result Alert Box -->
-<?php if (isset($systemStatus) && isset($systemStatus->onoff_system) && $systemStatus->onoff_system == 'on'): ?>
-    <div class="result-alert-box">
-        <div class="result-icon-pulse">
-            <i class="bx bxs-megaphone"></i>
-        </div>
-        <div class="result-text flex-grow-1">
-            <h4 class="mb-1">🎉 <?= $systemStatus->onoff_system_text ?? 'ประกาศผลการคัดเลือกแล้ว!' ?></h4>
-            <p>ตรวจสอบรายชื่อผู้มีสิทธิ์สอบ รายชื่อผู้ผ่านการคัดเลือก และกำหนดการต่าง ๆ ได้ที่นี่ครับ</p>
-        </div>
-        <div class="result-action">
-            <a href="<?= site_url('new-admission/announcements') ?>" class="btn btn-white shadow-sm">
-                <i class="bx bx-show-alt me-1"></i> ดูรายละเอียดประกาศผล
-            </a>
-        </div>
-    </div>
-<?php endif; ?>
-
-<!-- Report Alert Box -->
-<?php if (isset($systemStatus) && isset($systemStatus->onoff_report) && $systemStatus->onoff_report == 'on'): ?>
-    <div class="report-alert-box">
-        <div class="report-icon-pulse">
-            <i class="bx bxs-user-check"></i>
-        </div>
-        <div class="report-text flex-grow-1">
-            <h4 class="mb-1">✨ เปิดรายงานตัวนักเรียนแล้ว (รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>)</h4>
-            <p>ยินดีกับนักเรียนทุกคนที่ผ่านการคัดเลือกในรอบนี้ สามารถรายงานตัวและมอบตัวออนไลน์ได้ที่นี่ครับ</p>
-        </div>
-        <div class="report-action">
-            <a href="<?= site_url('confirmation') ?>" class="btn btn-white shadow-sm">
-                <i class="bx bx-check-double me-1"></i> เข้าสู่ระบบรายงานตัว
-            </a>
-        </div>
-    </div>
-<?php endif; ?>
-
-<!-- Status Check Alert Box -->
-<div class="status-alert-box">
-    <div class="status-icon-pulse">
-        <i class="bx bx-bell"></i>
-    </div>
-    <div class="status-text flex-grow-1">
-        <h5>สมัครเสร็จแล้ว? อย่าลืมเช็คสถานะนะ! 📋</h5>
-        <p>เมื่อน้องๆ สมัครเสร็จแล้ว พี่ๆ แนะนำให้เข้ามาตรวจสอบสถานะ <strong>"บ่อยๆ"</strong> จนกว่าจะขึ้นว่า
-            <strong><span class="text-success fw-bold">"ผ่านการตรวจสอบ"</span></strong> เพื่อรักษาสิทธิ์ของตนเองนะครับ
-        </p>
-    </div>
-    <div class="status-action">
-        <a href="<?= site_url('new-admission/status') ?>" class="btn btn-primary shadow-sm px-4 py-2">
-            <i class="bx bx-search-alt-2 me-1"></i> ตรวจสอบสถานะตอนนี้
-        </a>
-    </div>
-</div>
-
-<!-- Excellence Section -->
-<div class="excellence-section mb-4">
-    <div class="excellence-header text-center mb-3">
-        <div class="excellence-icon-wrapper mb-2">
-            <i class='bx bx-star'></i>
-        </div>
-        <h4 class="fw-bold mb-2">
-            <i class='bx bx-info-circle me-1'></i> กรุณาอ่านระเบียบการรับสมัครก่อนสมัคร
-        </h4>
-        <p class="text-muted mb-0">เลือกประเภทความเป็นเลิศที่ต้องการศึกษารายละเอียด</p>
-    </div>
-
-    <div class="row g-3 justify-content-center">
-        <div class="col-6 col-md-4 col-lg">
-            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal"
-                data-title="ด้านวิชาการ" data-image="<?= base_url('public/assets/banner/academic.jpg') ?>">
-                <div class="excellence-card-icon academic">
-                    <i class='bx bx-book-reader'></i>
-                </div>
-                <span class="excellence-card-title">ด้านวิชาการ</span>
-            </button>
-        </div>
-        <div class="col-6 col-md-4 col-lg">
-            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal"
-                data-title="ด้านกีฬา" data-image="<?= base_url('public/assets/banner/sport.jpg') ?>">
-                <div class="excellence-card-icon sport">
-                    <i class='bx bx-football'></i>
-                </div>
-                <span class="excellence-card-title">ด้านกีฬา</span>
-            </button>
-        </div>
-        <div class="col-6 col-md-4 col-lg">
-            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal"
-                data-title="ด้านศิลปะ ดนตรี การแสดง" data-image="<?= base_url('public/assets/banner/art.jpg') ?>">
-                <div class="excellence-card-icon art">
-                    <i class='bx bx-palette'></i>
-                </div>
-                <span class="excellence-card-title">ด้านศิลปะ ดนตรี การแสดง</span>
-            </button>
-        </div>
-        <div class="col-6 col-md-4 col-lg">
-            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal"
-                data-title="ด้านวิชาชีพ" data-image="<?= base_url('public/assets/banner/career.jpg') ?>">
-                <div class="excellence-card-icon career">
-                    <i class='bx bx-briefcase'></i>
-                </div>
-                <span class="excellence-card-title">ด้านวิชาชีพ</span>
-            </button>
-        </div>
-        <div class="col-6 col-md-4 col-lg">
-            <button type="button" class="excellence-card" data-bs-toggle="modal" data-bs-target="#excellenceModal"
-                data-title="ด้านภาษา" data-image="<?= base_url('public/assets/banner/language.jpg') ?>">
-                <div class="excellence-card-icon language">
-                    <i class='bx bx-globe'></i>
-                </div>
-                <span class="excellence-card-title">ด้านภาษา</span>
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- Excellence Modal -->
-<div class="modal fade" id="excellenceModal" tabindex="-1" aria-labelledby="excellenceModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content"
-            style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 25px 50px rgba(0,0,0,0.2);">
-            <div class="modal-header"
-                style="background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%); border: none; padding: 1.25rem 1.5rem;">
-                <h5 class="modal-title text-white fw-bold" id="excellenceModalLabel">
-                    <i class='bx bx-star me-2'></i><span id="modalTitleText">รายละเอียด</span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-0 position-relative">
-                <img id="excellenceImage" src="" alt="Excellence Image" class="w-100"
-                    style="display: block; max-height: 80vh; object-fit: contain; background: #f8f9fa;">
-            </div>
-            <div class="modal-footer justify-content-center gap-2" style="border: none; background: #f8f9fa;">
-                <button type="button" class="btn btn-primary rounded-pill px-4" id="zoomImageBtn">
-                    <i class='bx bx-zoom-in me-1'></i> ซูมดูรูปภาพ
-                </button>
-                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
-                    <i class='bx bx-x me-1'></i> ปิด
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Fullscreen Image Modal (for zoom) -->
-<div class="modal fade" id="fullscreenImageModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content" style="background: rgba(0,0,0,0.95);">
-            <div class="modal-header border-0 position-absolute w-100"
-                style="z-index: 10; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);">
-                <h5 class="modal-title text-white fw-bold">
-                    <i class='bx bx-image me-2'></i><span id="fullscreenTitleText">รายละเอียด</span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body d-flex align-items-center justify-content-center p-0" id="zoomableContainer"
-                style="overflow: auto; cursor: grab;">
-                <img id="fullscreenImage" src="" alt="Fullscreen Image" class="zoomable-image"
-                    style="max-width: none; max-height: none; transform-origin: center center; transition: transform 0.3s ease;">
-            </div>
-            <div class="modal-footer border-0 position-absolute w-100 bottom-0 justify-content-center"
-                style="z-index: 10; background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-outline-light rounded-start-pill px-3" id="zoomOutBtn">
-                        <i class='bx bx-zoom-out'></i> ย่อ
-                    </button>
-                    <button type="button" class="btn btn-outline-light px-3" id="zoomResetBtn">
-                        <i class='bx bx-reset'></i> รีเซ็ต
-                    </button>
-                    <button type="button" class="btn btn-outline-light rounded-end-pill px-3" id="zoomInBtn">
-                        <i class='bx bx-zoom-in'></i> ขยาย
-                    </button>
-                </div>
-                <button type="button" class="btn btn-light rounded-pill px-4 ms-3" data-bs-dismiss="modal">
-                    <i class='bx bx-x me-1'></i> ปิด
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-<!-- Application Cards -->
-<div class="row justify-content-center g-4 mb-4" id="apply-section">
-    <?php
-    // --- Determine which levels are open based on active quotas ---
-    $open_levels = [];
-    if (!empty($quotas)) {
-        foreach ($quotas as $quota) {
-            if (isset($quota->quota_status) && $quota->quota_status == 'on' && !empty($quota->quota_level)) {
-                $level_string = $quota->quota_level;
-                $levels_in_quota = [];
-
-                if (strpos($level_string, '|') !== false) {
-                    $levels_in_quota = explode('|', $level_string);
-                } elseif (strpos($level_string, ',') !== false) {
-                    $levels_in_quota = explode(',', $level_string);
-                } else {
-                    $levels_in_quota = [$level_string];
-                }
-
-                foreach ($levels_in_quota as $level_str) {
-                    $level_num_char = preg_replace('/[^0-9]/', '', $level_str);
-                    if (is_numeric($level_num_char)) {
-                        $open_levels[] = intval($level_num_char);
+                        $name = trim($cFullname);
+                        if (!isset($m4Grouped[$name])) {
+                            $m4Grouped[$name] = [
+                                'fullname' => $cFullname,
+                                'initials' => $cInitials,
+                                'branches' => []
+                            ];
+                        }
+                        if (!empty($cBranch)) {
+                            $b = trim($cBranch);
+                            if (!in_array($b, $m4Grouped[$name]['branches'])) {
+                                $m4Grouped[$name]['branches'][] = $b;
+                            }
+                        }
                     }
-                }
-            }
-        }
-    }
-    $open_levels = array_unique($open_levels);
-    sort($open_levels);
-    ?>
-
-    <?php if (isset($systemStatus) && $systemStatus->onoff_regis == 'on'): ?>
-        <?php if (!empty($open_levels)): ?>
-            <?php foreach ($open_levels as $level_num): ?>
-                <?php
-                $is_junior_high = $level_num <= 3;
-                $pre_check_url_level = $is_junior_high ? '1' : '4';
-                $subtitle = $is_junior_high ? 'สำหรับนักเรียนที่จบการศึกษาชั้น ป.6 หรือเทียบเท่า' : 'สำหรับนักเรียนที่จบการศึกษาชั้น ม.3 หรือเทียบเท่า';
-                $btn_class = $is_junior_high ? 'btn-primary' : 'btn-info text-white';
-                $card_class = $is_junior_high ? '' : 'm4';
-                ?>
-                <div class="col-md-6 col-lg-5">
-                    <div class="app-card <?= $card_class ?>">
-                        <div class="text-center">
-                            <div class="level-badge">
-                                <i class='bx bx-bookmark me-1'></i> มัธยมศึกษาปีที่ <?= $level_num ?>
+                    ?>
+                    <?php if (!empty($m4Grouped)): ?>
+                        <?php foreach ($m4Grouped as $g): ?>
+                            <div class="col-xxl-3 col-xl-4 col-md-6 col-12">
+                                <div class="course-card">
+                                    <div class="course-title">
+                                        <i class='bx bx-book-bookmark text-primary me-1'></i> <?= esc($g['fullname']) ?>
+                                    </div>
+                                    <?php if (!empty($g['branches'])): ?>
+                                        <div class="branch-badge-wrap">
+                                            <?php foreach ($g['branches'] as $b): ?>
+                                                <span class="branch-pill">
+                                                    <i class='bx bx-chevron-right text-muted' style="font-size: 0.8rem;"></i> <?= esc($b) ?>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                             </div>
-                            <p class="text-muted mb-3"><?= $subtitle ?></p>
-                            <div class="mb-4">
-                                <i class='bx bx-calendar fs-1 text-primary mb-2'></i>
-                                <p class="fw-bold text-dark mb-0">
-                                    ปีการศึกษา <?= isset($checkYear->openyear_year) ? $checkYear->openyear_year : date('Y') + 543 ?>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12 text-center text-muted py-3" style="font-size: 0.85rem;">ไม่มีข้อมูลแผนการเรียน ม.ปลาย</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         5. SCHEDULE & TIMELINE + STATS & CONTACT (FULL WIDTH GRID)
+         ============================================================ -->
+    <div class="row g-4">
+        <div class="col-xxl-7 col-xl-7 col-lg-6 mb-4">
+            <div class="timeline-card h-100 mb-0">
+                <div class="section-header">
+                    <h3 class="section-title"><i class='bx bx-calendar-event'></i> กำหนดการรับสมัคร</h3>
+                    <p class="section-desc">ไทม์ไลน์และกำหนดการที่สำคัญของการรับสมัคร</p>
+                </div>
+
+                <div class="timeline-wrapper mt-4">
+                    <?php if (!empty($schedules)): ?>
+                        <?php 
+                        $groupedSchedules = [];
+                        foreach ($schedules as $sc) {
+                            $hash = md5($sc->schedule_round . $sc->schedule_recruit_start . $sc->schedule_recruit_end . $sc->schedule_exam . $sc->schedule_announce . $sc->schedule_report);
+                            if (!isset($groupedSchedules[$hash])) {
+                                $sc->levels = [$sc->schedule_level];
+                                $groupedSchedules[$hash] = $sc;
+                            } else {
+                                if (!in_array($sc->schedule_level, $groupedSchedules[$hash]->levels)) {
+                                    $groupedSchedules[$hash]->levels[] = $sc->schedule_level;
+                                }
+                            }
+                        }
+                        $idx = 0;
+                        ?>
+                        <?php foreach ($groupedSchedules as $hash => $sc): ?>
+                            <div class="timeline-item">
+                                <div class="timeline-dot <?= ($idx === 0) ? 'active' : '' ?>"></div>
+                                <div class="timeline-date">
+                                    <span class="badge bg-primary text-white me-1">ม.<?= esc(implode(', ม.', $sc->levels)) ?></span> รอบ <?= esc($sc->schedule_round) ?>
+                                </div>
+                                <div class="timeline-event">
+                                    รับสมัคร: <?= $datethai->thai_date_short(strtotime($sc->schedule_recruit_start)) ?> - <?= $datethai->thai_date_short(strtotime($sc->schedule_recruit_end)) ?>
+                                </div>
+                                <p class="timeline-desc text-muted mt-1" style="font-size: 0.85rem;">
+                                    <?php if ($sc->schedule_exam): ?>
+                                        <strong>สอบ:</strong> <?= $datethai->thai_date_short(strtotime($sc->schedule_exam)) ?> <br>
+                                    <?php endif; ?>
+                                    <?php if ($sc->schedule_announce): ?>
+                                        <strong>ประกาศผล:</strong> <?= $datethai->thai_date_short(strtotime($sc->schedule_announce)) ?> <br>
+                                    <?php endif; ?>
+                                    <?php if ($sc->schedule_report): ?>
+                                        <strong>รายงานตัว:</strong> <?= $datethai->thai_date_short(strtotime($sc->schedule_report)) ?>
+                                    <?php endif; ?>
                                 </p>
                             </div>
-
-                            <?php
-                            $is_closed = false;
-                            $is_not_open = false;
-                            $open_time = 0;
-
-                            if (isset($systemStatus->onoff_datetime_regis_open)) {
-                                $open_time = strtotime($systemStatus->onoff_datetime_regis_open);
-                                if (time() < $open_time) {
-                                    $is_not_open = true;
-                                }
-                            }
-
-                            if (isset($systemStatus->onoff_datetime_regis_close)) {
-                                $close_time = strtotime($systemStatus->onoff_datetime_regis_close);
-                                if (time() > $close_time) {
-                                    $is_closed = true;
-                                }
-                            }
-                            ?>
-
-                            <?php if ($is_closed): ?>
-                                <button class="apply-button btn btn-secondary" disabled>
-                                    <i class='bx bx-x-circle me-2'></i> ปิดรับสมัครแล้ว
-                                </button>
-                            <?php elseif ($is_not_open): ?>
-                                <button class="apply-button btn btn-warning" disabled>
-                                    <i class='bx bx-time-five me-2'></i> ยังไม่ถึงวันรับสมัคร
-                                </button>
-                            <?php else: ?>
-                                <button type="button" class="apply-button btn <?= $btn_class ?> apply-btn"
-                                    data-href="<?= base_url('new-admission/pre-check/' . $pre_check_url_level . '?level=' . $level_num) ?>">
-                                    <i class='bx bx-edit-alt me-2'></i> สมัครเรียน ม.<?= $level_num ?>
-                                </button>
-                            <?php endif; ?>
+                        <?php $idx++; endforeach; ?>
+                    <?php else: ?>
+                        <div class="timeline-item">
+                            <div class="timeline-dot active"></div>
+                            <div class="timeline-date">รับสมัครออนไลน์</div>
+                            <div class="timeline-event">เปิดรับสมัครผ่านระบบออนไลน์ตลอด 24 ชั่วโมง</div>
+                            <p class="timeline-desc">กรอกข้อมูลและแนบเอกสารให้ครบถ้วนก่อนวันปิดรับสมัคร</p>
                         </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="col-12">
-                <div class="announcement-card text-center">
-                    <i class='bx bx-info-circle fs-1 mb-3'></i>
-                    <h4 class="fw-bold">ยังไม่เปิดรับสมัคร</h4>
-                    <p class="mb-0">ยังไม่มีระดับชั้นที่เปิดรับสมัครในขณะนี้ กรุณาติดตามประกาศจากทางโรงเรียน</p>
-                </div>
-            </div>
-        <?php endif; ?>
-
-    <?php else: ?>
-        <div class="col-12">
-            <div class="announcement-card text-center">
-                <i class='bx bx-lock-alt fs-1 mb-3'></i>
-                <h4 class="fw-bold">ปิดระบบรับสมัคร</h4>
-                <p class="mb-0">ระบบรับสมัครนักเรียนออนไลน์ยังไม่เปิดให้บริการ กรุณาติดตามประกาศจากทางโรงเรียน</p>
-            </div>
-        </div>
-    <?php endif; ?>
-</div>
-
-<!-- Schedule Table -->
-<div class="row g-4">
-    <?php
-    $grouped_schedules = [];
-    if (!empty($schedules)) {
-        foreach ($schedules as $schedule) {
-            $level = $schedule->schedule_level;
-            if (!isset($grouped_schedules[$level])) {
-                $grouped_schedules[$level] = [];
-            }
-            $grouped_schedules[$level][] = $schedule;
-        }
-    }
-    ?>
-
-    <?php if (!empty($grouped_schedules)): ?>
-        <?php foreach ($grouped_schedules as $level => $level_schedules): ?>
-            <div class="col-md-12">
-                <div class="schedule-card h-100">
-                    <div class="schedule-header">
-                        <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการ: <?= $level ?></h5>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light text-center">
-                                <tr>
-                                    <th width="25%"><i class='bx bx-bookmark me-2'></i> รอบการรับสมัคร</th>
-                                    <th width="20%"><i class='bx bx-edit me-2'></i> รับสมัคร</th>
-                                    <th width="15%"><i class='bx bx-pencil me-2'></i> สอบ</th>
-                                    <th width="20%"><i class='bx bx-broadcast me-2'></i> ประกาศผล</th>
-                                    <th width="20%"><i class='bx bx-id-card me-2'></i> รายงานตัว</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($level_schedules as $schedule): ?>
-                                    <tr>
-                                        <td class="align-middle text-center">
-                                            <div class="fw-bold text-primary"><?= $schedule->schedule_round ?></div>
-                                        </td>
-
-                                        <!-- Recruit -->
-                                        <td class="align-middle text-center">
-                                            <div class="d-flex flex-column">
-                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_recruit_start)) ?>
-                                                    -
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_recruit_end)) ?>
-                                                </span>
-                                                <small class="text-muted" style="font-size: 0.75rem;">Online</small>
-                                            </div>
-                                        </td>
-
-                                        <!-- Exam -->
-                                        <td class="align-middle text-center">
-                                            <?php if ($schedule->schedule_exam): ?>
-                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_exam)) ?>
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
-                                        </td>
-
-                                        <!-- Announce -->
-                                        <td class="align-middle text-center">
-                                            <?php if ($schedule->schedule_announce): ?>
-                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_announce)) ?>
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
-                                        </td>
-
-                                        <!-- Report -->
-                                        <td class="align-middle text-center">
-                                            <?php if ($schedule->schedule_report): ?>
-                                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <?= $datethai->thai_date_short(strtotime($schedule->schedule_report)) ?>
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <div class="col-12">
-            <div class="schedule-card">
-                <div class="schedule-header">
-                    <h5 class="mb-0 fw-bold"><i class='bx bx-calendar-event me-2'></i> กำหนดการรับสมัคร</h5>
-                </div>
-                <div class="table-responsive">
-                    <table class="table mb-0">
-                        <tbody>
-                            <tr>
-                                <td colspan="5" class="text-center py-5">
-                                    <div class="py-4">
-                                        <i class='bx bx-calendar-x fs-1 text-muted mb-3'></i>
-                                        <h5 class="fw-bold text-secondary">ยังไม่มีกำหนดการ</h5>
-                                        <p class="text-muted mb-0">กรุณาติดตามประกาศจากทางโรงเรียนในภายหลัง</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-date">ประกาศรายชื่อและสอบคัดเลือก</div>
+                            <div class="timeline-event">ประกาศรายชื่อผู้มีสิทธิ์สอบ และดำเนินการสอบคัดเลือก</div>
+                            <p class="timeline-desc">ณ โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-date">รายงานตัวและมอบตัว</div>
+                            <div class="timeline-event">รายงานตัวและมอบตัวนักเรียนใหม่</div>
+                            <p class="timeline-desc">ตามวันเวลาที่โรงเรียนกำหนด</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
-    <?php endif; ?>
-</div>
 
-<!-- Contact Us Section -->
-<div class="row mt-5 mb-4">
-    <div class="col-12">
-        <div class="excellence-section p-4 p-md-5" style="border-radius: 30px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 158, 181, 0.2); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);">
-            <div class="row align-items-center">
-                <div class="col-lg-6 mb-4 mb-lg-0 text-center text-lg-start">
-                    <div class="welcome-badge mb-3 bg-label-primary px-3 py-1 rounded-pill d-inline-block" style="background: rgba(255, 158, 181, 0.1) !important; color: #ff9eb5 !important;">
-                        <span class="small fw-bold text-uppercase"><i class="bx bx-headphone me-1"></i> Support Center</span>
-                    </div>
-                    <h2 class="fw-bold mb-3 display-6" style="color: #444;">ติดต่อสอบถามข้อมูล</h2>
-                    <p class="text-muted mb-4 fs-5">หากคุณมีข้อสงสัยหรือต้องการความช่วยเหลือเกี่ยวกับการสมัครเรียน สามารถติดต่อเราได้ผ่านช่องทางต่างๆ หรือเยี่ยมชมหน้าช่วยเหลือของเรา</p>
-                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
-                        <a href="<?= base_url('contact') ?>" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm">
-                            <i class="bx bx-help-circle me-2"></i> ดูคำถามที่พบบ่อย (FAQ)
-                        </a>
-                        <a href="https://line.me/R/ti/p/<?= esc($contact_info['line_id'] ?? '') ?>" target="_blank" class="btn btn-outline-success btn-lg rounded-pill px-4 shadow-sm" style="border-color: #00c300; color: #008f00;">
-                            <i class="bi bi-line me-2"></i> LINE Official
-                        </a>
-                    </div>
+        <!-- ============================================================
+             6. STATS COUNTER & CONTACT
+             ============================================================ -->
+        <div class="col-xxl-5 col-xl-5 col-lg-6 mb-4">
+            <!-- Stats -->
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="text-white fw-bold mb-0 d-flex align-items-center" style="font-size: 1.05rem;">
+                        <i class='bx bx-pulse text-info me-2 fs-4'></i> สถิติผู้สมัครล่าสุด
+                    </h5>
+                    <span class="badge rounded-pill bg-danger text-white px-2 py-1 small fw-bold" style="font-size: 0.72rem;">LIVE</span>
                 </div>
-                <div class="col-lg-6">
-                    <div class="card border-0 shadow-none bg-transparent">
-                        <div class="card-body p-0">
-                            <div class="row g-3">
-                                <div class="col-sm-6">
-                                    <div class="p-3 rounded-4 bg-white border h-100 transition-hover shadow-sm" style="transition: all 0.3s ease;">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="rounded-3 bg-label-info p-2 me-3">
-                                                <i class="bx bx-phone fs-4 text-info"></i>
-                                            </div>
-                                            <h6 class="fw-bold mb-0 text-dark">เบอร์โทรศัพท์</h6>
-                                        </div>
-                                        <p class="mb-0 small text-muted">โรงเรียน: <?= esc($contact_info['phone'] ?? '') ?></p>
-                                        <p class="mb-0 small text-muted"><?= esc($contact_info['phone2'] ?? '') ?></p>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="p-3 rounded-4 bg-white border h-100 transition-hover shadow-sm" style="transition: all 0.3s ease;">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="rounded-3 bg-label-primary p-2 me-3">
-                                                <i class="bx bxl-facebook fs-4 text-primary"></i>
-                                            </div>
-                                            <h6 class="fw-bold mb-0 text-dark">Facebook</h6>
-                                        </div>
-                                        <p class="mb-0 small text-muted">SKJNS160</p>
-                                        <a href="<?= esc($contact_info['facebook'] ?? '') ?>" target="_blank" class="small text-primary text-decoration-none">เยี่ยมชมเพจ <i class="bx bx-right-arrow-alt"></i></a>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="p-3 rounded-4 bg-white border h-100 transition-hover shadow-sm" style="transition: all 0.3s ease;">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="rounded-3 bg-label-warning p-2 me-3">
-                                                <i class="bx bx-time fs-4 text-warning"></i>
-                                            </div>
-                                            <h6 class="fw-bold mb-0 text-dark">เวลาทำการ</h6>
-                                        </div>
-                                        <p class="mb-0 small text-muted"><?= esc($contact_info['office_hours'] ?? '') ?></p>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="p-3 rounded-4 bg-white border h-100 transition-hover shadow-sm" style="transition: all 0.3s ease;">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="rounded-3 bg-label-secondary p-2 me-3">
-                                                <i class="bx bx-map fs-4 text-secondary"></i>
-                                            </div>
-                                            <h6 class="fw-bold mb-0 text-dark">สถานที่ตั้ง</h6>
-                                        </div>
-                                        <a href="https://maps.google.com/?q=โรงเรียนสวนกุหลาบวิทยาลัย(จิรประวัติ)นครสวรรค์" target="_blank" class="small text-danger text-decoration-none">เปิดแผนที่ Google Maps <i class="bx bx-navigation"></i></a>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="stat-box-item">
+                            <div class="stat-val" style="color: #56ccf2;"><?= number_format($stats->total ?? 0) ?></div>
+                            <div class="stat-lbl text-white-50"><i class='bx bx-group me-1 text-info'></i>ผู้สมัครทั้งหมด</div>
                         </div>
                     </div>
+                    <div class="col-6">
+                        <div class="stat-box-item">
+                            <div class="stat-val" style="color: #4ade80;"><?= number_format($stats->pass ?? 0) ?></div>
+                            <div class="stat-lbl text-white-50"><i class='bx bx-check-circle me-1 text-success'></i>ผ่านการตรวจ</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-box-item" style="border-left: 3px solid #ff6b8b;">
+                            <div class="stat-val" style="color: #ff6b8b;"><?= number_format($stats->m1 ?? 0) ?></div>
+                            <div class="stat-lbl text-white-50"><i class='bx bx-user me-1 text-danger'></i>ระดับชั้น ม.1</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-box-item" style="border-left: 3px solid #56ccf2;">
+                            <div class="stat-val" style="color: #56ccf2;"><?= number_format($stats->m4 ?? 0) ?></div>
+                            <div class="stat-lbl text-white-50"><i class='bx bx-award me-1 text-primary'></i>ระดับชั้น ม.4</div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="<?= site_url('new-admission/statistics') ?>" class="btn btn-outline-info text-white w-100 rounded-pill py-2 fw-bold d-flex align-items-center justify-content-center" style="font-size: 0.88rem; border-color: rgba(86, 204, 242, 0.5);">
+                    <i class='bx bx-bar-chart-alt-2 me-2'></i> ดูรายงานสถิติละเอียดทั้งหมด
+                </a>
+            </div>
+
+            <!-- Contact -->
+            <div class="contact-card">
+                <h5 class="fw-bold text-dark mb-3"><i class='bx bx-headphone text-primary me-2'></i> ช่องทางติดต่อสอบถาม</h5>
+                
+                <a href="https://line.me/R/ti/p/<?= esc($contact_info['line_id'] ?? '@514kixba') ?>" target="_blank" class="contact-btn contact-btn-line">
+                    <i class='bx bxl-line fs-4'></i>
+                    <div>
+                        <div style="font-size: 0.95rem;">LINE Official Account</div>
+                        <small style="opacity: 0.9; font-weight: 400;"><?= esc($contact_info['line_id'] ?? '@514kixba') ?></small>
+                    </div>
+                </a>
+
+                <a href="tel:056009667" class="contact-btn contact-btn-phone">
+                    <i class='bx bx-phone-call fs-4 text-primary'></i>
+                    <div>
+                        <div style="font-size: 0.95rem;">โทรศัพท์ฝ่ายรับสมัคร</div>
+                        <small class="text-muted"><?= esc($contact_info['phone'] ?? '056-009-667') ?></small>
+                    </div>
+                </a>
+
+                <div class="mt-3 p-3 bg-light rounded-3 text-muted small">
+                    <i class='bx bx-time-five me-1 text-primary'></i> <strong>เวลาทำการ:</strong> <?= esc($contact_info['office_hours'] ?? 'จันทร์ - ศุกร์ 08:30 - 16:30 น.') ?><br>
+                    <i class='bx bx-map me-1 text-primary mt-1'></i> <?= esc($contact_info['school_name'] ?? 'โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์') ?>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
-<style>
-    .transition-hover:hover {
-        transform: translateY(-5px);
-        border-color: #ff9eb5 !important;
-        box-shadow: 0 10px 20px rgba(255, 158, 181, 0.1) !important;
-    }
-</style>
-
-<!-- PDPA Modal -->
-<div class="modal fade" id="pdpaModal" tabindex="-1" aria-labelledby="pdpaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="pdpaModalLabel">ข้อตกลงและเงื่อนไขการใช้ข้อมูลส่วนบุคคล</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>ข้อตกลงการใช้ข้อมูลส่วนบุคคลในการลงทะเบียนและสมัครเข้าศึกษาต่อในระบบรับสมัครออนไลน์ของโรงเรียนสวนกุหลาบวิทยาลัย
-                        (จิรประวัติ) นครสวรรค์</strong></p>
-                <p>โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์ ("โรงเรียน")
-                    ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลของผู้สมัคร ("ท่าน")
-                    โรงเรียนจึงได้จัดทำข้อตกลงและเงื่อนไขการใช้ข้อมูลส่วนบุคคลฉบับนี้ขึ้น
-                    เพื่อแจ้งให้ท่านทราบถึงวิธีการที่โรงเรียนเก็บรวบรวม ใช้ หรือเปิดเผยข้อมูลส่วนบุคคลของท่าน
-                    และสิทธิของท่านในฐานะเจ้าของข้อมูลส่วนบุคคล</p>
-
-                <h6>1. ข้อมูลส่วนบุคคลที่เก็บรวบรวม</h6>
-                <p>โรงเรียนจะเก็บรวบรวมข้อมูลส่วนบุคคลของท่านที่จำเป็นต่อการรับสมัครและการพิจารณาคัดเลือกเข้าศึกษาต่อ
-                    ซึ่งรวมถึงแต่ไม่จำกัดเพียง:</p>
-                <ul>
-                    <li>ข้อมูลระบุตัวตน เช่น ชื่อ-นามสกุล, เลขประจำตัวประชาชน, วันเดือนปีเกิด</li>
-                    <li>ข้อมูลการติดต่อ เช่น ที่อยู่, หมายเลขโทรศัพท์, อีเมล</li>
-                    <li>ข้อมูลการศึกษา เช่น ประวัติการศึกษา, ผลการเรียน</li>
-                    <li>ข้อมูลผู้ปกครอง</li>
-                    <li>ข้อมูลอื่นๆ ที่ท่านให้ไว้ในใบสมัคร</li>
-                </ul>
-
-                <h6>2. วัตถุประสงค์ในการเก็บรวบรวม ใช้ หรือเปิดเผยข้อมูล</h6>
-                <p>โรงเรียนจะใช้ข้อมูลส่วนบุคคลของท่านเพื่อวัตถุประสงค์ดังต่อไปนี้:</p>
-                <ul>
-                    <li>เพื่อดำเนินการตามกระบวนการรับสมัคร และตรวจสอบคุณสมบัติของผู้สมัคร</li>
-                    <li>เพื่อใช้ในการติดต่อสื่อสารกับท่านและผู้ปกครองเกี่ยวกับการสมัคร</li>
-                    <li>เพื่อใช้ในการพิจารณาคัดเลือกนักเรียนเข้าศึกษาต่อ</li>
-                    <li>เพื่อจัดทำทะเบียนนักเรียน และใช้ในกิจกรรมที่เกี่ยวข้องกับการศึกษาของโรงเรียน
-                        (กรณีที่ท่านผ่านการคัดเลือก)</li>
-                    <li>เพื่อปฏิบัติตามกฎหมายและข้อบังคับที่เกี่ยวข้อง</li>
-                </ul>
-
-                <h6>3. การเปิดเผยข้อมูลส่วนบุคคล</h6>
-                <p>โรงเรียนจะไม่เปิดเผยข้อมูลส่วนบุคคลของท่านแก่บุคคลภายนอกโดยไม่ได้รับความยินยอมจากท่าน
-                    เว้นแต่ในกรณีที่มีกฎหมายกำหนดให้สามารถกระทำได้</p>
-
-                <h6>4. ระยะเวลาในการเก็บรักษาข้อมูล</h6>
-                <p>โรงเรียนจะเก็บรักษาข้อมูลส่วนบุคคลของท่านไว้เป็นระยะเวลาเท่าที่จำเป็นเพื่อบรรลุวัตถุประสงค์ที่ได้แจ้งไว้
-                    และตามที่กฏหมายกำหนด</p>
-
-                <h6>5. สิทธิของเจ้าของข้อมูล</h6>
-                <p>ท่านมีสิทธิตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 ซึ่งรวมถึงสิทธิในการขอเข้าถึง ขอแก้ไข
-                    ขอให้ลบ หรือจำกัดการใช้ข้อมูลส่วนบุคคลของท่าน</p>
-
-                <p class="mt-4">การที่ท่านกดปุ่ม "ยอมรับ" และดำเนินการสมัครต่อไป
-                    ถือว่าท่านได้อ่านและเข้าใจข้อความข้างต้นโดยละเอียด และยินยอมให้โรงเรียนเก็บรวบรวม ใช้
-                    และเปิดเผยข้อมูลส่วนบุคคลของท่านตามวัตถุประสงค์ที่ระบุไว้ในข้อตกลงนี้ทุกประการ</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ไม่ยอมรับ</button>
-                <button type="button" class="btn btn-primary" id="pdpa-accept-btn">ยอมรับและดำเนินการต่อ</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
+    // Target DateTime for countdown
+    const targetDateStr = '<?= $isOpen ? $closeDateTime : $openDateTime ?>';
+    let targetDate = targetDateStr ? new Date(targetDateStr.replace(/-/g, '/')).getTime() : null;
+
+    function updateCountdown() {
+        if (!targetDate || isNaN(targetDate)) return;
+
+        const now = new Date().getTime();
+        const difference = targetDate - now;
+
+        if (difference <= 0) {
+            document.getElementById('cdDays').innerText = '00';
+            document.getElementById('cdHours').innerText = '00';
+            document.getElementById('cdMinutes').innerText = '00';
+            document.getElementById('cdSeconds').innerText = '00';
+            return;
+        }
+
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        document.getElementById('cdDays').innerText = String(days).padStart(2, '0');
+        document.getElementById('cdHours').innerText = String(hours).padStart(2, '0');
+        document.getElementById('cdMinutes').innerText = String(minutes).padStart(2, '0');
+        document.getElementById('cdSeconds').innerText = String(seconds).padStart(2, '0');
+    }
+
+    if (targetDate) {
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    }
+
+    // Closed System Alert
+    function alertClosedSystem() {
+        Swal.fire({
+            icon: 'info',
+            title: 'ระบบยังไม่เปิดรับสมัคร',
+            text: 'กรุณาติดตามกำหนดการและประกาศวันรับสมัครอย่างเป็นทางการจากทางโรงเรียน',
+            confirmButtonText: 'รับทราบ',
+            confirmButtonColor: '#ff6b8b'
+        });
+    }
+
+    // PDPA SweetAlert2 Handler for Registration
+    function openRegisterPDPA(level) {
+        Swal.fire({
+            title: `<div style="font-size: 1.15rem; font-weight: 700; color: #0f172a;"><i class='bx bx-shield-quarter me-2 text-primary'></i> ข้อตกลงการสมัครระดับชั้น ม.${level}</div>`,
+            html: `
+                <div class="text-start p-3 border rounded-3 bg-light" style="max-height: 260px; overflow-y: auto; font-size: 0.88rem; line-height: 1.6; color: #1e293b;">
+                    <p class="fw-bold mb-2">ข้อตกลงการใช้ข้อมูลส่วนบุคคล (PDPA)</p>
+                    <p>โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์ ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลของผู้สมัคร ข้อมูลที่ท่านกรอกจะถูกนำไปใช้เพื่อการประมวลผลการรับสมัคร การจัดทำทะเบียนประวัติ และการติดต่อประสานงานเท่านั้น</p>
+                    <ul class="ps-3 mb-2">
+                        <li>ข้าพเจ้ารับรองว่าข้อมูลและเอกสารที่แนบเป็นความจริงทุกประการ</li>
+                        <li>หากตรวจพบว่าข้อมูลหรือเอกสารเป็นเท็จ ทางโรงเรียนขอสงวนสิทธิ์ตัดสิทธิ์การสมัคร</li>
+                    </ul>
+                    <p class="mt-2 text-muted small">การกด "ยอมรับและดำเนินการต่อ" ถือว่าท่านได้ยอมรับข้อตกลงและเงื่อนไขทั้งหมด</p>
+                </div>
+            `,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'ยอมรับและดำเนินการต่อ',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#ff6b8b',
+            cancelButtonColor: '#64748b'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '<?= site_url('new-admission/pre-check/') ?>' + level;
+            }
+        });
+    }
+
+    // SweetAlert2 School Announcement
+    <?php if (!empty($systemStatus->onoff_comment)): ?>
+    function showAnnouncementSwal(forceShow = false) {
+        const announceRaw = '<?= addslashes(preg_replace('/\s+/', ' ', $systemStatus->onoff_comment)) ?>';
+        const storageKey = 'skj_hide_swal_announce_' + encodeURIComponent(announceRaw).substring(0, 32);
+
+        if (!forceShow && localStorage.getItem(storageKey) === 'true') {
+            return;
+        }
+
+        Swal.fire({
+            title: `
+                <div class="d-flex align-items-center justify-content-center gap-2" style="color: #ff6b8b; font-weight: 800; font-size: 1.25rem;">
+                    <i class='bx bxs-megaphone bx-tada fs-3' style="color: #ff6b8b;"></i>
+                    <span>ประกาศสำคัญจากทางโรงเรียน</span>
+                </div>
+            `,
+            html: `
+                <div class="text-start p-3 my-2 border rounded-3 bg-light shadow-sm" style="max-height: 280px; overflow-y: auto; font-size: 0.95rem; line-height: 1.8; color: #0f172a;">
+                    <?= nl2br(addslashes(esc($systemStatus->onoff_comment))) ?>
+                </div>
+                <div class="form-check mt-3 pt-2 text-start border-top d-flex align-items-center gap-2">
+                    <input class="form-check-input" type="checkbox" id="swalDontShowAgain" role="button">
+                    <label class="form-check-label text-muted fw-bold small" for="swalDontShowAgain" role="button">
+                        ไม่ต้องแสดงข้อความประกาศนี้อีก
+                    </label>
+                </div>
+            `,
+            confirmButtonText: 'รับทราบและปิด',
+            confirmButtonColor: '#ff6b8b',
+            customClass: {
+                popup: 'rounded-4 shadow-lg border-0',
+                confirmButton: 'btn btn-primary px-5 py-2 rounded-pill fw-bold text-white'
+            },
+            buttonsStyling: false,
+            preConfirm: () => {
+                const chk = document.getElementById('swalDontShowAgain');
+                if (chk && chk.checked) {
+                    localStorage.setItem(storageKey, 'true');
+                }
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
-        const countdowns = document.querySelectorAll('.countdown-container');
-
-        countdowns.forEach(timer => {
-            const targetDateStr = timer.dataset.target;
-            if (!targetDateStr) return;
-
-            const targetDate = new Date(targetDateStr.replace(' ', 'T')).getTime();
-
-            const daysEl = timer.querySelector('.days');
-            const hoursEl = timer.querySelector('.hours');
-            const minutesEl = timer.querySelector('.minutes');
-            const secondsEl = timer.querySelector('.seconds');
-
-            function updateCountdown() {
-                const now = new Date().getTime();
-                const distance = targetDate - now;
-
-                if (distance < 0) {
-                    clearInterval(countdownInterval);
-                    daysEl.textContent = '0';
-                    hoursEl.textContent = '0';
-                    minutesEl.textContent = '0';
-                    secondsEl.textContent = '0';
-                    setTimeout(() => location.reload(), 1000);
-                    return;
-                }
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                daysEl.textContent = days;
-                hoursEl.textContent = hours.toString().padStart(2, '0');
-                minutesEl.textContent = minutes.toString().padStart(2, '0');
-                secondsEl.textContent = seconds.toString().padStart(2, '0');
-            }
-
-            updateCountdown();
-            const countdownInterval = setInterval(updateCountdown, 1000);
-        });
-
-        // PDPA Modal
-        const applyButtons = document.querySelectorAll('.apply-btn');
-        const pdpaModal = new bootstrap.Modal(document.getElementById('pdpaModal'));
-        let selectedHref = '';
-
-        applyButtons.forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                selectedHref = this.dataset.href;
-                pdpaModal.show();
-            });
-        });
-
-        document.getElementById('pdpa-accept-btn').addEventListener('click', function () {
-            if (selectedHref) {
-                window.location.href = selectedHref;
-            }
-        });
-
-        // Excellence Modal - Set title and image dynamically
-        const excellenceModal = document.getElementById('excellenceModal');
-        let currentImageSrc = '';
-        let currentTitle = '';
-
-        if (excellenceModal) {
-            excellenceModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                currentTitle = button.getAttribute('data-title');
-                currentImageSrc = button.getAttribute('data-image');
-
-                document.getElementById('modalTitleText').textContent = currentTitle;
-                document.getElementById('excellenceImage').src = currentImageSrc;
-                document.getElementById('excellenceImage').alt = currentTitle;
-            });
-        }
-
-        // Fullscreen Zoom Modal
-        const zoomImageBtn = document.getElementById('zoomImageBtn');
-        const fullscreenModal = document.getElementById('fullscreenImageModal');
-        const fullscreenImage = document.getElementById('fullscreenImage');
-        const zoomInBtn = document.getElementById('zoomInBtn');
-        const zoomOutBtn = document.getElementById('zoomOutBtn');
-        const zoomResetBtn = document.getElementById('zoomResetBtn');
-        const zoomableContainer = document.getElementById('zoomableContainer');
-
-        let currentZoom = 1;
-        const zoomStep = 0.25;
-        const minZoom = 0.5;
-        const maxZoom = 4;
-
-        if (zoomImageBtn) {
-            zoomImageBtn.addEventListener('click', function () {
-                // Hide excellence modal and show fullscreen modal
-                const excellenceModalInstance = bootstrap.Modal.getInstance(excellenceModal);
-                excellenceModalInstance.hide();
-
-                // Set fullscreen modal content
-                document.getElementById('fullscreenTitleText').textContent = currentTitle;
-                fullscreenImage.src = currentImageSrc;
-                fullscreenImage.alt = currentTitle;
-
-                // Reset zoom
-                currentZoom = 1;
-                updateZoom();
-
-                // Show fullscreen modal
-                const fullscreenModalInstance = new bootstrap.Modal(fullscreenModal);
-                fullscreenModalInstance.show();
-            });
-        }
-
-        // Zoom controls
-        if (zoomInBtn) {
-            zoomInBtn.addEventListener('click', function () {
-                if (currentZoom < maxZoom) {
-                    currentZoom += zoomStep;
-                    updateZoom();
-                }
-            });
-        }
-
-        if (zoomOutBtn) {
-            zoomOutBtn.addEventListener('click', function () {
-                if (currentZoom > minZoom) {
-                    currentZoom -= zoomStep;
-                    updateZoom();
-                }
-            });
-        }
-
-        if (zoomResetBtn) {
-            zoomResetBtn.addEventListener('click', function () {
-                currentZoom = 1;
-                updateZoom();
-            });
-        }
-
-        function updateZoom() {
-            if (fullscreenImage) {
-                fullscreenImage.style.transform = `scale(${currentZoom})`;
-            }
-        }
-
-        // Drag to pan functionality
-        let isDragging = false;
-        let startX, startY, scrollLeft, scrollTop;
-
-        if (zoomableContainer) {
-            zoomableContainer.addEventListener('mousedown', function (e) {
-                isDragging = true;
-                zoomableContainer.style.cursor = 'grabbing';
-                startX = e.pageX - zoomableContainer.offsetLeft;
-                startY = e.pageY - zoomableContainer.offsetTop;
-                scrollLeft = zoomableContainer.scrollLeft;
-                scrollTop = zoomableContainer.scrollTop;
-            });
-
-            zoomableContainer.addEventListener('mouseleave', function () {
-                isDragging = false;
-                zoomableContainer.style.cursor = 'grab';
-            });
-
-            zoomableContainer.addEventListener('mouseup', function () {
-                isDragging = false;
-                zoomableContainer.style.cursor = 'grab';
-            });
-
-            zoomableContainer.addEventListener('mousemove', function (e) {
-                if (!isDragging) return;
-                e.preventDefault();
-                const x = e.pageX - zoomableContainer.offsetLeft;
-                const y = e.pageY - zoomableContainer.offsetTop;
-                const walkX = (x - startX) * 2;
-                const walkY = (y - startY) * 2;
-                zoomableContainer.scrollLeft = scrollLeft - walkX;
-                zoomableContainer.scrollTop = scrollTop - walkY;
-            });
-
-            // Mouse wheel zoom
-            zoomableContainer.addEventListener('wheel', function (e) {
-                e.preventDefault();
-                if (e.deltaY < 0) {
-                    // Zoom in
-                    if (currentZoom < maxZoom) {
-                        currentZoom += zoomStep;
-                        updateZoom();
-                    }
-                } else {
-                    // Zoom out
-                    if (currentZoom > minZoom) {
-                        currentZoom -= zoomStep;
-                        updateZoom();
-                    }
-                }
-            });
-        }
-
-        // Smooth Scroll for Status Badge
-        document.querySelector('.smooth-scroll')?.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-
-        // Reset zoom when fullscreen modal is hidden
-        if (fullscreenModal) {
-            fullscreenModal.addEventListener('hidden.bs.modal', function () {
-                currentZoom = 1;
-                updateZoom();
-            });
-        }
+        setTimeout(function () {
+            showAnnouncementSwal(false);
+        }, 300);
     });
+    <?php endif; ?>
 </script>
 <?= $this->endSection() ?>

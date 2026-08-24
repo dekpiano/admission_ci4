@@ -7,88 +7,250 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
-    /* Sneat-specific adjustments */
+    /* Suankularb Rose Pink & Sky Blue Design Tokens */
+    :root {
+        --skj-pink: #ff6b8b;
+        --skj-pink-dark: #e04869;
+        --skj-blue: #56ccf2;
+        --skj-blue-dark: #0284c7;
+        --skj-gradient: linear-gradient(135deg, #ff6b8b 0%, #56ccf2 100%);
+    }
+
+    /* Section Form Cards */
+    .edit-section-card {
+        border-radius: 16px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .edit-section-card .card-header {
+        background: #ffffff;
+        border-bottom: 1px solid #f1f5f9;
+        padding: 1.1rem 1.4rem;
+        font-weight: 800;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .section-icon-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        margin-right: 10px;
+    }
+
+    /* Form Controls & Focus States */
+    .form-label {
+        font-weight: 700;
+        font-size: 0.84rem;
+        color: #334155;
+        margin-bottom: 0.35rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1.5px solid #cbd5e1;
+        padding: 0.55rem 0.85rem;
+        font-size: 0.9rem;
+        color: #0f172a;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--skj-pink);
+        box-shadow: 0 0 0 0.2rem rgba(255, 107, 139, 0.2);
+    }
+
+    /* Photo Upload Box */
+    .photo-edit-card {
+        border-radius: 16px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+
     .photo-preview-wrapper {
         position: relative;
         margin: 0 auto;
-        border-radius: 0.5rem;
+        border-radius: 16px;
         overflow: hidden;
-        border: 3px solid #fff;
-        box-shadow: 0 2px 6px 0 rgba(67, 89, 113, 0.12);
+        border: 3px solid #ffffff;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         width: 100%;
-        max-width: 200px;
+        max-width: 190px;
         aspect-ratio: 3/4;
-        background: #f5f5f9;
+        background: #f8fafc;
     }
+
     .photo-preview-wrapper img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
+
+    /* Document Upload Preview Box */
+    .doc-upload-box {
+        border: 1.5px dashed #cbd5e1;
+        border-radius: 14px;
+        background: #f8fafc;
+        padding: 14px;
+        text-align: center;
+        height: 100%;
+        transition: all 0.2s ease;
+    }
+
+    .doc-upload-box:hover {
+        border-color: var(--skj-pink);
+        background: #ffffff;
+    }
+
     .doc-preview-container {
-        height: 150px;
-        background-color: #f5f5f9;
-        border-radius: 0.375rem;
+        height: 130px;
+        background-color: #ffffff;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        border: 1px dashed #d9dee3;
-        margin-bottom: 0.5rem;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 0.6rem;
     }
 
-    /* Fix Select2 inside Input Group for Sneat */
+    /* Course Selection Rank Group */
+    .rank-input-group {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .rank-badge-text {
+        font-weight: 800;
+        font-size: 0.82rem;
+        min-width: 85px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1.5px solid #cbd5e1;
+        border-right: none;
+    }
+
+    .rank-badge-1 {
+        background: rgba(255, 107, 139, 0.12);
+        color: #ff6b8b;
+    }
+
+    .rank-badge-2 {
+        background: rgba(86, 204, 242, 0.12);
+        color: #0284c7;
+    }
+
+    .rank-badge-3 {
+        background: rgba(100, 116, 139, 0.12);
+        color: #475569;
+    }
+
+    /* Select2 Tweaks */
+    .select2-container--bootstrap-5 .select2-selection {
+        border-radius: 10px !important;
+        border: 1.5px solid #cbd5e1 !important;
+        min-height: 40px !important;
+        padding: 0.35rem 0.5rem !important;
+    }
+    
     .input-group > .select2-container--bootstrap-5 {
         flex: 1 1 auto;
         width: 1% !important;
     }
-    .input-group-merge > .select2-container--bootstrap-5 .select2-selection {
-        border-right: 1px solid #d9dee3 !important;
-        border-left: 0 !important;
+    
+    .input-group > .select2-container--bootstrap-5 .select2-selection {
         border-top-left-radius: 0 !important;
         border-bottom-left-radius: 0 !important;
     }
-    .input-group-merge > .input-group-text {
-        border-right: 0 !important;
+
+    /* Sports Box Accent */
+    .sports-edit-box {
+        background: rgba(255, 107, 139, 0.04);
+        border: 1.5px dashed var(--skj-pink);
+        border-radius: 14px;
+        padding: 1.25rem;
     }
 </style>
 
 <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="row">
-        <div class="col-12">
-            <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">จัดการข้อมูล /</span> แก้ไขข้อมูลผู้สมัคร
+    
+    <!-- Top Breadcrumb & Actions -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a href="<?= site_url('skjadmin/recruits') ?>" class="btn btn-sm btn-outline-secondary d-flex align-items-center" style="border-radius: 8px;">
+                    <i class="bx bx-arrow-back me-1"></i> รายชื่อผู้สมัคร
+                </a>
+                <span class="text-muted">/</span>
+                <a href="<?= site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) ?>" class="btn btn-sm btn-outline-primary d-flex align-items-center" style="border-radius: 8px;">
+                    <i class="bx bx-show me-1"></i> ดูรายละเอียด
+                </a>
+            </div>
+            <h4 class="fw-bold mb-0 d-flex align-items-center text-dark">
+                <i class="bx bx-edit text-primary me-2 fs-3"></i> แก้ไขข้อมูลผู้สมัคร #<?= esc(sprintf('%04d', $recruit['recruit_id'])) ?>
             </h4>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="<?= site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) ?>" class="btn btn-outline-secondary fw-bold" style="border-radius: 10px;">
+                ยกเลิก
+            </a>
+            <button type="button" class="btn btn-primary fw-bold d-flex align-items-center" onclick="document.getElementById('submitBtn').click();" style="border-radius: 10px; padding: 8px 20px;">
+                <i class="bx bx-save me-1 fs-5"></i> บันทึกข้อมูล
+            </button>
         </div>
     </div>
 
+    <!-- Main Edit Form -->
     <form action="<?= site_url('skjadmin/recruits/update/' . $recruit['recruit_id']) ?>" method="post" enctype="multipart/form-data" id="editForm">
         <?= csrf_field() ?>
         <input type="hidden" name="recruit_id" value="<?= esc($recruit['recruit_id']) ?>">
 
-        <div class="row">
+        <div class="row g-4">
+            
+            <!-- Left Column: Main Form Inputs -->
             <div class="col-lg-8">
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">1. ข้อมูลการสมัครและแผนการเรียน</h5>
-                        <small class="text-muted float-end">ID: <?= esc($recruit['recruit_id']) ?></small>
+                
+                <!-- Section 1: Admission & Course Selection -->
+                <div class="card edit-section-card">
+                    <div class="card-header">
+                        <span class="d-flex align-items-center">
+                            <span class="section-icon-badge" style="background: rgba(255, 107, 139, 0.15); color: #ff6b8b;">
+                                <i class="bx bx-book-open"></i>
+                            </span>
+                            1. ข้อมูลการสมัครและแผนการเรียน
+                        </span>
+                        <span class="badge bg-label-secondary font-monospace fw-bold">ID: <?= esc(sprintf('%04d', $recruit['recruit_id'])) ?></span>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="row g-3">
                             <div class="col-md-6 text-start">
                                 <label for="recruit_year" class="form-label">ปีการศึกษา</label>
-                                <input type="text" class="form-control" id="recruit_year" value="<?= $recruit['recruit_year'] ?>" readonly>
+                                <input type="text" class="form-control bg-light fw-bold" id="recruit_year" value="<?= $recruit['recruit_year'] ?>" readonly>
                             </div>
                             <div class="col-md-6 text-start">
-                                <label for="recruit_regLevel" class="form-label">ระดับชั้น <span class="text-danger">*</span></label>
-                                <select class="form-select" id="recruit_regLevel" name="recruit_regLevel" required>
-                                    <option value="1" <?= $recruit['recruit_regLevel'] == '1' ? 'selected' : '' ?>>มัธยมศึกษาปีที่ 1</option>
-                                    <option value="4" <?= $recruit['recruit_regLevel'] == '4' ? 'selected' : '' ?>>มัธยมศึกษาปีที่ 4</option>
+                                <label for="recruit_regLevel" class="form-label">ระดับชั้นที่สมัคร <span class="text-danger">*</span></label>
+                                <select class="form-select fw-bold text-primary" id="recruit_regLevel" name="recruit_regLevel" required>
+                                    <option value="1" <?= $recruit['recruit_regLevel'] == '1' ? 'selected' : '' ?>>มัธยมศึกษาปีที่ 1 (ม.1)</option>
+                                    <option value="4" <?= $recruit['recruit_regLevel'] == '4' ? 'selected' : '' ?>>มัธยมศึกษาปีที่ 4 (ม.4)</option>
                                 </select>
                             </div>
                             <div class="col-md-12 text-start">
                                 <label for="recruit_category" class="form-label">ประเภทโควตา / รอบการสมัคร <span class="text-danger">*</span></label>
-                                <select class="form-select" id="recruit_category" disabled required>
+                                <select class="form-select bg-light" id="recruit_category" disabled required>
                                     <?php if (isset($quotas)) : ?>
                                         <?php foreach ($quotas as $quota) : ?>
                                             <option value="<?= $quota->quota_id ?>" data-courses="<?= $quota->quota_course ?? '' ?>" <?= $recruit['recruit_category'] == $quota->quota_id ? 'selected' : '' ?>>
@@ -100,27 +262,29 @@
                                 <input type="hidden" name="recruit_category" value="<?= esc($recruit['recruit_category']) ?>">
                             </div>
 
-                            <div class="col-12 mt-3 text-start">
-                                <label class="form-label d-block mb-2" id="course_main_label">เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span class="text-danger">*</span></label>
-                                <small id="level_badge_info" class="text-primary d-block mb-3">
-                                    <i class="bi bi-info-circle me-1"></i>
-                                    <?= ($recruit['recruit_regLevel'] == '1') ? 'ม.ต้น เลือกได้ 3 อันดับ' : 'ม.ปลาย เลือกได้ 3 อันดับ (ตามคุณสมบัติ)' ?>
-                                </small>
+                            <div class="col-12 mt-4 text-start">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0" id="course_main_label">เลือกอันดับแผนการเรียนที่สมัคร <span class="text-danger">*</span></label>
+                                    <small id="level_badge_info" class="text-primary fw-bold">
+                                        <i class="bx bx-info-circle me-1"></i>
+                                        <?= ($recruit['recruit_regLevel'] == '1') ? 'ม.ต้น เลือกได้ 3 อันดับ' : 'ม.ปลาย เลือกได้ 3 อันดับ (ตามคุณสมบัติ)' ?>
+                                    </small>
+                                </div>
                                 
-                                <div class="mb-3 input-group input-group-merge" id="rank_container_1">
-                                    <span class="input-group-text">อันดับ 1</span>
+                                <div class="mb-3 input-group rank-input-group" id="rank_container_1">
+                                    <span class="input-group-text rank-badge-text rank-badge-1">อันดับ 1</span>
                                     <select class="form-select course-select" name="recruit_tpyeRoom1" id="recruit_tpyeRoom1" required>
-                                        <option value="" disabled selected>-- เลือกอันดับ 1 --</option>
+                                        <option value="" disabled selected>-- เลือกแผนการเรียนอันดับ 1 (หลัก) --</option>
                                     </select>
                                 </div>
-                                <div class="mb-3 input-group input-group-merge" id="rank_container_2">
-                                    <span class="input-group-text">อันดับ 2</span>
+                                <div class="mb-3 input-group rank-input-group" id="rank_container_2">
+                                    <span class="input-group-text rank-badge-text rank-badge-2">อันดับ 2</span>
                                     <select class="form-select course-select" name="recruit_tpyeRoom2" id="recruit_tpyeRoom2">
                                         <option value="">-- ไม่ระบุ --</option>
                                     </select>
                                 </div>
-                                <div class="mb-3 input-group input-group-merge" id="rank_container_3">
-                                    <span class="input-group-text">อันดับ 3</span>
+                                <div class="mb-3 input-group rank-input-group" id="rank_container_3">
+                                    <span class="input-group-text rank-badge-text rank-badge-3">อันดับ 3</span>
                                     <select class="form-select course-select" name="recruit_tpyeRoom3" id="recruit_tpyeRoom3">
                                         <option value="">-- ไม่ระบุ --</option>
                                     </select>
@@ -128,19 +292,21 @@
                             </div>
                         </div>
 
-                        <!-- Sports Info Block -->
-                        <div id="sports_info_block" style="display:none;" class="mt-4 border-top pt-4">
-                            <h6 class="fw-bold mb-3 text-info"><i class="bi bi-person-walking me-1"></i> ข้อมูลเพิ่มเติมสำหรับนักกีฬา</h6>
+                        <!-- Sports Extra Info Block -->
+                        <div id="sports_info_block" style="display:none;" class="mt-4 sports-edit-box">
+                            <h6 class="fw-bold mb-3 text-primary d-flex align-items-center">
+                                <i class="bx bx-run me-2 fs-5"></i> ข้อมูลเพิ่มเติมสำหรับผู้สมัครประเภทกีฬา
+                            </h6>
                             
-                            <div id="age_radio_container" class="mb-4 text-start">
+                            <div id="age_radio_container" class="mb-3 text-start">
                                 <!-- Populated via JS -->
                             </div>
                             <input type="hidden" name="recruit_agegroup" id="recruit_agegroup" value="<?= esc($recruit['recruit_agegroup'] ?? '') ?>">
 
                             <div class="row g-3">
                                 <div class="col-md-12 text-start">
-                                    <label for="recruit_sportPosition" class="form-label">สมัครชนิดกีฬาในตำแหน่ง <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="recruit_sportPosition" id="recruit_sportPosition" value="<?= esc($recruit['recruit_sportPosition'] ?? '') ?>" placeholder="ระบุตำแหน่งที่สมัคร">
+                                    <label for="recruit_sportPosition" class="form-label">สมัครชนิดกีฬา / ตำแหน่ง <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="recruit_sportPosition" id="recruit_sportPosition" value="<?= esc($recruit['recruit_sportPosition'] ?? '') ?>" placeholder="ระบุชนิดกีฬาหรือตำแหน่ง">
                                 </div>
                                 <div class="col-md-4 text-start">
                                     <label for="recruit_nickname" class="form-label">ชื่อเล่น <span class="text-danger">*</span></label>
@@ -156,19 +322,19 @@
                                 </div>
                                 <div class="col-md-6 text-start">
                                     <label for="recruit_fatherName" class="form-label">ชื่อ-นามสกุล บิดา <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="recruit_fatherName" id="recruit_fatherName" value="<?= esc($recruit['recruit_fatherName'] ?? '') ?>">
+                                    <input type="text" class="form-control" name="recruit_fatherName" id="recruit_fatherName" value="<?= esc($recruit['recruit_fatherName'] ?? '') ?>" placeholder="ชื่อ-นามสกุล บิดา">
                                 </div>
                                 <div class="col-md-6 text-start">
                                     <label for="recruit_fatherJob" class="form-label">อาชีพ บิดา <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="recruit_fatherJob" id="recruit_fatherJob" value="<?= esc($recruit['recruit_fatherJob'] ?? '') ?>">
+                                    <input type="text" class="form-control" name="recruit_fatherJob" id="recruit_fatherJob" value="<?= esc($recruit['recruit_fatherJob'] ?? '') ?>" placeholder="อาชีพบิดา">
                                 </div>
                                 <div class="col-md-6 text-start">
                                     <label for="recruit_motherName" class="form-label">ชื่อ-นามสกุล มารดา <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="recruit_motherName" id="recruit_motherName" value="<?= esc($recruit['recruit_motherName'] ?? '') ?>">
+                                    <input type="text" class="form-control" name="recruit_motherName" id="recruit_motherName" value="<?= esc($recruit['recruit_motherName'] ?? '') ?>" placeholder="ชื่อ-นามสกุล มารดา">
                                 </div>
                                 <div class="col-md-6 text-start">
                                     <label for="recruit_motherJob" class="form-label">อาชีพ มารดา <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="recruit_motherJob" id="recruit_motherJob" value="<?= esc($recruit['recruit_motherJob'] ?? '') ?>">
+                                    <input type="text" class="form-control" name="recruit_motherJob" id="recruit_motherJob" value="<?= esc($recruit['recruit_motherJob'] ?? '') ?>" placeholder="อาชีพมารดา">
                                 </div>
                             </div>
                         </div>
@@ -176,11 +342,16 @@
                 </div>
 
                 <!-- Section 2: Personal Info -->
-                <div class="card mb-4">
+                <div class="card edit-section-card">
                     <div class="card-header">
-                        <h5 class="mb-0">2. ข้อมูลส่วนตัวนักเรียน</h5>
+                        <span class="d-flex align-items-center">
+                            <span class="section-icon-badge" style="background: rgba(86, 204, 242, 0.15); color: #0284c7;">
+                                <i class="bx bx-user"></i>
+                            </span>
+                            2. ข้อมูลส่วนตัวผู้สมัคร
+                        </span>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="row g-3">
                             <div class="col-md-4 text-start">
                                 <label for="recruit_prefix" class="form-label">คำนำหน้า <span class="text-danger">*</span></label>
@@ -200,13 +371,13 @@
                                 <input type="text" class="form-control" id="recruit_lastName" name="recruit_lastName" placeholder="นามสกุล" value="<?= esc($recruit['recruit_lastName']) ?>" required>
                             </div>
                             <div class="col-md-6 text-start">
-                                <label for="recruit_idCard" class="form-label">เลขบัตรประชาชน (13 หลัก) <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="recruit_idCard" name="recruit_idCard" placeholder="เลขบัตรประชาชน" value="<?= esc($recruit['recruit_idCard']) ?>" maxlength="17" required>
+                                <label for="recruit_idCard" class="form-label">เลขประจำตัวประชาชน (13 หลัก) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control font-monospace" id="recruit_idCard" name="recruit_idCard" placeholder="x-xxxx-xxxxx-xx-x" value="<?= esc($recruit['recruit_idCard']) ?>" maxlength="17" required>
                             </div>
                             <div class="col-md-6 text-start">
-                                <label for="recruit_birthday" class="form-label">วันเดือนปีเกิด <span class="text-danger">*</span></label>
-                                <div class="input-group input-group-merge">
-                                    <span class="input-group-text"><i class="bx bx-calendar"></i></span>
+                                <label for="recruit_birthday" class="form-label">วันเดือนปีเกิด (พ.ศ.) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bx bx-calendar text-primary"></i></span>
                                     <input type="text" class="form-control" id="recruit_birthday" name="recruit_birthday" placeholder="วว/ดด/ปปปป" value="<?= esc($recruit['recruit_birthday']) ?>" required>
                                 </div>
                             </div>
@@ -255,18 +426,27 @@
                             </div>
                             <div class="col-md-12 text-start">
                                 <label for="recruit_phone" class="form-label">เบอร์โทรศัพท์สำหรับติดต่อ <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" id="recruit_phone" name="recruit_phone" placeholder="08xxxxxxxx" value="<?= esc($recruit['recruit_phone']) ?>" required>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bx bx-phone" style="color: #ff6b8b;"></i></span>
+                                    <input type="tel" class="form-control" id="recruit_phone" name="recruit_phone" placeholder="08xxxxxxxx" value="<?= esc($recruit['recruit_phone']) ?>" required>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Section 3: Address -->
-                <div class="card mb-4">
+                <div class="card edit-section-card">
                     <div class="card-header">
-                        <h5 class="mb-0">3. ที่อยู่ตามทะเบียนบ้าน</h5>
+                        <span class="d-flex align-items-center">
+                            <span class="section-icon-badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7;">
+                                <i class="bx bx-home"></i>
+                            </span>
+                            3. ที่อยู่ตามทะเบียนบ้าน
+                        </span>
+                        <small class="text-muted">ระบบค้นหาตำบล/อำเภอ/จังหวัดอัตโนมัติ</small>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="row g-3">
                             <div class="col-md-4 text-start">
                                 <label for="recruit_homeNumber" class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
@@ -294,23 +474,28 @@
                             </div>
                             <div class="col-md-6 text-start">
                                 <label for="recruit_homePostcode" class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="recruit_homePostcode" id="recruit_homePostcode" placeholder="รหัสไปรษณีย์" value="<?= esc($recruit['recruit_homePostcode'] ?? '') ?>" required>
+                                <input type="text" class="form-control font-monospace" name="recruit_homePostcode" id="recruit_homePostcode" placeholder="รหัสไปรษณีย์" value="<?= esc($recruit['recruit_homePostcode'] ?? '') ?>" required>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 4: Education -->
-                <div class="card mb-4">
+                <!-- Section 4: Education Background -->
+                <div class="card edit-section-card">
                     <div class="card-header">
-                        <h5 class="mb-0">4. ข้อมูลการศึกษาเดิม</h5>
+                        <span class="d-flex align-items-center">
+                            <span class="section-icon-badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                                <i class="bx bx-buildings"></i>
+                            </span>
+                            4. ข้อมูลการศึกษาเดิม
+                        </span>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="row g-3">
                             <div class="col-12 text-start">
                                 <label for="recruit_oldSchool_select" class="form-label">ชื่อโรงเรียนเดิม <span class="text-danger">*</span></label>
-                                <div class="input-group input-group-merge">
-                                    <span class="input-group-text"><i class="bx bx-buildings"></i></span>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bx bx-buildings text-muted"></i></span>
                                     <select class="form-select" id="recruit_oldSchool_select">
                                         <?php if (!empty($recruit['recruit_oldSchool'])): ?>
                                             <option value="<?= esc($recruit['recruit_oldSchool']) ?>" selected><?= esc($recruit['recruit_oldSchool']) ?></option>
@@ -320,7 +505,7 @@
                                     </select>
                                 </div>
                                 <input type="hidden" name="recruit_oldSchool" id="recruit_oldSchool" value="<?= esc($recruit['recruit_oldSchool'] ?? '') ?>" required>
-                                <div class="form-text text-muted small">* พิมพ์ชื่อโรงเรียนเพื่อค้นหาและเลือกจากรายการ ระบบจะกรอกอำเภอและจังหวัดให้อัตโนมัติ</div>
+                                <div class="form-text text-muted small mt-1">* พิมพ์ชื่อโรงเรียนเพื่อค้นหา ระบบจะกรอกอำเภอและจังหวัดให้อัตโนมัติ</div>
                             </div>
                             <div class="col-md-6 text-start">
                                 <label for="recruit_district" class="form-label">อำเภอที่ตั้งโรงเรียน</label>
@@ -331,58 +516,67 @@
                                 <input type="text" class="form-control" name="recruit_province" id="recruit_province" placeholder="จังหวัดที่ตั้ง" value="<?= esc($recruit['recruit_province'] ?? '') ?>">
                             </div>
                             <div class="col-md-6 text-start">
-                                <label for="recruit_grade" class="form-label">ผลการเรียนเฉลี่ย (GPAX) <span class="text-danger">*</span></label>
-                                <input type="number" step="0.01" min="0" max="4.00" class="form-control" name="recruit_grade" id="recruit_grade" placeholder="GPAX" value="<?= esc($recruit['recruit_grade']) ?>" required>
+                                <label for="recruit_grade" class="form-label">ผลการเรียนเฉลี่ยสะสม (GPAX) <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" min="0" max="4.00" class="form-control fw-bold" name="recruit_grade" id="recruit_grade" placeholder="0.00" value="<?= esc($recruit['recruit_grade']) ?>" required>
                             </div>
                             <div class="col-md-6 text-start">
-                                <label for="recruit_major" class="form-label">สาขาวิชา / แผนการเรียน (อันดับ 1)</label>
-                                <input type="text" class="form-control" name="recruit_major" id="recruit_major" placeholder="ระบุสาขาวิชา" value="<?= esc($recruit['recruit_major'] ?? '') ?>" readonly>
-                                <div class="form-text small">เปลี่ยนตามแผนการเรียนอันดับ 1 ที่เลือก</div>
+                                <label for="recruit_major" class="form-label">สาขาวิชา (อิงอันดับ 1)</label>
+                                <input type="text" class="form-control bg-light" name="recruit_major" id="recruit_major" placeholder="ระบุสาขาวิชา" value="<?= esc($recruit['recruit_major'] ?? '') ?>" readonly>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 5: Documents -->
-                <div class="card mb-4">
+                <!-- Section 5: Attached Documents -->
+                <div class="card edit-section-card">
                     <div class="card-header">
-                        <h5 class="mb-0">5. เอกสารหลักฐานประกอบ</h5>
+                        <span class="d-flex align-items-center">
+                            <span class="section-icon-badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+                                <i class="bx bx-file"></i>
+                            </span>
+                            5. เอกสารหลักฐานประกอบการสมัคร
+                        </span>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="row g-3">
                             <?php
                             $docFields = [
-                                ['id' => 'recruit_certificateEdu', 'name' => 'ปพ.1 (ด้านหน้า)', 'dir' => 'certificate', 'icon' => 'bx bx-file'],
-                                ['id' => 'recruit_certificateEduB', 'name' => 'ปพ.1 (ด้านหลัง)', 'dir' => 'certificateB', 'icon' => 'bx bx-file'],
-                                ['id' => 'recruit_copyidCard', 'name' => 'สำเนาบัตรประชาชน', 'dir' => 'copyidCard', 'icon' => 'bx bx-id-card'],
+                                ['id' => 'recruit_certificateEdu', 'name' => 'ปพ.1 (ด้านหน้า)', 'dir' => 'certificate', 'icon' => 'bx bx-file', 'color' => '#0284c7'],
+                                ['id' => 'recruit_certificateEduB', 'name' => 'ปพ.1 (ด้านหลัง)', 'dir' => 'certificateB', 'icon' => 'bx bx-file', 'color' => '#0284c7'],
+                                ['id' => 'recruit_copyidCard', 'name' => 'สำเนาบัตรประชาชน', 'dir' => 'copyidCard', 'icon' => 'bx bx-id-card', 'color' => '#e11d48'],
                             ];
                             foreach ($docFields as $df) : 
                             ?>
                             <div class="col-md-4">
-                                <div class="border rounded p-3 text-center h-100 bg-light">
-                                    <h6 class="fw-bold mb-3 small"><?= $df['name'] ?></h6>
+                                <div class="doc-upload-box">
+                                    <h6 class="fw-bold mb-2 small text-dark"><?= $df['name'] ?></h6>
                                     <div class="doc-preview-container">
                                         <?php if (!empty($recruit[$df['id']])) : ?>
-                                            <a href="<?= get_recruit_file_url($recruit[$df['id']], $recruit['recruit_regLevel'], $df['dir']) ?>" target="_blank" class="d-block w-100 h-100">
+                                            <a href="<?= get_recruit_file_url($recruit[$df['id']], $recruit['recruit_regLevel'], $df['dir']) ?>" target="_blank" class="d-block w-100 h-100 p-1">
                                                 <?php if (strpos($recruit[$df['id']], '.pdf') !== false) : ?>
                                                     <div class="d-flex flex-column justify-content-center align-items-center h-100">
                                                         <i class="bx bxs-file-pdf text-danger fs-1"></i>
-                                                        <span class="small mt-2 text-dark">PDF</span>
+                                                        <span class="small mt-1 text-dark fw-bold">ดูไฟล์ PDF</span>
                                                     </div>
                                                 <?php else : ?>
-                                                    <img src="<?= get_recruit_file_url($recruit[$df['id']], $recruit['recruit_regLevel'], $df['dir']) ?>" class="img-fluid" style="max-height: 120px;" alt="<?= $df['name'] ?>">
+                                                    <img src="<?= get_recruit_file_url($recruit[$df['id']], $recruit['recruit_regLevel'], $df['dir']) ?>" class="img-fluid rounded" style="max-height: 110px;" alt="<?= $df['name'] ?>">
                                                 <?php endif; ?>
                                             </a>
                                         <?php else : ?>
-                                            <i class="<?= $df['icon'] ?> text-muted fs-1 opacity-25"></i>
+                                            <div class="d-flex flex-column align-items-center justify-content-center text-muted">
+                                                <i class="<?= $df['icon'] ?> fs-1 opacity-40"></i>
+                                                <span style="font-size: 0.75rem;" class="mt-1">ยังไม่มีไฟล์</span>
+                                            </div>
                                         <?php endif; ?>
                                     </div>
-                                    <input class="form-control form-control-sm mb-2 mt-2" type="file" name="<?= $df['id'] ?>" accept="image/*,.pdf">
+                                    
+                                    <input class="form-control form-control-sm mb-2" type="file" name="<?= $df['id'] ?>" accept="image/*,.pdf">
+                                    
                                     <div class="text-center">
                                         <?php if (!empty($recruit[$df['id']])) : ?>
-                                            <span class="badge bg-label-success rounded-pill">เรียบร้อย</span>
+                                            <span class="badge bg-label-success" style="font-size: 0.72rem;"><i class="bx bx-check me-1"></i> มีไฟล์แล้ว</span>
                                         <?php else : ?>
-                                            <span class="badge bg-label-secondary rounded-pill">ยังไม่แนบ</span>
+                                            <span class="badge bg-label-secondary" style="font-size: 0.72rem;">ยังไม่แนบ</span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -391,62 +585,76 @@
                         </div>
                     </div>
                 </div>
+
             </div>
 
+            <!-- Right Column: Photo & Action Controls (Sticky) -->
             <div class="col-lg-4">
-                <div class="sticky-top" style="top: 1rem;">
-                    <div class="card mb-4">
-                        <div class="card-body text-center">
+                <div class="sticky-top" style="top: 1rem; z-index: 10;">
+                    
+                    <!-- Photo Card -->
+                    <div class="card photo-edit-card mb-4">
+                        <div class="card-body p-4 text-center">
                             <div class="photo-preview-wrapper mb-3">
                                 <img id="preview_img_display" src="<?= get_recruit_file_url($recruit['recruit_img'] ?? '', $recruit['recruit_regLevel'], 'img') ?>" alt="Student Photo" onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png';">
                             </div>
-                            <h5 class="mb-1 fw-bold"><?= esc($recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']) ?></h5>
-                            <p class="text-muted small mb-3">รหัสประจำตัว: <?= esc($recruit['recruit_id']) ?></p>
                             
-                            <input type="file" class="d-none" name="recruit_img" id="recruit_img" accept="image/*">
-                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" onclick="document.getElementById('recruit_img').click()">
-                                <i class='bx bx-camera me-1'></i> เปลี่ยนรูปถ่าย
-                            </button>
+                            <h5 class="mb-1 fw-bold text-dark"><?= esc($recruit['recruit_prefix'] . $recruit['recruit_firstName'] . ' ' . $recruit['recruit_lastName']) ?></h5>
+                            <span class="badge bg-label-secondary font-monospace fw-bold mb-3">#<?= esc(sprintf('%04d', $recruit['recruit_id'])) ?></span>
+                            
+                            <div>
+                                <input type="file" class="d-none" name="recruit_img" id="recruit_img" accept="image/*">
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold" onclick="document.getElementById('recruit_img').click()">
+                                    <i class='bx bx-camera me-1'></i> อัปโหลดรูปใหม่
+                                </button>
+                            </div>
                         </div>
-                        <hr class="m-0">
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-3 text-start"><i class="bx bx-star text-warning me-2"></i>ผลการสมัคร</h6>
-                            
+                    </div>
+
+                    <!-- Status & Submission Card -->
+                    <div class="card photo-edit-card mb-4">
+                        <div class="card-header border-bottom py-3">
+                            <h6 class="fw-bold mb-0 text-dark d-flex align-items-center">
+                                <i class="bx bx-check-shield text-success me-2 fs-5"></i> ผลการตรวจ & จัดการสถานะ
+                            </h6>
+                        </div>
+                        <div class="card-body p-4">
                             <div class="mb-3 text-start">
-                                <label for="recruit_status" class="form-label">ผลการตรวจเอกสาร</label>
-                                <select class="form-select" id="recruit_status" name="recruit_status" required>
-                                    <option value="รอตรวจสอบ" <?= $recruit['recruit_status'] == 'รอตรวจสอบ' ? 'selected' : '' ?>>⏳ รอตรวจสอบ</option>
+                                <label for="recruit_status" class="form-label">สถานะการตรวจเอกสาร <span class="text-danger">*</span></label>
+                                <select class="form-select fw-bold" id="recruit_status" name="recruit_status" required>
+                                    <option value="รอการตรวจสอบ" <?= ($recruit['recruit_status'] == 'รอการตรวจสอบ' || $recruit['recruit_status'] == 'รอตรวจสอบ') ? 'selected' : '' ?>>⏳ รอการตรวจสอบ</option>
                                     <option value="ผ่านการตรวจสอบ" <?= $recruit['recruit_status'] == 'ผ่านการตรวจสอบ' ? 'selected' : '' ?>>✅ ผ่านการตรวจสอบ</option>
                                     <option value="ไม่ผ่านการตรวจสอบ" <?= strpos($recruit['recruit_status'], 'ไม่ผ่าน') !== false ? 'selected' : '' ?>>❌ ไม่ผ่านการตรวจสอบ</option>
                                 </select>
                             </div>
 
-                            <div id="sportSelectionResultSection" style="display:none;" class="text-start">
-                                <div class="mb-3">
-                                    <label for="recruit_sportSelectionResult" class="form-label">ผลการคัดนักกีฬา</label>
-                                    <select class="form-select" name="recruit_sportSelectionResult" id="recruit_sportSelectionResult">
-                                        <option value="รอคัดเลือก" <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'รอคัดเลือก' || empty($recruit['recruit_sportSelectionResult']) ? 'selected' : '' ?>>⏳ รอคัดเลือก</option>
-                                        <option value="ผ่านการคัดเลือก" <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'ผ่านการคัดเลือก' ? 'selected' : '' ?>>✅ ผ่านการคัดเลือก</option>
-                                        <option value="ไม่ผ่านการคัดเลือก" <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'ไม่ผ่านการคัดเลือก' ? 'selected' : '' ?>>❌ ไม่ผ่านการคัดเลือก</option>
-                                    </select>
-                                </div>
+                            <div id="sportSelectionResultSection" style="display:none;" class="text-start mb-3">
+                                <label for="recruit_sportSelectionResult" class="form-label">ผลการคัดเลือกนักกีฬา</label>
+                                <select class="form-select fw-bold" name="recruit_sportSelectionResult" id="recruit_sportSelectionResult">
+                                    <option value="รอคัดเลือก" <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'รอคัดเลือก' || empty($recruit['recruit_sportSelectionResult']) ? 'selected' : '' ?>>⏳ รอคัดเลือก</option>
+                                    <option value="ผ่านการคัดเลือก" <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'ผ่านการคัดเลือก' ? 'selected' : '' ?>>✅ ผ่านการคัดเลือก</option>
+                                    <option value="ไม่ผ่านการคัดเลือก" <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'ไม่ผ่านการคัดเลือก' ? 'selected' : '' ?>>❌ ไม่ผ่านการคัดเลือก</option>
+                                    <option value="ไม่มาคัดเลือก" <?= ($recruit['recruit_sportSelectionResult'] ?? '') == 'ไม่มาคัดเลือก' ? 'selected' : '' ?>>🚫 ไม่มาคัดเลือก</option>
+                                </select>
                             </div>
 
-                            <div class="mt-4">
-                                <button type="submit" class="btn btn-primary d-grid w-100 mb-2">
+                            <div class="mt-4 pt-2">
+                                <button type="submit" id="submitBtn" class="btn btn-primary d-grid w-100 mb-2 fw-bold" style="padding: 10px; border-radius: 10px;">
                                     <span class="d-flex align-items-center justify-content-center">
-                                        <i class="bx bx-save me-2"></i> บันทึกข้อมูล
+                                        <i class="bx bx-save me-2 fs-5"></i> บันทึกการเปลี่ยนแปลง
                                     </span>
                                 </button>
                                 
-                                <a href="<?= site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) ?>" class="btn btn-outline-secondary d-grid w-100">
+                                <a href="<?= site_url('skjadmin/recruits/view/' . $recruit['recruit_id']) ?>" class="btn btn-outline-secondary d-grid w-100 fw-bold" style="border-radius: 10px;">
                                     ยกเลิก
                                 </a>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
+
         </div>
     </form>
 </div>
@@ -464,7 +672,7 @@
 
 <script>
     $(document).ready(function() {
-        // Initialize Select2 with Sneat-friendly style
+        // Initialize Select2
         $('.form-select:not(#recruit_prefix, #recruit_status, #recruit_sportSelectionResult, #recruit_regLevel, #recruit_category, .select2-tags)').select2({
             theme: 'bootstrap-5',
             width: '100%'
@@ -517,6 +725,26 @@
             altFormat: "j F Y", 
             allowInput: true,
             disableMobile: "true",
+            onReady: function(selectedDates, dateStr, instance) {
+                if (instance.currentYearElement) {
+                    instance.currentYearElement.value = instance.currentYear + 543;
+                }
+            },
+            onYearChange: function(selectedDates, dateStr, instance) {
+                if (instance.currentYearElement) {
+                    instance.currentYearElement.value = instance.currentYear + 543;
+                }
+            },
+            onMonthChange: function(selectedDates, dateStr, instance) {
+                if (instance.currentYearElement) {
+                    instance.currentYearElement.value = instance.currentYear + 543;
+                }
+            },
+            onOpen: function(selectedDates, dateStr, instance) {
+                if (instance.currentYearElement) {
+                    instance.currentYearElement.value = instance.currentYear + 543;
+                }
+            },
             formatDate: (date, format, locale) => {
                 const year = date.getFullYear() + 543;
                 const month = locale.months.longhand[date.getMonth()];
@@ -548,8 +776,8 @@
             const gradeLevel = (level == '1') ? 'ม.ต้น' : 'ม.ปลาย';
 
             let infoText = (level == '1') ?
-                '<i class="bi bi-info-circle me-1"></i> เงื่อนไข: ม.ต้น เลือกได้ 3 อันดับ' :
-                '<i class="bi bi-info-circle me-1"></i> เงื่อนไข: ม.ปลาย เลือกได้ 3 อันดับ (ตามคุณสมบัติ)';
+                '<i class="bx bx-info-circle me-1"></i> เงื่อนไข: ม.ต้น เลือกได้ 3 อันดับ' :
+                '<i class="bx bx-info-circle me-1"></i> เงื่อนไข: ม.ปลาย เลือกได้ 3 อันดับ (ตามคุณสมบัติ)';
             $('#level_badge_info').html(infoText);
 
             $('.course-select').each(function(index) {
@@ -557,7 +785,7 @@
                 const currentValue = $select.val() || (currentMajorOrder[index] || '');
                 $select.empty();
 
-                const placeholder = $select.attr('id') === 'recruit_tpyeRoom1' ? '-- เลือกอันดับ 1 --' : '-- ไม่ระบุ --';
+                const placeholder = $select.attr('id') === 'recruit_tpyeRoom1' ? '-- เลือกอันดับ 1 (หลัก) --' : '-- ไม่ระบุ --';
                 $select.append(`<option value="" ${$select.prop('required') ? 'disabled' : ''}>${placeholder}</option>`);
 
                 const filtered = courses.filter(c => {
@@ -566,7 +794,8 @@
 
                 filtered.forEach(c => {
                     const isSelected = (c.course_id == currentValue) ? 'selected' : '';
-                    $select.append(`<option value="${c.course_id}" ${isSelected}>${c.course_branch}</option>`);
+                    const courseDisplayName = c.course_initials ? c.course_initials : (c.course_branch || c.course_fullname);
+                    $select.append(`<option value="${c.course_id}" data-branch="${c.course_branch || ''}" ${isSelected}>${courseDisplayName}</option>`);
                 });
 
                 $select.val(currentValue).trigger('change');
@@ -613,7 +842,7 @@
             if (isSportsQuotaCategory) {
                 $('#rank_container_2, #rank_container_3').hide();
                 $('#course_main_label').text('ประเภทกีฬาที่สมัคร');
-                $('#rank_container_1 .input-group-text').text('กีฬา');
+                $('#rank_container_1 .rank-badge-text').text('กีฬา');
                 $('#sports_info_block').slideDown();
                 
                 $('#recruit_sportPosition, #recruit_nickname, #recruit_weight, #recruit_height, #recruit_fatherName, #recruit_motherName, #recruit_fatherJob, #recruit_motherJob').prop('required', true);
@@ -622,8 +851,8 @@
                 handleAgeRadios(selectedCourse);
             } else {
                 $('#rank_container_2, #rank_container_3').show();
-                $('#course_main_label').text('เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ)');
-                $('#rank_container_1 .input-group-text').text('อันดับ 1');
+                $('#course_main_label').text('เลือกอันดับแผนการเรียนที่สมัคร');
+                $('#rank_container_1 .rank-badge-text').text('อันดับ 1');
                 
                 if (selectedCourse && selectedCourse.course_age && selectedCourse.course_age.trim() !== '') {
                     $('#rank_container_2, #rank_container_3').hide();
@@ -692,9 +921,12 @@
             if(currentId === 'recruit_tpyeRoom1') { 
                 updateSportSelectionVisibility(); 
                 
-                //Sync recruit_major with selected course branch
+                // Sync recruit_major with selected course branch
+                const selectedBranch = $(this).find('option:selected').data('branch');
                 const selectedText = $(this).find('option:selected').text();
-                if(selectedText && !selectedText.includes('--')) {
+                if (selectedBranch && selectedBranch.trim() !== '') {
+                    $('#recruit_major').val(selectedBranch);
+                } else if (selectedText && !selectedText.includes('--')) {
                     $('#recruit_major').val(selectedText);
                 }
             }

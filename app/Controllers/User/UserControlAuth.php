@@ -74,6 +74,11 @@ class UserControlAuth extends \App\Controllers\BaseController
     {
         helper(['form', 'url']); 
         
+        $redirect = $this->request->getGet('redirect');
+        if (!empty($redirect)) {
+            session()->set('redirect_url', $redirect);
+        }
+
         $data = [];
         return view('Admin/PageAdminAuth/PageAdminAuthLogin', $data);
     }
@@ -153,6 +158,12 @@ class UserControlAuth extends \App\Controllers\BaseController
             ];                
             session()->set($newdata);  
             
+            $redirectUrl = session()->get('redirect_url');
+            if (!empty($redirectUrl)) {
+                session()->remove('redirect_url');
+                return redirect()->to($redirectUrl);
+            }
+
             return redirect()->to(base_url('skjadmin')); 
         } else {
             return redirect()->to(base_url('auth/login'))->with('error', "ไม่พบชื่อพนักงานที่เตรียมไว้กับอีเมล $email ในระบบ");
@@ -182,6 +193,13 @@ class UserControlAuth extends \App\Controllers\BaseController
         ];
 
         session()->set($data);
+
+        $redirectUrl = session()->get('redirect_url');
+        if (!empty($redirectUrl)) {
+            session()->remove('redirect_url');
+            return redirect()->to($redirectUrl);
+        }
+
         return redirect()->to(base_url('skjadmin')); // Always redirect to the new admin dashboard
     }
 

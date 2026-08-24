@@ -11,6 +11,7 @@ class UserControlConfirmation extends BaseController
 {
     protected $admissionModel;
     protected $db;
+    protected $dbPers;
     protected $session;
     protected $datethai;
 
@@ -159,9 +160,21 @@ class UserControlConfirmation extends BaseController
         $studentId = $this->session->get('confirmation_student_id');
         $year = $this->admissionModel->getOpenYear()->openyear_year;
 
+        // Normalize studentId to both formats for robust searching
+        $plainStudentId = str_replace('-', '', $studentId);
+        $formattedStudentId = '';
+        if (strlen($plainStudentId) == 13) {
+            $formattedStudentId = substr($plainStudentId, 0, 1) . '-' . substr($plainStudentId, 1, 4) . '-' . substr($plainStudentId, 5, 5) . '-' . substr($plainStudentId, 10, 2) . '-' . substr($plainStudentId, 12, 1);
+        } else {
+            $formattedStudentId = $studentId;
+        }
+
         // Fetch Recruit Data
         $recruit = $this->db->table('tb_recruitstudent')
-            ->where('recruit_idCard', $studentId)
+            ->groupStart()
+                ->where('recruit_idCard', $plainStudentId)
+                ->orWhere('recruit_idCard', $formattedStudentId)
+            ->groupEnd()
             ->where('recruit_year', $year)
             ->get()->getResult(); // View expects array of objects for $stu[0]
 
@@ -171,7 +184,10 @@ class UserControlConfirmation extends BaseController
 
         // Fetch Personnel Data (tb_students)
         $studentPers = $this->dbPers->table('tb_students')
-            ->where('stu_iden', $studentId)
+            ->groupStart()
+                ->where('stu_iden', $plainStudentId)
+                ->orWhere('stu_iden', $formattedStudentId)
+            ->groupEnd()
             ->get()->getResult();
 
         // Check if student has confirmed for THE CURRENT YEAR
@@ -249,7 +265,10 @@ class UserControlConfirmation extends BaseController
 
         // Fetch Parent Data
         $parents = $this->dbPers->table('tb_parent')
-            ->where('par_stuID', $studentId)
+            ->groupStart()
+                ->where('par_stuID', $plainStudentId)
+                ->orWhere('par_stuID', $formattedStudentId)
+            ->groupEnd()
             ->get()->getResult();
 
         $data['title'] = 'กรอกข้อมูลรายงานตัว';
@@ -410,9 +429,16 @@ class UserControlConfirmation extends BaseController
         }
 
         // Check for duplicate Student ID in database (excluding current session student)
+        $plainStudentId = str_replace('-', '', $studentId);
+        $formattedStudentId = substr($plainStudentId, 0, 1) . '-' . substr($plainStudentId, 1, 4) . '-' . substr($plainStudentId, 5, 5) . '-' . substr($plainStudentId, 10, 2) . '-' . substr($plainStudentId, 12, 1);
+        
         $formattedNewId = substr($data['stu_iden'], 0, 1) . '-' . substr($data['stu_iden'], 1, 4) . '-' . substr($data['stu_iden'], 5, 5) . '-' . substr($data['stu_iden'], 10, 2) . '-' . substr($data['stu_iden'], 12, 1);
+        
         $dupStudent = $this->dbPers->table('tb_students')
-            ->where('stu_iden !=', $studentId)
+            ->groupStart()
+                ->where('stu_iden !=', $plainStudentId)
+                ->where('stu_iden !=', $formattedStudentId)
+            ->groupEnd()
             ->groupStart()
                 ->where('stu_iden', $data['stu_iden'])
                 ->orWhere('stu_iden', $formattedNewId)
@@ -486,11 +512,16 @@ class UserControlConfirmation extends BaseController
             'stu_phoneFriend' => $saveData['stu_phoneFriend'], // Save with dashes
         ];
 
-        // Check if student exists (using ID with dashes as per session/DB convention)
-        $existing = $this->dbPers->table('tb_students')->where('stu_iden', $studentId)->get()->getRow();
+        // Check if student exists (using both formats to be safe)
+        $existing = $this->dbPers->table('tb_students')
+            ->groupStart()
+                ->where('stu_iden', $plainStudentId)
+                ->orWhere('stu_iden', $formattedStudentId)
+            ->groupEnd()
+            ->get()->getRow();
 
         if ($existing) {
-            $this->dbPers->table('tb_students')->where('stu_iden', $studentId)->update($studentData);
+            $this->dbPers->table('tb_students')->where('stu_iden', $existing->stu_iden)->update($studentData);
         } else {
             $this->dbPers->table('tb_students')->insert($studentData);
         }
@@ -514,6 +545,15 @@ class UserControlConfirmation extends BaseController
         try {
             // Keep original data
             $saveData = $data;
+
+            // Normalize studentId to both formats
+            $plainStudentId = str_replace('-', '', $studentId);
+            $formattedStudentId = '';
+            if (strlen($plainStudentId) == 13) {
+                $formattedStudentId = substr($plainStudentId, 0, 1) . '-' . substr($plainStudentId, 1, 4) . '-' . substr($plainStudentId, 5, 5) . '-' . substr($plainStudentId, 10, 2) . '-' . substr($plainStudentId, 12, 1);
+            } else {
+                $formattedStudentId = $studentId;
+            }
 
             // Map fields based on relation key
             $suffix = '';
@@ -623,8 +663,12 @@ class UserControlConfirmation extends BaseController
             ];
 
             // Check if parent record exists for this student and relation
+            // Use both formats of studentId for finding existing parent record
             $existing = $this->dbPers->table('tb_parent')
-                ->where('par_stuID', $studentId)
+                ->groupStart()
+                    ->where('par_stuID', $plainStudentId)
+                    ->orWhere('par_stuID', $formattedStudentId)
+                ->groupEnd()
                 ->where('par_relationKey', $relationKey)
                 ->get()->getRow();
 
@@ -685,33 +729,55 @@ class UserControlConfirmation extends BaseController
 
         $studentId = $this->session->get('confirmation_student_id');
 
-
+        // Normalize studentId to both formats
+        $plainStudentId = str_replace('-', '', $studentId);
+        $formattedStudentId = '';
+        if (strlen($plainStudentId) == 13) {
+            $formattedStudentId = substr($plainStudentId, 0, 1) . '-' . substr($plainStudentId, 1, 4) . '-' . substr($plainStudentId, 5, 5) . '-' . substr($plainStudentId, 10, 2) . '-' . substr($plainStudentId, 12, 1);
+        } else {
+            $formattedStudentId = $studentId;
+        }
 
         // Fetch Data
         $checkYear = $this->db->table('tb_openyear')->get()->getRow();
         $Year = $checkYear->openyear_year;
 
         $recruit = $this->db->table('tb_recruitstudent')
-            ->where('recruit_idCard', $studentId)
+            ->groupStart()
+                ->where('recruit_idCard', $plainStudentId)
+                ->orWhere('recruit_idCard', $formattedStudentId)
+            ->groupEnd()
             ->where('recruit_year', $Year)
             ->get()->getResult();
 
         $confrim = $this->dbPers->table('tb_students')
-            ->where('stu_iden', $studentId)
+            ->groupStart()
+                ->where('stu_iden', $plainStudentId)
+                ->orWhere('stu_iden', $formattedStudentId)
+            ->groupEnd()
             ->get()->getResult();
 
         $mother = $this->dbPers->table('tb_parent')
-            ->where('par_stuID', $studentId)
+            ->groupStart()
+                ->where('par_stuID', $plainStudentId)
+                ->orWhere('par_stuID', $formattedStudentId)
+            ->groupEnd()
             ->where('par_relationKey', 'แม่')
             ->get()->getRow();
 
         $father = $this->dbPers->table('tb_parent')
-            ->where('par_stuID', $studentId)
+            ->groupStart()
+                ->where('par_stuID', $plainStudentId)
+                ->orWhere('par_stuID', $formattedStudentId)
+            ->groupEnd()
             ->where('par_relationKey', 'พ่อ')
             ->get()->getRow();
 
         $guardian = $this->dbPers->table('tb_parent')
-            ->where('par_stuID', $studentId)
+            ->groupStart()
+                ->where('par_stuID', $plainStudentId)
+                ->orWhere('par_stuID', $formattedStudentId)
+            ->groupEnd()
             ->where('par_relationKey', 'ผู้ปกครอง')
             ->get()->getRow();
 
@@ -774,7 +840,12 @@ class UserControlConfirmation extends BaseController
         $html .= '<div style="position:absolute;top:463px;left:475px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
         $html .= '<div style="position:absolute;top:463px;left:550px; width:100%">' . $date_Y . '</div>';
 
-        $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . get_recruit_file_url($recruit[0]->recruit_img, $recruit[0]->recruit_regLevel, 'img') . '"></div>';
+        $imgPath = get_recruit_image_path_for_pdf($recruit[0]->recruit_img, $recruit[0]->recruit_regLevel, 'img');
+        if (!empty($imgPath) && file_exists($imgPath)) {
+            $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . $imgPath . '"></div>';
+        } else {
+            $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . get_recruit_file_url($recruit[0]->recruit_img, $recruit[0]->recruit_regLevel, 'img') . '"></div>';
+        }
 
         $regLevel = $confrim[0]->stu_regLevel ?? $recruit[0]->recruit_regLevel;
 

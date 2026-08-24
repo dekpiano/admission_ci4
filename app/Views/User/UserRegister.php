@@ -5,13 +5,32 @@
 <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <style>
-    /* Custom Wizard CSS */
+    /* Main Register Card - Exactly 50% Width on Desktop PC & Centered */
+    .register-main-card {
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1.5px solid #cbd5e1;
+        border-top: 4px solid #e11d48;
+        border-bottom: 4px solid #0284c7;
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .register-card-header {
+        background: #ffffff;
+        padding: 1.25rem 1.75rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    /* Step Indicator Wizard */
     .step-indicator {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 2rem;
+        margin-bottom: 2.25rem;
         position: relative;
-        padding: 0 20px;
+        padding: 0 10px;
     }
 
     .step-indicator::before {
@@ -21,7 +40,7 @@
         left: 0;
         right: 0;
         height: 3px;
-        background: #e9ecef;
+        background: #e2e8f0;
         z-index: 0;
         margin: 0 40px;
     }
@@ -34,53 +53,56 @@
     }
 
     .step-icon {
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: #fff;
-        border: 3px solid #e9ecef;
-        color: #a1acb8;
+        background: #ffffff;
+        border: 3px solid #e2e8f0;
+        color: #94a3b8;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 10px;
+        margin: 0 auto 8px;
         font-weight: bold;
-        transition: all 0.3s;
-        font-size: 1.2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1.25rem;
     }
 
     .step.active .step-icon {
-        border-color: #74b9ff;
-        background: #74b9ff;
-        color: #fff;
-        box-shadow: 0 0 0 4px rgba(116, 185, 255, 0.2);
+        border-color: #e11d48;
+        background: linear-gradient(135deg, #e11d48 0%, #ff2d75 100%);
+        color: #ffffff;
+        box-shadow: 0 6px 16px rgba(225, 29, 72, 0.35);
+        transform: scale(1.08);
     }
 
     .step.completed .step-icon {
-        border-color: #71dd37;
-        background: #71dd37;
-        color: #fff;
+        border-color: #0284c7;
+        background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
     }
 
     .step-label {
-        font-size: 0.85rem;
-        color: #697a8d;
-        font-weight: 500;
+        font-size: 0.82rem;
+        color: #64748b;
+        font-weight: 600;
         display: block;
+        transition: all 0.2s;
     }
 
     .step.active .step-label {
-        color: #74b9ff;
+        color: #e11d48;
         font-weight: 700;
     }
 
     .step.completed .step-label {
-        color: #71dd37;
+        color: #0284c7;
     }
 
     .form-step {
         display: none;
-        animation: fadeIn 0.5s;
+        animation: fadeIn 0.4s ease-in-out;
     }
 
     .form-step.active {
@@ -90,54 +112,201 @@
     @keyframes fadeIn {
         from {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(8px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
 
-    /* Spacing & Typography Balance */
-    .card-body {
-        padding: 2.5rem;
-        /* More breathing room on desktop */
+    /* Form Controls & Inputs - Crisp Pure White & High Contrast */
+    .form-control,
+    .form-select,
+    .input-group-text,
+    .select2-container--bootstrap-5 .select2-selection {
+        background-color: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        color: #1e293b !important;
+    }
+
+    .form-control:focus, 
+    .form-select:focus,
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection {
+        background-color: #ffffff !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 0.25rem rgba(2, 132, 199, 0.18) !important;
+    }
+
+    .input-group-text {
+        background-color: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0284c7 !important;
+    }
+
+    .input-group:focus-within .input-group-text {
+        border-color: #0284c7 !important;
+    }
+
+    .form-control[readonly] {
+        background-color: #ffffff !important;
+        color: #334155 !important;
+        border-color: #94a3b8 !important;
     }
 
     .divider {
-        margin: 2rem 0 1.5rem 0;
+        margin: 1.75rem 0 1.25rem 0;
     }
 
-    .form-label {
-        margin-bottom: 0.5rem;
-        color: #566a7f;
-        /* Soft text color for readability */
-        font-weight: 500;
+    .divider-text {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 0.95rem;
     }
 
-    /* Consistent Row Spacing */
-    .row.mb-3 {
-        margin-bottom: 1.5rem !important;
-        /* Increase gap between rows for better separation */
+    /* Wizard Navigation Buttons */
+    .btn-wizard-next, .btn-wizard-submit {
+        background: linear-gradient(135deg, #e11d48 0%, #0284c7 100%);
+        color: #ffffff !important;
+        border: none;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        transition: all 0.25s ease;
+        box-shadow: 0 8px 18px rgba(225, 29, 72, 0.25);
+        border-radius: 12px;
+        padding: 0.75rem 1.75rem;
+        min-height: 48px;
     }
 
-    /* Input Group Styling */
-    .input-group-text {
-        background-color: #f5f7f9;
-        border-color: #d9dee3;
+    .btn-wizard-next:hover, .btn-wizard-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(225, 29, 72, 0.35);
+        color: #ffffff !important;
     }
 
-    /* Mobile Responsive Adjustments */
+    .btn-wizard-next:active, .btn-wizard-submit:active {
+        transform: scale(0.98);
+    }
+
+    .btn-wizard-prev {
+        background: #f8fafc;
+        border: 1.5px solid #cbd5e1;
+        color: #475569 !important;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        min-height: 48px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-wizard-prev:hover {
+        background: #e2e8f0;
+        color: #0f172a !important;
+    }
+
+    /* Step 2 Dedicated Styling */
+    .photo-upload-box {
+        background: linear-gradient(135deg, rgba(225, 29, 72, 0.03) 0%, rgba(2, 132, 199, 0.05) 100%);
+        border: 2px dashed #cbd5e1;
+        border-radius: 20px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .photo-upload-box:hover {
+        border-color: #0284c7;
+        box-shadow: 0 8px 25px -5px rgba(2, 132, 199, 0.12);
+    }
+
+    .student-avatar-frame {
+        width: 140px;
+        height: 185px;
+        border-radius: 16px;
+        overflow: hidden;
+        margin: 0 auto 12px;
+        position: relative;
+        background: #f8fafc;
+        border: 3px solid #ffffff;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .student-avatar-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .btn-upload-avatar {
+        background: linear-gradient(135deg, #e11d48 0%, #0284c7 100%);
+        color: #ffffff !important;
+        border: none;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.6rem 1.4rem;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(225, 29, 72, 0.25);
+        transition: all 0.2s ease;
+    }
+
+    .btn-upload-avatar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(225, 29, 72, 0.35);
+    }
+
+    .form-subgroup-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 1.25rem 1.25rem 0.75rem 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .form-subgroup-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .badge-verified-id {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 50px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        background: #ecfdf5;
+        color: #059669;
+        border: 1px solid #a7f3d0;
+    }
+
+    /* Mobile First Adjustments */
     @media (max-width: 576px) {
+        .register-main-card {
+            border-radius: 16px;
+        }
+
+        .register-card-header {
+            padding: 1rem 1.15rem;
+        }
+
+        .card-body {
+            padding: 1.25rem 1rem !important;
+        }
+
         .step-indicator {
             padding: 0;
             margin-bottom: 2rem;
         }
 
         .step-indicator::before {
-            top: 15px;
-            margin: 0 10px;
+            top: 16px;
+            margin: 0 15px;
         }
 
         .step {
@@ -146,10 +315,10 @@
         }
 
         .step-icon {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             font-size: 1rem;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             border-width: 2px;
         }
 
@@ -159,76 +328,37 @@
 
         .step.active .step-label {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             white-space: nowrap;
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
             width: max-content;
-            bottom: -25px;
-        }
-
-        /* Refined Mobile Spacing */
-        .card-body {
-            padding: 1.5rem !important;
-            /* Balanced mobile padding */
+            bottom: -22px;
         }
 
         .divider {
-            margin: 1.5rem 0 1rem 0;
+            margin: 1.25rem 0 0.75rem 0;
         }
 
         .row.mb-3 {
-            margin-bottom: 1.25rem !important;
-            /* Optimal spacing for mobile scrolling */
+            margin-bottom: 1rem !important;
         }
 
-        /* Button Adjustments */
-        .row.justify-content-between.mt-4 {
+        /* Mobile Action Buttons Stack */
+        .wizard-buttons-wrap {
             flex-direction: column-reverse;
-            gap: 12px;
+            gap: 10px;
             margin-top: 1.5rem !important;
         }
 
-        .row.justify-content-between.mt-4 .col-auto {
+        .wizard-buttons-wrap .col-auto {
             width: 100%;
         }
 
-        #prevBtn,
-        #nextBtn,
-        #submitBtn {
+        #prevBtn, #nextBtn, #submitBtn {
             width: 100%;
-            padding: 0.8rem;
-            font-size: 1rem;
-            border-radius: 0.5rem;
-            display: flex;
             justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Mobile Friendly Radio Buttons for Age Selection */
-        .form-check-inline {
-            display: flex;
-            align-items: center;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-            background-color: #f8f9fa;
-            padding: 0.5rem 1rem;
-            border-radius: 50rem;
-            border: 1px solid #d9dee3;
-        }
-
-        .form-check-input {
-            width: 1.2em;
-            height: 1.2em;
-            margin-top: 0;
-            margin-right: 0.5rem;
-        }
-
-        .form-check-label {
-            font-size: 1rem;
-            cursor: pointer;
         }
     }
 </style>
@@ -236,20 +366,28 @@
 
 <?= $this->section('content') ?>
 
-<div class="row justify-content-center">
-    <div class="col-xl-10">
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center border-bottom">
-                <h5 class="mb-0 text-primary"><i class='bx bx-edit me-2'></i>แบบฟอร์มสมัครเรียน ชั้นมัธยมศึกษาปีที่
-                    <?= $level ?> (Registration Form)
-                </h5>
-                <div class="text-end">
-                    <small class="text-muted d-block">ปีการศึกษา <?= $checkYear->openyear_year ?? '-' ?>
+<div class="row justify-content-center w-100 mx-auto">
+    <div class="col-12 col-lg-6 px-0 px-sm-2">
+        <div class="card register-main-card mb-4">
+            <div class="register-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-2.5" style="width: 40px; height: 40px; background: linear-gradient(135deg, #e11d48 0%, #0284c7 100%); color: white;">
+                        <i class='bx bx-edit fs-4'></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold text-dark" style="font-size: 1.1rem;">
+                            แบบฟอร์มสมัครเรียน ชั้นมัธยมศึกษาปีที่ <?= $level ?>
+                        </h5>
+                        <small class="text-muted" style="font-size: 0.76rem;">กรุณากรอกข้อมูลให้ถูกต้องครบถ้วน</small>
+                    </div>
+                </div>
+                <div>
+                    <span class="badge rounded-pill text-white px-3 py-1.5 fw-bold" style="background: linear-gradient(135deg, #e11d48 0%, #0284c7 100%); font-size: 0.78rem;">
+                        ปีการศึกษา <?= esc($checkYear->openyear_year ?? '-') ?>
                         <?php if (isset($checkYear->openyear_year) && $checkYear->openyear_year >= 2569): ?>
-                            (รอบที่ <?= $systemStatus->onoff_round ?? '1' ?>)
+                            (รอบที่ <?= esc($systemStatus->onoff_round ?? '1') ?>)
                         <?php endif; ?>
-                    </small>
-                    <small class="text-muted">กรุณากรอกข้อมูลให้ครบถ้วน</small>
+                    </span>
                 </div>
             </div>
             <div class="card-body pt-4">
@@ -308,8 +446,9 @@
                                     <span class="input-group-text"><i class='bx bx-star'></i></span>
                                     <select class="form-select" name="recruit_category" id="recruit_category" required>
                                         <option value="" disabled selected>-- กรุณาเลือกประเภทโควตา --</option>
-                                        <?php foreach ($quotas as $quota): ?>
-                                            <?php if ($quota->quota_status == 'on' && strpos($quota->quota_level, (string) $level) !== false): ?>
+                                        <?php foreach ($quotas as $quota): 
+                                            $levelsInQ = preg_split('/[|,]/', $quota->quota_level ?? '');
+                                            if ($quota->quota_status == 'on' && in_array((string) $level, $levelsInQ)): ?>
                                                 <option value="<?= $quota->quota_id ?>"
                                                     data-courses="<?= $quota->quota_course ?>">
                                                     <?= $quota->quota_explain ?>
@@ -478,188 +617,217 @@
 
                     <!-- Step 2: Student Info -->
                     <div class="form-step" id="step-2">
-                        <div class="divider text-start">
-                            <div class="divider-text text-primary fw-bold fs-5">2. ข้อมูลส่วนตัวนักเรียน</div>
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom flex-wrap gap-2">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center me-2.5" style="width: 38px; height: 38px; background: rgba(225, 29, 72, 0.1); color: #e11d48;">
+                                    <i class='bx bx-user fs-4'></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark fs-5">2. ข้อมูลส่วนตัวนักเรียน</h6>
+                                    <small class="text-muted">กรุณากรอกข้อมูลส่วนบุคคลและอัปโหลดรูปถ่ายหน้าตรง</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-label-primary rounded-pill px-3 py-1.5 fw-bold">ขั้นตอน 2 / 5</span>
                         </div>
 
-                        <!-- Student Photo Upload (Top Center) -->
-                        <div class="row justify-content-center mb-4">
-                            <div class="col-md-4 text-center">
-                                <label class="form-label fw-bold">รูปถ่ายนักเรียน (ชุดนักเรียน) <span
-                                        class="text-danger">*</span></label>
-                                <div class="card shadow-sm">
-                                    <div class="card-body text-center p-3">
-                                        <div class="mb-3">
-                                            <img id="preview_img_display"
-                                                src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-                                                alt="รูปถ่ายนักเรียน" class="d-block rounded mx-auto"
-                                                style="width: 150px; height: 200px; object-fit: contain; border: 2px dashed #d9dee3;">
-                                        </div>
-                                        <button type="button" class="btn btn-primary btn-sm w-100"
-                                            onclick="document.getElementById('recruit_img_input').click()">
-                                            <i class='bx bx-camera me-1'></i> อัปโหลดรูปถ่าย
-                                        </button>
-                                        <input type="file" id="recruit_img_input" accept="image/*" class="d-none"
-                                            onchange="handleImageSelect(this)">
-                                        <input type="hidden" name="recruit_img_cropped" id="recruit_img_cropped">
-                                        <!-- Hidden input for validation -->
-                                        <input type="text" id="recruit_img_validator" name="recruit_img_validator"
-                                            style="opacity: 0; position: absolute; width: 1px; height: 1px;" required>
+                        <!-- 1. Student Photo Upload (Hero Center) -->
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-12 col-md-6 col-lg-5">
+                                <div class="photo-upload-box">
+                                    <label class="form-label fw-bold text-dark mb-2 d-block">
+                                        <i class='bx bx-camera me-1 text-primary'></i> รูปถ่ายนักเรียน (ชุดนักเรียน) <span class="text-danger">*</span>
+                                    </label>
+                                    
+                                    <div class="student-avatar-frame">
+                                        <img id="preview_img_display"
+                                            src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                                            alt="รูปถ่ายนักเรียน">
+                                    </div>
+
+                                    <button type="button" class="btn btn-upload-avatar w-100"
+                                        onclick="document.getElementById('recruit_img_input').click()">
+                                        <i class='bx bx-cloud-upload me-1.5 fs-5 align-middle'></i> อัปโหลด / เปลี่ยนรูปถ่าย
+                                    </button>
+                                    
+                                    <input type="file" id="recruit_img_input" accept="image/*" class="d-none"
+                                        onchange="handleImageSelect(this)">
+                                    <input type="hidden" name="recruit_img_cropped" id="recruit_img_cropped">
+                                    <!-- Hidden input for validation -->
+                                    <input type="text" id="recruit_img_validator" name="recruit_img_validator"
+                                        style="opacity: 0; position: absolute; width: 1px; height: 1px;" required>
+
+                                    <div class="form-text text-muted small mt-2">
+                                        <i class='bx bx-info-circle me-1'></i>รูปถ่ายหน้าตรง ชุดนักเรียน ขนาด 1.5 นิ้ว (ปรับแต่งได้ในระบบ)
                                     </div>
                                 </div>
-                                <div class="form-text mt-2">รูปถ่ายหน้าตรง ชุดนักเรียน ขนาด 1.5 นิ้ว</div>
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <label for="recruit_prefix" class="form-label">คำนำหน้า <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" name="recruit_prefix" id="recruit_prefix" required>
-                                    <option value="">เลือก</option>
-                                    <option value="เด็กชาย">เด็กชาย</option>
-                                    <option value="เด็กหญิง">เด็กหญิง</option>
-                                    <option value="นาย">นาย</option>
-                                    <option value="นางสาว">นางสาว</option>
-                                </select>
+                        <!-- 2. Identification Subgroup Card -->
+                        <div class="form-subgroup-card">
+                            <div class="form-subgroup-title">
+                                <i class='bx bx-id-card fs-5 text-primary'></i> ข้อมูลระบุตัวตน
                             </div>
-                            <div class="col-sm-4">
-                                <label for="recruit_firstName" class="form-label">ชื่อ <span
-                                        class="text-danger">*</span></label>
-                                <div class="input-group flex-nowrap">
-                                    <span class="input-group-text"><i class='bx bx-user'></i></span>
-                                    <input type="text" class="form-control" name="recruit_firstName"
-                                        id="recruit_firstName" placeholder="ชื่อจริง" required>
+
+                            <div class="row g-2 g-sm-3 mb-2.5">
+                                <div class="col-12 col-sm-3">
+                                    <label for="recruit_prefix" class="form-label">คำนำหน้า <span class="text-danger">*</span></label>
+                                    <select class="form-select rounded-3" name="recruit_prefix" id="recruit_prefix" required>
+                                        <option value="">เลือก</option>
+                                        <option value="เด็กชาย">เด็กชาย</option>
+                                        <option value="เด็กหญิง">เด็กหญิง</option>
+                                        <option value="นาย">นาย</option>
+                                        <option value="นางสาว">นางสาว</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <label for="recruit_firstName" class="form-label">ชื่อจริง <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                        <input type="text" class="form-control rounded-end-3" name="recruit_firstName"
+                                            id="recruit_firstName" placeholder="กรอกชื่อจริง" required>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-5">
+                                    <label for="recruit_lastName" class="form-label">นามสกุล <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                        <input type="text" class="form-control rounded-end-3" name="recruit_lastName"
+                                            id="recruit_lastName" placeholder="กรอกนามสกุล" required>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-sm-5">
-                                <label for="recruit_lastName" class="form-label">นามสกุล <span
-                                        class="text-danger">*</span></label>
-                                <div class="input-group flex-nowrap">
-                                    <span class="input-group-text"><i class='bx bx-user'></i></span>
-                                    <input type="text" class="form-control" name="recruit_lastName"
-                                        id="recruit_lastName" placeholder="นามสกุล" required>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-sm-12">
-                                <label for="recruit_idCard" class="form-label">เลขบัตรประชาชน (13 หลัก) <span
-                                        class="text-danger">*</span></label>
-                                <div class="input-group flex-nowrap">
-                                    <span class="input-group-text"><i class='bx bx-id-card'></i></span>
-                                    <input type="text" class="form-control" name="recruit_idCard" id="recruit_idCard"
-                                        maxlength="17" required placeholder="เลขบัตรประชาชน 13 หลัก"
-                                        value="<?= isset($preCheckIdCard) ? $preCheckIdCard : '' ?>" readonly>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label class="form-label mb-2">วันเดือนปีเกิด <span class="text-danger">*</span></label>
-                            <div class="col-sm-3">
-                                <select class="form-select" name="recruit_birthdayD" id="recruit_birthdayD" required>
-                                    <option value="">วัน</option>
-                                    <?php for ($i = 1; $i <= 31; $i++): ?>
-                                            <option value="<?= sprintf('%02d', $i) ?>"><?= $i ?></option>
-                                    <?php endfor; ?>
-                                </select>
-                            </div>
-                            <div class="col-sm-5">
-                                <select class="form-select" name="recruit_birthdayM" id="recruit_birthdayM" required>
-                                    <option value="">เดือน</option>
-                                    <option value="01">มกราคม</option>
-                                    <option value="02">กุมภาพันธ์</option>
-                                    <option value="03">มีนาคม</option>
-                                    <option value="04">เมษายน</option>
-                                    <option value="05">พฤษภาคม</option>
-                                    <option value="06">มิถุนายน</option>
-                                    <option value="07">กรกฎาคม</option>
-                                    <option value="08">สิงหาคม</option>
-                                    <option value="09">กันยายน</option>
-                                    <option value="10">ตุลาคม</option>
-                                    <option value="11">พฤศจิกายน</option>
-                                    <option value="12">ธันวาคม</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-4">
-                                <select class="form-select" name="recruit_birthdayY" id="recruit_birthdayY" required>
-                                    <option value="">ปี (พ.ศ.)</option>
-                                    <?php $curYear = date('Y') + 543;
-                                    for ($i = $curYear - 20; $i <= $curYear - 10; $i++): ?>
-                                            <option value="<?= $i ?>"><?= $i ?></option>
-                                    <?php endfor; ?>
-                                </select>
-                            </div>
-                        </div>
-
-
-
-                        <div class="row mb-3">
-                            <div class="col-sm-4">
-                                <label for="recruit_race" class="form-label">เชื้อชาติ <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" name="recruit_race" id="recruit_race" required>
-                                    <option value="ไทย" selected>ไทย</option>
-                                    <option value="จีน">จีน</option>
-                                    <option value="ญี่ปุ่น">ญี่ปุ่น</option>
-                                    <option value="เกาหลี">เกาหลี</option>
-                                    <option value="เวียดนาม">เวียดนาม</option>
-                                    <option value="ลาว">ลาว</option>
-                                    <option value="กัมพูชา">กัมพูชา</option>
-                                    <option value="พม่า">พม่า</option>
-                                    <option value="มาเลเซีย">มาเลเซีย</option>
-                                    <option value="อินเดีย">อินเดีย</option>
-                                    <option value="อื่นๆ">อื่นๆ</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-4">
-                                <label for="recruit_nationality" class="form-label">สัญชาติ <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" name="recruit_nationality" id="recruit_nationality"
-                                    required>
-                                    <option value="ไทย" selected>ไทย</option>
-                                    <option value="จีน">จีน</option>
-                                    <option value="ญี่ปุ่น">ญี่ปุ่น</option>
-                                    <option value="เกาหลี">เกาหลี</option>
-                                    <option value="เวียดนาม">เวียดนาม</option>
-                                    <option value="ลาว">ลาว</option>
-                                    <option value="กัมพูชา">กัมพูชา</option>
-                                    <option value="พม่า">พม่า</option>
-                                    <option value="มาเลเซีย">มาเลเซีย</option>
-                                    <option value="อินเดีย">อินเดีย</option>
-                                    <option value="อื่นๆ">อื่นๆ</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-4">
-                                <label for="recruit_religion" class="form-label">ศาสนา <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" name="recruit_religion" id="recruit_religion" required>
-                                    <option value="พุทธ" selected>พุทธ</option>
-                                    <option value="อิสลาม">อิสลาม</option>
-                                    <option value="คริสต์">คริสต์</option>
-                                    <option value="ฮินดู">ฮินดู</option>
-                                    <option value="ซิกข์">ซิกข์</option>
-                                    <option value="ไม่นับถือศาสนา">ไม่นับถือศาสนา</option>
-                                    <option value="อื่นๆ">อื่นๆ</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-sm-12">
-                                <label for="recruit_phone" class="form-label">เบอร์โทรศัพท์ <span
-                                        class="text-danger">*</span></label>
-                                <div class="input-group flex-nowrap">
-                                    <span class="input-group-text"><i class='bx bx-phone'></i></span>
-                                    <input type="tel" class="form-control" name="recruit_phone" id="recruit_phone"
-                                        placeholder="0x-xxxx-xxxx" maxlength="12" required>
+                            <div class="row g-2 g-sm-3 mb-1">
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <label for="recruit_idCard" class="form-label mb-0">เลขบัตรประจำตัวประชาชน (13 หลัก) <span class="text-danger">*</span></label>
+                                        <span class="badge-verified-id">
+                                            <i class='bx bx-check-shield'></i> ตรวจสอบสิทธิ์แล้ว
+                                        </span>
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class='bx bx-credit-card-front text-primary'></i></span>
+                                        <input type="text" class="form-control bg-white fw-bold text-dark rounded-end-3" name="recruit_idCard" id="recruit_idCard"
+                                            maxlength="17" required placeholder="เลขบัตรประชาชน 13 หลัก"
+                                            value="<?= isset($preCheckIdCard) ? $preCheckIdCard : '' ?>" readonly>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- 3. Birth Date & Demographics Subgroup Card -->
+                        <div class="form-subgroup-card">
+                            <div class="form-subgroup-title">
+                                <i class='bx bx-calendar-event fs-5 text-info'></i> วันเดือนปีเกิด และข้อมูลทั่วไป
+                            </div>
 
+                            <div class="row g-2 g-sm-3 mb-3">
+                                <div class="col-12 mb-1">
+                                    <label class="form-label mb-0">วัน / เดือน / ปีเกิด (พ.ศ.) <span class="text-danger">*</span></label>
+                                </div>
+                                <div class="col-4">
+                                    <select class="form-select rounded-3" name="recruit_birthdayD" id="recruit_birthdayD" required>
+                                        <option value="">วัน</option>
+                                        <?php for ($i = 1; $i <= 31; $i++): ?>
+                                                <option value="<?= sprintf('%02d', $i) ?>"><?= $i ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <select class="form-select rounded-3" name="recruit_birthdayM" id="recruit_birthdayM" required>
+                                        <option value="">เดือน</option>
+                                        <option value="01">มกราคม</option>
+                                        <option value="02">กุมภาพันธ์</option>
+                                        <option value="03">มีนาคม</option>
+                                        <option value="04">เมษายน</option>
+                                        <option value="05">พฤษภาคม</option>
+                                        <option value="06">มิถุนายน</option>
+                                        <option value="07">กรกฎาคม</option>
+                                        <option value="08">สิงหาคม</option>
+                                        <option value="09">กันยายน</option>
+                                        <option value="10">ตุลาคม</option>
+                                        <option value="11">พฤศจิกายน</option>
+                                        <option value="12">ธันวาคม</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <select class="form-select rounded-3" name="recruit_birthdayY" id="recruit_birthdayY" required>
+                                        <option value="">ปี (พ.ศ.)</option>
+                                        <?php $curYear = date('Y') + 543;
+                                        for ($i = $curYear - 20; $i <= $curYear - 10; $i++): ?>
+                                                <option value="<?= $i ?>"><?= $i ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row g-2 g-sm-3 mb-1">
+                                <div class="col-12 col-sm-4">
+                                    <label for="recruit_race" class="form-label">เชื้อชาติ <span class="text-danger">*</span></label>
+                                    <select class="form-select rounded-3" name="recruit_race" id="recruit_race" required>
+                                        <option value="ไทย" selected>ไทย</option>
+                                        <option value="จีน">จีน</option>
+                                        <option value="ญี่ปุ่น">ญี่ปุ่น</option>
+                                        <option value="เกาหลี">เกาหลี</option>
+                                        <option value="เวียดนาม">เวียดนาม</option>
+                                        <option value="ลาว">ลาว</option>
+                                        <option value="กัมพูชา">กัมพูชา</option>
+                                        <option value="พม่า">พม่า</option>
+                                        <option value="มาเลเซีย">มาเลเซีย</option>
+                                        <option value="อินเดีย">อินเดีย</option>
+                                        <option value="อื่นๆ">อื่นๆ</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <label for="recruit_nationality" class="form-label">สัญชาติ <span class="text-danger">*</span></label>
+                                    <select class="form-select rounded-3" name="recruit_nationality" id="recruit_nationality" required>
+                                        <option value="ไทย" selected>ไทย</option>
+                                        <option value="จีน">จีน</option>
+                                        <option value="ญี่ปุ่น">ญี่ปุ่น</option>
+                                        <option value="เกาหลี">เกาหลี</option>
+                                        <option value="เวียดนาม">เวียดนาม</option>
+                                        <option value="ลาว">ลาว</option>
+                                        <option value="กัมพูชา">กัมพูชา</option>
+                                        <option value="พม่า">พม่า</option>
+                                        <option value="มาเลเซีย">มาเลเซีย</option>
+                                        <option value="อินเดีย">อินเดีย</option>
+                                        <option value="อื่นๆ">อื่นๆ</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <label for="recruit_religion" class="form-label">ศาสนา <span class="text-danger">*</span></label>
+                                    <select class="form-select rounded-3" name="recruit_religion" id="recruit_religion" required>
+                                        <option value="พุทธ" selected>พุทธ</option>
+                                        <option value="อิสลาม">อิสลาม</option>
+                                        <option value="คริสต์">คริสต์</option>
+                                        <option value="ฮินดู">ฮินดู</option>
+                                        <option value="ซิกข์">ซิกข์</option>
+                                        <option value="ไม่นับถือศาสนา">ไม่นับถือศาสนา</option>
+                                        <option value="อื่นๆ">อื่นๆ</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Contact Information Subgroup Card -->
+                        <div class="form-subgroup-card">
+                            <div class="form-subgroup-title">
+                                <i class='bx bx-phone-call fs-5 text-success'></i> ข้อมูลการติดต่อ
+                            </div>
+
+                            <div class="row g-2 g-sm-3 mb-1">
+                                <div class="col-12">
+                                    <label for="recruit_phone" class="form-label">เบอร์โทรศัพท์ที่ติดต่อได้สะดวก <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-phone text-success'></i></span>
+                                        <input type="tel" class="form-control rounded-end-3" name="recruit_phone" id="recruit_phone"
+                                            placeholder="0x-xxxx-xxxx" maxlength="12" required>
+                                    </div>
+                                    <small class="form-text text-muted">กรอกเบอร์โทรศัพท์มือถือที่สามารถติดต่อผู้สมัครหรือผู้ปกครองได้จริง</small>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
 
@@ -871,18 +1039,18 @@
                     </div>
 
                     <!-- Navigation Buttons -->
-                    <div class="row justify-content-between mt-4">
+                    <div class="row justify-content-between mt-4 wizard-buttons-wrap">
                         <div class="col-auto">
-                            <button type="button" class="btn btn-outline-secondary" id="prevBtn" style="display:none;">
+                            <button type="button" class="btn btn-wizard-prev" id="prevBtn" style="display:none;">
                                 <i class='bx bx-chevron-left'></i> ย้อนกลับ
                             </button>
                         </div>
                         <div class="col-auto">
-                            <button type="button" class="btn btn-primary" id="nextBtn">
-                                ถัดไป <i class='bx bx-chevron-right'></i>
+                            <button type="button" class="btn btn-wizard-next" id="nextBtn">
+                                <span>ถัดไป</span> <i class='bx bx-chevron-right'></i>
                             </button>
-                            <button type="button" class="btn btn-success" id="submitBtn" style="display:none;">
-                                <i class='bx bx-check-circle'></i> ยืนยันการสมัครเรียน
+                            <button type="button" class="btn btn-wizard-submit" id="submitBtn" style="display:none;">
+                                <i class='bx bx-check-circle'></i> <span>ตรวจสอบและยืนยันการสมัคร</span>
                             </button>
                         </div>
                     </div>
@@ -892,26 +1060,7 @@
     </div>
 </div>
 
-<!-- Crop Modal -->
-<div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">ปรับแต่งรูปถ่าย (Crop Image)</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="img-container" style="max-height: 500px;">
-                    <img id="image_to_crop" src="" style="max-width: 100%;">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                <button type="button" class="btn btn-primary" id="crop_btn">ยืนยันการตัดรูป</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Crop Modal replaced by SweetAlert2 - no Bootstrap modal needed -->
 
 <?= $this->endSection() ?>
 
@@ -935,7 +1084,7 @@
 
 <script>
     $(document).ready(function () {
-        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        // confirmModal replaced by SweetAlert2 (no bootstrap.Modal needed)
 
         // CAPTCHA Refresh Functionality
         $('#refreshCaptchaBtn').on('click', function () {
@@ -1033,10 +1182,7 @@
             // Disable button and show loading
             $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังบันทึก...');
 
-            // Hide modal
-            confirmModal.hide();
-
-            // Show loading
+            // Close SweetAlert confirmation and show loading
             Swal.fire({
                 title: 'กำลังบันทึกข้อมูล...',
                 html: '<div class="mb-3"><div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div></div><p class="mb-0">กรุณารอสักครู่ ระบบกำลังอัปโหลดไฟล์และบันทึกข้อมูล</p>',
@@ -1056,6 +1202,9 @@
                 dataType: 'json',
                 success: function (response) {
                     if (response.status === 'success') {
+                        // Clear saved step upon successful submission
+                        sessionStorage.removeItem('admission_reg_step_<?= $level ?>');
+
                         Swal.fire({
                             icon: 'success',
                             title: 'สำเร็จ!',
@@ -1117,7 +1266,7 @@
                 if (validateStep(currentStep)) {
                     // Reset button before showing modal
                     $btn.prop('disabled', false).html(originalText);
-                    showConfirmationModal(confirmModal);
+                    showConfirmationSwal();
                 } else {
                     Swal.fire({
                         icon: 'warning',
@@ -1131,10 +1280,8 @@
         });
     });
 
-    // Image Cropping Logic
+    // Image Cropping Logic (SweetAlert2 - no Bootstrap modal)
     let cropper;
-    const imageToCrop = document.getElementById('image_to_crop');
-    const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
 
     function handleImageSelect(input) {
         if (input.files && input.files[0]) {
@@ -1142,72 +1289,96 @@
             // Validate file type
             const allowedTypes = ['image/jpeg', 'image/png'];
             if (!allowedTypes.includes(file.type)) {
-                console.error('Invalid file type selected:', file.type);
                 Swal.fire({
                     icon: 'error',
                     title: 'ชนิดไฟล์รูปภาพไม่ถูกต้อง',
-                    text: 'กรุณาเลือกไฟล์รูปภาพที่เป็น JPG, PNG หรือ GIF เท่านั้น',
+                    text: 'กรุณาเลือกไฟล์รูปภาพที่เป็น JPG หรือ PNG เท่านั้น',
                     confirmButtonText: 'ตกลง'
                 });
-                input.value = ''; // Clear the input
+                input.value = '';
                 return;
             }
 
             const reader = new FileReader();
 
             reader.onload = function (e) {
-                imageToCrop.src = e.target.result;
-                cropModal.show();
+                showCropSwal(e.target.result);
             };
 
             reader.onerror = function (error) {
-                console.error('Error reading image file:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'เกิดข้อผิดพลาดในการอ่านไฟล์รูปภาพ',
                     text: 'ไม่สามารถอ่านไฟล์รูปภาพได้ โปรดลองใหม่อีกครั้ง หรือเลือกไฟล์อื่น',
                     confirmButtonText: 'ตกลง'
                 });
-                input.value = ''; // Clear the input
+                input.value = '';
             };
 
             reader.readAsDataURL(file);
-
-            input.value = ''; // Clear the input after processing to allow selecting same file again if needed
+            input.value = '';
         }
     }
 
-    document.getElementById('cropModal').addEventListener('shown.bs.modal', function () {
-        cropper = new Cropper(imageToCrop, {
-            aspectRatio: 3 / 4,
-            viewMode: 1,
-            autoCropArea: 1,
+    function showCropSwal(imageSrc) {
+        Swal.fire({
+            title: '<i class="bx bx-crop me-2" style="color:#e11d48;"></i>ปรับแต่งรูปถ่าย',
+            html: `<div id="swal-crop-container" style="max-height:60vh;overflow:hidden;border-radius:12px;background:#f1f5f9;">
+                       <img id="swal_image_to_crop" src="${imageSrc}" style="max-width:100%;display:block;">
+                   </div>
+                   <p class="text-muted small mt-2 mb-0"><i class="bx bx-info-circle me-1"></i>ลากเพื่อจัดตำแหน่งรูปภาพ (อัตราส่วน 3:4)</p>`,
+            width: '600px',
+            showCancelButton: true,
+            confirmButtonText: '<i class="bx bx-check-circle me-1"></i> ยืนยันการตัดรูป',
+            cancelButtonText: '<i class="bx bx-x me-1"></i> ยกเลิก',
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#64748b',
+            reverseButtons: true,
+            allowOutsideClick: false,
+            customClass: {
+                popup: 'rounded-4',
+                title: 'fs-6 fw-bold text-start',
+            },
+            didOpen: () => {
+                const imgEl = document.getElementById('swal_image_to_crop');
+                // Destroy previous cropper if exists
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+                cropper = new Cropper(imgEl, {
+                    aspectRatio: 3 / 4,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                });
+            },
+            preConfirm: () => {
+                if (cropper) {
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 450,
+                        height: 600,
+                    });
+                    return canvas.toDataURL('image/jpeg');
+                }
+                return false;
+            },
+            willClose: () => {
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                const croppedImage = result.value;
+                document.getElementById('preview_img_display').src = croppedImage;
+                document.getElementById('recruit_img_cropped').value = croppedImage;
+                document.getElementById('recruit_img_validator').value = 'uploaded';
+                document.getElementById('recruit_img_validator').classList.remove('is-invalid');
+                document.getElementById('recruit_img_validator').classList.add('is-valid');
+            }
         });
-    });
-
-    document.getElementById('cropModal').addEventListener('hidden.bs.modal', function () {
-        if (cropper) {
-            cropper.destroy();
-            cropper = null;
-        }
-    });
-
-    document.getElementById('crop_btn').addEventListener('click', function () {
-        if (cropper) {
-            const canvas = cropper.getCroppedCanvas({
-                width: 450,
-                height: 600,
-            });
-
-            const croppedImage = canvas.toDataURL('image/jpeg');
-            document.getElementById('preview_img_display').src = croppedImage;
-            document.getElementById('recruit_img_cropped').value = croppedImage;
-            document.getElementById('recruit_img_validator').value = 'uploaded';
-            document.getElementById('recruit_img_validator').classList.remove('is-invalid');
-            document.getElementById('recruit_img_validator').classList.add('is-valid');
-            cropModal.hide();
-        }
-    });
+    }
 
     function previewImage(input, previewId) {
         const preview = document.getElementById(previewId);
@@ -1943,28 +2114,27 @@
     // Initial setup
     setupCourseSelectionLogic();
 
-    // Wizard Logic
-    let currentStep = 1;
+    // Wizard Logic with Session Tab/Step Persistence
+    const savedStepKey = 'admission_reg_step_<?= $level ?>';
+    const savedStep = parseInt(sessionStorage.getItem(savedStepKey));
     const totalSteps = 5;
+    let currentStep = (savedStep && savedStep >= 1 && savedStep <= totalSteps) ? savedStep : 1;
 
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const submitBtn = document.getElementById('submitBtn');
 
-    function showConfirmationModal(confirmModal) {
+    function showConfirmationSwal() {
         const formData = new FormData(document.getElementById('regisForm'));
-        const dataList = document.getElementById('confirm-data-list');
-        dataList.innerHTML = '';
 
         const birthday = formData.get('recruit_birthdayD') + '/' + formData.get('recruit_birthdayM') + '/' + formData.get('recruit_birthdayY');
 
         // Helper function to get field value
         function getFieldValue(key) {
-            // For sport fields, check by data-field or _input suffix
             const sportFields = ['recruit_sportPosition', 'recruit_nickname', 'recruit_weight', 'recruit_height', 'recruit_fatherName', 'recruit_motherName', 'recruit_fatherJob', 'recruit_motherJob'];
             if (sportFields.includes(key)) {
                 const el = document.getElementById(key + '_input');
-                return el ? el.value || '<span class="text-muted">-</span>' : '<span class="text-muted">-</span>';
+                return el ? el.value || '-' : '-';
             }
 
             const element = document.querySelector(`[name="${key}"]`);
@@ -1983,22 +2153,29 @@
                     }
                     return element.options[element.selectedIndex].text;
                 }
-                return '<span class="text-muted">-</span>';
+                return '-';
             } else if (key.endsWith('_validator')) {
-                return formData.get('recruit_img_cropped') ? '<i class="bx bx-check-circle text-success"></i>' : '<i class="bx bx-x-circle text-danger"></i>';
+                return formData.get('recruit_img_cropped') ? '✅' : '❌';
             } else if (element && element.type === 'file') {
-                return element.files.length > 0 ? '<i class="bx bx-check-circle text-success"></i>' : '<span class="text-muted">-</span>';
+                return element.files.length > 0 ? '✅' : '-';
             }
-            return formData.get(key) || '<span class="text-muted">-</span>';
+            return formData.get(key) || '-';
         }
 
-        // Create data item HTML
-        function createDataItem(label, value) {
-            return `<div class="data-item"><span class="data-label">${label}</span><span class="data-value">${value}</span></div>`;
+        // Create compact data row
+        function row(label, value) {
+            return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);gap:8px;">
+                <span style="font-size:0.78rem;color:#64748b;flex-shrink:0;max-width:45%;">${label}</span>
+                <span style="font-size:0.82rem;font-weight:600;color:#1e293b;text-align:right;word-break:break-word;">${value}</span>
+            </div>`;
         }
 
-        // Build grouped HTML
-        let html = '';
+        function groupTitle(icon, color, title) {
+            return `<div style="font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+                <i class="bx ${icon}" style="font-size:1rem;color:${color};"></i>${title}
+            </div>`;
+        }
+
         const quotaName = getFieldValue('recruit_category');
         const courseId1 = document.querySelector('[name="recruit_tpyeRoom1"]').value;
         const selectedCourse1 = coursesData.find(c => c.course_id == courseId1);
@@ -2008,108 +2185,111 @@
                 (selectedCourse1.course_branch && selectedCourse1.course_branch.includes('กีฬา'))
             ));
 
+        // Build student photo
+        const croppedVal = document.getElementById('recruit_img_cropped').value;
+        let photoHtml = '';
+        if (croppedVal) {
+            photoHtml = `<div style="text-align:center;padding:12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+                <img src="${croppedVal}" alt="รูปถ่ายนักเรียน" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #e11d48;box-shadow:0 4px 12px rgba(225,29,72,0.2);">
+                <p style="margin:6px 0 0;font-size:0.75rem;color:#e11d48;font-weight:600;">รูปถ่ายนักเรียน</p>
+            </div>`;
+        }
+
         // Group 1: ข้อมูลการสมัคร
-        html += '<div class="data-group">';
-        html += '<div class="data-group-title"><i class="bx bx-bookmark text-primary"></i>ข้อมูลการสมัคร</div>';
-        html += createDataItem('ประเภทโควตา', quotaName);
+        let g1 = `<div style="background:#f8fafc;border-radius:10px;padding:10px 12px;margin-bottom:8px;">`;
+        g1 += groupTitle('bx-bookmark', '#e11d48', 'ข้อมูลการสมัคร');
+        g1 += row('ประเภทโควตา', quotaName);
         if (isSports) {
             const ageGroup = formData.get('recruit_agegroup');
-            if (ageGroup) {
-                html += createDataItem('รุ่นอายุ', ageGroup + ' ปี');
-            }
-            html += createDataItem('ตำแหน่งที่สมัคร', getFieldValue('recruit_sportPosition'));
+            if (ageGroup) g1 += row('รุ่นอายุ', ageGroup + ' ปี');
+            g1 += row('ตำแหน่งที่สมัคร', getFieldValue('recruit_sportPosition'));
         }
-        html += createDataItem('แผนการเรียน 1', getFieldValue('recruit_tpyeRoom1'));
+        g1 += row('แผนการเรียน 1', getFieldValue('recruit_tpyeRoom1'));
         const plan2 = getFieldValue('recruit_tpyeRoom2');
         const plan3 = getFieldValue('recruit_tpyeRoom3');
-        if (plan2 && !plan2.includes('text-muted')) html += createDataItem('แผนการเรียน 2', plan2);
-        if (plan3 && !plan3.includes('text-muted')) html += createDataItem('แผนการเรียน 3', plan3);
-        html += '</div>';
+        if (plan2 && plan2 !== '-') g1 += row('แผนการเรียน 2', plan2);
+        if (plan3 && plan3 !== '-') g1 += row('แผนการเรียน 3', plan3);
+        g1 += '</div>';
 
         // Group 2: ข้อมูลส่วนตัว
-        html += '<div class="data-group">';
-        html += '<div class="data-group-title"><i class="bx bx-user text-success"></i>ข้อมูลส่วนตัว</div>';
-        html += createDataItem('ชื่อ-นามสกุล', getFieldValue('recruit_prefix') + getFieldValue('recruit_firstName') + ' ' + getFieldValue('recruit_lastName'));
+        let g2 = `<div style="background:#f8fafc;border-radius:10px;padding:10px 12px;margin-bottom:8px;">`;
+        g2 += groupTitle('bx-user', '#0284c7', 'ข้อมูลส่วนตัว');
+        g2 += row('ชื่อ-นามสกุล', getFieldValue('recruit_prefix') + getFieldValue('recruit_firstName') + ' ' + getFieldValue('recruit_lastName'));
+        if (isSports) g2 += row('ชื่อเล่น', getFieldValue('recruit_nickname'));
+        g2 += row('เลขบัตรประชาชน', getFieldValue('recruit_idCard'));
+        g2 += row('วันเกิด', getFieldValue('recruit_birthday'));
+        if (isSports) g2 += row('น้ำหนัก / ส่วนสูง', getFieldValue('recruit_weight') + ' กก. / ' + getFieldValue('recruit_height') + ' ซม.');
+        g2 += row('เบอร์โทรศัพท์', getFieldValue('recruit_phone'));
+        g2 += row('เชื้อชาติ/สัญชาติ', getFieldValue('recruit_race') + '/' + getFieldValue('recruit_nationality'));
+        g2 += row('ศาสนา', getFieldValue('recruit_religion'));
         if (isSports) {
-            html += createDataItem('ชื่อเล่น', getFieldValue('recruit_nickname'));
+            g2 += row('บิดา', getFieldValue('recruit_fatherName') + ' (อาชีพ: ' + getFieldValue('recruit_fatherJob') + ')');
+            g2 += row('มารดา', getFieldValue('recruit_motherName') + ' (อาชีพ: ' + getFieldValue('recruit_motherJob') + ')');
         }
-        html += createDataItem('เลขบัตรประชาชน', getFieldValue('recruit_idCard'));
-        html += createDataItem('วันเกิด', getFieldValue('recruit_birthday'));
-        if (isSports) {
-            html += createDataItem('น้ำหนัก / ส่วนสูง', getFieldValue('recruit_weight') + ' กก. / ' + getFieldValue('recruit_height') + ' ซม.');
-        }
-        html += createDataItem('เบอร์โทรศัพท์', getFieldValue('recruit_phone'));
-        html += createDataItem('เชื้อชาติ/สัญชาติ', getFieldValue('recruit_race') + '/' + getFieldValue('recruit_nationality'));
-        html += createDataItem('ศาสนา', getFieldValue('recruit_religion'));
-        if (isSports) {
-            html += createDataItem('บิดา', getFieldValue('recruit_fatherName') + ' (อาชีพ: ' + getFieldValue('recruit_fatherJob') + ')');
-            html += createDataItem('มารดา', getFieldValue('recruit_motherName') + ' (อาชีพ: ' + getFieldValue('recruit_motherJob') + ')');
-        }
-        html += '</div>';
+        g2 += '</div>';
 
         // Group 3: ที่อยู่
-        html += '<div class="data-group">';
-        html += '<div class="data-group-title"><i class="bx bx-home text-warning"></i>ที่อยู่ปัจจุบัน</div>';
+        let g3 = `<div style="background:#f8fafc;border-radius:10px;padding:10px 12px;margin-bottom:8px;">`;
+        g3 += groupTitle('bx-home', '#f59e0b', 'ที่อยู่ปัจจุบัน');
         const homeNumber = getFieldValue('recruit_homeNumber');
         const homeGroup = getFieldValue('recruit_homeGroup');
         const homeRoad = getFieldValue('recruit_homeRoad');
         let address = homeNumber;
-        if (homeGroup && !homeGroup.includes('text-muted')) address += ' หมู่ ' + homeGroup;
-        if (homeRoad && !homeRoad.includes('text-muted')) address += ' ถ.' + homeRoad;
-        html += createDataItem('บ้านเลขที่', address);
-        html += createDataItem('ตำบล/อำเภอ', getFieldValue('recruit_homeSubdistrict') + '/' + getFieldValue('recruit_homedistrict'));
-        html += createDataItem('จังหวัด', getFieldValue('recruit_homeProvince') + ' ' + getFieldValue('recruit_homePostcode'));
-        html += '</div>';
+        if (homeGroup && homeGroup !== '-') address += ' หมู่ ' + homeGroup;
+        if (homeRoad && homeRoad !== '-') address += ' ถ.' + homeRoad;
+        g3 += row('บ้านเลขที่', address);
+        g3 += row('ตำบล/อำเภอ', getFieldValue('recruit_homeSubdistrict') + '/' + getFieldValue('recruit_homedistrict'));
+        g3 += row('จังหวัด', getFieldValue('recruit_homeProvince') + ' ' + getFieldValue('recruit_homePostcode'));
+        g3 += '</div>';
 
         // Group 4: โรงเรียนเดิม
-        html += '<div class="data-group">';
-        html += '<div class="data-group-title"><i class="bx bx-building text-info"></i>โรงเรียนเดิม</div>';
-        html += createDataItem('โรงเรียน', getFieldValue('recruit_oldSchool'));
-        html += createDataItem('อำเภอ/จังหวัด', getFieldValue('recruit_district') + ', ' + getFieldValue('recruit_province'));
-        html += createDataItem('เกรดเฉลี่ย', '<strong class="text-primary">' + getFieldValue('recruit_grade') + '</strong>');
-        html += '</div>';
+        let g4 = `<div style="background:#f8fafc;border-radius:10px;padding:10px 12px;margin-bottom:8px;">`;
+        g4 += groupTitle('bx-building', '#06b6d4', 'โรงเรียนเดิม');
+        g4 += row('โรงเรียน', getFieldValue('recruit_oldSchool'));
+        g4 += row('อำเภอ/จังหวัด', getFieldValue('recruit_district') + ', ' + getFieldValue('recruit_province'));
+        g4 += row('เกรดเฉลี่ย', '<strong style="color:#e11d48;">' + getFieldValue('recruit_grade') + '</strong>');
+        g4 += '</div>';
 
-        dataList.innerHTML = html;
+        // Warning banner
+        const warningHtml = `<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+            <i class="bx bx-error-circle" style="color:#f59e0b;font-size:1.2rem;flex-shrink:0;"></i>
+            <small style="font-weight:600;color:#92400e;">หากยืนยันการสมัครแล้ว จะไม่สามารถกลับมาแก้ไขได้</small>
+        </div>`;
 
-        // Set image preview in modal
-        const imgElem = document.getElementById('confirm_image');
-        const croppedVal = document.getElementById('recruit_img_cropped').value;
-        if (croppedVal) {
-            imgElem.src = croppedVal;
-            imgElem.classList.remove('d-none');
-        } else {
-            imgElem.classList.add('d-none');
-        }
+        const fullHtml = `
+            ${photoHtml}
+            <div style="padding:10px 4px;max-height:60vh;overflow-y:auto;">
+                ${warningHtml}${g1}${g2}${g3}${g4}
+            </div>
+        `;
 
-        // Helper function to set document previews
-        const setDocPreview = (srcImgId, srcTxtId, targetImgId, targetTxtId) => {
-            const srcImg = document.getElementById(srcImgId);
-            const srcTxt = document.getElementById(srcTxtId);
-            const targetImg = document.getElementById(targetImgId);
-            const targetTxt = document.getElementById(targetTxtId);
-
-            if (srcImg && !srcImg.classList.contains('d-none')) {
-                targetImg.src = srcImg.src;
-                targetImg.classList.remove('d-none');
-                targetTxt.classList.add('d-none');
-            } else if (srcTxt && !srcTxt.classList.contains('d-none')) {
-                targetTxt.textContent = srcTxt.textContent;
-                targetTxt.classList.remove('d-none');
-                targetImg.classList.add('d-none');
-            } else {
-                targetImg.classList.add('d-none');
-                targetTxt.classList.add('d-none');
+        Swal.fire({
+            title: '<i class="bx bx-check-shield me-2" style="color:#e11d48;"></i>ตรวจสอบข้อมูลการสมัคร',
+            html: fullHtml,
+            width: '540px',
+            showCancelButton: true,
+            confirmButtonText: '<i class="bx bx-check-circle me-1"></i> ยืนยันและสมัครเรียน',
+            cancelButtonText: '<i class="bx bx-edit me-1"></i> แก้ไขข้อมูล',
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#64748b',
+            reverseButtons: true,
+            customClass: {
+                popup: 'rounded-4',
+                title: 'fs-6 fw-bold text-start',
+                htmlContainer: 'text-start px-0',
             }
-        };
-
-        setDocPreview('preview_certificate', 'preview_certificate_name', 'confirm_certificate', 'confirm_certificate_name');
-        setDocPreview('preview_certificateB', 'preview_certificateB_name', 'confirm_certificateB', 'confirm_certificateB_name');
-        setDocPreview('preview_idcard', 'preview_idcard_name', 'confirm_idcard', 'confirm_idcard_name');
-
-        confirmModal.show();
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Trigger confirmSubmitBtn click logic
+                $('#confirmSubmitBtn').trigger('click');
+            }
+        });
     }
 
     function showStep(step) {
+        currentStep = step;
+        sessionStorage.setItem(savedStepKey, step);
+
         document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
         document.getElementById('step-' + step).classList.add('active');
 
@@ -2135,6 +2315,9 @@
             submitBtn.style.display = 'none';
         }
     }
+
+    // Initialize step on page load (restore saved tab if refreshed)
+    showStep(currentStep);
 
     function validateStep(step) {
         const stepEl = document.getElementById('step-' + step);
@@ -2289,156 +2472,6 @@
 
 </script>
 
-<!-- Confirmation Modal - Mobile Friendly -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true"
-    data-bs-backdrop="static">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white py-3">
-                <div>
-                    <h5 class="modal-title mb-1" id="confirmModalLabel">
-                        <i class="bx bx-check-shield me-2"></i>ตรวจสอบข้อมูลการสมัคร
-                    </h5>
-                    <small class="opacity-75">กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนยืนยัน</small>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-0">
-                <!-- Warning Alert -->
-                <div class="alert alert-warning rounded-0 mb-0 py-2 px-3 border-0 border-bottom">
-                    <div class="d-flex align-items-center">
-                        <i class="bx bx-error-circle fs-4 me-2"></i>
-                        <small class="fw-medium">หากยืนยันการสมัครแล้ว จะไม่สามารถกลับมาแก้ไขได้</small>
-                    </div>
-                </div>
-
-                <!-- Student Photo Section -->
-                <div class="text-center p-3 bg-light border-bottom">
-                    <img id="confirm_image" src="#" alt="รูปถ่ายนักเรียน"
-                        class="rounded-circle border border-3 border-primary shadow-sm d-none"
-                        style="width:100px; height:100px; object-fit:cover;" />
-                    <p class="mb-0 mt-2 fw-bold text-primary small">รูปถ่ายนักเรียน</p>
-                </div>
-
-                <!-- Data List -->
-                <div id="confirm-data-list" class="px-3 py-2">
-                    <!-- Data will be injected here by JS -->
-                </div>
-
-                <!-- Documents Section -->
-                <div class="px-3 pb-3">
-                    <div class="bg-light rounded-3 p-3">
-                        <h6 class="fw-bold mb-3 d-flex align-items-center">
-                            <i class="bx bx-file text-primary me-2"></i>เอกสารหลักฐาน
-                        </h6>
-                        <div class="row g-2">
-                            <div class="col-4 text-center">
-                                <div class="bg-white rounded p-2 h-100">
-                                    <img id="confirm_certificate" src="#" class="img-fluid rounded d-none mb-1"
-                                        style="max-height:80px; width: auto;">
-                                    <p id="confirm_certificate_name" class="small text-muted d-none mb-0"></p>
-                                    <small class="text-muted d-block">ปพ.1 (หน้า)</small>
-                                </div>
-                            </div>
-                            <div class="col-4 text-center">
-                                <div class="bg-white rounded p-2 h-100">
-                                    <img id="confirm_certificateB" src="#" class="img-fluid rounded d-none mb-1"
-                                        style="max-height:80px; width: auto;">
-                                    <p id="confirm_certificateB_name" class="small text-muted d-none mb-0"></p>
-                                    <small class="text-muted d-block">ปพ.1 (หลัง)</small>
-                                </div>
-                            </div>
-                            <div class="col-4 text-center">
-                                <div class="bg-white rounded p-2 h-100">
-                                    <img id="confirm_idcard" src="#" class="img-fluid rounded d-none mb-1"
-                                        style="max-height:80px; width: auto;">
-                                    <p id="confirm_idcard_name" class="small text-muted d-none mb-0"></p>
-                                    <small class="text-muted d-block">สำเนาบัตร</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer flex-column flex-sm-row gap-2 p-3 bg-light">
-                <button type="button" class="btn btn-outline-secondary w-100 w-sm-auto order-2 order-sm-1"
-                    data-bs-dismiss="modal">
-                    <i class="bx bx-edit me-1"></i>แก้ไขข้อมูล
-                </button>
-                <button type="button" class="btn btn-success w-100 w-sm-auto order-1 order-sm-2 py-2"
-                    id="confirmSubmitBtn">
-                    <i class="bx bx-check-circle me-1"></i>ยืนยันและสมัครเรียน
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    /* Mobile-friendly Modal Styles */
-    @media (max-width: 575.98px) {
-        #confirmModal .modal-footer {
-            position: sticky;
-            bottom: 0;
-            z-index: 10;
-        }
-
-        #confirmModal .modal-footer .btn {
-            font-size: 1rem;
-            padding: 0.75rem;
-        }
-    }
-
-    /* Data List Styles */
-    #confirm-data-list .data-group {
-        background: #f8f9fa;
-        border-radius: 0.5rem;
-        padding: 0.75rem;
-        margin-bottom: 0.75rem;
-    }
-
-    #confirm-data-list .data-group-title {
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-    }
-
-    #confirm-data-list .data-group-title i {
-        margin-right: 0.5rem;
-        font-size: 1rem;
-    }
-
-    #confirm-data-list .data-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        padding: 0.35rem 0;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        gap: 0.5rem;
-    }
-
-    #confirm-data-list .data-item:last-child {
-        border-bottom: none;
-    }
-
-    #confirm-data-list .data-label {
-        font-size: 0.8rem;
-        color: #6c757d;
-        flex-shrink: 0;
-        max-width: 45%;
-    }
-
-    #confirm-data-list .data-value {
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: #212529;
-        text-align: right;
-        word-break: break-word;
-    }
-</style><?= $this->endSection() ?>
+<!-- Hidden confirmSubmitBtn (triggered by SweetAlert2 confirmation) -->
+<button type="button" id="confirmSubmitBtn" style="display:none;"></button>
+<?= $this->endSection() ?>

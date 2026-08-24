@@ -209,9 +209,9 @@
 
 <?= $this->section('content') ?>
 
-<div class="row justify-content-center">
-    <div class="col-xl-10">
-        <div class="card mb-4">
+<div class="row justify-content-center w-100 mx-auto">
+    <div class="col-12 col-lg-6 px-0 px-sm-2">
+        <div class="card mb-4" style="width: 100%; margin: 0 auto; border-radius: 24px; border: 1.5px solid #cbd5e1; border-top: 4px solid #e11d48; border-bottom: 4px solid #0284c7; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08); overflow: hidden;">
             <div class="card-header d-flex justify-content-between align-items-center border-bottom">
                 <h5 class="mb-0 text-primary"><i class='bx bx-edit me-2'></i>แก้ไขข้อมูลการสมัคร (Edit Registration)
                 </h5>
@@ -262,8 +262,9 @@
                                     <span class="input-group-text"><i class='bx bx-star'></i></span>
                                     <select class="form-select" name="recruit_category" id="recruit_category" required>
                                         <option value="" selected disabled>-- กรุณาเลือกประเภทโควตา --</option>
-                                        <?php foreach ($quotas as $quota): ?>
-                                            <?php if ($quota->quota_status == 'on' && strpos($quota->quota_level, (string) $level) !== false): ?>
+                                        <?php foreach ($quotas as $quota): 
+                                            $levelsInQ = preg_split('/[|,]/', $quota->quota_level ?? '');
+                                            if ($quota->quota_status == 'on' && in_array((string) $level, $levelsInQ)): ?>
                                                 <option value="<?= $quota->quota_id ?>"
                                                     data-courses="<?= $quota->quota_course ?>"
                                                     <?= (isset($student['recruit_category']) && $student['recruit_category'] == $quota->quota_id) ? 'selected' : '' ?>>

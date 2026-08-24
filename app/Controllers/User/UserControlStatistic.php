@@ -2,6 +2,7 @@
 
 namespace App\Controllers\User;
 
+use App\Controllers\BaseController;
 use App\Libraries\Datethai;
 
 class UserControlStatistic extends BaseController

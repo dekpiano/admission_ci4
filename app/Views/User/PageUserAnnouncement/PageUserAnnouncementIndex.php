@@ -8,13 +8,14 @@
 
     /* Page Header */
     .announce-hero {
-        background: linear-gradient(135deg, #ff9eb5 0%, #c9aed6 50%, #84d2f6 100%);
+        background: linear-gradient(135deg, #e11d48 0%, #ff2d75 35%, #0284c7 80%, #0369a1 100%);
         border-radius: 24px;
         padding: 2.5rem 2rem;
         color: white;
         position: relative;
         overflow: hidden;
         margin-bottom: 2rem;
+        box-shadow: 0 20px 40px rgba(225, 29, 72, 0.25);
     }
 
     .announce-hero::before {
@@ -24,7 +25,7 @@
         right: -20%;
         width: 300px;
         height: 300px;
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.12);
         border-radius: 50%;
     }
 
@@ -45,6 +46,7 @@
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         position: relative;
         z-index: 1;
+        color: #ffffff;
     }
 
     .announce-hero p {
@@ -52,6 +54,7 @@
         opacity: 0.95;
         position: relative;
         z-index: 1;
+        color: rgba(255, 255, 255, 0.95);
     }
 
     /* Filter Tabs */
@@ -65,11 +68,11 @@
     .filter-tab {
         padding: 10px 24px;
         border-radius: 50px;
-        font-weight: 600;
+        font-weight: 700;
         font-size: 0.95rem;
-        border: 2px solid #e0e0e0;
+        border: 2px solid #cbd5e1;
         background: white;
-        color: #555;
+        color: #475569;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
@@ -81,14 +84,15 @@
     .filter-tab:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        color: #555;
+        color: #0f172a;
+        border-color: #0284c7;
     }
 
     .filter-tab.active {
-        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
-        color: white;
+        background: linear-gradient(135deg, #e11d48 0%, #0284c7 100%);
+        color: white !important;
         border-color: transparent;
-        box-shadow: 0 6px 20px rgba(255, 158, 181, 0.35);
+        box-shadow: 0 6px 20px rgba(225, 29, 72, 0.3);
     }
 
     .filter-tab .badge-count {
@@ -99,7 +103,8 @@
     }
 
     .filter-tab.active .badge-count {
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.35);
+        color: white;
     }
 
     /* Year Selector */
@@ -107,10 +112,10 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        background: linear-gradient(135deg, #ff9eb5 0%, #84d2f6 100%);
+        background: linear-gradient(135deg, #e11d48 0%, #0284c7 100%);
         padding: 10px 20px;
         border-radius: 50px;
-        box-shadow: 0 4px 15px rgba(255, 158, 181, 0.25);
+        box-shadow: 0 4px 15px rgba(225, 29, 72, 0.25);
     }
 
     .year-filter-wrapper label {
@@ -127,7 +132,7 @@
         font-weight: 700;
         font-size: 1rem;
         background: white;
-        color: #ff9eb5;
+        color: #e11d48;
         min-width: 90px;
     }
 

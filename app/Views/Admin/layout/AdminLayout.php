@@ -18,39 +18,336 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=K2D:wght@200;300;400;500;600;700&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
     rel="stylesheet" />
   <style>
-    body {
+    body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, .fw-bold, .btn, .nav, .form-control, .form-select, .badge, .swal2-popup, .modal, .dropdown-menu, .table, p, span:not(.bx):not([class*="bx-"]), a:not(.bx), div {
       font-family: 'K2D', sans-serif !important;
     }
 
+    /* Force Boxicons & Icon Fonts to NEVER be overridden by text font */
+    i.bx, i.bxs, i.bxl, .bx, .bxs, .bxl, [class^="bx-"], [class*=" bx-"], .bx-fw,
+    .fa, .fas, .far, .fab, .bi, .material-icons, [class^="bx"], [class*=" bx"] {
+      font-family: 'boxicons' !important;
+      font-style: normal;
+      font-weight: normal;
+      font-variant: normal;
+      text-transform: none;
+      line-height: 1;
+      display: inline-block;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
     :root {
-      --bs-primary: #28a745;
-      --bs-primary-rgb: 40, 167, 69;
+      /* Primary: Suankularb Coral Pink (#ff6b8b) */
+      --bs-primary: #ff6b8b;
+      --bs-primary-rgb: 255, 107, 139;
+      --bs-link-color: #ff6b8b;
+      --bs-link-hover-color: #e04869;
+      
+      /* Secondary: Suankularb Sky Blue (#56ccf2) */
+      --bs-secondary: #56ccf2;
+      --bs-secondary-rgb: 86, 204, 242;
+      --bs-info: #56ccf2;
+      --bs-info-rgb: 86, 204, 242;
+
+      /* Suankularb Brand Palette */
+      --skj-pink: #ff6b8b;
+      --skj-pink-light: #ff8fa7;
+      --skj-pink-dark: #e04869;
+      --skj-pink-surface: #fff0f3;
+      --skj-pink-text: #9e1136;
+
+      --skj-blue: #56ccf2;
+      --skj-blue-light: #7be0ff;
+      --skj-blue-dark: #249ecd;
+      --skj-blue-surface: #eef9fe;
+      --skj-blue-text: #075985;
+
+      --skj-gradient: linear-gradient(135deg, #ff6b8b 0%, #56ccf2 100%);
+      --skj-gradient-pink: linear-gradient(135deg, #ff6b8b 0%, #e04869 100%);
+      --skj-gradient-blue: linear-gradient(135deg, #56ccf2 0%, #2f80ed 100%);
+
+      /* High Contrast Text */
+      --skj-text-dark: #0f172a;
+      --skj-text-body: #1e293b;
+      --skj-text-muted: #64748b;
+      --skj-text-light: #ffffff;
+
+      --skj-card-border: 1px solid #e2e8f0;
+      --skj-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
     }
 
+    body {
+      background-color: #f8fafc;
+      color: var(--skj-text-body) !important;
+    }
+
+    h1, h2, h3, h4, h5, h6, .fw-bold {
+      color: var(--skj-text-dark);
+      font-weight: 700;
+    }
+
+    /* Buttons with high-contrast text */
     .btn-primary {
-      background-color: #28a745 !important;
-      border-color: #28a745 !important;
+      background: var(--skj-pink) !important;
+      border: none !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(255, 107, 139, 0.35);
+      transition: all 0.25s ease;
     }
 
-    .btn-primary:hover {
-      background-color: #218838 !important;
-      border-color: #1e7e34 !important;
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+      background: var(--skj-pink-dark) !important;
+      color: #ffffff !important;
+      box-shadow: 0 6px 18px rgba(255, 107, 139, 0.5);
+      transform: translateY(-1px);
     }
 
+    .btn-secondary, .btn-info {
+      background: var(--skj-blue) !important;
+      border: none !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(86, 204, 242, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .btn-secondary:hover, .btn-info:hover {
+      background: var(--skj-blue-dark) !important;
+      color: #ffffff !important;
+      box-shadow: 0 6px 18px rgba(86, 204, 242, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline-primary {
+      border: 2px solid var(--skj-pink) !important;
+      color: var(--skj-pink-dark) !important;
+      background: transparent;
+      font-weight: 700 !important;
+      transition: all 0.25s ease;
+    }
+
+    .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+      background: var(--skj-pink) !important;
+      color: #ffffff !important;
+      border-color: var(--skj-pink) !important;
+      box-shadow: 0 4px 14px rgba(255, 107, 139, 0.35);
+    }
+
+    .btn-outline-secondary, .btn-outline-info {
+      border: 2px solid var(--skj-blue-dark) !important;
+      color: var(--skj-blue-dark) !important;
+      background: transparent;
+      font-weight: 700 !important;
+      transition: all 0.25s ease;
+    }
+
+    .btn-outline-secondary:hover, .btn-outline-info:hover {
+      background: var(--skj-blue) !important;
+      color: #ffffff !important;
+      border-color: var(--skj-blue) !important;
+      box-shadow: 0 4px 14px rgba(86, 204, 242, 0.35);
+    }
+
+    /* Colors & Text Utilities */
     .text-primary {
-      color: #28a745 !important;
+      color: #ff6b8b !important;
     }
 
-    .bg-primary {
-      background-color: #28a745 !important;
+    .text-secondary, .text-info {
+      color: #249ecd !important;
     }
 
+    .text-muted {
+      color: #64748b !important;
+    }
+
+    .text-dark {
+      color: #0f172a !important;
+    }
+
+    /* Solid Badges */
+    .badge.bg-primary {
+      background-color: #ff6b8b !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .badge.bg-secondary, .badge.bg-info {
+      background-color: #56ccf2 !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Soft High-Contrast Badges */
     .bg-label-primary {
-        background-color: rgba(40, 167, 69, 0.1) !important;
-        color: #28a745 !important;
+      background-color: #fff0f3 !important;
+      color: #9e1136 !important;
+      font-weight: 700 !important;
+      border: 1px solid #ffd1dc !important;
+    }
+
+    .bg-label-secondary, .bg-label-info {
+      background-color: #eef9fe !important;
+      color: #075985 !important;
+      font-weight: 700 !important;
+      border: 1px solid #bae6fd !important;
+    }
+
+    .bg-label-success {
+      background-color: #dcfce7 !important;
+      color: #166534 !important;
+      font-weight: 700 !important;
+      border: 1px solid #bbf7d0 !important;
+    }
+
+    .bg-label-warning {
+      background-color: #fef3c7 !important;
+      color: #92400e !important;
+      font-weight: 700 !important;
+      border: 1px solid #fde68a !important;
+    }
+
+    .bg-label-danger {
+      background-color: #fee2e2 !important;
+      color: #991b1b !important;
+      font-weight: 700 !important;
+      border: 1px solid #fecaca !important;
+    }
+
+    /* Sidebar Navigation (Suankularb Pink Active) */
+    .app-brand {
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 0.75rem;
+    }
+
+    .app-brand-text {
+      background: linear-gradient(135deg, #ff6b8b 0%, #56ccf2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800 !important;
+    }
+
+    .menu-vertical .menu-item.active > .menu-link:not(.menu-toggle) {
+      background: linear-gradient(135deg, #ff6b8b 0%, #e04869 100%) !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 14px rgba(255, 107, 139, 0.4) !important;
+      border-radius: 12px !important;
+    }
+
+    .menu-vertical .menu-item.active > .menu-link:not(.menu-toggle) i,
+    .menu-vertical .menu-item.active > .menu-link:not(.menu-toggle) div {
+      color: #ffffff !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .menu-vertical .menu-item:not(.active) > .menu-link {
+      color: #475569 !important;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .menu-vertical .menu-item:not(.active) > .menu-link:hover {
+      background-color: #fff0f3 !important;
+      color: #9e1136 !important;
+      border-radius: 12px;
+    }
+
+    .menu-vertical .menu-item:not(.active) > .menu-link:hover i {
+      color: #9e1136 !important;
+    }
+
+    .menu-header-text {
+      color: #249ecd !important;
+      font-size: 0.74rem !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.8px;
+    }
+
+    /* Form Controls, Inputs & Labels */
+    label, .form-label {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+      margin-bottom: 0.35rem;
+    }
+
+    .form-control, .form-select, textarea.form-control, input.form-control {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      font-weight: 500;
+      border: 1.5px solid #cbd5e1 !important;
+      border-radius: 10px;
+    }
+
+    .form-control:focus, .form-select:focus, textarea.form-control:focus, input.form-control:focus {
+      background-color: #ffffff !important;
+      border-color: var(--skj-pink, #e11d48) !important;
+      box-shadow: 0 0 0 0.2rem rgba(225, 29, 72, 0.15) !important;
+      color: #0f172a !important;
+    }
+
+    .form-check-input:checked,
+    .form-switch .form-check-input:checked {
+      background-color: var(--skj-pink, #e11d48) !important;
+      border-color: var(--skj-pink, #e11d48) !important;
+      box-shadow: 0 2px 6px rgba(225, 29, 72, 0.3) !important;
+    }
+
+    /* Table Typography & Headers */
+    .table thead th {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+      font-weight: 700 !important;
+      font-size: 0.84rem !important;
+      border-bottom: 2px solid #cbd5e1 !important;
+      letter-spacing: 0.3px;
+    }
+
+    .table tbody td {
+      color: #1e293b !important;
+      font-size: 0.875rem;
+      vertical-align: middle;
+    }
+
+    /* Pagination */
+    .page-item.active .page-link {
+      background: #ff6b8b !important;
+      border-color: #ff6b8b !important;
+      color: #ffffff !important;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(255, 107, 139, 0.35);
+    }
+
+    .page-link {
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .page-link:hover {
+      color: #ff6b8b;
+    }
+
+    /* Cards */
+    .card {
+      border-radius: 18px !important;
+      border: var(--skj-card-border) !important;
+      box-shadow: var(--skj-card-shadow) !important;
+      background-color: #ffffff;
+    }
+
+    .card-header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #f1f5f9;
+      color: #0f172a !important;
+      font-weight: 700;
     }
 
     /* SweetAlert2 Highest Priority */
@@ -59,7 +356,21 @@
     }
 
     .swal2-styled.swal2-confirm {
-        background-color: #28a745 !important;
+      background: linear-gradient(135deg, #ff6b8b 0%, #e04869 100%) !important;
+      color: #ffffff !important;
+      border-radius: 50px !important;
+      padding: 0.6rem 2rem !important;
+      font-weight: 700 !important;
+      border: none !important;
+      box-shadow: 0 4px 14px rgba(255, 107, 139, 0.4) !important;
+    }
+
+    .swal2-styled.swal2-cancel {
+      border-radius: 50px !important;
+      padding: 0.6rem 1.8rem !important;
+      font-weight: 700 !important;
+      background-color: #64748b !important;
+      color: #ffffff !important;
     }
 
     /* Mobile Enhancements */
@@ -82,18 +393,15 @@
         padding: 0.4em 0.6em;
       }
       
-      /* Better spacing for mobile content */
       .container-xxl {
         padding-left: 1rem !important;
         padding-right: 1rem !important;
       }
 
-      /* Adjust card padding for mobile */
       .card-body {
         padding: 1rem !important;
       }
       
-      /* Make tables scrollable on mobile */
       .table-responsive {
         border: 0;
         margin-bottom: 0;
@@ -111,8 +419,9 @@
     }
   </style>
 
-  <!-- Icons. Uncomment required icon fonts -->
-  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 
   <!-- Core CSS -->
   <link rel="stylesheet" href="<?= base_url('public/sneat-assets/vendor/css/core.css') ?>"
@@ -212,6 +521,13 @@
             </a>
           </li>
 
+          <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/live-chat') !== false) ? 'active' : '' ?>">
+            <a href="<?= site_url('skjadmin/live-chat') ?>" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-conversation text-primary"></i>
+              <div data-i18n="LiveChat">ระบบสนทนาสด (Live Chat)</div>
+            </a>
+          </li>
+
           <!-- ========== จัดการข้อมูลหลัก ========== -->
           <li class="menu-header small text-uppercase">
             <span class="menu-header-text">จัดการข้อมูลหลัก</span>
@@ -286,10 +602,10 @@
               <span class="menu-header-text">ผู้ดูแลระบบ</span>
             </li>
 
-            <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/line-notify') !== false) ? 'active' : '' ?>">
-              <a href="<?= site_url('skjadmin/line-notify') ?>" class="menu-link">
-                <i class="menu-icon tf-icons bx bxl-line" style="color: #00c300;"></i>
-                <div data-i18n="LineNotify">LINE Notify</div>
+            <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/telegram-notify') !== false) ? 'active' : '' ?>">
+              <a href="<?= site_url('skjadmin/telegram-notify') ?>" class="menu-link">
+                <i class="menu-icon tf-icons bx bxl-telegram" style="color: #24A1DE;"></i>
+                <div data-i18n="TelegramNotify">Telegram Notify</div>
               </a>
             </li>
 
@@ -453,7 +769,8 @@
   <script>
     $(document).ready(function () {
       // Skip forms with 'ajax-form' class or 'data-ajax' attribute - they handle their own button states
-      $('form:not(.ajax-form):not([data-ajax])').on('submit', function () {
+      $('form:not(.ajax-form):not([data-ajax]):not(#adminReplyForm):not(#skjUserChatForm)').on('submit', function (e) {
+        if (e.isDefaultPrevented()) return;
         var $form = $(this);
         // Check HTML5 validation
         if ($form[0].checkValidity()) {
@@ -464,7 +781,7 @@
             $btn = $clickedBtn;
           }
 
-          if ($btn.length > 0) {
+          if ($btn.length > 0 && !$btn.hasClass('no-disable')) {
             $btn.addClass('disabled');
             $btn.css('pointer-events', 'none');
             // Keep original width if possible or just replace text

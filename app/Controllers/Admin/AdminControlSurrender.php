@@ -46,14 +46,14 @@ class AdminControlSurrender extends BaseController
             ->get()->getResult();
         $data['years'] = $yearList;
 
-        // Get selected year from request or default to latest year in DB
+        // Always get open year from configuration
+        $yearConfig = $this->db->table('tb_openyear')->where('openyear_id', 1)->get()->getRow();
+        $defaultOpenYear = ($yearConfig && !empty($yearConfig->openyear_year)) ? $yearConfig->openyear_year : (date('Y') + 543);
+
+        // Get selected year from request or default to configured open year
         $year = $request->getVar('year');
         if (empty($year)) {
-            if (!empty($yearList)) {
-                $year = $yearList[0]->recruit_year;
-            } else {
-                $year = date('Y') + 543;
-            }
+            $year = $defaultOpenYear;
         }
         
         $data['selected_year'] = $year;
@@ -63,7 +63,7 @@ class AdminControlSurrender extends BaseController
         $builder->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials, tb_course.course_fullname, tb_course.course_branch, skjacth_personnel.tb_students.stu_UpdateConfirm');
         $builder->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left');
         $builder->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left');
-        $builder->join('skjacth_personnel.tb_students', 'tb_recruitstudent.recruit_idCard = skjacth_personnel.tb_students.stu_iden', 'left');
+        $builder->join('skjacth_personnel.tb_students', 'REPLACE(tb_recruitstudent.recruit_idCard, "-", "") = REPLACE(skjacth_personnel.tb_students.stu_iden, "-", "")', 'left');
         $builder->where('recruit_year', $year);
         $builder->groupBy('tb_recruitstudent.recruit_id');
         $builder->orderBy('recruit_id', 'DESC');
@@ -88,12 +88,12 @@ class AdminControlSurrender extends BaseController
             $affected = $this->db->affectedRows();
 
             return $this->response->setJSON([
-                'success' => $affected > 0,
+                'success' => true,
                 'affected' => $affected,
                 'recruit_id' => $recruit_id,
                 'status' => $status
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->response->setJSON(['success' => false, 'message' => $e->getMessage()]);
         }
     }
@@ -118,12 +118,12 @@ class AdminControlSurrender extends BaseController
             $affected = $this->db->affectedRows();
 
             return $this->response->setJSON([
-                'success' => $affected > 0,
+                'success' => true,
                 'affected' => $affected,
                 'recruit_id' => $recruit_id,
                 'status' => $status
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->response->setJSON(['success' => false, 'message' => $e->getMessage()]);
         }
     }
@@ -142,10 +142,25 @@ class AdminControlSurrender extends BaseController
         $studentId = $recruit[0]->recruit_idCard;
         $Year = $recruit[0]->recruit_year;
 
-        // Fetch Confirmation Data (tb_students)
+        $plainStudentId = str_replace('-', '', $studentId);
+        $formattedStudentId = (strlen($plainStudentId) == 13) 
+            ? substr($plainStudentId, 0, 1) . '-' . substr($plainStudentId, 1, 4) . '-' . substr($plainStudentId, 5, 5) . '-' . substr($plainStudentId, 10, 2) . '-' . substr($plainStudentId, 12, 1) 
+            : $studentId;
+
+        // Fetch Confirmation Data (tb_students) supporting both plain and formatted citizen IDs
         $confrim = $this->db->table('skjacth_personnel.tb_students')
-            ->where('stu_iden', $studentId)
+            ->groupStart()
+                ->where('stu_iden', $plainStudentId)
+                ->orWhere('stu_iden', $formattedStudentId)
+                ->orWhere('stu_iden', $studentId)
+            ->groupEnd()
             ->get()->getResult();
+
+        if (empty($confrim)) {
+            $confrim = $this->db->table('skjacth_personnel.tb_students')
+                ->where('REPLACE(stu_iden, "-", "") =', $plainStudentId)
+                ->get()->getResult();
+        }
 
         if (empty($confrim)) {
             return "ไม่พบข้อมูลการรายงานตัว กรุณาให้นักเรียนกรอกข้อมูลรายงานตัวก่อน";
@@ -212,7 +227,12 @@ class AdminControlSurrender extends BaseController
         $html .= '<div style="position:absolute;top:463px;left:475px; width:100%">' . $TH_Month[$date_M - 1] . '</div>';
         $html .= '<div style="position:absolute;top:463px;left:550px; width:100%">' . $date_Y . '</div>';
 
-        $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . get_recruit_file_url($recruit[0]->recruit_img, $recruit[0]->recruit_regLevel, 'img') . '"></div>';
+        $imgPath = get_recruit_image_path_for_pdf($recruit[0]->recruit_img, $recruit[0]->recruit_regLevel, 'img');
+        if (!empty($imgPath) && file_exists($imgPath)) {
+            $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . $imgPath . '"></div>';
+        } else {
+            $html .= '<div style="position:absolute;top:75px;left:663px; width:100%"><img style="width: 100px;height:130px;" src="' . get_recruit_file_url($recruit[0]->recruit_img, $recruit[0]->recruit_regLevel, 'img') . '"></div>';
+        }
 
         $regLevel = $confrim[0]->stu_regLevel ?? $recruit[0]->recruit_regLevel;
 
@@ -338,8 +358,20 @@ class AdminControlSurrender extends BaseController
 
         $mpdf->AddPage();
 
+        // Prepare parent ID variants
+        $studentIdToQuery = $confrim[0]->stu_iden ?? $studentId;
+        $plainIdToQuery = str_replace('-', '', $studentIdToQuery);
+        $formattedIdToQuery = (strlen($plainIdToQuery) == 13) 
+            ? substr($plainIdToQuery, 0, 1) . '-' . substr($plainIdToQuery, 1, 4) . '-' . substr($plainIdToQuery, 5, 5) . '-' . substr($plainIdToQuery, 10, 2) . '-' . substr($plainIdToQuery, 12, 1) 
+            : $studentIdToQuery;
+
+        $parentIds = array_unique(array_filter([$studentId, $plainStudentId, $formattedStudentId, $studentIdToQuery, $plainIdToQuery, $formattedIdToQuery]));
+
         // Father Data
-        $confrimFa = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "พ่อ")->get()->getResult();
+        $confrimFa = $this->db->table('skjacth_personnel.tb_parent')
+            ->whereIn('par_stuID', $parentIds)
+            ->where('par_relationKey', "พ่อ")
+            ->get()->getResult();
         $father = $confrimFa[0] ?? null;
 
         $par_decease = ($father->par_decease ?? '0000-00-00') == '0000-00-00' ? "" : $father->par_decease;
@@ -404,7 +436,10 @@ class AdminControlSurrender extends BaseController
             $html2 .= sprintf($checkMark, 875, 270);
 
         // Mother Data
-        $confrimMa = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "แม่")->get()->getResult();
+        $confrimMa = $this->db->table('skjacth_personnel.tb_parent')
+            ->whereIn('par_stuID', $parentIds)
+            ->where('par_relationKey', "แม่")
+            ->get()->getResult();
         $mother = $confrimMa[0] ?? null;
         $par_decease_Ma = ($mother->par_decease ?? '0000-00-00') == '0000-00-00' ? "" : $mother->par_decease;
 
@@ -468,7 +503,10 @@ class AdminControlSurrender extends BaseController
             $html2 .= sprintf($checkMark, 875, 470);
 
         // Guardian Data
-        $confrimPu = $this->db->table('skjacth_personnel.tb_parent')->where('par_stuID', $studentId)->where('par_relationKey', "ผู้ปกครอง")->get()->getResult();
+        $confrimPu = $this->db->table('skjacth_personnel.tb_parent')
+            ->whereIn('par_stuID', $parentIds)
+            ->where('par_relationKey', "ผู้ปกครอง")
+            ->get()->getResult();
         $guardian = $confrimPu[0] ?? null;
         $par_decease_Pu = ($guardian->par_decease ?? '0000-00-00') == '0000-00-00' ? "" : $guardian->par_decease;
 

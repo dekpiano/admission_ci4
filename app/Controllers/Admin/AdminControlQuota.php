@@ -79,19 +79,32 @@ class AdminControlQuota extends BaseController
 
     public function add()
     {
+        $courseModel = new \App\Models\CourseModel();
         $data['title'] = 'เพิ่มโควต้า';
+        $data['courses'] = $courseModel->findAll();
         return view('Admin/PageAdminQuota/PageAdminQuotaAdd', $data);
     }
 
     public function create()
     {
         $model = new QuotaModel();
+
+        $quotaCourse = $this->request->getPost('quota_course');
+        if (is_array($quotaCourse)) {
+            $quotaCourse = implode('|', $quotaCourse);
+        }
+
+        $quotaLevel = $this->request->getPost('quota_level');
+        if (is_array($quotaLevel)) {
+            $quotaLevel = implode('|', $quotaLevel);
+        }
+
         $data = [
             'quota_key' => $this->request->getPost('quota_key'),
-            'quota_level' => $this->request->getPost('quota_level'),
+            'quota_level' => $quotaLevel,
             'quota_explain' => $this->request->getPost('quota_explain'),
             'quota_status' => $this->request->getPost('quota_status'),
-            'quota_course' => $this->request->getPost('quota_course'),
+            'quota_course' => $quotaCourse,
         ];
         $model->insert($data);
         return redirect()->to(site_url('skjadmin/quotas'))->with('success', 'เพิ่มโควต้าใหม่สำเร็จ');
