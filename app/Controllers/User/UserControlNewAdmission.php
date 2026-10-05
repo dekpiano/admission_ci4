@@ -151,7 +151,8 @@ class UserControlNewAdmission extends BaseController
         }
 
         // Pass ID card to the registration form (via session or view data)
-        // For security, using session flashdata is better than URL parameters
+        // Store in level-specific session so page reload doesn't lose it
+        $this->session->set('pre_check_idCard_' . $level, $idCard);
         $this->session->setFlashdata('pre_check_idCard', $idCard);
 
         return redirect()->to(base_url('new-admission/register/' . $level));
@@ -173,13 +174,16 @@ class UserControlNewAdmission extends BaseController
             return redirect()->to('new-admission')->with('error', 'ระดับชั้น ม.' . $level . ' ยังไม่เปิดรับสมัครในขณะนี้');
         }
 
-        // Check if ID Card is passed from pre-check
-        $preCheckIdCard = $this->session->getFlashdata('pre_check_idCard');
+        // Check if ID Card is passed from pre-check or saved in session
+        $preCheckIdCard = $this->session->get('pre_check_idCard_' . $level) ?? $this->session->getFlashdata('pre_check_idCard');
 
         // If no ID Card in session (direct access), redirect to pre-check
         if (!$preCheckIdCard) {
             return redirect()->to('new-admission/pre-check/' . $level);
         }
+
+        // Keep in session for this level
+        $this->session->set('pre_check_idCard_' . $level, $preCheckIdCard);
 
         $data['title'] = "สมัครเรียน ม." . $level;
         $data['level'] = $level;
@@ -670,6 +674,11 @@ class UserControlNewAdmission extends BaseController
             } catch (\Exception $e) {
                 log_message('error', 'Notification Error: ' . $e->getMessage());
             }
+
+            // Clear persistent pre-check sessions
+            $regLevel = $data_insert['recruit_regLevel'] ?? $level ?? '1';
+            $this->session->remove('pre_check_idCard_' . $regLevel);
+            $this->session->remove('pre_check_idCard');
 
             return $this->response->setJSON([
                 'status' => 'success',

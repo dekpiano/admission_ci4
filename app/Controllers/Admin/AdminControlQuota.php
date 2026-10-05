@@ -19,7 +19,10 @@ class AdminControlQuota extends BaseController
         foreach ($courses as $c) {
             $courseMap[$c['course_id']] = [
                 'name' => $c['course_fullname'],
-                'level' => $c['course_gradelevel']
+                'level' => $c['course_gradelevel'],
+                'initials' => $c['course_initials'] ?? '',
+                'branch' => $c['course_branch'] ?? '',
+                'age' => $c['course_age'] ?? ''
             ];
         }
 
@@ -45,19 +48,25 @@ class AdminControlQuota extends BaseController
                 $html = '';
                 
                 if (!empty($m1Courses)) {
-                    $html .= '<h6 class="fw-bold text-primary mt-2"><i class="bx bx-user me-1"></i> ระดับชั้น ม.ต้น</h6>';
-                    $html .= '<div class="table-responsive mb-3"><table class="table table-bordered table-sm table-striped"><thead><tr class="table-primary"><th>หลักสูตร</th></tr></thead><tbody>';
+                    $html .= '<h6 class="fw-bold text-primary mt-2"><i class="bx bx-user me-1"></i> ระดับชั้น ม.ต้น (' . count($m1Courses) . ' หลักสูตร)</h6>';
+                    $html .= '<div class="table-responsive mb-3"><table class="table table-bordered table-sm table-striped align-middle"><thead><tr class="table-primary"><th>ชื่อหลักสูตร</th><th>สาขา / กีฬา</th><th class="text-center">อายุ</th></tr></thead><tbody>';
                     foreach ($m1Courses as $c) {
-                        $html .= '<tr><td>' . $c['name'] . '</td></tr>';
+                        $branchBadge = (!empty($c['branch']) && $c['branch'] !== '-') ? '<span class="badge bg-warning text-dark rounded-pill px-2 fw-bold"><i class="bx bx-run me-1"></i>' . esc($c['branch']) . '</span>' : '<span class="text-muted">-</span>';
+                        $ageBadge = !empty($c['age']) ? '<span class="badge bg-label-secondary rounded-pill px-2">' . esc($c['age']) . ' ปี</span>' : '<span class="text-muted">-</span>';
+                        $initialBadge = !empty($c['initials']) ? '<span class="badge bg-label-info rounded-pill me-1">' . esc($c['initials']) . '</span>' : '';
+                        $html .= '<tr><td>' . $initialBadge . '<span class="fw-semibold text-dark">' . esc($c['name']) . '</span></td><td>' . $branchBadge . '</td><td class="text-center">' . $ageBadge . '</td></tr>';
                     }
                     $html .= '</tbody></table></div>';
                 }
 
                 if (!empty($m4Courses)) {
-                    $html .= '<h6 class="fw-bold text-warning mt-2"><i class="bx bx-user-plus me-1"></i> ระดับชั้น ม.ปลาย</h6>';
-                    $html .= '<div class="table-responsive"><table class="table table-bordered table-sm table-striped"><thead><tr class="table-warning"><th>หลักสูตร</th></tr></thead><tbody>';
+                    $html .= '<h6 class="fw-bold text-warning mt-2"><i class="bx bx-user-plus me-1"></i> ระดับชั้น ม.ปลาย (' . count($m4Courses) . ' หลักสูตร)</h6>';
+                    $html .= '<div class="table-responsive"><table class="table table-bordered table-sm table-striped align-middle"><thead><tr class="table-warning"><th>ชื่อหลักสูตร</th><th>สาขา / กีฬา</th><th class="text-center">อายุ</th></tr></thead><tbody>';
                     foreach ($m4Courses as $c) {
-                        $html .= '<tr><td>' . $c['name'] . '</td></tr>';
+                        $branchBadge = (!empty($c['branch']) && $c['branch'] !== '-') ? '<span class="badge bg-warning text-dark rounded-pill px-2 fw-bold"><i class="bx bx-run me-1"></i>' . esc($c['branch']) . '</span>' : '<span class="text-muted">-</span>';
+                        $ageBadge = !empty($c['age']) ? '<span class="badge bg-label-secondary rounded-pill px-2">' . esc($c['age']) . ' ปี</span>' : '<span class="text-muted">-</span>';
+                        $initialBadge = !empty($c['initials']) ? '<span class="badge bg-label-primary rounded-pill me-1">' . esc($c['initials']) . '</span>' : '';
+                        $html .= '<tr><td>' . $initialBadge . '<span class="fw-semibold text-dark">' . esc($c['name']) . '</span></td><td>' . $branchBadge . '</td><td class="text-center">' . $ageBadge . '</td></tr>';
                     }
                     $html .= '</tbody></table></div>';
                 }

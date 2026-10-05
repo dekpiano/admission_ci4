@@ -219,6 +219,12 @@
         box-shadow: 0 8px 25px -5px rgba(2, 132, 199, 0.12);
     }
 
+    .photo-upload-box.is-invalid {
+        border-color: #ef4444 !important;
+        background: rgba(239, 68, 68, 0.04) !important;
+        box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.15) !important;
+    }
+
     .student-avatar-frame {
         width: 140px;
         height: 185px;
@@ -229,6 +235,12 @@
         background: #f8fafc;
         border: 3px solid #ffffff;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .student-avatar-frame.is-invalid {
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.25) !important;
     }
 
     .student-avatar-frame img {
@@ -1202,8 +1214,10 @@
                 dataType: 'json',
                 success: function (response) {
                     if (response.status === 'success') {
-                        // Clear saved step upon successful submission
+                        // Clear saved step and draft upon successful submission
                         sessionStorage.removeItem('admission_reg_step_<?= $level ?>');
+                        localStorage.removeItem('admission_draft_data_<?= $level ?>');
+                        localStorage.removeItem('admission_draft_step_<?= $level ?>');
 
                         Swal.fire({
                             icon: 'success',
@@ -1263,20 +1277,14 @@
             $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status"></span>กำลังตรวจสอบ...');
 
             setTimeout(() => {
-                if (validateStep(currentStep)) {
+                if (validateStep(currentStep, true)) {
                     // Reset button before showing modal
                     $btn.prop('disabled', false).html(originalText);
                     showConfirmationSwal();
                 } else {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'ข้อมูลยังไม่ครบถ้วน',
-                        text: 'กรุณาตรวจสอบข้อมูลในขั้นตอนสุดท้ายให้ครบถ้วนก่อนยืนยัน',
-                        confirmButtonText: 'ตกลง'
-                    });
                     $btn.prop('disabled', false).html(originalText);
                 }
-            }, 300);
+            }, 250);
         });
     });
 
@@ -1376,6 +1384,10 @@
                 document.getElementById('recruit_img_validator').value = 'uploaded';
                 document.getElementById('recruit_img_validator').classList.remove('is-invalid');
                 document.getElementById('recruit_img_validator').classList.add('is-valid');
+                const photoBox = document.querySelector('.photo-upload-box');
+                const avatarFrame = document.querySelector('.student-avatar-frame');
+                if (photoBox) photoBox.classList.remove('is-invalid');
+                if (avatarFrame) avatarFrame.classList.remove('is-invalid');
             }
         });
     }
@@ -1645,9 +1657,9 @@
                     title: 'คำแนะนำสำหรับโควตานักกีฬา',
                     html: '<div class="text-start">' +
                         'เมื่อเลือกประเภทโควตาความสามารถพิเศษทางกีฬา:<br>' +
-                        '1. ท่านจะเลือกได้เพียง 1 ประเภทกีฬาเท่านั้น (ไม่มีการจัดอันดับ)<br>' +
-                        '2. ท่านจะไม่สามารถเลือกแผนการเรียนปกติในอันดับอื่นได้<br>' +
-                        '<br><b>ขอให้ท่านพิจารณาอย่างถี่ถ้วนก่อนเลือกประเภทโควตานี้ครับ</b>' +
+                        '1. กรุณาเลือกหลักสูตร / ประเภทกีฬาที่ท่านต้องการสมัคร (เลือกได้ 1 อันดับ)<br>' +
+                        '2. กรอกข้อมูลความสามารถพิเศษทางกีฬาและข้อมูลผู้ปกครองให้ครบถ้วน<br>' +
+                        '3. ท่านจะไม่สามารถเลือกแผนการเรียนในอันดับ 2 และ 3 ได้<br>' +
                         '</div>',
                     confirmButtonText: 'รับทราบ',
                     confirmButtonColor: '#3085d6'
@@ -1659,37 +1671,57 @@
             const rank2 = document.getElementById('rank_container_2');
             const rank3 = document.getElementById('rank_container_3');
 
-            console.log('rank1 element:', rank1);
-            console.log('rank2 element:', rank2);
-            console.log('rank3 element:', rank3);
-
             if (isSportsQuotaCategory) {
-                console.log('>>> Entering SPORTS quota branch - HIDING ranks');
-                // โควตานักกีฬา - ไม่ต้องเลือกแผนการเรียน (ซ่อนทั้งหมด)
-                courseLabel.style.display = 'none';
+                // โควตานักกีฬา - แสดงอันดับ 1 ให้เลือกหลักสูตร/ประเภทกีฬาที่บันทึกไว้ในโควตานี้
+                courseLabel.style.display = 'block';
+                courseLabel.innerHTML = 'เลือกแผนการเรียน / ประเภทกีฬาที่สมัคร (เลือกได้ 1 อันดับ) <span class="text-danger">*</span>';
 
-                // ซ่อนทั้งอันดับ 1, 2 และ 3 แบบเจาะจง (ใช้ important เพื่อบดบัง CSS เดิม)
-                if (rank1) rank1.style.setProperty('display', 'none', 'important');
+                if (rank1) {
+                    rank1.style.setProperty('display', 'flex', 'important');
+                    const spanText = rank1.querySelector('.input-group-text');
+                    if (spanText) {
+                        spanText.textContent = 'หลักสูตร';
+                        spanText.style.display = 'block';
+                    }
+                }
                 if (rank2) rank2.style.setProperty('display', 'none', 'important');
                 if (rank3) rank3.style.setProperty('display', 'none', 'important');
 
-                // ปิด required และเคลียร์ค่า หรือเลือกอันแรกให้อัตโนมัติถ้ามี
-                courseSelects[0].required = false;
+                courseSelects[0].required = true;
                 courseSelects[1].required = false;
                 courseSelects[2].required = false;
-
-                if (allowedCourses.length > 0 && allowedCourses[0] !== '') {
-                    courseSelects[0].value = allowedCourses[0];
-                }
+                courseSelects[1].value = '';
+                courseSelects[2].value = '';
             } else {
                 // โควตาปกติ - เลือกได้สูงสุด 3 อันดับ
                 courseLabel.style.display = 'block';
-                courseLabel.innerHTML = 'เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ) <span class="text-danger">*</span>';
+                courseLabel.innerHTML = 'เลือกแผนการเรียน (เลือกได้สูงสุด 3 อันดับ/ นักกีฬาเลือกได้ 1 อันดับ) <span class="text-danger">*</span>';
 
                 // แสดงทั้ง 3 อันดับ
-                if (rank1) rank1.style.setProperty('display', 'flex', 'important');
-                if (rank2) rank2.style.setProperty('display', 'flex', 'important');
-                if (rank3) rank3.style.setProperty('display', 'flex', 'important');
+                if (rank1) {
+                    rank1.style.setProperty('display', 'flex', 'important');
+                    const spanText = rank1.querySelector('.input-group-text');
+                    if (spanText) {
+                        spanText.textContent = 'อันดับ 1';
+                        spanText.style.display = 'block';
+                    }
+                }
+                if (rank2) {
+                    rank2.style.setProperty('display', 'flex', 'important');
+                    const spanText = rank2.querySelector('.input-group-text');
+                    if (spanText) {
+                        spanText.textContent = 'อันดับ 2';
+                        spanText.style.display = 'block';
+                    }
+                }
+                if (rank3) {
+                    rank3.style.setProperty('display', 'flex', 'important');
+                    const spanText = rank3.querySelector('.input-group-text');
+                    if (spanText) {
+                        spanText.textContent = 'อันดับ 3';
+                        spanText.style.display = 'block';
+                    }
+                }
 
                 // เปิด required
                 courseSelects[0].required = true;
@@ -1706,53 +1738,51 @@
                     el.required = false;
                     el.value = '';
                 }
+                const hiddenEl = document.getElementById('recruit_' + field + '_hidden');
+                if (hiddenEl) hiddenEl.value = '';
             });
 
-            // Restore names (in case they were modified elsewhere, good practice)
+            // Restore names
             courseSelects[0].setAttribute('name', 'recruit_tpyeRoom1');
             courseSelects[1].setAttribute('name', 'recruit_tpyeRoom2');
             courseSelects[2].setAttribute('name', 'recruit_tpyeRoom3');
 
-            // Restore input group text visibility (just in case - for normal quota)
-            if (!isSportsQuotaCategory) {
-                if (rank1) rank1.querySelector('.input-group-text').style.display = 'block';
-                if (rank2) rank2.querySelector('.input-group-text').style.display = 'block';
-                if (rank3) rank3.querySelector('.input-group-text').style.display = 'block';
-            }
-
             ageRadioContainer.style.display = 'none';
+            ageRadioContainer.innerHTML = '';
+            ageGroupInput.value = '';
 
-            // Populate all dropdowns (Logic populate ยังเหมือนเดิม)
+            // Populate dropdowns
             courseSelects.forEach((select, index) => {
-                // ถ้าเป็นโควตานักกีฬา และเป็น index 1 หรือ 2 (อันดับ 2-3) ข้ามการ populate ก็ได้ หรือ populate ทิ้งไว้แต่ซ่อน
+                // ถ้าเป็นโควตานักกีฬา และเป็น index 1 หรือ 2 (อันดับ 2-3) ให้ข้าม
                 if (isSportsQuotaCategory && index > 0) {
                     select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 1} --</option>`;
                     return;
                 }
 
-                select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 1} --</option>`;
+                const placeholderText = (isSportsQuotaCategory && index === 0)
+                    ? '-- กรุณาเลือกหลักสูตร / ชนิดกีฬา --'
+                    : `-- เลือกอันดับ ${index + 1} --`;
+
+                select.innerHTML = `<option value="" selected disabled>${placeholderText}</option>`;
                 coursesData.forEach(course => {
                     if (allowedCourses.includes(course.course_id.toString())) {
                         const option = document.createElement('option');
                         option.value = course.course_id;
-                        // Display: Initials - Branch
+                        // Display: Initials - Branch (ไม่แสดงอายุตรงชื่อหลักสูตร ให้ผู้สมัครกรอกเอง)
                         const initials = course.course_initials || course.course_fullname;
-                        const branch = course.course_branch || '';
-                        option.text = `${initials} ${branch ? '(' + branch + ')' : ''}`;
+                        const branch = (course.course_branch && course.course_branch !== '-') ? ` (${course.course_branch})` : '';
+                        option.text = `${initials}${branch}`;
                         select.appendChild(option);
                     }
                 });
             });
 
-            // After population, if it's Sports Quota, auto-select the first allowed course
-            if (isSportsQuotaCategory && allowedCourses.length > 0 && allowedCourses[0] !== '') {
+            // ถ้าเป็นโควตานักกีฬา และมีหลักสูตรที่เปิดรับเพียง 1 หลักสูตร ให้เลือกให้อัตโนมัติและ trigger change
+            if (isSportsQuotaCategory && allowedCourses.length === 1 && allowedCourses[0] !== '') {
                 courseSelects[0].value = allowedCourses[0];
-                // Trigger change to handle any side effects (like age group radios)
                 const event = new Event('change');
                 courseSelects[0].dispatchEvent(event);
             }
-
-            // Event Listeners และ Logic อื่นๆ (เหมือนเดิม)
 
             // เพิ่ม event listener สำหรับอันดับ 1 เพื่อตรวจสอบว่าเป็นกีฬาหรือไม่
             courseSelects[0].addEventListener('change', function () {
@@ -1763,10 +1793,13 @@
 
                 if (!selectedCourse) return;
 
-                // ตรวจสอบว่าแผนการเรียนที่เลือกเป็น "กีฬา" หรือไม่
+                // ตรวจสอบว่าแผนการเรียนที่เลือกเป็น "กีฬา" หรือเป็นโควตานักกีฬา
                 const courseName = selectedCourse.course_initials || selectedCourse.course_fullname || '';
                 const courseBranch = selectedCourse.course_branch || '';
-                const isSportsCourse = courseName.includes('กีฬา') || courseBranch.includes('กีฬา');
+                const isSportsCourse = isSportsQuotaCategory || 
+                                       courseName.includes('กีฬา') || 
+                                       courseBranch.includes('กีฬา') || 
+                                       (selectedCourse.course_age && selectedCourse.course_age.trim() !== '');
 
                 console.log('=== DEBUG Course Selection ===');
                 console.log('Course Name:', courseName);
@@ -1788,7 +1821,7 @@
                     courseSelects[1].value = '';
                     courseSelects[2].value = '';
 
-                    // แสดงช่องข้อมูลกีฬา (Section ใหม่)
+                    // แสดงช่องข้อมูลกีฬา (Section นักกีฬา เหมือนในรอบทั่วไป)
                     if (sportsInfoSection) sportsInfoSection.style.display = 'block';
 
                     // ตั้ง required สำหรับ fields ในกีฬา
@@ -1814,6 +1847,8 @@
                             el.required = false;
                             el.value = '';
                         }
+                        const hiddenEl = document.getElementById('recruit_' + field + '_hidden');
+                        if (hiddenEl) hiddenEl.value = '';
                     });
                 }
 
@@ -1845,7 +1880,7 @@
                     requiredGPA = 2.75;
                 }
 
-                // ... (SweetAlert เกรดเฉลี่ย) ...
+                // SweetAlert เกรดเฉลี่ย
                 if (gradeRequirement) {
                     Swal.fire({
                         icon: 'warning',
@@ -1887,18 +1922,14 @@
                 }
 
                 function processCourseSelection(selectedCourse) {
-                    // Change: ตามคำขอของผู้ใช้ ให้เปลี่ยนจากเลือก (Radio) เป็นกรอกเอง (Manual Input) สำหรับรุ่นอายุ
-                    
-                    if (selectedCourse && selectedCourse.course_age && selectedCourse.course_age.trim() !== '') {
-                        // ถ้า Course มีอายุ (มักจะเป็นแผนนักกีฬา)
-                        const agesHint = selectedCourse.course_age; // เช่น "13, 15, 18"
-                        
+                    if (isSportsCourse) {
+                        // ให้ผู้สมัครกรอกรุ่นอายุเอง
                         ageRadioContainer.innerHTML = `
                             <label for="recruit_agegroup_manual" class="form-label d-block">ระบุรุ่นอายุที่ลงสมัคร (ปี) <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class='bx bx-time'></i></span>
                                 <input type="number" class="form-control" id="recruit_agegroup_manual" 
-                                    placeholder="เช่น ${agesHint}" required>
+                                    placeholder="ระบุรุ่นอายุ เช่น 12, 13, 14, 15, 16" required>
                                 <span class="input-group-text">ปี</span>
                             </div>
                             <div class="form-text text-muted small">* ระบุรุ่นอายุที่จะลงสมัครแข่งขันนักกีฬา</div>
@@ -1924,19 +1955,21 @@
 
                     // ถ้าไม่ใช่โควตานักกีฬา (isSportsQuotaCategory = false) เราต้องจัดการ reset options อันดับ 2-3 ด้วย
                     if (!isSportsQuotaCategory) {
-                        // Populate อันดับ 2 และ 3 ใหม่ โดยกรองแผนการเรียนกีฬาออก (เหมือนเดิม)
+                        // Populate อันดับ 2 และ 3 ใหม่ โดยกรองแผนการเรียนกีฬาออก
                         [courseSelects[1], courseSelects[2]].forEach((select, index) => {
                             const currentValue = select.value;
                             select.innerHTML = `<option value="" selected disabled>-- เลือกอันดับ ${index + 2} --</option>`;
                             coursesData.forEach(course => {
                                 if (allowedCourses.includes(course.course_id.toString())) {
-                                    const isSportsCourse = course.course_age && course.course_age.trim() !== '';
+                                    const isSportsCourse = (course.course_age && course.course_age.trim() !== '') ||
+                                                           (course.course_fullname && course.course_fullname.includes('กีฬา')) ||
+                                                           (course.course_branch && course.course_branch.includes('กีฬา'));
                                     if (!isSportsCourse) {
                                         const option = document.createElement('option');
                                         option.value = course.course_id;
                                         const initials = course.course_initials || course.course_fullname;
-                                        const branch = course.course_branch || '';
-                                        option.text = `${initials} ${branch ? '(' + branch + ')' : ''}`;
+                                        const branch = (course.course_branch && course.course_branch !== '-') ? ` (${course.course_branch})` : '';
+                                        option.text = `${initials}${branch}`;
                                         select.appendChild(option);
                                     }
                                 }
@@ -2286,9 +2319,189 @@
         });
     }
 
+    // ==========================================
+    // AUTO-SAVE & DRAFT RESTORE SYSTEM
+    // ==========================================
+    const draftStorageKey = 'admission_draft_data_<?= $level ?>';
+    const draftStepKey = 'admission_draft_step_<?= $level ?>';
+
+    function saveFormDraft() {
+        try {
+            const formEl = document.getElementById('regisForm');
+            if (!formEl) return;
+            const formData = {};
+            
+            // Collect all inputs, selects, textareas
+            const elements = formEl.querySelectorAll('input, select, textarea');
+            elements.forEach(el => {
+                if (!el.name && !el.dataset.field && !el.id) return;
+                const key = el.name || el.dataset.field || el.id;
+                if (el.type === 'file') return;
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                    if (el.checked) formData[key] = el.value;
+                } else {
+                    formData[key] = el.value;
+                }
+            });
+
+            // Save visible sport fields specifically
+            document.querySelectorAll('.sport-field').forEach(input => {
+                const fieldName = input.dataset.field;
+                if (fieldName) {
+                    formData[fieldName + '_input_val'] = input.value;
+                }
+            });
+
+            const manualAgeInput = document.getElementById('recruit_agegroup_manual');
+            if (manualAgeInput) {
+                formData['recruit_agegroup_manual_val'] = manualAgeInput.value;
+            }
+
+            localStorage.setItem(draftStorageKey, JSON.stringify(formData));
+            localStorage.setItem(draftStepKey, currentStep.toString());
+            sessionStorage.setItem(savedStepKey, currentStep.toString());
+        } catch (e) {
+            console.warn('Auto-save draft error:', e);
+        }
+    }
+
+    let saveDraftTimer = null;
+    function saveFormDraftDebounced() {
+        clearTimeout(saveDraftTimer);
+        saveDraftTimer = setTimeout(saveFormDraft, 250);
+    }
+
+    function restoreFormDraft() {
+        try {
+            const savedDataJson = localStorage.getItem(draftStorageKey);
+            if (!savedDataJson) return false;
+            const data = JSON.parse(savedDataJson);
+            if (!data || Object.keys(data).length === 0) return false;
+
+            console.log('Restoring form draft from localStorage...');
+
+            // 1. Restore Category/Quota first
+            if (data.recruit_category) {
+                const catSelect = document.getElementById('recruit_category');
+                if (catSelect) {
+                    catSelect.value = data.recruit_category;
+                    catSelect.dispatchEvent(new Event('change'));
+                }
+            }
+
+            // 2. Restore Course Selections & trigger change
+            if (data.recruit_tpyeRoom1) {
+                const room1 = document.getElementById('recruit_tpyeRoom1');
+                if (room1) {
+                    room1.value = data.recruit_tpyeRoom1;
+                    room1.dispatchEvent(new Event('change'));
+                }
+            }
+            if (data.recruit_tpyeRoom2) {
+                const room2 = document.getElementById('recruit_tpyeRoom2');
+                if (room2) room2.value = data.recruit_tpyeRoom2;
+            }
+            if (data.recruit_tpyeRoom3) {
+                const room3 = document.getElementById('recruit_tpyeRoom3');
+                if (room3) room3.value = data.recruit_tpyeRoom3;
+            }
+
+            // 3. Restore all inputs & selects
+            for (const [key, value] of Object.entries(data)) {
+                if (value === null || value === undefined || value === '') continue;
+
+                // Direct input by name or id
+                const el = document.querySelector(`[name="${key}"]`) || document.getElementById(key);
+                if (el && el.type !== 'file') {
+                    if (el.type === 'checkbox' || el.type === 'radio') {
+                        if (el.value === value) el.checked = true;
+                    } else {
+                        el.value = value;
+                    }
+                }
+
+                // Sport fields visual inputs
+                if (key.endsWith('_input_val')) {
+                    const pureField = key.replace('_input_val', '');
+                    const sportInp = document.getElementById(pureField + '_input');
+                    if (sportInp) sportInp.value = value;
+                    const hiddenInp = document.getElementById(pureField + '_hidden');
+                    if (hiddenInp) hiddenInp.value = value;
+                }
+
+                if (key === 'recruit_agegroup_manual_val') {
+                    const manualAgeInput = document.getElementById('recruit_agegroup_manual');
+                    if (manualAgeInput) manualAgeInput.value = value;
+                    const hiddenAge = document.getElementById('recruit_agegroup_hidden');
+                    if (hiddenAge) hiddenAge.value = value;
+                }
+            }
+
+            // 4. Restore Service Area & Old School Select2
+            if (data.recruit_oldSchool) {
+                $('#recruit_oldSchool').val(data.recruit_oldSchool);
+                const select2School = $('#recruit_oldSchool_select');
+                if (select2School.length && !select2School.find("option[value='" + data.recruit_oldSchool + "']").length) {
+                    const newOpt = new Option(data.recruit_oldSchool, data.recruit_oldSchool, true, true);
+                    select2School.append(newOpt).trigger('change');
+                }
+            }
+
+            // 5. Restore Cropped Image
+            if (data.recruit_img_cropped) {
+                const imgPreview = document.getElementById('preview_img_display');
+                if (imgPreview) imgPreview.src = data.recruit_img_cropped;
+                const imgVal = document.getElementById('recruit_img_validator');
+                if (imgVal) {
+                    imgVal.value = 'uploaded';
+                    imgVal.classList.remove('is-invalid');
+                    imgVal.classList.add('is-valid');
+                }
+            }
+
+            // 6. Restore Step
+            const savedStepNum = parseInt(localStorage.getItem(draftStepKey)) || parseInt(sessionStorage.getItem(savedStepKey)) || 1;
+            if (savedStepNum >= 1 && savedStepNum <= totalSteps) {
+                showStep(savedStepNum);
+            }
+
+            return true;
+        } catch (e) {
+            console.warn('Restore draft error:', e);
+            return false;
+        }
+    }
+
+    // Network Status Alerts (Online / Offline)
+    window.addEventListener('offline', () => {
+        saveFormDraft();
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'warning',
+            title: 'สัญญาณอินเทอร์เน็ตขาดหาย',
+            text: 'ระบบได้บันทึกข้อมูลแบบร่างไว้ในเครื่องของคุณเรียบร้อยแล้ว',
+            showConfirmButton: false,
+            timer: 4000
+        });
+    });
+
+    window.addEventListener('online', () => {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'เชื่อมต่ออินเทอร์เน็ตแล้ว',
+            text: 'ข้อมูลที่คุณกรอกไว้ยังคงอยู่ครบถ้วน',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    });
+
     function showStep(step) {
         currentStep = step;
         sessionStorage.setItem(savedStepKey, step);
+        localStorage.setItem(draftStepKey, step.toString());
 
         document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
         document.getElementById('step-' + step).classList.add('active');
@@ -2314,45 +2527,447 @@
         } else {
             submitBtn.style.display = 'none';
         }
+
+        saveFormDraft();
     }
 
-    // Initialize step on page load (restore saved tab if refreshed)
-    showStep(currentStep);
+    function getFieldLabel(input) {
+        if (!input) return 'ข้อมูลที่จำเป็น';
+        if (input.dataset && input.dataset.label) return input.dataset.label;
+        if (input.id === 'recruit_img_validator') return 'รูปถ่ายนักเรียน (ชุดนักเรียน)';
+        if (input.id === 'service_area_school_search') return 'โรงเรียนเดิมในเขตพื้นที่บริการ';
 
-    function validateStep(step) {
+        const map = {
+            'recruit_category': 'ประเภทโควตา',
+            'recruit_tpyeRoom1': 'แผนการเรียนอันดับ 1',
+            'recruit_tpyeRoom2': 'แผนการเรียนอันดับ 2',
+            'recruit_tpyeRoom3': 'แผนการเรียนอันดับ 3',
+            'recruit_prefix': 'คำนำหน้าชื่อ',
+            'recruit_firstName': 'ชื่อจริง',
+            'recruit_lastName': 'นามสกุล',
+            'recruit_idCard': 'เลขประจำตัวประชาชน (13 หลัก)',
+            'recruit_birthdayD': 'วันเกิด',
+            'recruit_birthdayM': 'เดือนเกิด',
+            'recruit_birthdayY': 'ปีเกิด (พ.ศ.)',
+            'recruit_race': 'เชื้อชาติ',
+            'recruit_nationality': 'สัญชาติ',
+            'recruit_religion': 'ศาสนา',
+            'recruit_phone': 'เบอร์โทรศัพท์ที่ติดต่อได้',
+            'recruit_homeNumber': 'บ้านเลขที่',
+            'recruit_homeGroup': 'หมู่ที่',
+            'recruit_homeRoad': 'ถนน',
+            'recruit_homeSubdistrict': 'ตำบล/แขวง',
+            'recruit_homedistrict': 'อำเภอ/เขต',
+            'recruit_homeProvince': 'จังหวัด (ที่อยู่)',
+            'recruit_homePostcode': 'รหัสไปรษณีย์ (5 หลัก)',
+            'recruit_oldSchool': 'ชื่อโรงเรียนเดิม',
+            'recruit_oldSchool_select': 'ค้นหาโรงเรียนเดิม',
+            'recruit_district': 'อำเภอที่ตั้งโรงเรียนเดิม',
+            'recruit_province': 'จังหวัดที่ตั้งโรงเรียนเดิม',
+            'recruit_grade': 'เกรดเฉลี่ยสะสม (GPAX)',
+            'recruit_certificateEdu': 'เอกสาร ปพ.1 (ด้านหน้า)',
+            'recruit_certificateEduB': 'เอกสาร ปพ.1 (ด้านหลัง)',
+            'recruit_copyidCard': 'สำเนาบัตรประจำตัวประชาชน',
+            'captcha_answer': 'รหัสยืนยัน CAPTCHA',
+            'recruit_sportPosition_input': 'ตำแหน่งชนิดกีฬา',
+            'recruit_sportPosition': 'ตำแหน่งชนิดกีฬา',
+            'recruit_nickname_input': 'ชื่อเล่นนักเรียน',
+            'recruit_nickname': 'ชื่อเล่นนักเรียน',
+            'recruit_weight_input': 'น้ำหนัก (กก.)',
+            'recruit_weight': 'น้ำหนัก (กก.)',
+            'recruit_height_input': 'ส่วนสูง (ซม.)',
+            'recruit_height': 'ส่วนสูง (ซม.)',
+            'recruit_fatherName_input': 'ชื่อ-นามสกุล บิดา',
+            'recruit_fatherName': 'ชื่อ-นามสกุล บิดา',
+            'recruit_fatherJob_input': 'อาชีพ บิดา',
+            'recruit_fatherJob': 'อาชีพ บิดา',
+            'recruit_motherName_input': 'ชื่อ-นามสกุล มารดา',
+            'recruit_motherName': 'ชื่อ-นามสกุล มารดา',
+            'recruit_motherJob_input': 'อาชีพ มารดา',
+            'recruit_motherJob': 'อาชีพ มารดา',
+            'recruit_agegroup_manual': 'รุ่นอายุ (ปี)'
+        };
+
+        if (map[input.id]) return map[input.id];
+        if (map[input.name]) return map[input.name];
+
+        // Find label by 'for' attribute
+        if (input.id) {
+            const labelEl = document.querySelector(`label[for="${input.id}"]`);
+            if (labelEl) {
+                return labelEl.textContent.replace(/[*]/g, '').replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ').trim();
+            }
+        }
+
+        // Check closest container label
+        const container = input.closest('.mb-3, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-12, .col-md-6, .col-12, .photo-upload-box');
+        if (container) {
+            const labelEl = container.querySelector('label');
+            if (labelEl) {
+                return labelEl.textContent.replace(/[*]/g, '').replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ').trim();
+            }
+        }
+
+        if (input.placeholder && !input.placeholder.includes('--') && !input.placeholder.includes('0x-')) {
+            return input.placeholder;
+        }
+
+        return input.name || 'ข้อมูลที่จำเป็น';
+    }
+
+    function isElementVisible(el) {
+        if (!el) return false;
+        if (el.id === 'recruit_img_validator') {
+            const box = document.querySelector('.photo-upload-box');
+            return box && box.offsetParent !== null;
+        }
+        // If hidden input inside sports section or service area section
+        if (el.type === 'hidden') {
+            const parentSection = el.closest('#sports_info_section, #service_area_section, #course_section');
+            if (parentSection && $(parentSection).is(':hidden')) return false;
+            return true;
+        }
+        return el.offsetParent !== null && $(el).is(':visible');
+    }
+
+    function validateStep(step, showNotification = true) {
         const stepEl = document.getElementById('step-' + step);
-        const inputs = stepEl.querySelectorAll('input, select, textarea');
-        let valid = true;
+        if (!stepEl) return true;
 
-        // Custom Validation for Service Area School in Step 1
+        let valid = true;
+        let missingLabels = [];
+        let firstInvalidEl = null;
+
+        function markInvalid(input, labelName, scrollTarget = null) {
+            valid = false;
+            if (input && typeof input.classList !== 'undefined') {
+                input.classList.add('is-invalid');
+                input.classList.remove('is-valid');
+            }
+            if (labelName && !missingLabels.includes(labelName)) {
+                missingLabels.push(labelName);
+            }
+            if (!firstInvalidEl) {
+                firstInvalidEl = scrollTarget || input;
+            }
+        }
+
+        function markValid(input) {
+            if (input && typeof input.classList !== 'undefined') {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            }
+        }
+
+        // ================= STEP 1 VALIDATION =================
         if (step === 1) {
-            const serviceAreaSearch = document.getElementById('service_area_school_search');
-            if (serviceAreaSearch && serviceAreaSearch.hasAttribute('data-required')) {
-                // Check if value is selected (Select2 uses the select element's value)
-                if (!$(serviceAreaSearch).val()) {
-                    // Show error (maybe using SweetAlert or adding class)
-                    // Since it's a select2, adding is-invalid to the select might not show visually on the select2 container
-                    // We can use the container:
-                    $(serviceAreaSearch).next('.select2-container').find('.select2-selection').addClass('border-danger');
-                    valid = false;
+            const catSelect = document.getElementById('recruit_category');
+            if (!catSelect || !catSelect.value) {
+                markInvalid(catSelect, 'ประเภทโควตา');
+            } else {
+                markValid(catSelect);
+            }
+
+            // Service Area Check
+            const serviceAreaSection = document.getElementById('service_area_section');
+            if (serviceAreaSection && $(serviceAreaSection).is(':visible')) {
+                const serviceAreaSearch = document.getElementById('service_area_school_search');
+                if (!serviceAreaSearch || !$(serviceAreaSearch).val()) {
+                    if (serviceAreaSearch) {
+                        $(serviceAreaSearch).next('.select2-container').find('.select2-selection').addClass('border-danger');
+                    }
+                    markInvalid(serviceAreaSearch, 'โรงเรียนเดิมในเขตพื้นที่บริการ');
                 } else {
                     $(serviceAreaSearch).next('.select2-container').find('.select2-selection').removeClass('border-danger');
+                    markValid(serviceAreaSearch);
+                }
+            }
+
+            // Course rank 1
+            const room1 = document.getElementById('recruit_tpyeRoom1');
+            if (!room1 || !room1.value) {
+                markInvalid(room1, 'แผนการเรียนอันดับ 1');
+            } else {
+                markValid(room1);
+            }
+
+            // Sports Information if visible
+            const sportsSection = document.getElementById('sports_info_section');
+            if (sportsSection && $(sportsSection).is(':visible')) {
+                const sportInputs = sportsSection.querySelectorAll('input.sport-field, input[type="text"], input[type="number"], select');
+                sportInputs.forEach(input => {
+                    if (isElementVisible(input) && input.hasAttribute('required')) {
+                        if (!input.value || !input.value.trim()) {
+                            markInvalid(input, getFieldLabel(input));
+                        } else {
+                            markValid(input);
+                        }
+                    }
+                });
+
+                // Check manual age group if present
+                const ageManual = document.getElementById('recruit_agegroup_manual');
+                if (ageManual && isElementVisible(ageManual) && ageManual.hasAttribute('required')) {
+                    if (!ageManual.value || !ageManual.value.trim()) {
+                        markInvalid(ageManual, 'รุ่นอายุ (ปี)');
+                    } else {
+                        markValid(ageManual);
+                    }
                 }
             }
         }
 
-        inputs.forEach(input => {
-            if (input.hasAttribute('required') && !input.value) {
-                input.classList.add('is-invalid');
-                valid = false;
+        // ================= STEP 2 VALIDATION =================
+        if (step === 2) {
+            // 1. Photo Check
+            const imgValidator = document.getElementById('recruit_img_validator');
+            const photoBox = document.querySelector('.photo-upload-box');
+            const avatarFrame = document.querySelector('.student-avatar-frame');
+            if (!imgValidator || !imgValidator.value || imgValidator.value.trim() === '') {
+                if (photoBox) photoBox.classList.add('is-invalid');
+                if (avatarFrame) avatarFrame.classList.add('is-invalid');
+                markInvalid(imgValidator, 'รูปถ่ายนักเรียน (ชุดนักเรียน)', photoBox || avatarFrame);
             } else {
-                input.classList.remove('is-invalid');
+                if (photoBox) photoBox.classList.remove('is-invalid');
+                if (avatarFrame) avatarFrame.classList.remove('is-invalid');
+                markValid(imgValidator);
             }
-            if (!input.checkValidity()) {
-                input.classList.add('is-invalid');
-                valid = false;
+
+            // 2. Prefix, First Name, Last Name
+            const prefix = document.getElementById('recruit_prefix');
+            if (!prefix || !prefix.value) {
+                markInvalid(prefix, 'คำนำหน้าชื่อ');
+            } else {
+                markValid(prefix);
             }
-        });
+
+            const firstName = document.getElementById('recruit_firstName');
+            if (!firstName || !firstName.value.trim()) {
+                markInvalid(firstName, 'ชื่อจริง');
+            } else {
+                markValid(firstName);
+            }
+
+            const lastName = document.getElementById('recruit_lastName');
+            if (!lastName || !lastName.value.trim()) {
+                markInvalid(lastName, 'นามสกุล');
+            } else {
+                markValid(lastName);
+            }
+
+            // 3. ID Card
+            const idCard = document.getElementById('recruit_idCard');
+            if (!idCard || !idCard.value.trim()) {
+                markInvalid(idCard, 'เลขประจำตัวประชาชน (13 หลัก)');
+            } else {
+                markValid(idCard);
+            }
+
+            // 4. Birthday (Day, Month, Year)
+            const bDay = document.getElementById('recruit_birthdayD');
+            const bMonth = document.getElementById('recruit_birthdayM');
+            const bYear = document.getElementById('recruit_birthdayY');
+            let birthdayValid = true;
+
+            if (!bDay || !bDay.value) {
+                if (bDay) bDay.classList.add('is-invalid');
+                birthdayValid = false;
+            } else {
+                if (bDay) markValid(bDay);
+            }
+
+            if (!bMonth || !bMonth.value) {
+                if (bMonth) bMonth.classList.add('is-invalid');
+                birthdayValid = false;
+            } else {
+                if (bMonth) markValid(bMonth);
+            }
+
+            if (!bYear || !bYear.value) {
+                if (bYear) bYear.classList.add('is-invalid');
+                birthdayValid = false;
+            } else {
+                if (bYear) markValid(bYear);
+            }
+
+            if (!birthdayValid) {
+                markInvalid(bDay || bMonth || bYear, 'วัน / เดือน / ปีเกิด (พ.ศ.)');
+            }
+
+            // 5. Race, Nationality, Religion
+            const race = document.getElementById('recruit_race');
+            if (!race || !race.value) {
+                markInvalid(race, 'เชื้อชาติ');
+            } else {
+                markValid(race);
+            }
+
+            const nationality = document.getElementById('recruit_nationality');
+            if (!nationality || !nationality.value) {
+                markInvalid(nationality, 'สัญชาติ');
+            } else {
+                markValid(nationality);
+            }
+
+            const religion = document.getElementById('recruit_religion');
+            if (!religion || !religion.value) {
+                markInvalid(religion, 'ศาสนา');
+            } else {
+                markValid(religion);
+            }
+
+            // 6. Phone Number
+            const phone = document.getElementById('recruit_phone');
+            if (!phone || !phone.value.trim()) {
+                markInvalid(phone, 'เบอร์โทรศัพท์ที่ติดต่อได้สะดวก');
+            } else {
+                const cleanPhone = phone.value.replace(/\D/g, '');
+                if (cleanPhone.length < 9 || cleanPhone.length > 10) {
+                    markInvalid(phone, 'เบอร์โทรศัพท์ที่ติดต่อได้ (ต้องมี 9-10 หลัก)');
+                } else {
+                    markValid(phone);
+                }
+            }
+        }
+
+        // ================= STEP 3 VALIDATION =================
+        if (step === 3) {
+            const step3Inputs = stepEl.querySelectorAll('input, select, textarea');
+            step3Inputs.forEach(input => {
+                if (isElementVisible(input) && input.hasAttribute('required')) {
+                    if (!input.value || !input.value.trim()) {
+                        markInvalid(input, getFieldLabel(input));
+                    } else {
+                        // Check postcode length
+                        if (input.id === 'recruit_homePostcode') {
+                            const cleanZip = input.value.replace(/\D/g, '');
+                            if (cleanZip.length !== 5) {
+                                markInvalid(input, 'รหัสไปรษณีย์ (ต้องมี 5 หลัก)');
+                                return;
+                            }
+                        }
+                        markValid(input);
+                    }
+                }
+            });
+        }
+
+        // ================= STEP 4 VALIDATION =================
+        if (step === 4) {
+            const oldSchool = document.getElementById('recruit_oldSchool');
+            const oldSchoolSelect = document.getElementById('recruit_oldSchool_select');
+            if (oldSchool && !oldSchool.value.trim()) {
+                if (oldSchoolSelect) {
+                    $(oldSchoolSelect).next('.select2-container').find('.select2-selection').addClass('border-danger');
+                }
+                markInvalid(oldSchoolSelect || oldSchool, 'โรงเรียนเดิม');
+            } else {
+                if (oldSchoolSelect) {
+                    $(oldSchoolSelect).next('.select2-container').find('.select2-selection').removeClass('border-danger');
+                }
+            }
+
+            const district = document.getElementById('recruit_district');
+            if (!district || !district.value.trim()) {
+                markInvalid(district, 'อำเภอที่ตั้งโรงเรียนเดิม');
+            } else {
+                markValid(district);
+            }
+
+            const province = document.getElementById('recruit_province');
+            if (!province || !province.value.trim()) {
+                markInvalid(province, 'จังหวัดที่ตั้งโรงเรียนเดิม');
+            } else {
+                markValid(province);
+            }
+
+            const grade = document.getElementById('recruit_grade');
+            if (!grade || !grade.value.trim()) {
+                markInvalid(grade, 'เกรดเฉลี่ยสะสม (GPAX)');
+            } else {
+                const gVal = parseFloat(grade.value);
+                if (isNaN(gVal) || gVal < 0 || gVal > 4.00) {
+                    markInvalid(grade, 'เกรดเฉลี่ยสะสม (GPAX ต้องอยู่ระหว่าง 0.00 - 4.00)');
+                } else {
+                    markValid(grade);
+                }
+            }
+        }
+
+        // ================= STEP 5 VALIDATION =================
+        if (step === 5) {
+            const certFront = document.querySelector('input[name="recruit_certificateEdu"]');
+            if (certFront && certFront.hasAttribute('required') && (!certFront.files || certFront.files.length === 0)) {
+                markInvalid(certFront, 'เอกสาร ปพ.1 (ด้านหน้า)');
+            } else if (certFront) {
+                markValid(certFront);
+            }
+
+            const certBack = document.querySelector('input[name="recruit_certificateEduB"]');
+            if (certBack && certBack.hasAttribute('required') && (!certBack.files || certBack.files.length === 0)) {
+                markInvalid(certBack, 'เอกสาร ปพ.1 (ด้านหลัง)');
+            } else if (certBack) {
+                markValid(certBack);
+            }
+
+            const copyIdCard = document.querySelector('input[name="recruit_copyidCard"]');
+            if (copyIdCard && copyIdCard.hasAttribute('required') && (!copyIdCard.files || copyIdCard.files.length === 0)) {
+                markInvalid(copyIdCard, 'สำเนาบัตรประจำตัวประชาชน');
+            } else if (copyIdCard) {
+                markValid(copyIdCard);
+            }
+
+            const captchaAnswer = document.getElementById('captcha_answer');
+            const num1 = parseInt($('#captcha_num1').val()) || 0;
+            const num2 = parseInt($('#captcha_num2').val()) || 0;
+            const userAnswer = parseInt($('#captcha_answer').val());
+            if (isNaN(userAnswer) || userAnswer !== (num1 + num2)) {
+                markInvalid(captchaAnswer, 'รหัสยืนยัน CAPTCHA (ผลลัพธ์ไม่ถูกต้อง)');
+            } else {
+                markValid(captchaAnswer);
+            }
+        }
+
+        // If invalid and showNotification is requested
+        if (!valid && showNotification) {
+            const errorListHtml = missingLabels.map(item => `
+                <li class="d-flex align-items-center gap-2 mb-1.5 py-1 px-2 rounded-2" style="background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444;">
+                    <i class="bx bx-x-circle text-danger fs-5 flex-shrink-0"></i>
+                    <span class="fw-bold text-dark small">${item}</span>
+                </li>
+            `).join('');
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                html: `
+                    <div class="text-start mt-2">
+                        <p class="mb-2 text-secondary small fw-medium">โปรดตรวจสอบและระบุข้อมูลในรายการต่อไปนี้ให้สมบูรณ์:</p>
+                        <ul class="list-unstyled mb-0" style="max-height: 220px; overflow-y: auto;">
+                            ${errorListHtml}
+                        </ul>
+                    </div>
+                `,
+                confirmButtonText: '<i class="bx bx-check me-1"></i> เข้าใจแล้ว / กรอกข้อมูล',
+                customClass: {
+                    confirmButton: 'btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm'
+                },
+                buttonsStyling: false
+            }).then(() => {
+                if (firstInvalidEl) {
+                    if (firstInvalidEl.id === 'recruit_img_validator') {
+                        const target = document.querySelector('.photo-upload-box') || firstInvalidEl;
+                        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (typeof firstInvalidEl.focus === 'function') {
+                            setTimeout(() => firstInvalidEl.focus(), 350);
+                        }
+                    }
+                }
+            });
+        }
+
         return valid;
     }
 
@@ -2361,23 +2976,15 @@
         nextBtn.disabled = true;
         nextBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>กำลังตรวจสอบ...';
 
-        // Small delay for visual feedback
         setTimeout(() => {
-            if (validateStep(currentStep)) {
+            if (validateStep(currentStep, true)) {
                 currentStep++;
                 showStep(currentStep);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-                    text: 'โปรดตรวจสอบข้อมูลในช่องที่มีเครื่องหมาย *',
-                    confirmButtonText: 'ตกลง'
-                });
             }
             nextBtn.disabled = false;
             nextBtn.innerHTML = originalText;
-        }, 300);
+        }, 250);
     });
 
     prevBtn.addEventListener('click', () => {
@@ -2385,7 +2992,6 @@
         prevBtn.disabled = true;
         prevBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>กำลังโหลด...';
 
-        // Small delay for visual feedback
         setTimeout(() => {
             currentStep--;
             showStep(currentStep);
@@ -2395,7 +3001,7 @@
         }, 200);
     });
 
-    document.querySelectorAll('input, select').forEach(input => {
+    document.querySelectorAll('input, select, textarea').forEach(input => {
         input.addEventListener('input', function () {
             if (this.value) {
                 this.classList.remove('is-invalid');
@@ -2403,10 +3009,27 @@
             } else {
                 this.classList.remove('is-valid');
             }
+            saveFormDraftDebounced();
+        });
+        input.addEventListener('change', function () {
+            saveFormDraftDebounced();
         });
     });
 
-    // Client-side CAPTCHA Check to Enable/Disable Submit Button
+    // Real-time sync for sport fields to hidden inputs
+    document.querySelectorAll('.sport-field').forEach(input => {
+        input.addEventListener('input', function() {
+            const fieldName = this.dataset.field;
+            if (fieldName) {
+                const hiddenInput = document.getElementById(fieldName + '_hidden');
+                if (hiddenInput) {
+                    hiddenInput.value = this.value;
+                }
+            }
+            saveFormDraftDebounced();
+        });
+    });
+
     // Client-side CAPTCHA Check to Enable/Disable Submit Button
     function checkCaptchaClientSide() {
         const num1 = parseInt($('#captcha_num1').val()) || 0;
@@ -2437,9 +3060,6 @@
         checkCaptchaClientSide();
     });
 
-    // Initialize step
-    showStep(1);
-
     // Phone number formatting
     const phoneInput = document.getElementById('recruit_phone');
     if (phoneInput) {
@@ -2466,8 +3086,13 @@
             var x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,4})(\d{0,5})(\d{0,2})(\d{0,1})/);
             e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
         });
-        // Run once for pre-filled data
         idCardInput.dispatchEvent(new Event('input'));
+    }
+
+    // Initialize step & restore draft on page load
+    const isRestored = restoreFormDraft();
+    if (!isRestored) {
+        showStep(currentStep);
     }
 
 </script>

@@ -249,11 +249,28 @@
                                         <?php $isSelected = in_array((string)$c['course_id'], $selectedCourses); ?>
                                         <div class="col-12">
                                             <div class="course-item-box <?= $isSelected ? 'selected' : '' ?>" onclick="toggleCourseBox('course_<?= $c['course_id'] ?>', this)">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <input class="form-check-input course-m1 m-0" type="checkbox" name="quota_course[]" value="<?= $c['course_id'] ?>" id="course_<?= $c['course_id'] ?>" <?= $isSelected ? 'checked' : '' ?> onclick="event.stopPropagation(); syncCourseBoxStyle(this);">
+                                                <div class="d-flex align-items-start gap-2">
+                                                    <input class="form-check-input course-m1 mt-1" type="checkbox" name="quota_course[]" value="<?= $c['course_id'] ?>" id="course_<?= $c['course_id'] ?>" <?= $isSelected ? 'checked' : '' ?> onclick="event.stopPropagation(); syncCourseBoxStyle(this);">
                                                     <div class="flex-grow-1">
-                                                        <span class="badge bg-label-info rounded-pill me-1"><?= esc($c['course_initials']) ?></span>
-                                                        <span class="fw-semibold text-dark small"><?= esc($c['course_fullname']) ?></span>
+                                                        <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
+                                                            <span class="badge bg-label-info rounded-pill px-2"><?= esc($c['course_initials']) ?></span>
+                                                            <?php if (!empty($c['course_branch']) && $c['course_branch'] !== '-'): ?>
+                                                                <span class="badge bg-warning text-dark rounded-pill px-2 fw-bold shadow-xs">
+                                                                    <i class="bx <?= (mb_strpos($c['course_fullname'], 'กีฬา') !== false || mb_strpos($c['course_branch'], 'กีฬา') !== false) ? 'bx-run' : 'bx-tag-alt' ?> me-1"></i><?= esc($c['course_branch']) ?>
+                                                                </span>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($c['course_age'])): ?>
+                                                                <span class="badge bg-label-secondary rounded-pill px-2">
+                                                                    <i class="bx bx-time me-1"></i>อายุ <?= esc($c['course_age']) ?> ปี
+                                                                </span>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                        <div class="fw-semibold text-dark small">
+                                                            <?= esc($c['course_fullname']) ?>
+                                                            <?php if (!empty($c['course_branch']) && $c['course_branch'] !== '-'): ?>
+                                                                <span class="text-primary fw-bold ms-1">(<?= esc($c['course_branch']) ?>)</span>
+                                                            <?php endif; ?>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -289,11 +306,28 @@
                                         <?php $isSelected = in_array((string)$c['course_id'], $selectedCourses); ?>
                                         <div class="col-12">
                                             <div class="course-item-box <?= $isSelected ? 'selected' : '' ?>" onclick="toggleCourseBox('course_<?= $c['course_id'] ?>', this)">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <input class="form-check-input course-m4 m-0" type="checkbox" name="quota_course[]" value="<?= $c['course_id'] ?>" id="course_<?= $c['course_id'] ?>" <?= $isSelected ? 'checked' : '' ?> onclick="event.stopPropagation(); syncCourseBoxStyle(this);">
+                                                <div class="d-flex align-items-start gap-2">
+                                                    <input class="form-check-input course-m4 mt-1" type="checkbox" name="quota_course[]" value="<?= $c['course_id'] ?>" id="course_<?= $c['course_id'] ?>" <?= $isSelected ? 'checked' : '' ?> onclick="event.stopPropagation(); syncCourseBoxStyle(this);">
                                                     <div class="flex-grow-1">
-                                                        <span class="badge bg-label-primary rounded-pill me-1"><?= esc($c['course_initials']) ?></span>
-                                                        <span class="fw-semibold text-dark small"><?= esc($c['course_fullname']) ?></span>
+                                                        <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
+                                                            <span class="badge bg-label-primary rounded-pill px-2"><?= esc($c['course_initials']) ?></span>
+                                                            <?php if (!empty($c['course_branch']) && $c['course_branch'] !== '-'): ?>
+                                                                <span class="badge bg-warning text-dark rounded-pill px-2 fw-bold shadow-xs">
+                                                                    <i class="bx <?= (mb_strpos($c['course_fullname'], 'กีฬา') !== false || mb_strpos($c['course_branch'], 'กีฬา') !== false) ? 'bx-run' : 'bx-tag-alt' ?> me-1"></i><?= esc($c['course_branch']) ?>
+                                                                </span>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($c['course_age'])): ?>
+                                                                <span class="badge bg-label-secondary rounded-pill px-2">
+                                                                    <i class="bx bx-time me-1"></i>อายุ <?= esc($c['course_age']) ?> ปี
+                                                                </span>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                        <div class="fw-semibold text-dark small">
+                                                            <?= esc($c['course_fullname']) ?>
+                                                            <?php if (!empty($c['course_branch']) && $c['course_branch'] !== '-'): ?>
+                                                                <span class="text-primary fw-bold ms-1">(<?= esc($c['course_branch']) ?>)</span>
+                                                            <?php endif; ?>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
