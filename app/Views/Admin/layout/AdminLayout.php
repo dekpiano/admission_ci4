@@ -521,13 +521,6 @@
             </a>
           </li>
 
-          <li class="menu-item <?= (strpos(uri_string(), 'skjadmin/live-chat') !== false) ? 'active' : '' ?>">
-            <a href="<?= site_url('skjadmin/live-chat') ?>" class="menu-link">
-              <i class="menu-icon tf-icons bx bx-conversation text-primary"></i>
-              <div data-i18n="LiveChat">ระบบสนทนาสด (Live Chat)</div>
-            </a>
-          </li>
-
           <!-- ========== จัดการข้อมูลหลัก ========== -->
           <li class="menu-header small text-uppercase">
             <span class="menu-header-text">จัดการข้อมูลหลัก</span>

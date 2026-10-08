@@ -288,16 +288,6 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
     $routes->post('telegram-notify/update', 'AdminControlTelegram::updateConfig');
     $routes->post('telegram-notify/test', 'AdminControlTelegram::sendTestMessage');
     $routes->post('telegram-notify/detect-chat', 'AdminControlTelegram::detectChatId');
-    $routes->post('telegram-notify/set-webhook', 'AdminControlTelegram::setWebhook');
-    $routes->post('telegram-notify/get-webhook', 'AdminControlTelegram::getWebhookInfo');
-    $routes->post('telegram-notify/delete-webhook', 'AdminControlTelegram::deleteWebhook');
-
-    // Live Chat Management (Admin)
-    $routes->get('live-chat', 'AdminControlChat::index');
-    $routes->get('live-chat/sessions', 'AdminControlChat::getSessions');
-    $routes->get('live-chat/messages/(:num)', 'AdminControlChat::getSessionMessages/$1');
-    $routes->post('live-chat/reply', 'AdminControlChat::sendReply');
-    $routes->post('live-chat/toggle-status/(:num)', 'AdminControlChat::toggleStatus/$1');
 
     // Announcement Management
     $routes->get('announcements', 'AdminControlAnnouncement::index');
@@ -308,14 +298,8 @@ $routes->group('skjadmin', ['namespace' => 'App\Controllers\Admin'], function ($
 
 });
 
-// LINE & Telegram Webhook (Public - ไม่ต้อง login)
+// LINE Webhook (Public - ไม่ต้อง login)
 $routes->post('api/line/webhook', 'Api\LineWebhook::webhook');
-$routes->post('api/telegram/webhook', 'Api\TelegramWebhook::handle');
-
-// Public Live Chat API (For Floating Chat Widget)
-$routes->post('api/chat/init', 'Api\ChatApi::initSession');
-$routes->post('api/chat/send', 'Api\ChatApi::sendMessage');
-$routes->get('api/chat/messages', 'Api\ChatApi::getMessages');
 
 // Compatibility / Legacy Routes (Mapping old CI3 controller names to new CI4 controllers)
 $routes->post('admin/Control_admin_admission/DataRecruitment', 'Admin\AdminControlAdmission::DataRecruitment');

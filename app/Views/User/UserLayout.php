@@ -17,7 +17,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
         rel="stylesheet" />
 
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -38,7 +39,28 @@
 
     <!-- Page CSS -->
     <style>
-        *, body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, .fw-bold, .btn, .nav, .form-control, .form-select, .badge, .swal2-popup, .modal, .dropdown-menu, .table {
+        *,
+        body,
+        button,
+        input,
+        select,
+        textarea,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .fw-bold,
+        .btn,
+        .nav,
+        .form-control,
+        .form-select,
+        .badge,
+        .swal2-popup,
+        .modal,
+        .dropdown-menu,
+        .table {
             font-family: 'K2D', sans-serif !important;
         }
 
@@ -718,15 +740,15 @@
             font-size: 0.95rem;
         }
 
-        .menu-vertical .menu-item.active > .menu-link,
-        .menu-vertical .menu-item.active > .menu-link *,
-        .menu-vertical .menu-item.active > .menu-link i,
-        .menu-vertical .menu-item.active > .menu-link div {
+        .menu-vertical .menu-item.active>.menu-link,
+        .menu-vertical .menu-item.active>.menu-link *,
+        .menu-vertical .menu-item.active>.menu-link i,
+        .menu-vertical .menu-item.active>.menu-link div {
             color: #ffffff !important;
             -webkit-text-fill-color: #ffffff !important;
         }
 
-        .menu-vertical .menu-item.active > .menu-link {
+        .menu-vertical .menu-item.active>.menu-link {
             background: linear-gradient(135deg, #e11d48 0%, #0284c7 100%) !important;
             font-weight: 800;
             box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
@@ -878,7 +900,7 @@
         .container-xxl,
         .container-p-y,
         .container-xxl.container-p-y,
-        .content-wrapper > .container-p-y {
+        .content-wrapper>.container-p-y {
             max-width: 100% !important;
             width: 100% !important;
             padding-left: 2rem !important;
@@ -890,7 +912,7 @@
             align-items: center;
         }
 
-        .content-wrapper > .container-p-y > * {
+        .content-wrapper>.container-p-y>* {
             width: 100% !important;
             max-width: 100% !important;
         }
@@ -898,8 +920,8 @@
         /* High-Contrast Crisp Pure White Inputs */
         .form-control,
         .form-select,
-        .form-floating > .form-control,
-        .form-floating > .form-select,
+        .form-floating>.form-control,
+        .form-floating>.form-select,
         .input-group-text {
             background-color: #ffffff !important;
             border: 1.5px solid #cbd5e1 !important;
@@ -908,8 +930,8 @@
 
         .form-control:focus,
         .form-select:focus,
-        .form-floating > .form-control:focus,
-        .form-floating > .form-select:focus {
+        .form-floating>.form-control:focus,
+        .form-floating>.form-select:focus {
             background-color: #ffffff !important;
             border-color: #0284c7 !important;
             box-shadow: 0 0 0 0.25rem rgba(2, 132, 199, 0.18) !important;
@@ -919,6 +941,7 @@
            EDGE-TO-EDGE NATIVE MOBILE APP FEEL (< 576px)
            ============================================================ */
         @media (max-width: 576px) {
+
             .layout-page,
             .content-wrapper {
                 padding-top: 0 !important;
@@ -927,7 +950,7 @@
 
             .container-xxl,
             .container-p-y,
-            .content-wrapper > .container-p-y {
+            .content-wrapper>.container-p-y {
                 padding-left: 4px !important;
                 padding-right: 4px !important;
                 padding-top: 4px !important;
@@ -941,7 +964,7 @@
                 margin-right: -2px !important;
             }
 
-            .row > * {
+            .row>* {
                 padding-left: 2px !important;
                 padding-right: 2px !important;
             }
@@ -1018,10 +1041,13 @@
         }
 
         @keyframes gridFlicker {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 0;
                 transform: scale(0.92);
             }
+
             50% {
                 opacity: 0.85;
                 transform: scale(1);
@@ -1039,21 +1065,27 @@
         .swal2-container {
             z-index: 100000 !important;
         }
+
         .modal {
             z-index: 1060 !important;
         }
+
         .modal-backdrop {
             z-index: 1050 !important;
         }
+
         .modal-dialog {
             z-index: 1065 !important;
         }
+
         .content-backdrop:not(.show),
         .layout-overlay:not(.show) {
             display: none !important;
             pointer-events: none !important;
         }
+
         @media (min-width: 992px) {
+
             .layout-overlay,
             .content-backdrop,
             .content-backdrop.fade,
@@ -1077,7 +1109,8 @@
         <svg class="animated-grid-svg" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <pattern id="animated-grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse" x="-1" y="-1">
-                    <path d="M.5 40V.5H40" fill="none" stroke="rgba(15, 23, 42, 0.08)" stroke-width="1" stroke-dasharray="0" />
+                    <path d="M.5 40V.5H40" fill="none" stroke="rgba(15, 23, 42, 0.08)" stroke-width="1"
+                        stroke-dasharray="0" />
                 </pattern>
             </defs>
             <rect width="100%" height="100%" stroke-width="0" fill="url(#animated-grid-pattern)" />
@@ -1201,7 +1234,8 @@
                             <div data-i18n="Status">ตรวจสอบสถานะ</div>
                         </a>
                     </li>
-                    <li class="menu-item <?= uri_string() == 'new-admission/announcements' || strpos(uri_string(), 'new-admission/announcements') !== false ? 'active' : '' ?>">
+                    <li
+                        class="menu-item <?= uri_string() == 'new-admission/announcements' || strpos(uri_string(), 'new-admission/announcements') !== false ? 'active' : '' ?>">
                         <a href="<?= base_url('new-admission/announcements') ?>" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-news"></i>
                             <div data-i18n="Announcements">ประกาศผล</div>
@@ -1220,7 +1254,9 @@
                     }
                     ?>
                     <li class="menu-item <?= uri_string() == 'confirmation/login' ? 'active' : '' ?>">
-                        <a href="<?= $is_confirmation_open ? base_url('confirmation/login') : 'javascript:void(0);' ?>" class="menu-link <?= !$is_confirmation_open ? 'disabled-link' : '' ?>" data-disabled-message="ระบบรายงานตัวยังไม่เปิดให้บริการ">
+                        <a href="<?= $is_confirmation_open ? base_url('confirmation/login') : 'javascript:void(0);' ?>"
+                            class="menu-link <?= !$is_confirmation_open ? 'disabled-link' : '' ?>"
+                            data-disabled-message="ระบบรายงานตัวยังไม่เปิดให้บริการ">
                             <i class="menu-icon tf-icons bx bx-user-check"></i>
                             <div data-i18n="Confirmation">
                                 รายงานตัว
@@ -1263,24 +1299,31 @@
                 <!-- Content wrapper -->
                 <div class="content-wrapper">
                     <!-- Content -->
-                    <div class="container-xxl flex-grow-1 container-p-y d-flex flex-column justify-content-center p-0 p-sm-3">
+                    <div
+                        class="container-xxl flex-grow-1 container-p-y d-flex flex-column justify-content-center p-0 p-sm-3">
                         <?= $this->renderSection('content') ?>
                     </div>
                     <!-- / Content -->
 
                     <!-- Modern School Footer -->
                     <footer class="content-footer footer bg-footer-theme">
-                        <div class="container-xxl d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-3">
+                        <div
+                            class="container-xxl d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-3">
                             <div class="d-flex align-items-center">
-                                <img src="https://skj.ac.th/uploads/logoSchool/LogoSKJ_4.png" alt="SKJ Logo" width="28" height="28" class="me-2 rounded-circle">
+                                <img src="https://skj.ac.th/uploads/logoSchool/LogoSKJ_4.png" alt="SKJ Logo" width="28"
+                                    height="28" class="me-2 rounded-circle">
                                 <div>
-                                    <span class="fw-bold text-dark" style="font-size: 0.88rem;">โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์</span>
-                                    <small class="d-block text-muted" style="font-size: 0.72rem;">สังกัดองค์การบริหารส่วนจังหวัดนครสวรรค์</small>
+                                    <span class="fw-bold text-dark"
+                                        style="font-size: 0.88rem;">โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ)
+                                        นครสวรรค์</span>
+                                    <small class="d-block text-muted"
+                                        style="font-size: 0.72rem;">สังกัดองค์การบริหารส่วนจังหวัดนครสวรรค์</small>
                                 </div>
                             </div>
                             <div class="text-center text-md-end text-muted small" style="font-size: 0.76rem;">
                                 <div>ระบบรับสมัครนักเรียนออนไลน์ &copy; <?= date('Y') + 543 ?></div>
-                                <div class="text-muted opacity-75">Suankularb Wittayalai (Jiraprawat) Nakhonsawan School</div>
+                                <div class="text-muted opacity-75">Suankularb Wittayalai (Jiraprawat) Nakhonsawan School
+                                </div>
                             </div>
                         </div>
                     </footer>
@@ -1303,31 +1346,37 @@
          ============================================================ -->
     <nav class="mobile-bottom-bar">
         <!-- 1. Home -->
-        <a href="<?= base_url('new-admission') ?>" class="mobile-nav-tab <?= (uri_string() == '' || uri_string() == 'new-admission') ? 'active' : '' ?>">
+        <a href="<?= base_url('new-admission') ?>"
+            class="mobile-nav-tab <?= (uri_string() == '' || uri_string() == 'new-admission') ? 'active' : '' ?>">
             <i class='bx bx-home-alt'></i>
             <span>หน้าแรก</span>
         </a>
 
         <!-- 2. Apply (Dynamic Levels Unified) -->
-        <a href="javascript:void(0);" onclick="showLevelChoiceModal()" class="mobile-nav-tab <?= (strpos(uri_string(), 'pre-check') !== false || strpos(uri_string(), 'register') !== false || strpos(uri_string(), 'apply') !== false) ? 'active' : '' ?>">
+        <a href="javascript:void(0);" onclick="showLevelChoiceModal()"
+            class="mobile-nav-tab <?= (strpos(uri_string(), 'pre-check') !== false || strpos(uri_string(), 'register') !== false || strpos(uri_string(), 'apply') !== false) ? 'active' : '' ?>">
             <i class='bx bx-user-plus'></i>
             <span>สมัครเรียน</span>
         </a>
 
         <!-- 3. Status -->
-        <a href="<?= base_url('new-admission/status') ?>" class="mobile-nav-tab <?= strpos(uri_string(), 'status') !== false ? 'active' : '' ?>">
+        <a href="<?= base_url('new-admission/status') ?>"
+            class="mobile-nav-tab <?= strpos(uri_string(), 'status') !== false ? 'active' : '' ?>">
             <i class='bx bx-search-alt'></i>
             <span>สถานะ</span>
         </a>
 
         <!-- 4. Confirmation / Report -->
-        <a href="<?= base_url('confirmation/login') ?>" class="mobile-nav-tab <?= strpos(uri_string(), 'confirmation') !== false ? 'active' : '' ?>">
+        <a href="<?= base_url('confirmation/login') ?>"
+            class="mobile-nav-tab <?= strpos(uri_string(), 'confirmation') !== false ? 'active' : '' ?>">
             <i class='bx bx-user-check'></i>
             <span>รายงานตัว</span>
         </a>
 
         <!-- 5. All Menu (Drawer Trigger) -->
-        <a href="javascript:void(0);" class="mobile-nav-tab <?= (strpos(uri_string(), 'contact') !== false || strpos(uri_string(), 'schedule') !== false) ? 'active' : '' ?>" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvasDrawer">
+        <a href="javascript:void(0);"
+            class="mobile-nav-tab <?= (strpos(uri_string(), 'contact') !== false || strpos(uri_string(), 'schedule') !== false) ? 'active' : '' ?>"
+            data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvasDrawer">
             <i class='bx bx-grid-alt'></i>
             <span>เมนู</span>
         </a>
@@ -1336,78 +1385,97 @@
     <!-- ============================================================
          MOBILE OFFCANVAS DRAWER
          ============================================================ -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileOffcanvasDrawer" aria-labelledby="mobileOffcanvasDrawerLabel" style="width: 320px; border-radius: 0 24px 24px 0; border: none; box-shadow: 10px 0 35px rgba(0,0,0,0.18);">
-        <div class="offcanvas-header p-3 text-white" style="background: linear-gradient(135deg, #e11d48 0%, #ff2d75 35%, #0284c7 80%, #0369a1 100%);">
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileOffcanvasDrawer"
+        aria-labelledby="mobileOffcanvasDrawerLabel"
+        style="width: 320px; border-radius: 0 24px 24px 0; border: none; box-shadow: 10px 0 35px rgba(0,0,0,0.18);">
+        <div class="offcanvas-header p-3 text-white"
+            style="background: linear-gradient(135deg, #e11d48 0%, #ff2d75 35%, #0284c7 80%, #0369a1 100%);">
             <div class="d-flex align-items-center">
-                <img src="https://skj.ac.th/uploads/logoSchool/LogoSKJ_4.png" alt="SKJ Logo" width="46" height="46" class="me-2 rounded-circle bg-white p-1 shadow-sm">
+                <img src="https://skj.ac.th/uploads/logoSchool/LogoSKJ_4.png" alt="SKJ Logo" width="46" height="46"
+                    class="me-2 rounded-circle bg-white p-1 shadow-sm">
                 <div>
-                    <h6 class="offcanvas-title text-white fw-bold mb-0" id="mobileOffcanvasDrawerLabel">SKJ Admission</h6>
-                    <small style="font-size: 0.72rem; color: rgba(255,255,255,0.92);">รร.สวนกุหลาบวิทยาลัย (จิรประวัติ)</small>
+                    <h6 class="offcanvas-title text-white fw-bold mb-0" id="mobileOffcanvasDrawerLabel">SKJ Admission
+                    </h6>
+                    <small style="font-size: 0.72rem; color: rgba(255,255,255,0.92);">รร.สวนกุหลาบวิทยาลัย
+                        (จิรประวัติ)</small>
                 </div>
             </div>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
         </div>
 
         <div class="offcanvas-body p-3 d-flex flex-column justify-content-between">
             <div class="list-group list-group-flush gap-1">
-                <a href="<?= base_url('new-admission') ?>" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= (uri_string() == '' || uri_string() == 'new-admission') ? 'active' : '' ?>">
+                <a href="<?= base_url('new-admission') ?>"
+                    class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= (uri_string() == '' || uri_string() == 'new-admission') ? 'active' : '' ?>">
                     <i class='bx bx-home-alt fs-5 me-3 text-primary'></i> หน้าแรกรับสมัคร
                 </a>
 
-                <div class="small fw-bold text-uppercase text-muted px-3 mt-3 mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">สมัครเรียนออนไลน์</div>
-                
+                <div class="small fw-bold text-uppercase text-muted px-3 mt-3 mb-1"
+                    style="font-size: 0.72rem; letter-spacing: 0.5px;">สมัครเรียนออนไลน์</div>
+
                 <?php if ($is_system_open && !empty($open_levels)): ?>
-                    <?php foreach ($open_levels as $l_num): 
+                    <?php foreach ($open_levels as $l_num):
                         $is_jr = $l_num <= 3;
                         $l_icon = $is_jr ? 'bx-user' : 'bx-award';
                         $l_color = $is_jr ? '#e11d48' : '#0284c7';
-                    ?>
-                    <a href="<?= base_url('new-admission/pre-check/' . $l_num . '?level=' . $l_num) ?>" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= (strpos(uri_string(), 'pre-check/' . $l_num) !== false || strpos(uri_string(), 'register/' . $l_num) !== false) ? 'active' : '' ?>">
-                        <i class='bx <?= $l_icon ?> fs-5 me-3' style="color: <?= $l_color ?>;"></i> สมัครระดับชั้น ม.<?= $l_num ?>
-                    </a>
+                        ?>
+                        <a href="<?= base_url('new-admission/pre-check/' . $l_num . '?level=' . $l_num) ?>"
+                            class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= (strpos(uri_string(), 'pre-check/' . $l_num) !== false || strpos(uri_string(), 'register/' . $l_num) !== false) ? 'active' : '' ?>">
+                            <i class='bx <?= $l_icon ?> fs-5 me-3' style="color: <?= $l_color ?>;"></i> สมัครระดับชั้น
+                            ม.<?= $l_num ?>
+                        </a>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="px-3 py-2 text-muted small d-flex align-items-center"><i class='bx bx-lock-alt me-2 text-danger fs-5'></i> ปิดรับสมัครในขณะนี้</div>
+                    <div class="px-3 py-2 text-muted small d-flex align-items-center"><i
+                            class='bx bx-lock-alt me-2 text-danger fs-5'></i> ปิดรับสมัครในขณะนี้</div>
                 <?php endif; ?>
 
-                <div class="small fw-bold text-uppercase text-muted px-3 mt-3 mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">บริการและตรวจสอบ</div>
+                <div class="small fw-bold text-uppercase text-muted px-3 mt-3 mb-1"
+                    style="font-size: 0.72rem; letter-spacing: 0.5px;">บริการและตรวจสอบ</div>
 
-                <a href="<?= base_url('new-admission/status') ?>" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'new-admission/status' ? 'active' : '' ?>">
+                <a href="<?= base_url('new-admission/status') ?>"
+                    class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'new-admission/status' ? 'active' : '' ?>">
                     <i class='bx bx-search-alt fs-5 me-3 text-primary'></i> ตรวจสอบสถานะการสมัคร
                 </a>
-                <a href="<?= base_url('new-admission/announcements') ?>" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= strpos(uri_string(), 'announcements') !== false ? 'active' : '' ?>">
+                <a href="<?= base_url('new-admission/announcements') ?>"
+                    class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= strpos(uri_string(), 'announcements') !== false ? 'active' : '' ?>">
                     <i class='bx bx-news fs-5 me-3 text-warning'></i> ประกาศผลการคัดเลือก
                 </a>
-                <a href="<?= base_url('new-admission/statistics') ?>" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'new-admission/statistics' ? 'active' : '' ?>">
+                <a href="<?= base_url('new-admission/statistics') ?>"
+                    class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'new-admission/statistics' ? 'active' : '' ?>">
                     <i class='bx bx-bar-chart-alt-2 fs-5 me-3 text-success'></i> สถิติยอดผู้สมัคร
                 </a>
-                <a href="<?= $is_confirmation_open ? base_url('confirmation/login') : 'javascript:void(0);' ?>" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'confirmation/login' ? 'active' : '' ?> <?= !$is_confirmation_open ? 'disabled-link' : '' ?>">
+                <a href="<?= $is_confirmation_open ? base_url('confirmation/login') : 'javascript:void(0);' ?>"
+                    class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'confirmation/login' ? 'active' : '' ?> <?= !$is_confirmation_open ? 'disabled-link' : '' ?>">
                     <i class='bx bx-user-check fs-5 me-3 text-info'></i> รายงานตัวออนไลน์
                 </a>
 
-                <div class="small fw-bold text-uppercase text-muted px-3 mt-3 mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">คู่มือและติดต่อ</div>
+                <div class="small fw-bold text-uppercase text-muted px-3 mt-3 mb-1"
+                    style="font-size: 0.72rem; letter-spacing: 0.5px;">คู่มือและติดต่อ</div>
 
-                <a href="<?= base_url('new-admission/manual') ?>" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'new-admission/manual' ? 'active' : '' ?>">
+                <a href="<?= base_url('new-admission/manual') ?>"
+                    class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'new-admission/manual' ? 'active' : '' ?>">
                     <i class='bx bx-book-open fs-5 me-3 text-secondary'></i> คู่มือการสมัคร
                 </a>
-                <a href="<?= base_url('new-admission/manual-report') ?>" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'new-admission/manual-report' ? 'active' : '' ?>">
+                <a href="<?= base_url('new-admission/manual-report') ?>"
+                    class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'new-admission/manual-report' ? 'active' : '' ?>">
                     <i class='bx bx-file-blank fs-5 me-3 text-secondary'></i> คู่มือการรายงานตัว
                 </a>
-                <a href="<?= base_url('contact') ?>" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'contact' ? 'active' : '' ?>">
+                <a href="<?= base_url('contact') ?>"
+                    class="list-group-item list-group-item-action d-flex align-items-center rounded-3 py-2 px-3 fw-bold <?= uri_string() == 'contact' ? 'active' : '' ?>">
                     <i class='bx bx-support fs-5 me-3 text-primary'></i> ติดต่อสอบถาม / FAQs
                 </a>
             </div>
 
             <div class="pt-3 border-top mt-3">
-                <a href="<?= base_url('auth/login') ?>" class="btn btn-outline-primary w-100 rounded-pill py-2 fw-bold d-flex align-items-center justify-content-center">
+                <a href="<?= base_url('auth/login') ?>"
+                    class="btn btn-outline-primary w-100 rounded-pill py-2 fw-bold d-flex align-items-center justify-content-center">
                     <i class='bx bx-lock-alt me-2'></i> เจ้าหน้าที่เข้าสู่ระบบ
                 </a>
             </div>
         </div>
     </div>
-
-    <!-- Live Chat Widget (Connected with Telegram) -->
-    <?= view('User/Components/ChatWidget') ?>
 
     <!-- Core JS -->
     <script src="<?= base_url('public/sneat-assets/vendor/libs/jquery/jquery.js') ?>"></script>
@@ -1420,6 +1488,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <?= $this->renderSection('scripts') ?>
+    <!-- SKJ Live Chat Widget -->
+    <script src="https://chat.skj.ac.th/public/assets/js/skj-chat-widget.js?v=1.7"
+        data-chat-server="https://chat.skj.ac.th" data-school-name="โรงเรียนสวนกุหลาบวิทยาลัย (จิรประวัติ) นครสวรรค์"
+        data-primary-color="#e91e63" async></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const disabledLinks = document.querySelectorAll('.disabled-link');
@@ -1460,14 +1532,14 @@
                     title: '<div class="fw-bold text-dark fs-5"><i class="bx bx-select-multiple text-primary me-2"></i> เลือกระดับชั้นที่ต้องการสมัคร</div>',
                     html: `
                         <div class="d-flex flex-column gap-2 my-2 text-start">
-                            <?php foreach ($open_levels as $l_num): 
+                            <?php foreach ($open_levels as $l_num):
                                 $is_jr = $l_num <= 3;
                                 $bg_tint = $is_jr ? 'rgba(225, 29, 72, 0.04)' : 'rgba(2, 132, 199, 0.04)';
                                 $bd_tint = $is_jr ? 'rgba(225, 29, 72, 0.2)' : 'rgba(2, 132, 199, 0.2)';
                                 $bg_icon = $is_jr ? '#e11d48' : '#0284c7';
                                 $icon_cls = $is_jr ? 'bx-user' : 'bx-award';
                                 $sub_desc = $is_jr ? ($l_num == 1 ? 'สำหรับนักเรียนจบ ป.6 หรือเทียบเท่า' : 'ระดับมัธยมศึกษาตอนต้น') : ($l_num == 4 ? 'สำหรับนักเรียนจบ ม.3 หรือเทียบเท่า' : 'ระดับมัธยมศึกษาตอนปลาย');
-                            ?>
+                                ?>
                             <button type="button" onclick="Swal.close(); showPdpaAgreementSwal('<?= base_url('new-admission/pre-check/' . $l_num . '?level=' . $l_num) ?>');" class="btn p-3 text-start d-flex align-items-center justify-content-between rounded-3 border w-100" style="background: <?= $bg_tint ?>; border-color: <?= $bd_tint ?> !important;">
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 42px; height: 42px; background: <?= $bg_icon ?>; color: white;">
@@ -1551,7 +1623,7 @@
     </script>
     <script>
         $(document).ready(function () {
-            $('form:not(.ajax-form):not(#skjUserChatForm)').on('submit', function (e) {
+            $('form:not(.ajax-form)').on('submit', function (e) {
                 if (e.isDefaultPrevented()) return;
                 var $form = $(this);
                 if ($form[0].checkValidity()) {
