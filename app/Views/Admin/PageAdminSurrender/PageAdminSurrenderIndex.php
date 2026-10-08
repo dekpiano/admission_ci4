@@ -242,14 +242,26 @@
 </div>
 
 <?php
-// Filter only students who passed selection or quiz
+// Filter students who are eligible for confirmation & surrender:
+// 1. Passed exam/quiz (recruit_StatusQuiz = 'สอบผ่าน' / 'ผ่านการคัดเลือก' / 'ผ่าน')
+// 2. Passed talent/sport selection (recruit_sportSelectionResult = 'ผ่านการคัดเลือก' / 'ผ่าน')
+// 3. Approved application status by staff (recruit_status = 'ผ่านการตรวจสอบ' / 'อนุมัติ' / 'ผ่าน')
+// 4. Online confirmed (stu_UpdateConfirm not empty)
+// 5. Surrendered (recruit_statusSurrender not empty) or Final Enrolled (recruit_statusFinal = 'เสร็จสิ้น')
 $eligibleStudents = array_values(array_filter($students ?? [], function($student) {
-    $statusQuiz = $student->recruit_StatusQuiz ?? '';
+    $statusQuiz = trim($student->recruit_StatusQuiz ?? '');
+    $statusSport = trim($student->recruit_sportSelectionResult ?? '');
+    $statusRecruit = trim($student->recruit_status ?? '');
     $isSurrendered = !empty($student->recruit_statusSurrender ?? '');
-    $isFinal = ($student->recruit_statusFinal ?? '') == 'เสร็จสิ้น';
+    $isFinal = trim($student->recruit_statusFinal ?? '') == 'เสร็จสิ้น';
+    $isConfirmed = !empty($student->stu_UpdateConfirm);
     
-    // แสดงเฉพาะผู้ที่ผ่านการคัดเลือก หรือผู้ที่ได้มอบตัว/อนุมัติเป็นนักเรียนแล้ว
-    return $statusQuiz == 'ผ่านการคัดเลือก' || $statusQuiz == 'สอบผ่าน' || $isSurrendered || $isFinal;
+    $isQuizPassed = in_array($statusQuiz, ['ผ่านการคัดเลือก', 'สอบผ่าน', 'ผ่าน']);
+    $isSportPassed = in_array($statusSport, ['ผ่านการคัดเลือก', 'ผ่าน']);
+    $isRecruitApproved = in_array($statusRecruit, ['ผ่านการตรวจสอบ', 'อนุมัติ', 'ผ่าน']);
+    
+    // แสดงเฉพาะผู้ที่ผ่านการคัดเลือก หรือเจ้าหน้าที่อนุมัติแล้ว หรือรายงานตัวแล้ว/มอบตัวแล้ว
+    return $isQuizPassed || $isSportPassed || $isRecruitApproved || $isSurrendered || $isFinal || $isConfirmed;
 }));
 
 // Calculate stats
@@ -427,7 +439,7 @@ $pendingConfirmCount = max(0, $totalEligible - $confirmedCount);
                                 <!-- Avatar -->
                                 <td class="text-center">
                                     <img src="<?= $imgSrc ?>" class="recruit-avatar" alt="Avatar" loading="lazy"
-                                        onerror="this.onerror=null;this.src='<?= base_url('public/sneat-assets/img/avatars/1.png') ?>';">
+                                        onerror="this.onerror=null;this.src='<?= base_url('sneat-assets/img/avatars/1.png') ?>';">
                                 </td>
 
                                 <!-- Applicant Info -->

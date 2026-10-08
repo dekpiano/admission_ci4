@@ -169,16 +169,9 @@ if (!function_exists('get_recruit_file_url')) {
             return base_url('uploads/' . $fullPath);
         }
 
-        // 2. กรณีพิเศษ: หากต้องการลิงก์ตรง (ข้าม Proxy)
-        if ($forceDirect) {
-            $baseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
-            return rtrim($baseUrl, '/') . '/' . $subPath;
-        }
-
-        // 3. ใช้ Image Proxy เป็นตัวช่วยหลัก (สำรองกรณีโดเมนหลักล่ม)
-        // Proxy จะไปหาไฟล์จากทั้ง Local และ IP Server ให้เองโดยอัตโนมัติ
-        // และจะส่งกลับมาเป็น HTTPS ทำให้ไม่มีปัญหา Mixed Content ครับ
-        return base_url("image-proxy?file=" . urlencode($subPath));
+        // 2. ใช้ Direct Remote URL จากเซิร์ฟเวอร์หลัก (โหลดตรงผ่าน Static Web Server ได้เร็วกว่า ไม่กิน PHP Worker)
+        $baseUrl = getenv('upload.server.baseurl') ?: "https://skj.nsnpao.go.th/uploads/admission/";
+        return rtrim($baseUrl, '/') . '/' . $subPath;
     }
 }
 

@@ -60,10 +60,10 @@ class AdminControlSurrender extends BaseController
         $data['title'] = 'ข้อมูลการรายงานตัว';
 
         $builder = $this->db->table('tb_recruitstudent');
-        $builder->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials, tb_course.course_fullname, tb_course.course_branch, skjacth_personnel.tb_students.stu_UpdateConfirm');
+        $builder->select('tb_recruitstudent.*, tb_quota.quota_explain, tb_course.course_initials, tb_course.course_fullname, tb_course.course_branch, MAX(skjacth_personnel.tb_students.stu_UpdateConfirm) AS stu_UpdateConfirm');
         $builder->join('tb_quota', 'tb_quota.quota_id = tb_recruitstudent.recruit_category', 'left');
         $builder->join('tb_course', 'tb_course.course_id = tb_recruitstudent.recruit_tpyeRoom_id', 'left');
-        $builder->join('skjacth_personnel.tb_students', 'REPLACE(tb_recruitstudent.recruit_idCard, "-", "") = REPLACE(skjacth_personnel.tb_students.stu_iden, "-", "")', 'left');
+        $builder->join('skjacth_personnel.tb_students', 'REPLACE(REPLACE(TRIM(tb_recruitstudent.recruit_idCard), "-", ""), " ", "") = REPLACE(REPLACE(TRIM(skjacth_personnel.tb_students.stu_iden), "-", ""), " ", "")', 'left');
         $builder->where('recruit_year', $year);
         $builder->groupBy('tb_recruitstudent.recruit_id');
         $builder->orderBy('recruit_id', 'DESC');
@@ -142,25 +142,22 @@ class AdminControlSurrender extends BaseController
         $studentId = $recruit[0]->recruit_idCard;
         $Year = $recruit[0]->recruit_year;
 
-        $plainStudentId = str_replace('-', '', $studentId);
+        $plainStudentId = str_replace('-', '', trim($studentId));
         $formattedStudentId = (strlen($plainStudentId) == 13) 
             ? substr($plainStudentId, 0, 1) . '-' . substr($plainStudentId, 1, 4) . '-' . substr($plainStudentId, 5, 5) . '-' . substr($plainStudentId, 10, 2) . '-' . substr($plainStudentId, 12, 1) 
             : $studentId;
 
         // Fetch Confirmation Data (tb_students) supporting both plain and formatted citizen IDs
-        $confrim = $this->db->table('skjacth_personnel.tb_students')
+        $builder = $this->db->table('skjacth_personnel.tb_students');
+        $confrim = $builder
             ->groupStart()
                 ->where('stu_iden', $plainStudentId)
                 ->orWhere('stu_iden', $formattedStudentId)
                 ->orWhere('stu_iden', $studentId)
+                ->orWhere('REPLACE(REPLACE(TRIM(stu_iden), "-", ""), " ", "") =', $plainStudentId)
             ->groupEnd()
+            ->orderBy('stu_id', 'DESC')
             ->get()->getResult();
-
-        if (empty($confrim)) {
-            $confrim = $this->db->table('skjacth_personnel.tb_students')
-                ->where('REPLACE(stu_iden, "-", "") =', $plainStudentId)
-                ->get()->getResult();
-        }
 
         if (empty($confrim)) {
             return "ไม่พบข้อมูลการรายงานตัว กรุณาให้นักเรียนกรอกข้อมูลรายงานตัวก่อน";

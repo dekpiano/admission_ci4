@@ -24,6 +24,11 @@ class ImageProxy extends BaseController
             return $this->response->setStatusCode(400)->setBody('Missing file parameter');
         }
 
+        // หากเป็น default.png ให้ส่งรูป default ทันทีโดยไม่ต้อง request remote
+        if (basename($fileName) === 'default.png' || basename($fileName) === 'default-user.png') {
+            return $this->serveDefaultAvatar();
+        }
+
         $debugInfo = [];
 
         // 1. ตรวจสอบ Local ก่อน
@@ -32,8 +37,8 @@ class ImageProxy extends BaseController
             return $localResult;
         }
 
-        // 2. ลอง Remote servers
-        $servers = [$this->primaryServer, $this->fallbackServer];
+        // 2. ลอง Remote servers (ตัดตัวซ้ำ)
+        $servers = array_unique(array_filter([$this->primaryServer, $this->fallbackServer]));
         
         foreach ($servers as $server) {
             $result = $this->fetchFromServer($server, $fileName, $debugInfo);
@@ -41,9 +46,6 @@ class ImageProxy extends BaseController
                 return $result;
             }
         }
-        
-        // ทั้ง Local และ Remote ไม่พบ
-        log_message('error', "ImageProxy: File not found anywhere: {$fileName} | Debug: " . json_encode($debugInfo));
         
         // หากเปิด debug mode โดยส่ง ?debug=1 มา ค่อยแสดง JSON
         if ($this->request->getVar('debug') === '1') {
@@ -56,7 +58,29 @@ class ImageProxy extends BaseController
                 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         }
 
+        // 3. ถ้าเป็นไฟล์รูปภาพ (jpg, png, webp, etc.) ให้ส่งรูป Fallback Avatar เพื่อไม่ให้เกิด Error 404 / 508 ในหน้าเว็บ
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', ''])) {
+            return $this->serveDefaultAvatar();
+        }
+
         return $this->response->setStatusCode(404)->setBody('File not found.');
+    }
+
+    protected function serveDefaultAvatar()
+    {
+        $defaultAvatarPath = FCPATH . 'sneat-assets/img/avatars/1.png';
+        if (file_exists($defaultAvatarPath)) {
+            $body = file_get_contents($defaultAvatarPath);
+            return $this->response
+                ->setStatusCode(200)
+                ->setHeader('Content-Type', 'image/png')
+                ->setHeader('Cache-Control', 'public, max-age=86400')
+                ->setHeader('X-Source', 'default-avatar')
+                ->setBody($body);
+        }
+
+        return $this->response->setStatusCode(404)->setBody('Default avatar not found.');
     }
     
     protected function fetchFromLocal(string $fileName, array &$debugInfo)
